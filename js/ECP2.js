@@ -602,3 +602,25 @@ ECP2.teq=function(b,c)
 	return ((x>>31)&1);
 };
 
+/**
+ * Get a generator in G2.
+ * 
+ * @return {ECP2} generator in G2
+ */
+ECP2.getGenerator = function() {
+	var Q = new ECP2();
+	var Qx = new FP2(0), Qy = new FP2(0);
+
+	var a = new BIG(0), b = new BIG(0);
+
+	a.rcopy(ROM.CURVE_Pxa);
+	b.rcopy(ROM.CURVE_Pxb);
+	Qx.bset(a, b);
+
+	a.rcopy(ROM.CURVE_Pya);
+	b.rcopy(ROM.CURVE_Pyb);
+	Qy.bset(a, b);
+
+	Q.setxy(Qx, Qy);
+	return Q;
+};
