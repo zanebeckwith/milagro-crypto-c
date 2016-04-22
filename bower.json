@@ -21,7 +21,7 @@
 		"js/FP12.js",
 		"js/PAIR.js",
 		"js/MPIN.js",
-		"js/MPINAuth.js"
+		"js/MPINAuth.js",
 		"js/eMPINAuth.js"
 	],
 	"ignore": [
