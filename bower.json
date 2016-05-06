@@ -12,7 +12,7 @@
 		"js/HASH.js",
 		"js/RAND.js",
 		"js/AES.js",
-		"js/GPM.js",
+		"js/GCM.js",
 		"js/UTILS.js",	
 		"js/ECP.js",
 		"js/FP2.js",
