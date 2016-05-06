@@ -31,7 +31,7 @@ under the License.
 function isBytes(bytes) {
 	function isByte(num) {
 		// is Integer s.t. 0 <= num < 256?
-		if ((!Number.isInteger(num)) || (num < 0) || (256 <= num)) {
+		if (!(typeof(num) === 'number') || !(Math.round(num) === num) || (num < 0) || (256 <= num)) {
 			return false;
 		} else {
 			return true;
@@ -54,7 +54,7 @@ function isBytes(bytes) {
  */
 function uint2bytes(num) {
 	// is Unsigned Integer?
-	if ((!Number.isInteger(num)) || (num < 0)) {
+	if (!(typeof(num) === 'number') || !(Math.round(num) === num) || (num < 0)) {
 		return null;
 	}
 
