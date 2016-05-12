@@ -23,6 +23,7 @@ In order to build the documentation <a href="http://www.stack.nl/~dimitri/doxyge
 <p>The default build is for 32 bit machines</p>
 
 <ol type="disc">
+  <li>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./</li>
   <li>mkdir Release</li>
   <li>cd Release</li>
   <li>cmake ..</li>
@@ -37,6 +38,9 @@ In order to build the documentation <a href="http://www.stack.nl/~dimitri/doxyge
 <ol type="disc">
   <li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ..</li>
 </ol>
+
+<p>After install set LD_LIBRARY_PATH to where you installed the libraries and also set PYTHONPATH to where the python wrappers are installed.(see install_manifest.txt)
+</p>
 
 <h2>Uninstall software</h2>
 
