@@ -33,14 +33,15 @@ In order to build the documentation <a href="http://www.stack.nl/~dimitri/doxyge
   <li>sudo make install</li>
 </ol>
 
-<p>The build can be configured using by setting flags on the command line i.e.</p>
+<p>The build can be configured by setting flags on the command line i.e.</p>
 
 <ol type="disc">
   <li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ..</li>
 </ol>
 
-<p>After install set LD_LIBRARY_PATH to where you installed the libraries and also set PYTHONPATH to where the python wrappers are installed.(see install_manifest.txt)
-</p>
+<p>set LD_LIBRARY_PATH to where you installed the libraries (see install_manifest.txt)</p>
+
+<p>set PYTHONPATH to where the python wrappers are installed (see install_manifest.txt)</p>
 
 <h2>Uninstall software</h2>
 
