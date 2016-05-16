@@ -141,7 +141,7 @@ static void hashit(int n,octet *x,octet *h)
 
 /*! \brief Hash EC Points and Id to an integer 
  *
- *  Perform sha256 of EC Points and Id. Map to an integer modulus the 
+ *  Perform sha256 of EC Points and Id. Map to an integer modulo the 
  *  curve order
  * 
  *  <ol>
