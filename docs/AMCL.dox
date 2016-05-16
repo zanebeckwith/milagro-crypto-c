@@ -23,7 +23,7 @@
 
   \section homepage Project page
   The official project page is hosted at 
-	<a href="http://www.miracl.com/index">MIRACL Products</a>
+	<a href="http://milagro.apache.org/">Apache Milagro (incubating)</a>
 
   \section license License
 
@@ -58,9 +58,9 @@ under the License.
 
   \section downloads Downloads
 
-  The source code is available from the GIT repository:
+  The source code is available from the mirror of the Apache GIT repository:
 
-  git clone https://github.com/miracl/milagro-crypto
+  git mirror https://github.com/apache/incubator-milagro
 
   \section installonmainpage Installation
  
