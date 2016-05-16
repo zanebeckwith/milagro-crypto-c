@@ -141,7 +141,7 @@ static void hashit(int n,octet *x,octet *h)
 
 /*! \brief Hash EC Points and Id to an integer 
  *
- *  Perform sha256 of EC Points and Id. Map to an integer modulus the 
+ *  Perform sha256 of EC Points and Id. Map to an integer modulo the 
  *  curve order
  * 
  *  <ol>
@@ -153,7 +153,7 @@ static void hashit(int n,octet *x,octet *h)
  *  @param  B        EC Point
  *  @param  C        EC Point
  *  @param  D        Identity
- *  @return h        Integer
+ *  @param  h        Integer result
  */
 void WCC_Hq(octet *A,octet *B,octet *C,octet *D,octet *h)
 {
@@ -409,7 +409,7 @@ int WCC_GET_G2_PERMIT(int date,octet *S,octet *HID,octet *TPG2)
  *  @param  AKeyG1Oct   Sender key 
  *  @param  ATPG1Oct    Sender time permit 
  *  @param  IdBOct      Receiver identity
- *  @return AESKeyOct   AES key
+ *  @param  AESKeyOct   Returned AES key
  *  @return rtn         Returns 0 if successful or else an error code  
  */
 int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *PbG2Oct, octet *PgG1Oct, octet *AKeyG1Oct, octet *ATPG1Oct, octet *IdBOct, octet *AESKeyOct)
@@ -548,7 +548,7 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
  *  @param  BKeyG2Oct   Receiver key 
  *  @param  BTPG2Oct    Receiver time permit 
  *  @param  IdAOct      Sender identity
- *  @return AESKeyOct   AES key
+ *  @param  AESKeyOct   AES key returned
  *  @return rtn         Returns 0 if successful or else an error code  
  */
 int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *pibOct,  octet *PaG1Oct, octet *PgG1Oct, octet *BKeyG2Oct,octet *BTPG2Oct,  octet *IdAOct, octet *AESKeyOct)
@@ -652,8 +652,8 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
  *  @param  IV            96 bit initialization vector
  *  @param  H             Additional authenticated data (AAD). This data is authenticated, but not encrypted.
  *  @param  P             Plaintext
- *  @return C             Ciphertext. It is the same length as the plaintext.
- *  @return T             128 bit authentication tag.
+ *  @param  C             Ciphertext output. It is the same length as the plaintext.
+ *  @param  T             128-bit authentication tag output.
  */
 void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
@@ -675,8 +675,8 @@ void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
  *  @param  IV            96 bit initialization vector
  *  @param  H             Additional authenticated data (AAD). This data is authenticated, but not encrypted.
  *  @param  C             Ciphertext.
- *  @return P             Decrypted data. It is the same length as the ciphertext.Plaintext
- *  @return T             128 bit authentication tag.
+ *  @param  P             Decrypted data. It is the same length as the ciphertext.Plaintext
+ *  @param  T             128-bit authentication tag.
  */
 void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 {
@@ -725,7 +725,7 @@ void WCC_KILL_CSPRNG(csprng *RNG)
  *   Hash ID
  * 
  *   @param  ID     Value to hash
- *   @return HID    sha256 hashed value
+ *   @param  HID    sha256 hashed value
  */
 void WCC_HASH_ID(octet *ID,octet *HID)
 {
@@ -737,7 +737,7 @@ void WCC_HASH_ID(octet *ID,octet *HID)
  *   Generate a random number modulus the group order
  * 
  *   @param  RNG    cryptographically secure random number generator
- *   @return S      Random integer modulus the group order
+ *   @param  S      Returned random integer modulus the group order
  */
 int WCC_RANDOM_GENERATE(csprng *RNG,octet* S)
 {
@@ -784,7 +784,7 @@ int WCC_GET_G1_PERMIT(int date,octet *S,octet *HID,octet *TPG1)
  *
  *   @param  R1      member of G1 
  *   @param  R2      member of G1 
- *   @return R       member of G1 = R1+R2
+ *   @param  R       returns member of G1 = R1+R2
  *   @return         Returns 0 if successful or else an error code
  */
 int WCC_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
@@ -805,8 +805,8 @@ int WCC_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
  *
  *   @param  W1      member of G2 
  *   @param  W2      member of G2 
- *   @return W       member of G2 = W1+W2
- *   @return         Weturns 0 if successful or else an error code
+ *   @param  W       returns member of G2 = W1+W2
+ *   @return         Returns 0 if successful or else an error code
  */
 int WCC_RECOMBINE_G2(octet *W1,octet *W2,octet *W)
 {
