@@ -12,7 +12,8 @@
 		"js/HASH.js",
 		"js/RAND.js",
 		"js/AES.js",
-		"js/GPM.js",
+		"js/GCM.js",
+		"js/UTILS.js",	
 		"js/ECP.js",
 		"js/FP2.js",
 		"js/ECP2.js",
@@ -20,7 +21,8 @@
 		"js/FP12.js",
 		"js/PAIR.js",
 		"js/MPIN.js",
-		"js/MPINAuth.js"
+		"js/MPINAuth.js",
+		"js/eMPINAuth.js"
 	],
 	"ignore": [
 		"**/.*",

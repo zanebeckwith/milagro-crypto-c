@@ -896,3 +896,36 @@ ECP.RHS= function(x)
 	r.reduce();
 	return r;
 };
+
+/**
+ * Map to an ECP point.
+ * 
+ * @param {byte-array}
+ *            bytes - any byte-array
+ * @return {ECP} point in G1
+ */
+ECP.mapToPoint = function(bytes) {
+	// is Array?
+	if (!Array.isArray(bytes)) {
+		return null;
+	}
+
+	var modp = new BIG(0);
+	modp.rcopy(ROM.Modulus);
+
+	var P = new ECP();
+	var Px = BIG.fromBytes(bytes);
+	Px.mod(modp);
+
+	while (true) {
+		P.setxi(Px, 0);
+		if (!P.is_infinity()) {
+			break;
+		}
+		Px.inc(1);
+		Px.norm();
+	}
+	return P;
+};
+
+

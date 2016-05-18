@@ -6,3 +6,5 @@ release
 *.pyc
 *.class
 *~
+
+js/amcl.js
