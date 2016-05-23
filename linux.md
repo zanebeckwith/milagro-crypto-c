@@ -23,25 +23,24 @@ In order to build the documentation <a href="http://www.stack.nl/~dimitri/doxyge
 <p>The default build is for 32 bit machines</p>
 
 <ol type="disc">
-  <li>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./</li>
-  <li>mkdir Release</li>
-  <li>cd Release</li>
+  <li>mkdir release</li>
+  <li>cd release</li>
   <li>cmake ..</li>
   <li>make</li>
   <li>make test</li>
   <li>make doc</li>
-  <li>sudo make install</li>
+  <li>sudo make install<br />
+  <em>On Debian/Ubuntu machine instead of executing the "sudo make install" it is possible to execute the "sudo checkinstall" to build and install a DEB package.</em></li>
 </ol>
 
-<p>The build can be configured by setting flags on the command line i.e.</p>
+
+
+<p>The build can be configured by setting flags on the command line, for example:</p>
 
 <ol type="disc">
-  <li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ..</li>
+  <li>cmake -DWORD_LENGTH=64 ..</li>
+  <li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on -D ..</li>
 </ol>
-
-<p>set LD_LIBRARY_PATH to where you installed the libraries (see install_manifest.txt)</p>
-
-<p>set PYTHONPATH to where the python wrappers are installed (see install_manifest.txt)</p>
 
 <h2>Uninstall software</h2>
 
