@@ -128,7 +128,7 @@ int main()
   csprng RNG;
 #ifdef __linux__
   fp = fopen("/dev/urandom", "r");
-  fread(&seed, 1, byte_count, fp);
+  if (fread(&seed, 1, byte_count, fp)){};
   fclose(fp);
 #else
   /* non random seed value! */
