@@ -74,7 +74,7 @@ NOTE: The default build is for 32 bit machines
     mkdir -p target/release
     cd target/release
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl ../..
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./..
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
     make
     make test
     make doc
