@@ -2,9 +2,12 @@ cmake_minimum_required (VERSION 2.8)
 project (AMCL)
 enable_testing()
 
-set(AMCL_VERSION_MAJOR "1")
-set(AMCL_VERSION_MINOR "1")
-set(AMCL_VERSION_PATCH "0")
+# Extract version from the VERSION file
+file(STRINGS VERSION VERSION_FILE_CONTENT)
+string(REPLACE "." ";" VERSION_FILE_PARTS ${VERSION_FILE_CONTENT})
+list(GET VERSION_FILE_PARTS 0 AMCL_VERSION_MAJOR)
+list(GET VERSION_FILE_PARTS 1 AMCL_VERSION_MINOR)
+list(GET VERSION_FILE_PARTS 2 AMCL_VERSION_PATCH)
 set(PROJECT_VERSION "${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
 message(STATUS "PROJECT_VERSION='${PROJECT_VERSION}'")
 message(STATUS "Generator - ${CMAKE_GENERATOR}")
@@ -66,8 +69,8 @@ message(STATUS "CURVE_TYPE='${CURVE_TYPE}'")
 # configure amcl header file to pass CMake settings
 # to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/c/amcl.h.in"
-  "${PROJECT_BINARY_DIR}/c/amcl.h"
+  "${PROJECT_SOURCE_DIR}/src/amcl.h.in"
+  "${PROJECT_BINARY_DIR}/src/amcl.h"
   )
 
 if(NOT(FIELD_CHOICE MATCHES "BN"))
@@ -84,8 +87,8 @@ if(BUILD_MPIN OR BUILD_WCC)
   message(STATUS "MPIN_RANDOM_TESTS=${MPIN_RANDOM_TESTS}")
   # Configure test variables
   configure_file (
-    "${PROJECT_SOURCE_DIR}/c/tests/config.h.in"
-    "${PROJECT_BINARY_DIR}/c/tests/config.h"
+    "${PROJECT_SOURCE_DIR}/test/config.h.in"
+    "${PROJECT_BINARY_DIR}/test/config.h"
   )
 endif(BUILD_MPIN OR BUILD_WCC)
 
@@ -98,7 +101,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Add subdirectories
-add_subdirectory (c)
+add_subdirectory (src)
 
 # Only build Python for shared libs
 if (NOT BUILD_SHARED_LIBS)
@@ -111,17 +114,17 @@ if (BUILD_PYTHON)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; from os.path import dirname; print dirname(get_python_lib())" OUTPUT_VARIABLE PYTHON_SITE_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   if((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
-    file(COPY "${PROJECT_SOURCE_DIR}/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/pythonCFFI")
-    file(RENAME "${PROJECT_BINARY_DIR}/pythonCFFI/BNCX.json" "${PROJECT_BINARY_DIR}/pythonCFFI/MPINTestVectors.json")
+    file(COPY "${PROJECT_SOURCE_DIR}/test/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/test/pythonCFFI")
+    file(RENAME "${PROJECT_BINARY_DIR}/test/pythonCFFI/BNCX.json" "${PROJECT_BINARY_DIR}/test/pythonCFFI/MPINTestVectors.json")
   endif((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
-  add_subdirectory (pythonCFFI)
+  add_subdirectory (test/pythonCFFI)
 endif (BUILD_PYTHON)
 
 # Build Documentation
 if (BUILD_DOXYGEN)
   find_package(Doxygen QUIET)
   if(DOXYGEN_FOUND)
-    add_subdirectory (docs)
+    add_subdirectory (doc)
   else(DOXYGEN_FOUND)
     message(STATUS "Doxygen not found. Documentation will not be built.")
   endif(DOXYGEN_FOUND)
@@ -141,7 +144,7 @@ add_custom_target(uninstall
 # Build a CPack driven installer package
 include (InstallRequiredSystemLibraries)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_VERSION "${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_NAME "AMCL")
 set(CPACK_PACKAGE_RELEASE 1)
 set(CPACK_PACKAGE_CONTACT "support@miracl.com")
@@ -168,11 +171,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "AMCL")
   set(CPACK_NSIS_MODIFY_PATH ON)
-  set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data\\\\icon.bmp")
-  set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data\\\\icon.ico")
-  set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/data\\\\icon.ico")
-  set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.miracl.com")
-  set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.miracl.com")
+  set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data/icon.bmp")
+  set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data/icon.ico")
+  set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/data/icon.ico")
+  set(CPACK_NSIS_HELP_LINK "http://www.miracl.com")
+  set(CPACK_NSIS_URL_INFO_ABOUT "http://www.miracl.com")
   set(CPACK_NSIS_CONTACT "support@miracl.com")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
