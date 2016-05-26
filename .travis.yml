@@ -1,0 +1,46 @@
+language: clang
+
+sudo: required
+dist: trusty
+
+branches:
+  except:
+    - release
+
+branches:
+  only:
+    - master
+    - develop
+
+addons:
+  apt:
+    packages:
+    - build-essential
+    - cmake
+    - gcc
+    - devscripts
+    - pbuilder
+    - strace
+    - lsof
+    - gdb
+    - valgrind
+    - python
+    - python-dev
+    - python-pip
+    - libffi-dev
+    - doxygen
+    - doxygen-latex
+
+install:
+  - pip install --user --upgrade pip
+  - pip install --user cffi
+  - export PATH=$PATH:$HOME/.local/bin
+
+script:
+  - mkdir -p target/release
+  - cd target/release
+  - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
+  - make
+  - make test
+  - make doc
