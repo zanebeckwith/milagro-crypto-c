@@ -24,7 +24,7 @@ NOTE: This product includes software developed at [The Apache Software Foundatio
 
 In order to build this library, the following packages are required:
 
-* [CMake](ttp://www.cmake.org) is required to build the source code.;
+* [CMake](https://cmake.org/) is required to build the source code.;
 * [CFFI](https://cffi.readthedocs.org/en/release-0.8/), the C Foreign Function Interface for Python is required in order to execute tests; 
 * [Doxygen](http://doxygen.org) is required to build the source code documentation.
 
