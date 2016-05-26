@@ -2,6 +2,7 @@
 
 *AMCL - Apache Milagro Crypto Library*
 
+[![Master Build Status](https://secure.travis-ci.org/tecnickcom/milagro-crypto-c.png?branch=master)](https://travis-ci.org/tecnickcom/milagro-crypto-c?branch=master)
 
 * **category**:    Library
 * **copyright**:   2016 The Apache Software Foundation
@@ -136,3 +137,8 @@ After having built the libraries you can build a Windows installer using this co
     sudo mingw32-make package
 
 In order for this to work NSSI has to have been installed
+
+
+## Docker Build
+
+The script dockerbuild.sh build, test and package this library inside a Docker container.
