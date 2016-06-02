@@ -2,12 +2,12 @@
 
 *AMCL - Apache Milagro Crypto Library*
 
-[![Master Build Status](https://secure.travis-ci.org/tecnickcom/milagro-crypto-c.png?branch=master)](https://travis-ci.org/tecnickcom/milagro-crypto-c?branch=master)
+[![Master Build Status](https://secure.travis-ci.org/miracl/milagro-crypto-c.png?branch=master)](https://travis-ci.org/miracl/milagro-crypto-c?branch=master)
 
 * **category**:    Library
 * **copyright**:   2016 The Apache Software Foundation
 * **license**:     Apache License Version 2.0, January 2004 (see LICENSE file)
-* **link**:        https://github.com/tecnickcom/milagro-crypto-c
+* **link**:        https://github.com/miracl/milagro-crypto-c
 * **introduction**: [AMCL.pdf](doc/AMCL.pdf)
 
 ## Description
