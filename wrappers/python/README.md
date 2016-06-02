@@ -5,11 +5,3 @@ To run all MPIN tests
 
 ./TestMPINInstall.py -v
 
-To run all SOK tests
-
-./TestSOKInstall.py -v
-
-To run all WCC tests
-
-./TestWCCInstall.py -v
-

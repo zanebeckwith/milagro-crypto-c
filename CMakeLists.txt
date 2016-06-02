@@ -14,7 +14,7 @@ message(STATUS "Generator - ${CMAKE_GENERATOR}")
 
 # Add options for build
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
-option (BUILD_PYTHON "Build Python" ON) 
+option (BUILD_PYTHON "Build Python" OFF) 
 option (BUILD_MPIN "Build MPIN" ON) 
 option (BUILD_WCC "Build WCC" OFF) 
 option (BUILD_DOXYGEN "Build Doxygen" ON) 
@@ -114,10 +114,10 @@ if (BUILD_PYTHON)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; from os.path import dirname; print dirname(get_python_lib())" OUTPUT_VARIABLE PYTHON_SITE_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   if((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
-    file(COPY "${PROJECT_SOURCE_DIR}/test/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/test/pythonCFFI")
-    file(RENAME "${PROJECT_BINARY_DIR}/test/pythonCFFI/BNCX.json" "${PROJECT_BINARY_DIR}/test/pythonCFFI/MPINTestVectors.json")
+    file(COPY "${PROJECT_SOURCE_DIR}/test/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
+    file(RENAME "${PROJECT_BINARY_DIR}/wrappers/python/BNCX.json" "${PROJECT_BINARY_DIR}/wrappers/python/MPINTestVectors.json")
   endif((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
-  add_subdirectory (test/pythonCFFI)
+  add_subdirectory (wrappers/python)
 endif (BUILD_PYTHON)
 
 # Build Documentation

@@ -87,77 +87,77 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-# Copy built libs to pythonCFFI which allows testing without
+# Copy built libs to wrappers/python to allow testing without
 # having to install the libs.
 if (BUILD_PYTHON AND BUILD_SHARED_LIBS)
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     if(BUILD_MPIN)
-      message(STATUS "Copy libmpin.so to pythonCFFI for testing")
+      message(STATUS "Copy libmpin.so to wrappers/python for testing")
       add_custom_command(
                   TARGET mpin
                   POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.so" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.so" "${PROJECT_BINARY_DIR}/wrappers/python/")
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
-      message(STATUS "Copy libwcc.so to pythonCFFI for testing")
+      message(STATUS "Copy libwcc.so to wrappers/python for testing")
       add_custom_command(
                   TARGET wcc
                   POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.so" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.so" "${PROJECT_BINARY_DIR}/wrappers/python/")
     endif(BUILD_WCC)  
 
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    message(STATUS "Copy libamcl.dll to pythonCFFI for testing")
+    message(STATUS "Copy libamcl.dll to wrappers/python for testing")
     add_custom_command(
                 TARGET amcl
                 POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.dll" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.dll" "${PROJECT_BINARY_DIR}/wrappers/python/")
 
     if(BUILD_MPIN)
-      message(STATUS "Copy libmpin.dll to pythonCFFI for testing")
+      message(STATUS "Copy libmpin.dll to wrappers/python for testing")
       add_custom_command(
                   TARGET mpin
                   POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.dll" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.dll" "${PROJECT_BINARY_DIR}/wrappers/python/")
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
-      message(STATUS "Copy libwcc.dll to pythonCFFI for testing")
+      message(STATUS "Copy libwcc.dll to wrappers/python for testing")
       add_custom_command(
                   TARGET wcc
                   POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.dll" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.dll" "${PROJECT_BINARY_DIR}/wrappers/python/")
     endif(BUILD_WCC)
 
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-    message(STATUS "Copy libamcl.dylib to pythonCFFI for testing")
+    message(STATUS "Copy libamcl.dylib to wrappers/python for testing")
     add_custom_command(
                 TARGET amcl
                 POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.dylib" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.dylib" "${PROJECT_BINARY_DIR}/wrappers/python/")
 
     if(BUILD_MPIN)
-      message(STATUS "Copy libmpin.dylib to pythonCFFI for testing")
+      message(STATUS "Copy libmpin.dylib to wrappers/python for testing")
       add_custom_command(
                   TARGET mpin
                   POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.dylib" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.dylib" "${PROJECT_BINARY_DIR}/wrappers/python/")
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
-      message(STATUS "Copy libwcc.dylib to pythonCFFI for testing")
+      message(STATUS "Copy libwcc.dylib to wrappers/python for testing")
       add_custom_command(
                   TARGET wcc
                   POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.dylib" "${PROJECT_BINARY_DIR}/test/pythonCFFI/")
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.dylib" "${PROJECT_BINARY_DIR}/wrappers/python/")
     endif(BUILD_WCC)  
 
 
