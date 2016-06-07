@@ -35,12 +35,12 @@ under the License.
 // #define DEBUG
 
 /* general purpose hashing functions */
-static void start_hash(hash *sha)
+static void start_hash(amcl_hash *sha)
 {
   HASH_init(sha);
 }
 
-static void add_to_hash(hash *sha,octet *x)
+static void add_to_hash(amcl_hash *sha,octet *x)
 {
   int i;
   for (i=0;i<x->len;i++)
@@ -50,7 +50,7 @@ static void add_to_hash(hash *sha,octet *x)
   }
 }
 
-static void finish_hash(hash *sha,octet *w)
+static void finish_hash(amcl_hash *sha,octet *w)
 {
   int i;
   char hh[HASH_BYTES];
@@ -118,7 +118,7 @@ static void mapit2(octet *h,ECP2 *Q)
 static void hashit(int n,octet *x,octet *h)
 {
   int i,c[4];
-  hash sha;
+  amcl_hash sha;
   char hh[HASH_BYTES];
   BIG px;
 
@@ -158,7 +158,7 @@ static void hashit(int n,octet *x,octet *h)
 void WCC_Hq(octet *A,octet *B,octet *C,octet *D,octet *h)
 {
   int i;
-  hash sha;
+  amcl_hash sha;
   char hh[HASH_BYTES];
   BIG q,hs;
 
@@ -429,7 +429,7 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
   BIG t,x,z,pia,pib;
   char ht[HASH_BYTES];
   octet HT={0,sizeof(ht),ht};
-  hash sha;
+  amcl_hash sha;
   char xpgg1[2*PFS+1];
   octet xPgG1Oct={0,sizeof(xpgg1), xpgg1};
 
@@ -568,7 +568,7 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
   BIG t,w,y,pia,pib;;
   char ht[HASH_BYTES];
   octet HT={0,sizeof(ht),ht};
-  hash sha;
+  amcl_hash sha;
   char wpag1[2*PFS+1];
   octet wPaG1Oct={0,sizeof(wpag1), wpag1};
   BIG_fromBytes(y,yOct->val);

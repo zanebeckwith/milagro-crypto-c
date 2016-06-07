@@ -33,7 +33,7 @@ under the License.
 static void hashit(octet *p,int n,octet *w)
 {
     int i,c[4];
-    hash sha;
+    amcl_hash sha;
     char hh[32];
 
     HASH_init(&sha);
