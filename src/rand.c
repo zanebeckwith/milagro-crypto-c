@@ -75,7 +75,7 @@ static void sirand(csprng* rng,unsign32 seed)
 static void fill_pool(csprng *rng)
 { /* hash down output of RNG to re-fill the pool */
     int i;
-    hash sh;
+    amcl_hash sh;
     HASH_init(&sh);
     for (i=0;i<128;i++) HASH_process(&sh,sbrand(rng));
     HASH_hash(&sh,rng->pool);
@@ -95,7 +95,7 @@ void RAND_seed(csprng *rng,int rawlen,char *raw)
     int i;
     char digest[32];
     uchar b[4];
-    hash sh;
+    amcl_hash sh;
     rng->pool_ptr=0;
     for (i=0;i<NK;i++) rng->ira[i]=0;
     if (rawlen>0)
