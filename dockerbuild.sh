@@ -38,7 +38,7 @@ RUN mkdir -p /root/C/milagro-crypto-c/target/release && \
 EOM
 
 # docker image name
-DOCKER_IMAGE_NAME="miracl/cdev"
+DOCKER_IMAGE_NAME="local/build"
 
 # build the docker container and build the project
 docker build --no-cache -t ${DOCKER_IMAGE_NAME} .
