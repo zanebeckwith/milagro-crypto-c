@@ -28,8 +28,7 @@ under the License.
 
 int main()
 {
-    int i,j=0,res;
-    int result;
+    int i,res;
 	unsigned long ran;
 	char *pp="M0ng00se";
 /* These octets are automatically protected against buffer overflow attacks */
@@ -61,6 +60,7 @@ int main()
 
     ECP_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
+//int j=0;
 //for (j=0;j<1000;j++)
 //{
     SALT.len=8;

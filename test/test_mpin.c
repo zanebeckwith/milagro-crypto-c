@@ -27,7 +27,7 @@ under the License.
 
 int main()
 {
-  int i,PIN1,PIN2,rtn,err;
+  int i,PIN1,PIN2,rtn;
 
   char id[256];
   octet ID = {0,sizeof(id),id};
@@ -68,12 +68,10 @@ int main()
   char token[2*PFS+1];
   octet TOKEN={sizeof(token),sizeof(token),token};
 
-  char ut[2*PFS+1],u[2*PFS+1];
+  char ut[2*PFS+1];
   octet UT={sizeof(ut),sizeof(ut),ut};
-  octet U={sizeof(u),sizeof(u),u};
 
-  char hid[2*PFS+1],htid[2*PFS+1];
-  octet HID={0,sizeof(hid),hid};
+  char htid[2*PFS+1];
   octet HTID={0,sizeof(htid),htid};
 
   char e[12*PFS], f[12*PFS];

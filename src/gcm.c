@@ -117,8 +117,6 @@ static void GCM_wrap(gcm *g)
 static int GCM_ghash(gcm *g,char *plain,int len)
 {
 	int i,j=0;
-	unsign32 counter;
-	uchar B[16];
 	if (g->status==GCM_ACCEPTING_HEADER) g->status=GCM_ACCEPTING_CIPHER;
 	if (g->status!=GCM_ACCEPTING_CIPHER) return 0;
 

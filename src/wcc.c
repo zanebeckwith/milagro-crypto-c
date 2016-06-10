@@ -120,7 +120,6 @@ static void hashit(int n,octet *x,octet *h)
   int i,c[4];
   amcl_hash sha;
   char hh[HASH_BYTES];
-  BIG px;
 
   HASH_init(&sha);
   if (n>0)
@@ -422,8 +421,6 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
 
   // Pairing outputs
   FP12 g;
-  char pair[12*PFS];
-  octet PAIR={0,sizeof(pair),pair};
 
   FP4 c;
   BIG t,x,z,pia,pib;
@@ -561,8 +558,6 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
 
   // Pairing outputs
   FP12 g;
-  char pair[12*PFS];
-  octet PAIR={0,sizeof(pair),pair};
 
   FP4 c;
   BIG t,w,y,pia,pib;;

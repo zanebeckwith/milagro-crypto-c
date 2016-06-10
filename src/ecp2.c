@@ -162,7 +162,6 @@ void ECP2_output(ECP2 *P)
 /* SU= 232 */
 void ECP2_outputxyz(ECP2 *P)
 {
-	FP2 x,y,z;
 	ECP2 Q;
 	if (P->inf)
 	{
@@ -467,8 +466,8 @@ static void ECP2_multiaffine(int m,ECP2 *P,FP2 *work)
 void ECP2_mul(ECP2 *P,BIG e)
 {
 /* fixed size windows */
-	int i,b,nb,m,s,ns;
-	BIG mt,t,r;
+	int i,nb,s,ns;
+	BIG mt,t;
 	ECP2 Q,W[8],C;
 	sign8 w[1+(NLEN*BASEBITS+3)/4];
 	FP2 work[8];

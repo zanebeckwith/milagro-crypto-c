@@ -44,7 +44,7 @@ static void BIG_mod2m(BIG x,int m)
 /* Arazi and Qi inversion mod 256 */
 static int invmod256(int a)
 {
-	int i,m,U,t1,t2,b,c;
+	int U,t1,t2,b,c;
 	t1=0;
 	c=(a>>1)&1;
 	t1+=c;
@@ -454,7 +454,7 @@ static void FF_karmul_lower(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,BIG t[]
 
 static void FF_karmul_upper(BIG z[],BIG x[],BIG y[],BIG t[],int n)
 { /* Calculates Most Significant upper half of x*y, given lower part */
-    int i,nd2;
+    int nd2;
 
     nd2=n/2;
 	FF_radd(z,n,x,0,x,nd2,nd2);
@@ -559,7 +559,7 @@ static void FF_reduce(BIG r[],BIG T[],BIG N[],BIG ND[],int n)
 /* r,b is of length - n */
 void FF_dmod(BIG r[],BIG a[],BIG b[],int n)
 {
-	int len,k;
+	int k;
 #ifndef C99
 	BIG m[2*FFLEN];
 	BIG x[2*FFLEN];
@@ -841,7 +841,7 @@ void FF_skspow(BIG r[],BIG x[],BIG e,BIG p[],int n)
 /* raise to an integer power - right-to-left method */
 void FF_power(BIG r[],BIG x[],int e,BIG p[],int n)
 {
-	int i,b,f=1;
+	int f=1;
 #ifndef C99
 	BIG w[FFLEN],ND[FFLEN];
 #else

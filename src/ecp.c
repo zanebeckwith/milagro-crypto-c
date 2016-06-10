@@ -509,8 +509,7 @@ int ECP_fromOctet(ECP *P,octet *W)
 void ECP_dbl(ECP *P)
 {
 #if CURVETYPE==WEIERSTRASS
-	int i;
-	BIG one,s1,s2;
+	BIG one;
 	BIG w1,w7,w8,w2,w3,w6;
 	if (ECP_isinf(P)) return;
 
@@ -832,7 +831,7 @@ static void ECP_multiaffine(int m,ECP P[],BIG work[])
 /* constant time multiply by small integer of length bts - use ladder */
 void ECP_pinmul(ECP *P,int e,int bts)
 {
-	int nb,i,b;
+	int i,b;
 	ECP R0,R1;
 
 	ECP_affine(P);
@@ -890,7 +889,7 @@ void ECP_mul(ECP *P,BIG e)
 
 #else
 /* fixed size windows */
-	int i,b,nb,m,s,ns;
+	int i,nb,s,ns;
 	BIG mt,t;
 	ECP Q,W[8],C;
 	sign8 w[1+(NLEN*BASEBITS+3)/4];
