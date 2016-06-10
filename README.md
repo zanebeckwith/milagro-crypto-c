@@ -72,8 +72,8 @@ NOTE: The default build is for 32 bit machines
 
     git clone https://github.com/miracl/milagro-crypto-c
     cd milagro-crypto-c
-    mkdir -p target/release
-    cd target/release
+    mkdir -p target/build
+    cd target/build
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl ../..
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
     make
@@ -110,8 +110,8 @@ Start a command prompt as an administrator
 
     git clone https://github.com/miracl/milagro-crypto-c
     cd milagro-crypto-c
-    mkdir -p target/release
-    cd target/release
+    mkdir -p target/build
+    cd target/build
     cmake -G "MinGW Makefiles" ../..
     mingw32-make
     mingw32-make test
@@ -142,3 +142,8 @@ In order for this to work NSSI has to have been installed
 ## Docker Build
 
 The script dockerbuild.sh build, test and package this library inside a Docker container.
+
+## Code Coverage
+
+The default build in Docker and TravisCI generates a test coverage report in HTML format:
+* target/build/index.html
