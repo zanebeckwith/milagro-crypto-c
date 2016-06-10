@@ -13,7 +13,7 @@ message(STATUS "PROJECT_VERSION='${PROJECT_VERSION}'")
 message(STATUS "Generator - ${CMAKE_GENERATOR}")
 
 # Add options for build
-option (BUILD_COVERAGE "Enable test coverage build flags" ON)
+option (BUILD_COVERAGE "Enable test coverage build flags" OFF)
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 option (BUILD_PYTHON "Build Python" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
