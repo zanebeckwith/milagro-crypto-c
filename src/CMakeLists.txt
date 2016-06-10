@@ -1,14 +1,8 @@
-# Create AMCL library and examples
+# Create AMCL library
 
-# add the binary tree directory to the search path for include files and linking
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+# Add the binary tree directory to the search path for linking and include files
 link_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-
-# post build: mv amcl_.h amcl.h
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/amcl.h")
-  file(RENAME amcl.h amcl_.h)
-endif()
-file(COPY DLLDefines.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
 
 set(SOURCES_AMCL
 big.c
@@ -41,10 +35,9 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # Build libmpin
 if(BUILD_MPIN)
+  message(STATUS "Build MPIN")
   add_library(mpin ${LIB_TYPE} pair.c mpin.c utils.c)
   target_link_libraries (mpin amcl) 
-  add_executable (testmpin testmpin.c)
-  target_link_libraries (testmpin mpin) 
 endif(BUILD_MPIN)
 
 # Build libwcc
@@ -52,13 +45,17 @@ if(BUILD_WCC)
   message(STATUS "Build WCC")
   add_library(wcc ${LIB_TYPE} pair.c wcc.c utils.c)
   target_link_libraries (wcc amcl) 
-  add_executable (testwcc testwcc.c)
-  add_executable (testwcc_tp testwcc_tp.c)
-  add_executable (testwcc_dta testwcc_dta.c)
-  target_link_libraries (testwcc wcc) 
-  target_link_libraries (testwcc_tp wcc) 
-  target_link_libraries (testwcc_dta wcc) 
 endif(BUILD_WCC)
+
+# Build libecdh
+message(STATUS "Build ECDH")
+add_library(ecdh ${LIB_TYPE} ecdh.c)
+target_link_libraries (ecdh amcl) 
+
+# Build librsa
+message(STATUS "Build RSA")
+add_library(rsa ${LIB_TYPE} rsa.c)
+target_link_libraries (rsa amcl) 
 
 # Copy built libs to test which allows testing without
 # having to install the libs.
@@ -166,126 +163,27 @@ if (BUILD_PYTHON AND BUILD_SHARED_LIBS)
 
 endif (BUILD_PYTHON AND BUILD_SHARED_LIBS)
 
-# Example programs
-add_executable (testecm testecm.c ecdh.c)
-add_executable (testecdh testecdh.c ecdh.c)
-add_executable (testrsa testrsa.c rsa.c)
-target_link_libraries (testecm amcl) 
-target_link_libraries (testecdh amcl) 
-target_link_libraries (testrsa amcl) 
-
-add_subdirectory (../test "${CMAKE_CURRENT_BINARY_DIR}/../test")
-
 # Install libs and headers
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  install(DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_WRITE GROUP_READ
-          WORLD_WRITE WORLD_READ WORLD_EXECUTE)
-  install (TARGETS amcl DESTINATION lib PERMISSIONS
+install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_WRITE GROUP_READ
+        WORLD_WRITE WORLD_READ WORLD_EXECUTE)
+install (TARGETS amcl DESTINATION lib PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
+
+if(BUILD_MPIN)
+  install (TARGETS mpin DESTINATION lib PERMISSIONS
           OWNER_WRITE OWNER_READ OWNER_EXECUTE
           GROUP_READ GROUP_EXECUTE
           WORLD_READ WORLD_EXECUTE)
-  install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION include PERMISSIONS
+endif(BUILD_MPIN)
+
+if(BUILD_WCC)
+  install (TARGETS wcc DESTINATION lib PERMISSIONS
           OWNER_WRITE OWNER_READ OWNER_EXECUTE
           GROUP_READ GROUP_EXECUTE
           WORLD_READ WORLD_EXECUTE)
-  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/utils.h DESTINATION include PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
-  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/DLLDefines.h DESTINATION include PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
+endif(BUILD_WCC)
 
-  if(BUILD_MPIN)
-    install (TARGETS mpin DESTINATION lib PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/mpin.h DESTINATION include PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-  endif(BUILD_MPIN)
-  
-  if(BUILD_WCC)
-    install (TARGETS wcc DESTINATION lib PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/wcc.h DESTINATION include PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-  endif(BUILD_WCC)
-
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  # Windows specific code
-  install (TARGETS amcl DESTINATION lib)
-  install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION lib)
-  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/utils.h DESTINATION lib)
-  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/DLLDefines.h DESTINATION lib)
-  
-  if(BUILD_MPIN)
-    install (TARGETS mpin DESTINATION lib)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/mpin.h DESTINATION lib)
-  endif(BUILD_MPIN)
-  
-  if(BUILD_WCC)
-    install (TARGETS wcc DESTINATION lib)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/wcc.h DESTINATION lib)
-  endif(BUILD_WCC)
-
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  # Mac OS X specific code
-  install(DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_WRITE GROUP_READ
-          WORLD_WRITE WORLD_READ WORLD_EXECUTE)
-  install (TARGETS amcl DESTINATION lib PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
-  install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION include PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
-  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/utils.h DESTINATION include PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
-  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/DLLDefines.h DESTINATION include PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
-
-  if(BUILD_MPIN)
-    install (TARGETS mpin DESTINATION lib PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/mpin.h DESTINATION include PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-  endif(BUILD_MPIN)
-
-  if(BUILD_WCC)
-    install (TARGETS wcc DESTINATION lib PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/wcc.h DESTINATION include PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE)
-  endif(BUILD_WCC)
-
-
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

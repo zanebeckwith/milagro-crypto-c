@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (AMCL)
-enable_testing()
+
+# enable testing
+enable_testing ()
 
 # Extract version from the VERSION file
 file(STRINGS VERSION VERSION_FILE_CONTENT)
@@ -69,8 +71,8 @@ message(STATUS "CURVE_TYPE='${CURVE_TYPE}'")
 # configure amcl header file to pass CMake settings
 # to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/src/amcl.h.in"
-  "${PROJECT_BINARY_DIR}/src/amcl.h"
+  "${PROJECT_SOURCE_DIR}/include/amcl.h.in"
+  "${PROJECT_BINARY_DIR}/include/amcl.h"
   )
 
 if(NOT(FIELD_CHOICE MATCHES "BN"))
@@ -87,8 +89,8 @@ if(BUILD_MPIN OR BUILD_WCC)
   message(STATUS "MPIN_RANDOM_TESTS=${MPIN_RANDOM_TESTS}")
   # Configure test variables
   configure_file (
-    "${PROJECT_SOURCE_DIR}/test/config.h.in"
-    "${PROJECT_BINARY_DIR}/test/config.h"
+    "${PROJECT_SOURCE_DIR}/include/config.h.in"
+    "${PROJECT_BINARY_DIR}/include/config.h"
   )
 endif(BUILD_MPIN OR BUILD_WCC)
 
@@ -101,7 +103,10 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Add subdirectories
-add_subdirectory (src)
+add_subdirectory(include)
+add_subdirectory(src)
+add_subdirectory(examples)
+add_subdirectory(test)
 
 # Only build Python for shared libs
 if (NOT BUILD_SHARED_LIBS)
@@ -114,7 +119,7 @@ if (BUILD_PYTHON)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; from os.path import dirname; print dirname(get_python_lib())" OUTPUT_VARIABLE PYTHON_SITE_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   if((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
-    file(COPY "${PROJECT_SOURCE_DIR}/test/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
+    file(COPY "${PROJECT_SOURCE_DIR}/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
     file(RENAME "${PROJECT_BINARY_DIR}/wrappers/python/BNCX.json" "${PROJECT_BINARY_DIR}/wrappers/python/MPINTestVectors.json")
   endif((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
   add_subdirectory (wrappers/python)
