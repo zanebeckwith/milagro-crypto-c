@@ -57,6 +57,6 @@ RUN apt-get update && apt-get -y dist-upgrade && \
     apt-get update
 
 # install development packages and debugging tools
-RUN apt-get install -y wget nano vim curl rsync git screen build-essential python python-dev python-pip libffi-dev autotools-dev autoconf make cmake gcc g++ alien rpm dh-make debhelper devscripts pbuilder strace lsof gdb valgrind pkg-config doxygen doxygen-latex
+RUN apt-get install -y wget nano vim curl rsync git screen build-essential python python-dev python-pip libffi-dev autotools-dev autoconf make cmake gcc g++ alien rpm dh-make debhelper devscripts pbuilder strace lsof gdb valgrind pkg-config doxygen doxygen-latex lcov
 
 RUN pip install --upgrade pip && pip install cffi
