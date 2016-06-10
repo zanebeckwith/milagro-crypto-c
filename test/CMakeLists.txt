@@ -1,11 +1,9 @@
-# Create tests
+# Tests
 
-# add the binary tree directory to the search path for include files and linking
-include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src )
+# Add the binary tree directory to the search path for linking and include files
 link_directories (${PROJECT_BINARY_DIR}/src)
+include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
 
-# enable testing
-enable_testing ()
 
 #define a macro to simplify adding tests
 macro (do_test arg result)
@@ -22,11 +20,11 @@ if(BUILD_MPIN)
   add_executable (test_mpin_bad_pin test_mpin_bad_pin.c)
   add_executable (test_mpin_bad_token test_mpin_bad_token.c)
   add_executable (test_mpin_expired_tp test_mpin_expired_tp.c)
-  add_executable (test_mpin_tp test_mpin_tp.c config.h)
-  add_executable (test_mpin_random test_mpin_random.c config.h)
+  add_executable (test_mpin_tp test_mpin_tp.c)
+  add_executable (test_mpin_random test_mpin_random.c)
   add_executable (test_mpinfull test_mpinfull.c)
   add_executable (test_mpinfullSingle test_mpinfullSingle.c)
-  add_executable (test_mpinfull_random test_mpinfull_random.c config.h)
+  add_executable (test_mpinfull_random test_mpinfull_random.c)
   # Link the executable to the libraries
   target_link_libraries (test_mpin mpin) 
   target_link_libraries (test_mpin_sign mpin) 
@@ -68,14 +66,14 @@ if(BUILD_WCC)
 endif(BUILD_WCC)  
 
 # General tests
-add_executable (test_rsa ${PROJECT_SOURCE_DIR}/src/rsa.c test_rsa.c)
-add_executable (test_ecm ${PROJECT_SOURCE_DIR}/src/ecdh.c test_ecm.c)
-add_executable (test_ecdh ${PROJECT_SOURCE_DIR}/src/ecdh.c test_ecdh.c)
+add_executable (test_rsa test_rsa.c)
+add_executable (test_ecm test_ecm.c)
+add_executable (test_ecdh test_ecdh.c)
 add_executable (test_version test_version.c)
 # Link the executable to the libraries
-target_link_libraries (test_rsa amcl) 
-target_link_libraries (test_ecm amcl) 
-target_link_libraries (test_ecdh amcl) 
+target_link_libraries (test_rsa rsa) 
+target_link_libraries (test_ecm ecdh) 
+target_link_libraries (test_ecdh ecdh) 
 target_link_libraries (test_version amcl) 
 # tests  
 do_test (test_rsa "SUCCESS")

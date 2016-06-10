@@ -29,7 +29,7 @@ RUN rm -rf /root/C/milagro-crypto-c/target/build
 WORKDIR /root/C/milagro-crypto-c
 RUN mkdir -p /root/C/milagro-crypto-c/target/build && \
     cd target/build && \
-    cmake -D BUILD_COVERAGE=on -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. && \
+    cmake -D BUILD_COVERAGE=on -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     lcov --zerocounters --directory . && \
@@ -38,6 +38,9 @@ RUN mkdir -p /root/C/milagro-crypto-c/target/build && \
     lcov --no-checksum --directory . --capture --output-file amcl.info && \
     genhtml amcl.info && \
     make doc && \
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. && \
+    make && \
+    make test && \
     make package
 EOM
 
