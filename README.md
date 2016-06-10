@@ -25,7 +25,7 @@ NOTE: This product includes software developed at [The Apache Software Foundatio
 In order to build this library, the following packages are required:
 
 * [CMake](https://cmake.org/) is required to build the source code.;
-* [CFFI](https://cffi.readthedocs.org/en/release-0.8/), the C Foreign Function Interface for Python is required in order to execute tests; 
+* [CFFI](https://cffi.readthedocs.org/en/build-0.8/), the C Foreign Function Interface for Python is required in order to execute tests; 
 * [Doxygen](http://doxygen.org) is required to build the source code documentation.
 
 
@@ -72,8 +72,8 @@ NOTE: The default build is for 32 bit machines
 
     git clone https://github.com/miracl/milagro-crypto-c
     cd milagro-crypto-c
-    mkdir -p target/release
-    cd target/release
+    mkdir -p target/build
+    cd target/build
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl ../..
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
     make
@@ -110,8 +110,8 @@ Start a command prompt as an administrator
 
     git clone https://github.com/miracl/milagro-crypto-c
     cd milagro-crypto-c
-    mkdir -p target/release
-    cd target/release
+    mkdir -p target/build
+    cd target/build
     cmake -G "MinGW Makefiles" ../..
     mingw32-make
     mingw32-make test
@@ -142,3 +142,8 @@ In order for this to work NSSI has to have been installed
 ## Docker Build
 
 The script dockerbuild.sh build, test and package this library inside a Docker container.
+
+## Code Coverage
+
+The default build in Docker and TravisCI generates a test coverage report in HTML format:
+* target/build/index.html
