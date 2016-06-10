@@ -1,10 +1,2 @@
-Dockerfile
+/Dockerfile
 target
-release
-*.o
-*.a
-*.o.d
-*.so
-*.pyc
-*.class
-*~
