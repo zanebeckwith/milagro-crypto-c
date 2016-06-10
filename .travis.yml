@@ -38,8 +38,8 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-  - mkdir -p target/release
-  - cd target/release
+  - mkdir -p target/build
+  - cd target/build
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
