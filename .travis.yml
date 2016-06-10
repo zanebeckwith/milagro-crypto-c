@@ -40,7 +40,7 @@ install:
 script:
   - mkdir -p target/build
   - cd target/build
-  - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
+  - cmake -D BUILD_COVERAGE=on -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
   - lcov --zerocounters --directory .
