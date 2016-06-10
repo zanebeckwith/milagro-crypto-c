@@ -18,6 +18,7 @@ addons:
     - build-essential
     - cmake
     - gcc
+    - lcov
     - devscripts
     - pbuilder
     - strace
@@ -42,7 +43,11 @@ script:
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
+  - lcov --zerocounters --directory .
+  - lcov --capture --initial --directory . --output-file amcl
   - make test
+  - lcov --no-checksum --directory . --capture --output-file amcl.info
+  - genhtml amcl.info
   - make doc
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
   - make

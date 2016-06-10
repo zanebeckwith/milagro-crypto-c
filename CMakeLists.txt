@@ -15,13 +15,21 @@ message(STATUS "PROJECT_VERSION='${PROJECT_VERSION}'")
 message(STATUS "Generator - ${CMAKE_GENERATOR}")
 
 # Add options for build
+option (BUILD_COVERAGE "Enable test coverage build flags" OFF)
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
-option (BUILD_PYTHON "Build Python" OFF) 
-option (BUILD_MPIN "Build MPIN" ON) 
-option (BUILD_WCC "Build WCC" OFF) 
-option (BUILD_DOXYGEN "Build Doxygen" ON) 
+option (BUILD_PYTHON "Build Python" OFF)
+option (BUILD_MPIN "Build MPIN" ON)
+option (BUILD_WCC "Build WCC" OFF)
+option (BUILD_DOXYGEN "Build Doxygen" ON)
 option (USE_PATENTS "Use alleged patents" ON)
 option (USE_ANONYMOUS "Anonymous authenticaion for M-Pin Full" OFF)
+
+# set build flags to generate test coverage data
+if (BUILD_COVERAGE)
+  set(CMAKE_CXX_FLAGS "-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage")
+  set(CMAKE_C_FLAGS "-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
+  set(CMAKE_SHARED_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+endif (BUILD_COVERAGE)
 
 # Allow the developer to select if Dynamic or Static libraries are built
 # Set the default LIB_TYPE variable to STATIC

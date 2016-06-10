@@ -25,20 +25,24 @@ RUN mkdir -p /root/.ssh
 RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
 RUN mkdir -p /root/C/milagro-crypto-c
 ADD ./ /root/C/milagro-crypto-c
-RUN rm -rf /root/C/milagro-crypto-c/target/release
+RUN rm -rf /root/C/milagro-crypto-c/target/build
 WORKDIR /root/C/milagro-crypto-c
-RUN mkdir -p /root/C/milagro-crypto-c/target/release && \
-    cd target/release && \
-    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. && \
+RUN mkdir -p /root/C/milagro-crypto-c/target/build && \
+    cd target/build && \
+    cmake -D BUILD_COVERAGE=on -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
+    lcov --zerocounters --directory . && \
+    lcov --capture --initial --directory . --output-file amcl && \
     make test && \
+    lcov --no-checksum --directory . --capture --output-file amcl.info && \
+    genhtml amcl.info && \
     make doc && \
     make package
 EOM
 
 # docker image name
-DOCKER_IMAGE_NAME="miracl/cdev"
+DOCKER_IMAGE_NAME="local/build"
 
 # build the docker container and build the project
 docker build --no-cache -t ${DOCKER_IMAGE_NAME} .
