@@ -32,7 +32,7 @@ under the License.
 static void hashit(octet *p,int n,octet *x,octet *y,octet *w)
 {
     int i,c[4];
-    hash sha;
+    amcl_hash sha;
     char hh[32];
 
     HASH_init(&sha);
@@ -186,7 +186,7 @@ void ECP_AES_CBC_IV0_ENCRYPT(octet *k,octet *m,octet *c)
 { /* AES CBC encryption, with Null IV and key k */
   /* Input is from an octet string m, output is to an octet string c */
   /* Input is padded as necessary to make up a full final block */
-    aes a;
+    amcl_aes a;
 	int fin;
     int i,j,ipt,opt;
     char buff[16];
@@ -225,7 +225,7 @@ void ECP_AES_CBC_IV0_ENCRYPT(octet *k,octet *m,octet *c)
 /* decrypts and returns TRUE if all consistent, else returns FALSE */
 int ECP_AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
 { /* padding is removed */
-    aes a;
+    amcl_aes a;
     int i,ipt,opt,ch;
     char buff[16];
     int fin,bad;

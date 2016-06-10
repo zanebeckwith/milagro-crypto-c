@@ -28,18 +28,18 @@ under the License.
 #define ROUNDUP(a,b) ((a)-1)/(b)+1
 
 /* general purpose hashing functions */
-static void start_hash(hash *sha)
+static void start_hash(amcl_hash *sha)
 {
 	HASH_init(sha);
 }
 
-static void add_to_hash(hash *sha,octet *x)
+static void add_to_hash(amcl_hash *sha,octet *x)
 {
 	int i;
 	for (i=0;i<x->len;i++) {/*printf("%d,",(unsigned char)x->val[i]);*/ HASH_process(sha,x->val[i]);  }
 }
 
-static void finish_hash(hash *sha,octet *w)
+static void finish_hash(amcl_hash *sha,octet *w)
 {
 	int i;
 	char hh[32];
@@ -142,7 +142,7 @@ static void mapit2(octet *h,ECP2 *Q)
 static void hashit(int n,octet *x,octet *h)
 {
     int i,c[4];
-    hash sha;
+    amcl_hash sha;
     char hh[HASH_BYTES];
 	BIG px;
 
@@ -731,7 +731,7 @@ int MPIN_CLIENT_KEY(octet *G1,octet *G2,int pin,octet *R,octet *X,octet *H,octet
 	ECP W;
         int res=0;
 	BIG r,z,x,q,m,a,b,h;
-	hash sha;
+	amcl_hash sha;
 	char ht[HASH_BYTES];
 	octet HT={0,sizeof(ht),ht};
 
@@ -819,7 +819,7 @@ int MPIN_SERVER_KEY(octet *Z,octet *SST,octet *W,octet *H,octet *HID,octet *xID,
 	ECP R,U,A;
 	ECP2 sQ;
 	BIG w,x,y,h;
-	hash sha;
+	amcl_hash sha;
 	char ht[HASH_BYTES];
 	octet HT={0,sizeof(ht),ht};
 
@@ -984,7 +984,7 @@ void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T
 static void hashitGen(octet *p,int n,octet *x,octet *y,octet *w)
 {
     int i,c[4];
-    hash sha;
+    amcl_hash sha;
     char hh[32];
 
     HASH_init(&sha);

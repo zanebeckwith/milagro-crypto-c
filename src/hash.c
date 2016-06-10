@@ -65,7 +65,7 @@ static const unsign32 K[64]={
 #define theta1(x)  (S(17,x)^S(19,x)^R(10,x))
 
 /* SU= 72 */
-static void HASH_transform(hash *sh)
+static void HASH_transform(amcl_hash *sh)
 { /* basic transformation step */
     unsign32 a,b,c,d,e,f,g,h,t1,t2;
     int j;
@@ -92,7 +92,7 @@ static void HASH_transform(hash *sh)
 }
 
 /* Initialise Hash function */
-void HASH_init(hash *sh)
+void HASH_init(amcl_hash *sh)
 { /* re-initialise */
     int i;
     for (i=0;i<64;i++) sh->w[i]=0L;
@@ -108,7 +108,7 @@ void HASH_init(hash *sh)
 }
 
 /* process a single byte */
-void HASH_process(hash *sh,int byte)
+void HASH_process(amcl_hash *sh,int byte)
 { /* process the next message byte */
     int cnt;
 //printf("byt= %x\n",byte);
@@ -124,7 +124,7 @@ void HASH_process(hash *sh,int byte)
 
 /* SU= 24 */
 /* Generate 32-byte Hash */
-void HASH_hash(hash *sh,char digest[32])
+void HASH_hash(amcl_hash *sh,char digest[32])
 { /* pad message and finish - supply digest */
     int i;
     unsign32 len0,len1;
@@ -156,7 +156,7 @@ int main()
 {
     char digest[32];
     int i;
-    hash sh;
+    amcl_hash sh;
     HASH_init(&sh);
     for (i=0;test[i]!=0;i++)
 		HASH_process(&sh,test[i]);
