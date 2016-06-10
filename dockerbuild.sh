@@ -38,6 +38,9 @@ RUN mkdir -p /root/C/milagro-crypto-c/target/build && \
     lcov --no-checksum --directory . --capture --output-file amcl.info && \
     genhtml amcl.info && \
     make doc && \
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. && \
+    make && \
+    make test && \
     make package
 EOM
 
