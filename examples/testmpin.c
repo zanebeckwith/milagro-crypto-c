@@ -48,7 +48,7 @@ int main()
 #endif
   unsigned long ran;
   char x[PGS],s[PGS],y[PGS],client_id[100],raw[100],sst[4*PFS],token[2*PFS+1],sec[2*PFS+1],permit[2*PFS+1],xcid[2*PFS+1],xid[2*PFS+1],e[12*PFS],f[12*PFS];
-  char hcid[HASH_BYTES],hsid[HASH_BYTES],hid[2*PFS+1],htid[2*PFS+1],h[PGS];
+  char hcid[HASH_BYTES],hid[2*PFS+1],htid[2*PFS+1],h[PGS];
 #ifdef FULL
   char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
   char g1[12*PFS],g2[12*PFS];
@@ -67,7 +67,6 @@ int main()
   octet xCID={0,sizeof(xcid),xcid};
   octet xID={0,sizeof(xid),xid};
   octet HCID={0,sizeof(hcid),hcid};
-  octet HSID={0,sizeof(hsid),hsid};
   octet HID={0,sizeof(hid),hid};
   octet HTID={0,sizeof(htid),htid};
   octet E={0,sizeof(e),e};
@@ -106,14 +105,6 @@ int main()
   OCT_jstring(&CLIENT_ID,"testUser@miracl.com");
   MPIN_HASH_ID(&CLIENT_ID,&HCID);  /* Either Client or TA calculates Hash(ID) - you decide! */
   printf("Client ID= "); OCT_output_string(&CLIENT_ID); printf("\n");
-
-  /* When set only send hashed IDs to server */
-  octet *pID;
-#ifdef USE_ANONYMOUS
-  pID = &HCID;
-#else
-  pID = &CLIENT_ID;
-#endif
 
   /* Client and Server are issued secrets by DTA */
   MPIN_GET_SERVER_SECRET(&S,&SST);
@@ -232,6 +223,14 @@ int main()
 
 #ifdef FULL
   MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);  /* Also Send Z=r.ID to Server, remember random r */
+#endif
+
+  /* When set only send hashed IDs to server */
+  octet *pID;
+#ifdef USE_ANONYMOUS
+  pID = &HCID;
+#else
+  pID = &CLIENT_ID;
 #endif
 
   /* Server calculates H(ID) and H(ID)+H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */

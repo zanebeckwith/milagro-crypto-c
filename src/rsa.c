@@ -72,7 +72,6 @@ void RSA_KILL_CSPRNG(csprng *RNG)
 void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB)
 { /* IEEE1363 A16.11/A16.12 more or less */
 
-    int hE,m,r,bytes,hbytes,words,err,res=0;
     BIG t[HFLEN],p1[HFLEN],q1[HFLEN];
 
 	for (;;)
@@ -152,7 +151,7 @@ void MGF1(octet *z,int olen,octet *mask)
 
 int RSA_OAEP_ENCODE(octet *m,csprng *RNG,octet *p,octet *f)
 {
-    int i,slen,olen=RFS-1;
+    int slen,olen=RFS-1;
     int mlen=m->len;
     int hlen,seedlen;
     char dbmask[RFS],seed[32];

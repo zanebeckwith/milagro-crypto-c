@@ -140,7 +140,6 @@ void FP_redc(BIG a)
 void FP_mod(BIG a,DBIG d)
 {
 	int i,j;
-	chunk m,carry;
 	BIG md;
 
 #ifdef dchunk
@@ -184,6 +183,7 @@ void FP_mod(BIG a,DBIG d)
 	BIG_norm(a);
 
 #else
+	chunk m, carry;
 	for (i=0;i<NLEN;i++)
 	{
 		if (MConst==-1) m=(-d[i])&MASK;
@@ -363,7 +363,7 @@ void FP_neg(BIG r,BIG a)
 {
 	int sb;
 	chunk ov;
-	BIG m,t;
+	BIG m;
 
 	BIG_rcopy(m,Modulus);
 	BIG_norm(a);

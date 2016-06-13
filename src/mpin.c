@@ -144,7 +144,6 @@ static void hashit(int n,octet *x,octet *h)
     int i,c[4];
     amcl_hash sha;
     char hh[HASH_BYTES];
-	BIG px;
 
     HASH_init(&sha);
 	if (n>0)
@@ -293,7 +292,7 @@ int MPIN_RANDOM_GENERATE(csprng *RNG,octet* S)
 int MPIN_EXTRACT_PIN(octet *CID,int pin,octet *TOKEN)
 {
     ECP P,R;
-    int plen,res=0;
+    int res=0;
 	char h[HASH_BYTES];
 	octet H={0,sizeof(h),h};
 
@@ -383,7 +382,7 @@ int MPIN_CLIENT_1(int date,octet *CLIENT_ID,csprng *RNG,octet *X,int pin,octet *
 {
     BIG r,x;
     ECP P,T,W;
-    int plen,res=0;
+    int res=0;
 	char h[HASH_BYTES];
 	octet H={0,sizeof(h),h};
 
@@ -529,7 +528,7 @@ void MPIN_SERVER_1(int date,octet *CID,octet *HID,octet *HTID)
 /* Implement M-Pin on server side */
 int MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
 {
-    BIG a,px,py,y;
+    BIG px,py,y;
 	FP2 qx,qy;
 	FP12 g;
     ECP2 Q,sQ;
@@ -815,7 +814,6 @@ int MPIN_SERVER_KEY(octet *Z,octet *SST,octet *W,octet *H,octet *HID,octet *xID,
 	int res=0;
 	FP12 g;
 	FP4 c;
-	FP2 qx,qy;
 	ECP R,U,A;
 	ECP2 sQ;
 	BIG w,x,y,h;

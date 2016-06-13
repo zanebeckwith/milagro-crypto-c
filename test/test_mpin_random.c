@@ -44,7 +44,7 @@ void rand_str(char *dest, size_t length,csprng *RNG) {
 
 int main()
 {
-  int i,PIN1,PIN2,rtn,err,iter;
+  int PIN1,PIN2,rtn,err,iter;
 
   char x[PGS],y[PGS];
   octet X={sizeof(x), sizeof(x),x};
@@ -97,7 +97,6 @@ int main()
 
   int date = 0;
 
-  unsigned long ran;
   int byte_count = 32;
   FILE *fp;
   char seed[32] = {0};
@@ -105,12 +104,13 @@ int main()
   csprng RNG;
 
 #ifdef __linux__
-  size_t readSize;
   fp = fopen("/dev/urandom", "r");
-  readSize = fread(&seed, 1, byte_count, fp);
+  if (fread(&seed, 1, byte_count, fp)){};
   fclose(fp);
 #else
   /* non random seed value! */
+  int i;
+  unsigned long ran;
   time((time_t *)&ran);
   SEED.val[0]=ran;
   SEED.val[1]=ran>>8;

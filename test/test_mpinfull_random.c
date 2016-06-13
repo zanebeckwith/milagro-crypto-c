@@ -44,7 +44,7 @@ void rand_str(char *dest, size_t length,csprng *RNG) {
 
 int main()
 {
-  int i,PIN1,PIN2,rtn,err,iter;
+  int PIN1,PIN2,rtn,err,iter;
 
   char id[256];
   octet ID = {0,sizeof(id),id};
@@ -61,8 +61,6 @@ int main()
   /* Hash values of client ID */
   char hcid[HASH_BYTES];
   octet HCID={sizeof(hcid),sizeof(hcid), hcid};
-  char hsid[HASH_BYTES];
-  octet HSID={sizeof(hsid),sizeof(hsid), hsid};
 
   /* Hash values of messages */
   char hm[HASH_BYTES];
@@ -120,7 +118,6 @@ int main()
 
   int date = 0;
 
-  unsigned long ran;
   int byte_count = 32;
   FILE *fp;
   char seed[32] = {0};
@@ -132,6 +129,8 @@ int main()
   fclose(fp);
 #else
   /* non random seed value! */
+  int i;
+  unsigned long ran;
   time((time_t *)&ran);
   SEED.val[0]=ran;
   SEED.val[1]=ran>>8;

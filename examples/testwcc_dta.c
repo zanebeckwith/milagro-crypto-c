@@ -125,7 +125,6 @@ int main()
   printf("Date %d \n", date);
 
   int hashDoneOn = 1;
-  int hashDoneOff = 0;
 
   OCT_jstring(&MESSAGE1,"Hello Bob");
   OCT_jstring(&MESSAGE2,"Hello Alice");

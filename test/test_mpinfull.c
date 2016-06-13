@@ -27,7 +27,7 @@ under the License.
 
 int main()
 {
-  int i,PIN1,PIN2,rtn,err;
+  int i,PIN1,PIN2,rtn;
 
   char id[256];
   octet ID = {0,sizeof(id),id};
@@ -44,8 +44,6 @@ int main()
   /* Hash values of client ID */
   char hcid[HASH_BYTES];
   octet HCID={sizeof(hcid),sizeof(hcid), hcid};
-  char hsid[HASH_BYTES];
-  octet HSID={sizeof(hsid),sizeof(hsid), hsid};
 
   /* Hash values of messages */
   char hm[HASH_BYTES];

@@ -445,7 +445,6 @@ void BIG_pxmul(DBIG c,BIG a,int b)
 void BIG_mul(DBIG c,BIG a,BIG b)
 {
 	int i,j;
-	chunk carry;
 #ifdef dchunk
 	dchunk t,co;
 #endif
@@ -478,6 +477,7 @@ void BIG_mul(DBIG c,BIG a,BIG b)
 	c[DNLEN-2]=(chunk)t&MASK; co=t>>BASEBITS;
 	c[DNLEN-1]=(chunk)co;
 #else
+	chunk carry;
 	BIG_dzero(c);
 	for (i=0;i<NLEN;i++)
 	{
@@ -520,7 +520,6 @@ void BIG_smul(BIG c,BIG a,BIG b)
 void BIG_sqr(DBIG c,BIG a)
 {
 	int i,j;
-	chunk carry;
 #ifdef dchunk
 	dchunk t,co;
 #endif
@@ -586,6 +585,7 @@ void BIG_sqr(DBIG c,BIG a)
 	c[DNLEN-1]=(chunk)co;
 
 #else
+	chunk carry;
 	BIG_dzero(c);
 	for (i=0;i<NLEN;i++)
 	{

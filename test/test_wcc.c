@@ -76,20 +76,10 @@ int main()
   octet MESSAGE1 = {0, sizeof(message1), message1};
   OCT_jstring(&MESSAGE1,"Hello Bob");
 
-  char t1[16];  // Tag
-  char t2[16];  // Tag
   char k1[16];  // AES Key
   char k2[16];  // AES Key
-  char iv[12]; // IV - Initialisation vector
-  char c[100];  // Ciphertext
-  char p[100];  // Recovered Plaintext
-  octet T1={sizeof(t1),sizeof(t1),t1};
-  octet T2={sizeof(t2),sizeof(t2),t2};
   octet K1={0,sizeof(k1),k1};
   octet K2={0,sizeof(k2),k2};
-  octet IV={0,sizeof(iv),iv};
-  octet C={0,sizeof(c),c};
-  octet P={0,sizeof(p),p};
 
   int date;
 

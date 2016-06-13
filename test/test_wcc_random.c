@@ -131,12 +131,10 @@ int main()
   printf("Date %d \n", date);
 
   int hashDoneOn = 1;
-  int hashDoneOff = 0;
 
   OCT_jstring(&MESSAGE1,"Hello Bob");
   OCT_jstring(&MESSAGE2,"Hello Alice");
 
-  unsigned long ran;
   int byte_count = 32;
   FILE *fp;
   char seed[32] = {0};
@@ -144,12 +142,12 @@ int main()
   csprng RNG;
 
 #ifdef __linux__
-  size_t readSize;
   fp = fopen("/dev/urandom", "r");
-  readSize = fread(&seed, 1, byte_count, fp);
+  if (fread(&seed, 1, byte_count, fp)){};
   fclose(fp);
 #else
   /* non random seed value! */
+  unsigned long ran;
   time((time_t *)&ran);
   SEED.val[0]=ran;
   SEED.val[1]=ran>>8;
