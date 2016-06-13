@@ -32,7 +32,7 @@ IF (BUILD_SHARED_LIBS)
 ENDIF (BUILD_SHARED_LIBS)
 
 set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}
-    CACHE STRING "Choose the type of build: None Debug Release Coverage ASan ASanDbg MemSan MemSanDbg Check CheckFull"
+    CACHE STRING "Choose the type of build: None Debug Release Coverage ASan ASanDbg Check CheckFull"
     FORCE)
 
 if(CMAKE_COMPILER_IS_GNUCC)
