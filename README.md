@@ -93,11 +93,15 @@ NOTE: The build can be configured by setting flags on the command line, for exam
 * cmake -DWORD_LENGTH=64 ../..
 * cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
 
+To list other available CMake options, use:
+
+    cmake -LH
+
 #### Uninstall software
 
     sudo make uninstall
 
-#### Building an installer (only for Linux)
+#### Building an installer 
 
 After having built the libraries you can build a binary installer and a source distribution by running this command
 

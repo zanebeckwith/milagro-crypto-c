@@ -15,7 +15,6 @@ message(STATUS "PROJECT_VERSION='${PROJECT_VERSION}'")
 message(STATUS "Generator - ${CMAKE_GENERATOR}")
 
 # Add options for build
-option (BUILD_COVERAGE "Enable test coverage build flags" OFF)
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 option (BUILD_PYTHON "Build Python" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
@@ -23,13 +22,6 @@ option (BUILD_WCC "Build WCC" OFF)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
 option (USE_PATENTS "Use alleged patents" ON)
 option (USE_ANONYMOUS "Anonymous authenticaion for M-Pin Full" OFF)
-
-# set build flags to generate test coverage data
-if (BUILD_COVERAGE)
-  set(CMAKE_CXX_FLAGS "-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage")
-  set(CMAKE_C_FLAGS "-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
-  set(CMAKE_SHARED_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
-endif (BUILD_COVERAGE)
 
 # Allow the developer to select if Dynamic or Static libraries are built
 # Set the default LIB_TYPE variable to STATIC
@@ -39,18 +31,40 @@ IF (BUILD_SHARED_LIBS)
   SET (LIB_TYPE SHARED)
 ENDIF (BUILD_SHARED_LIBS)
 
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}
+    CACHE STRING "Choose the type of build: None Debug Release Coverage ASan ASanDbg Check CheckFull"
+    FORCE)
+
+if(CMAKE_COMPILER_IS_GNUCC)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                    OUTPUT_VARIABLE GCC_VERSION)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wextra -Wno-strict-prototypes -Wunused-value -Wcast-align -Wunused-variable -Wundef")
+    if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
+    endif()
+    set(CMAKE_C_FLAGS_RELEASE     "-O2")
+    set(CMAKE_C_FLAGS_DEBUG       "-O0 -g3")
+    set(CMAKE_C_FLAGS_COVERAGE    "-O0 -g3 --coverage")
+    set(CMAKE_C_FLAGS_ASAN        "-Werror -fsanitize=address -fno-common -O3")
+    set(CMAKE_C_FLAGS_ASANDBG     "-fsanitize=address -fno-common -O1 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls ")
+    set(CMAKE_C_FLAGS_CHECK       "-Werror -Os")
+    set(CMAKE_C_FLAGS_CHECKFULL   "${CMAKE_C_FLAGS_CHECK} -Wcast-qual")
+endif(CMAKE_COMPILER_IS_GNUCC)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
+    set(CMAKE_SHARED_LINKER_FLAGS "--coverage")
+endif(CMAKE_BUILD_TYPE STREQUAL "Coverage")
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
    set(OS "Mac OS X")
    # MACOSX_RPATH
    cmake_policy(SET CMP0042 NEW)
-   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    # Linux specific code
    set(OS "Linux")
-   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
