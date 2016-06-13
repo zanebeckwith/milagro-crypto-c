@@ -933,14 +933,14 @@ extern void BIG_invmodp(BIG x,BIG y,BIG n);
 extern int FP_iszilch(BIG x);
 /**	@brief Converts from BIG integer to n-residue form mod Modulus
  *
-	@param x BIG number to be converted
+	@param a BIG number to be converted
  */
-extern void FP_nres(BIG x);
+extern void FP_nres(BIG a);
 /**	@brief Converts from n-residue form back to BIG integer form
  *
-	@param x BIG number to be converted
+	@param a BIG number to be converted
  */
-extern void FP_redc(BIG x);
+extern void FP_redc(BIG a);
 /**	@brief Sets BIG to representation of unity in n-residue form
  *
 	@param x BIG number to be set equal to unity.
@@ -949,10 +949,10 @@ extern void FP_one(BIG x);
 /**	@brief Reduces DBIG to BIG exploiting special form of the modulus
  *
 	This function comes in different flavours depending on the form of Modulus that is currently in use.
-	@param x BIG number, on exit = y mod Modulus
-	@param y DBIG number to be reduced
+	@param r BIG number, on exit = d mod Modulus
+	@param d DBIG number to be reduced
  */
-extern void FP_mod(BIG x,DBIG y);
+extern void FP_mod(BIG r,DBIG d);
 /**	@brief Fast Modular multiplication of two BIGs in n-residue form, mod Modulus
  *
 	Uses appropriate fast modular reduction method

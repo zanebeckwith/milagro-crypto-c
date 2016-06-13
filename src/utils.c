@@ -85,7 +85,7 @@ int generateOTP(csprng* RNG)
  *  Generate a random Octet
  *
  *  @param  RNG             random number generator
- *  @return randomValue     random Octet
+ *  @param randomValue     random Octet
  */
 void generateRandom(csprng *RNG,octet *randomValue)
 {
