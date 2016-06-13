@@ -247,12 +247,12 @@ static void FF_rinc(BIG z[],int zp,BIG y[],int yp,int n)
 }
 
 /* recursive sub */
-static void FF_rsub(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n)
-{
-	int i;
-	for (i=0;i<n;i++)
-		BIG_sub(z[zp+i],x[xp+i],y[yp+i]);
-}
+/* static void FF_rsub(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n) */
+/* { */
+/* 	int i; */
+/* 	for (i=0;i<n;i++) */
+/* 		BIG_sub(z[zp+i],x[xp+i],y[yp+i]); */
+/* } */
 
 /* recursive dec */
 static void FF_rdec(BIG z[],int zp,BIG y[],int yp,int n)

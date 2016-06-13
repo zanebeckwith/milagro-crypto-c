@@ -29,7 +29,7 @@ RUN rm -rf /root/C/milagro-crypto-c/target/build
 WORKDIR /root/C/milagro-crypto-c
 RUN mkdir -p /root/C/milagro-crypto-c/target/build && \
     cd target/build && \
-    cmake -D BUILD_COVERAGE=on -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
+    cmake-D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     lcov --zerocounters --directory . && \

@@ -97,46 +97,6 @@ static void mapit(octet *h,ECP *P)
 		BIG_inc(px,1);
 }
 
-/* needed for SOK */
-static void mapit2(octet *h,ECP2 *Q)
-{
-	BIG q,one,Fx,Fy,x,hv;
-	FP2 X;
-	ECP2 T,K;
-	BIG_fromBytes(hv,h->val);
-	BIG_rcopy(q,Modulus);
-	BIG_one(one);
-	BIG_mod(hv,q);
-
-	for (;;)
-	{
-		FP2_from_BIGs(&X,one,hv);
-		if (ECP2_setx(Q,&X)) break;
-		BIG_inc(hv,1);
-	}
-
-/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
-	BIG_rcopy(Fx,CURVE_Fra);
-	BIG_rcopy(Fy,CURVE_Frb);
-	FP2_from_BIGs(&X,Fx,Fy);
-	BIG_rcopy(x,CURVE_Bnx);
-
-	ECP2_copy(&T,Q);
-	ECP2_mul(&T,x);
-	ECP2_neg(&T);  /* our x is negative */
-	ECP2_copy(&K,&T);
-	ECP2_dbl(&K);
-	ECP2_add(&K,&T);
-	ECP2_affine(&K);
-
-	ECP2_frob(&K,&X);
-	ECP2_frob(Q,&X); ECP2_frob(Q,&X); ECP2_frob(Q,&X);
-	ECP2_add(Q,&T);
-	ECP2_add(Q,&K);
-	ECP2_frob(&T,&X); ECP2_frob(&T,&X);
-	ECP2_add(Q,&T);
-	ECP2_affine(Q);
-}
 
 /* Hash number (optional) and octet to octet */
 static void hashit(int n,octet *x,octet *h)
