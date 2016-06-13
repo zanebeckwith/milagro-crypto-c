@@ -35,16 +35,25 @@ under the License.
 
 /* Field size is assumed to be greater than or equal to group size */
 
-#define PGS 32  /* WCC Group Size */
-#define PFS 32  /* WCC Field Size */
-#define PAS 16  /* AES Symmetric Key Size */
+/** WCC Group Size */
+#define PGS 32
 
+/** WCC Field Size */
+#define PFS 32
+
+/** AES Symmetric Key Size */
+#define PAS 16
+
+/** WCC OK value */
 #define WCC_OK                     0
+
+/** WCC INVALID POINT value */
 #define WCC_INVALID_POINT         -51
 
+/** Time Slot = 1 day */
+#define TIME_SLOT_MINUTES 1440
 
-
-#define TIME_SLOT_MINUTES 1440 /* Time Slot = 1 day */
+/** Number of hash bytes */
 #define HASH_BYTES 32
 
 /*! \brief Generate a random integer */
