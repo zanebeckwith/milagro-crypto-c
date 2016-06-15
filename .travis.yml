@@ -38,7 +38,7 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-  - mkdir -p target/build
+  - mkdir -p target/build/coverage
   - cd target/build
   - cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../..
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
