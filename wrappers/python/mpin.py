@@ -107,7 +107,7 @@ else:
     libmpin = ffi.dlopen("libmpin.so")
 
 
-def toHex(octetValue):
+def to_hex(octetValue):
     """Converts an octet type into a string
 
     Add all the values in an octet into an array. This arrays is then
@@ -131,9 +131,43 @@ def toHex(octetValue):
         i = i+1
     return ''.join(val).encode("hex")
 
+def make_octet(length, value=None):
+    """Generates an octet
+
+    Generates an empty octet or one filled with the input value
+    
+    Args::
+        
+        length: Length of empty octet
+        value:  Data to assign to octet      
+           
+    Returns::
+        
+        oct_ptr: octet pointer
+        val: data associated with octet
+
+    Raises:
+        
+    """        
+    oct_ptr = ffi.new("octet*")    
+    if value:
+        val = ffi.new("char [%s]" % len(value), value)
+        oct_ptr.val = val
+        oct_ptr.max = len(value)
+        oct_ptr.len = len(value)
+    else:
+        val = ffi.new("char []", length)
+        oct_ptr.val = val
+        oct_ptr.max = length
+        oct_ptr.len = length        
+    return oct_ptr, val
+
+
 if __name__ == "__main__":
     # Print hex values
     DEBUG = False
+    # Require user input
+    INPUT = False
     SINGLE_PASS = False
     TIME_PERMITS = True
     MPIN_FULL = False
@@ -150,202 +184,68 @@ if __name__ == "__main__":
     seed = seedHex.decode("hex")
 
     # Identity
-    identity = raw_input("Please enter identity:")
-    MPIN_ID = ffi.new("octet*")
-    MPIN_IDval = ffi.new("char [%s]" % len(identity), identity)
-    MPIN_ID[0].val = MPIN_IDval
-    MPIN_ID[0].max = len(identity)
-    MPIN_ID[0].len = len(identity)
+    if INPUT:
+        identity = raw_input("Please enter identity:")
+    else:
+        identity = "user@miracl.com"
+    MPIN_ID, MPIN_ID_val = make_octet(None,identity)
 
     # Master Secret Shares
-    MS1 = ffi.new("octet*")
-    MS1val = ffi.new("char []", PGS)
-    MS1[0].val = MS1val
-    MS1[0].max = PGS
-    MS1[0].len = PGS
-
-    MS2 = ffi.new("octet*")
-    MS2val = ffi.new("char []", PGS)
-    MS2[0].val = MS2val
-    MS2[0].max = PGS
-    MS2[0].len = PGS
+    MS1, MS1_val = make_octet(PGS)
+    MS2, MS2_val = make_octet(PGS)
 
     # Hash value of MPIN_ID
-    HASH_MPIN_ID = ffi.new("octet*")
-    HASH_MPIN_IDval = ffi.new("char []",  HASH_BYTES)
-    HASH_MPIN_ID[0].val = HASH_MPIN_IDval
-    HASH_MPIN_ID[0].max = HASH_BYTES
-    HASH_MPIN_ID[0].len = HASH_BYTES
+    HASH_MPIN_ID, HASH_MPIN_ID_val = make_octet(HASH_BYTES)
 
-    # Client secret and shares
-    CS1 = ffi.new("octet*")
-    CS1val = ffi.new("char []", G1)
-    CS1[0].val = CS1val
-    CS1[0].max = G1
-    CS1[0].len = G1
-
-    CS2 = ffi.new("octet*")
-    CS2val = ffi.new("char []", G1)
-    CS2[0].val = CS2val
-    CS2[0].max = G1
-    CS2[0].len = G1
-
-    SEC = ffi.new("octet*")
-    SECval = ffi.new("char []", G1)
-    SEC[0].val = SECval
-    SEC[0].max = G1
-    SEC[0].len = G1
+    # Client secret and shares 
+    CS1, CS1_val = make_octet(G1)
+    CS2, CS2_val = make_octet(G1)
+    SEC, SEC_val = make_octet(G1)
 
     # Server secret and shares
-    SS1 = ffi.new("octet*")
-    SS1val = ffi.new("char []", G2)
-    SS1[0].val = SS1val
-    SS1[0].max = G2
-    SS1[0].len = G2
-
-    SS2 = ffi.new("octet*")
-    SS2val = ffi.new("char []", G2)
-    SS2[0].val = SS2val
-    SS2[0].max = G2
-    SS2[0].len = G2
-
-    SERVER_SECRET = ffi.new("octet*")
-    SERVER_SECRETval = ffi.new("char []", G2)
-    SERVER_SECRET[0].val = SERVER_SECRETval
-    SERVER_SECRET[0].max = G2
-    SERVER_SECRET[0].len = G2
+    SS1, SS1_val = make_octet(G2)
+    SS2, SS2_val = make_octet(G2)
+    SERVER_SECRET, SERVER_SECRET_val  = make_octet(G2)
 
     # Time Permit and shares
-    TP1 = ffi.new("octet*")
-    TP1val = ffi.new("char []", G1)
-    TP1[0].val = TP1val
-    TP1[0].max = G1
-    TP1[0].len = G1
+    TP1, TP1_val = make_octet(G1)
+    TP2, TP2_val = make_octet(G1)
+    TIME_PERMIT, TIME_PERMIT_val = make_octet(G1)
 
-    TP2 = ffi.new("octet*")
-    TP2val = ffi.new("char []", G1)
-    TP2[0].val = TP2val
-    TP2[0].max = G1
-    TP2[0].len = G1
-
-    TIME_PERMIT = ffi.new("octet*")
-    TIME_PERMITval = ffi.new("char []", G1)
-    TIME_PERMIT[0].val = TIME_PERMITval
-    TIME_PERMIT[0].max = G1
-    TIME_PERMIT[0].len = G1
-
-    # Token stored on computer
-    TOKEN = ffi.new("octet*")
-    TOKENval = ffi.new("char []", G1)
-    TOKEN[0].val = TOKENval
-    TOKEN[0].max = G1
-    TOKEN[0].len = G1
+    # Token stored on computer 
+    TOKEN, TOKEN_val = make_octet(G1)
 
     # H(ID)
-    HID = ffi.new("octet*")
-    HIDval = ffi.new("char []", G1)
-    HID[0].val = HIDval
-    HID[0].max = G1
-    HID[0].len = G1
+    HID, HID_val = make_octet(G1)
 
     # H(T|H(ID))
-    HTID = ffi.new("octet*")
-    HTIDval = ffi.new("char []", G1)
-    HTID[0].val = HTIDval
-    HTID[0].max = G1
-    HTID[0].len = G1
+    HTID, HTID_val = make_octet(G1)
 
-    UT = ffi.new("octet*")
-    UTval = ffi.new("char []", G1)
-    UT[0].val = UTval
-    UT[0].max = G1
-    UT[0].len = G1
+    UT, UT_val = make_octet(G1)
 
-    U = ffi.new("octet*")
-    Uval = ffi.new("char []", G1)
-    U[0].val = Uval
-    U[0].max = G1
-    U[0].len = G1
+    U, U_val = make_octet(G1)
 
-    X = ffi.new("octet*")
-    Xval = ffi.new("char []", PGS)
-    X[0].val = Xval
-    X[0].max = PGS
-    X[0].len = PGS
+    X, X_val = make_octet(PGS)
+    Y, Y_val = make_octet(PGS)
 
-    Y = ffi.new("octet*")
-    Yval = ffi.new("char []", PGS)
-    Y[0].val = Yval
-    Y[0].max = PGS
-    Y[0].len = PGS
-
-    E = ffi.new("octet*")
-    Eval = ffi.new("char []", 12*PFS)
-    E[0].val = Eval
-    E[0].max = 12*PFS
-    E[0].len = 12*PFS
-
-    F = ffi.new("octet*")
-    Fval = ffi.new("char []", 12*PFS)
-    F[0].val = Fval
-    F[0].max = 12*PFS
-    F[0].len = 12*PFS
+    lenGT = 12*PFS
+    E, E_val = make_octet(lenGT)
+    F, F_val = make_octet(lenGT)
 
     # MPIN Full
-    R = ffi.new("octet*")
-    Rval = ffi.new("char []", PGS)
-    R[0].val = Rval
-    R[0].max = PGS
-    R[0].len = PGS
+    R, R_val = make_octet(PGS)
+    W, W_val = make_octet(PGS)
+    Z, Z_val = make_octet(G1)
+    T, T_val = make_octet(G1)
 
-    W = ffi.new("octet*")
-    Wval = ffi.new("char []", PGS)
-    W[0].val = Wval
-    W[0].max = PGS
-    W[0].len = PGS
+    TATE1, TATE1_val = make_octet(lenGT)
+    TATE2, TATE2_val = make_octet(lenGT)
 
-    Z = ffi.new("octet*")
-    Zval = ffi.new("char []", G1)
-    Z[0].val = Zval
-    Z[0].max = G1
-    Z[0].len = G1
-
-    T = ffi.new("octet*")
-    Tval = ffi.new("char []", G1)
-    T[0].val = Tval
-    T[0].max = G1
-    T[0].len = G1
-
-    TATE1 = ffi.new("octet*")
-    TATE1val = ffi.new("char []", 12*PFS)
-    TATE1[0].val = TATE1val
-    TATE1[0].max = 12*PFS
-    TATE1[0].len = 12*PFS
-
-    TATE2 = ffi.new("octet*")
-    TATE2val = ffi.new("char []", 12*PFS)
-    TATE2[0].val = TATE2val
-    TATE2[0].max = 12*PFS
-    TATE2[0].len = 12*PFS
-
-    SK = ffi.new("octet*")
-    SKval = ffi.new("char []", PAS)
-    SK[0].val = SKval
-    SK[0].max = PAS
-    SK[0].len = PAS
-
-    CK = ffi.new("octet*")
-    CKval = ffi.new("char []", PAS)
-    CK[0].val = CKval
-    CK[0].max = PAS
-    CK[0].len = PAS
+    SK, SK_val = make_octet(PAS)
+    CK, CK_val = make_octet(PAS)
 
     # Hash value of transmission
-    HM = ffi.new("octet*")
-    HMval = ffi.new("char []",  HASH_BYTES)
-    HM[0].val = HMval
-    HM[0].max = HASH_BYTES
-    HM[0].len = HASH_BYTES
+    HM, HM_val = make_octet(HASH_BYTES)
 
     if date:
         prHID = HTID
@@ -362,13 +262,9 @@ if __name__ == "__main__":
         F = ffi.NULL
 
     # Assign a seed value
-    RAW = ffi.new("octet*")
-    RAWval = ffi.new("char [%s]" % len(seed), seed)
-    RAW[0].val = RAWval
-    RAW[0].len = len(seed)
-    RAW[0].max = len(seed)
+    RAW, RAW_val = make_octet(None,seed)
     if DEBUG:
-        print "RAW: %s" % toHex(RAW)
+        print "RAW: %s" % to_hex(RAW)
 
     # random number generator
     RNG = ffi.new("csprng*")
@@ -377,7 +273,7 @@ if __name__ == "__main__":
     # Hash MPIN_ID
     libmpin.MPIN_HASH_ID(MPIN_ID, HASH_MPIN_ID)
     if DEBUG:
-        print "MPIN_ID: %s" % toHex(MPIN_ID)
+        print "MPIN_ID: %s" % to_hex(MPIN_ID)
         print "HASH_MPIN_ID: %s" % toHex(HASH_MPIN_ID)
 
     if USE_ANONYMOUS:
@@ -429,7 +325,7 @@ if __name__ == "__main__":
     rtn = libmpin.MPIN_RECOMBINE_G1(CS1, CS2, TOKEN)
     if rtn != 0:
         print "libmpin.MPIN_RECOMBINE_G1( CS1, CS2, TOKEN) Error %s" % rtn
-    print "Client Secret: %s" % toHex(TOKEN)
+    print "Client Secret: %s" % to_hex(TOKEN)
 
     # Generate Time Permit shares
     if DEBUG:
@@ -441,26 +337,32 @@ if __name__ == "__main__":
     if rtn != 0:
         print "libmpin.MPIN_GET_CLIENT_PERMIT(date,MS2,HASH_MPIN_ID,TP2) Error %s" % rtn
     if DEBUG:
-        print "TP1: %s" % toHex(TP1)
-        print "TP2: %s" % toHex(TP2)
+        print "TP1: %s" % to_hex(TP1)
+        print "TP2: %s" % to_hex(TP2)
 
     # Combine Time Permit shares
     rtn = libmpin.MPIN_RECOMBINE_G1(TP1, TP2, TIME_PERMIT)
     if rtn != 0:
         print "libmpin.MPIN_RECOMBINE_G1(TP1, TP2, TIME_PERMIT) Error %s" % rtn
     if DEBUG:
-        print "TIME_PERMIT: %s" % toHex(TIME_PERMIT)
+        print "TIME_PERMIT: %s" % to_hex(TIME_PERMIT)
 
     # Client extracts PIN from secret to create Token
-    PIN = int(raw_input("Please enter four digit PIN to create M-Pin Token:"))
+    if INPUT:
+        PIN = int(raw_input("Please enter four digit PIN to create M-Pin Token:"))
+    else:
+        PIN = 1234
     rtn = libmpin.MPIN_EXTRACT_PIN(MPIN_ID, PIN, TOKEN)
     if rtn != 0:
         print "libmpin.MPIN_EXTRACT_PIN( MPIN_ID, PIN, TOKEN) Error %s" % rtn
-    print "Token: %s" % toHex(TOKEN)
+    print "Token: %s" % to_hex(TOKEN)
 
     if SINGLE_PASS:
         print "M-Pin Single Pass"
-        PIN = int(raw_input("Please enter PIN to authenticate:"))
+        if INPUT:
+            PIN = int(raw_input("Please enter PIN to authenticate:"))
+        else:
+            PIN = 1234
         TimeValue = libmpin.MPIN_GET_TIME()
         if DEBUG:
             print "TimeValue %s" % TimeValue
@@ -474,7 +376,7 @@ if __name__ == "__main__":
         if rtn != 0:
             print "MPIN_CLIENT ERROR %s" % rtn
         if DEBUG:
-            print "X: %s" % toHex(X)
+            print "X: %s" % to_hex(X)
 
         # Client sends Z=r.ID to Server
         if MPIN_FULL:
@@ -493,20 +395,23 @@ if __name__ == "__main__":
         # Server sends T=w.ID to client
         if MPIN_FULL:
             libmpin.MPIN_GET_G1_MULTIPLE(RNG, 0, W, prHID, T)
-            print "T: %s" % toHex(T)
+            print "T: %s" % to_hex(T)
 
         if MPIN_FULL:
             libmpin.MPIN_HASH_ALL(prHID,U,UT,SEC,Y,Z,T,HM);
             
             libmpin.MPIN_CLIENT_KEY(TATE1, TATE2, PIN, R, X, HM, T, CK)
-            print "Client AES Key: %s" % toHex(CK)
+            print "Client AES Key: %s" % to_hex(CK)
 
             libmpin.MPIN_SERVER_KEY(Z, SERVER_SECRET, W, HM, HID, U, UT, SK)
-            print "Server AES Key: %s" % toHex(SK)
+            print "Server AES Key: %s" % to_hex(SK)
 
     else:
         print "M-Pin Multi Pass"
-        PIN = int(raw_input("Please enter PIN to authenticate:"))
+        if INPUT:
+            PIN = int(raw_input("Please enter PIN to authenticate:"))
+        else:
+            PIN = 1234
         if MPIN_FULL:
             rtn = libmpin.MPIN_PRECOMPUTE(TOKEN, HASH_MPIN_ID, TATE1, TATE2)
             if rtn != 0:
@@ -517,7 +422,7 @@ if __name__ == "__main__":
         if rtn != 0:
             print "MPIN_CLIENT_1  ERROR %s" % rtn
         if DEBUG:
-            print "X: %s" % toHex(X)
+            print "X: %s" % to_hex(X)
 
         # Server calculates H(ID) and H(T|H(ID)) (if time permits enabled),
         # and maps them to points on the curve HID and HTID resp.
@@ -528,14 +433,14 @@ if __name__ == "__main__":
         if rtn != 0:
             print "libmpin.MPIN_RANDOM_GENERATE(RNG,Y) Error %s" % rtn
         if DEBUG:
-            print "Y: %s" % toHex(Y)
+            print "Y: %s" % to_hex(Y)
 
         # Client second pass
         rtn = libmpin.MPIN_CLIENT_2(X, Y, SEC)
         if rtn != 0:
             print "libmpin.MPIN_CLIENT_2(X,Y,SEC) Error %s" % rtn
         if DEBUG:
-            print "V: %s" % toHex(SEC)
+            print "V: %s" % to_hex(SEC)
 
         # Server second pass
         rtn = libmpin.MPIN_SERVER_2(date, HID, HTID, Y, SERVER_SECRET, U, UT, SEC, E, F)
@@ -564,9 +469,9 @@ if __name__ == "__main__":
             rtn = libmpin.MPIN_CLIENT_KEY(TATE1, TATE2, PIN, R, X, HM, T, CK)
             if rtn != 0:
                 print "ERROR: Generating CK %s" % rtn
-            print "Client AES Key: %s" % toHex(CK)
+            print "Client AES Key: %s" % to_hex(CK)
 
             rtn = libmpin.MPIN_SERVER_KEY(Z, SERVER_SECRET, W, HM, HID, U, UT, SK)
             if rtn != 0:
                 print "ERROR: Generating SK %s" % rtn
-            print "Server AES Key: %s" % toHex(SK)
+            print "Server AES Key: %s" % to_hex(SK)
