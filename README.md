@@ -150,4 +150,4 @@ The script dockerbuild.sh build, test and package this library inside a Docker c
 ## Code Coverage
 
 The default build in Docker and TravisCI generates a test coverage report in HTML format:
-* target/build/index.html
+* target/build/coverage/index.html

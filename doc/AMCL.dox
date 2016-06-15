@@ -125,6 +125,10 @@ export PYTHONPATH=/usr/lib/python2.7/dist-packages
 <li>cmake -DWORD_LENGTH=64 ../..</li>
 <li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../..</li>
 </ul>
+<p>To list other available CMake options, use:</p>
+<ul>
+<li>cmake -LH</li>
+</ul>
 <h4>Uninstall software</h4>
 <pre><code>sudo make uninstall
 </code></pre>
