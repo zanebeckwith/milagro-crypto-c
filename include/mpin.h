@@ -363,7 +363,7 @@ DLL_EXPORT int MPIN_HMAC(octet *M,octet *K,int len,octet *tag);
  */
 DLL_EXPORT void MPIN_PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
 
-/** @brief Hash the session transcript 
+/** @brief Hash the session transcript
 	@param I is the hashed input client ID = H(ID)
 	@param U is the client output = x.H(ID)
 	@param CU is the client output = x.(H(ID)+H(T|H(ID)))

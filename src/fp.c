@@ -41,35 +41,35 @@ void FP_redc(BIG a) {}
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
 {
-	BIG t,b,m;
-	chunk v,tw;
-	BIG_split(t,b,d,MODBITS);
+    BIG t,b,m;
+    chunk v,tw;
+    BIG_split(t,b,d,MODBITS);
 
-/* Note that all of the excess gets pushed into t. So if squaring a value with a 4-bit excess, this results in
-   t getting all 8 bits of the excess product! So products must be less than pR which is Montgomery compatible */
+    /* Note that all of the excess gets pushed into t. So if squaring a value with a 4-bit excess, this results in
+       t getting all 8 bits of the excess product! So products must be less than pR which is Montgomery compatible */
 
-	if (MConst < NEXCESS)
-	{
-		BIG_imul(t,t,MConst);
+    if (MConst < NEXCESS)
+    {
+        BIG_imul(t,t,MConst);
 
-		BIG_norm(t);
-		tw=t[NLEN-1];
-		t[NLEN-1]&=TMASK;
-		t[0]+=MConst*((tw>>TBITS));
-	}
-	else
-	{
-		v=BIG_pmul(t,t,MConst);
-		tw=t[NLEN-1];
-		t[NLEN-1]&=TMASK;
+        BIG_norm(t);
+        tw=t[NLEN-1];
+        t[NLEN-1]&=TMASK;
+        t[0]+=MConst*((tw>>TBITS));
+    }
+    else
+    {
+        v=BIG_pmul(t,t,MConst);
+        tw=t[NLEN-1];
+        t[NLEN-1]&=TMASK;
 #if CHUNK == 16
-		t[1]+=muladd(MConst,((tw>>TBITS)+(v<<(BASEBITS-TBITS))),0,&t[0]);
+        t[1]+=muladd(MConst,((tw>>TBITS)+(v<<(BASEBITS-TBITS))),0,&t[0]);
 #else
-		t[0]+=MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS)));
+        t[0]+=MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS)));
 #endif
-	}
-	BIG_add(r,t,b);
-	BIG_norm(r);
+    }
+    BIG_add(r,t,b);
+    BIG_norm(r);
 }
 #endif
 
@@ -78,34 +78,34 @@ void FP_mod(BIG r,DBIG d)
 /* convert to Montgomery n-residue form */
 void FP_nres(BIG a)
 {
-	DBIG d;
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	BIG_dscopy(d,a);
-	BIG_dshl(d,NLEN*BASEBITS);
-	BIG_dmod(a,d,m);
+    DBIG d;
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    BIG_dscopy(d,a);
+    BIG_dshl(d,NLEN*BASEBITS);
+    BIG_dmod(a,d,m);
 }
 
 /* convert back to regular form */
 void FP_redc(BIG a)
 {
-	DBIG d;
-	BIG_dzero(d);
-	BIG_dscopy(d,a);
-	FP_mod(a,d);
+    DBIG d;
+    BIG_dzero(d);
+    BIG_dscopy(d,a);
+    FP_mod(a,d);
 }
 
 /* fast modular reduction from DBIG to BIG exploiting special form of the modulus */
 void FP_mod(BIG a,DBIG d)
 {
-	int i;
-	chunk k;
+    int i;
+    chunk k;
 
-	for (i=0;i<NLEN;i++)
-		d[NLEN+i]+=muladd(d[i],MConst-1,d[i],&d[NLEN+i-1]);
+    for (i=0; i<NLEN; i++)
+        d[NLEN+i]+=muladd(d[i],MConst-1,d[i],&d[NLEN+i-1]);
 
-	BIG_sducopy(a,d);
-	BIG_norm(a);
+    BIG_sducopy(a,d);
+    BIG_norm(a);
 }
 
 #endif
@@ -116,22 +116,22 @@ void FP_mod(BIG a,DBIG d)
 /* SU= 120 */
 void FP_nres(BIG a)
 {
-	DBIG d;
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	BIG_dscopy(d,a);
-	BIG_dshl(d,NLEN*BASEBITS);
-	BIG_dmod(a,d,m);
+    DBIG d;
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    BIG_dscopy(d,a);
+    BIG_dshl(d,NLEN*BASEBITS);
+    BIG_dmod(a,d,m);
 }
 
 /* SU= 80 */
 /* convert back to regular form */
 void FP_redc(BIG a)
 {
-	DBIG d;
-	BIG_dzero(d);
-	BIG_dscopy(d,a);
-	FP_mod(a,d);
+    DBIG d;
+    BIG_dzero(d);
+    BIG_dscopy(d,a);
+    FP_mod(a,d);
 }
 
 /* reduce a DBIG to a BIG using Montgomery's no trial division method */
@@ -139,66 +139,67 @@ void FP_redc(BIG a)
 /* SU= 112 */
 void FP_mod(BIG a,DBIG d)
 {
-	int i,j;
-	BIG md;
+    int i,j;
+    BIG md;
 
 #ifdef dchunk
-	dchunk sum;
-	chunk sp;
+    dchunk sum;
+    chunk sp;
 #endif
 
-	BIG_rcopy(md,Modulus);
+    BIG_rcopy(md,Modulus);
 
 #ifdef COMBA
 
-/* Faster to Combafy it.. Let the compiler unroll the loops! */
+    /* Faster to Combafy it.. Let the compiler unroll the loops! */
 
-	sum=d[0];
-	for (j=0;j<NLEN;j++)
-	{
-		for (i=0;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
-		if (MConst==-1) sp=(-(chunk)sum)&MASK;
-		else
-		{
-			if (MConst==1) sp=((chunk)sum)&MASK;
-			else sp=((chunk)sum*MConst)&MASK;
-		}
-		d[j]=sp; sum+=(dchunk)sp*md[0];  /* no need for &MASK here! */
-		sum=d[j+1]+(sum>>BASEBITS);
-	}
+    sum=d[0];
+    for (j=0; j<NLEN; j++)
+    {
+        for (i=0; i<j; i++) sum+=(dchunk)d[i]*md[j-i];
+        if (MConst==-1) sp=(-(chunk)sum)&MASK;
+        else
+        {
+            if (MConst==1) sp=((chunk)sum)&MASK;
+            else sp=((chunk)sum*MConst)&MASK;
+        }
+        d[j]=sp;
+        sum+=(dchunk)sp*md[0];  /* no need for &MASK here! */
+        sum=d[j+1]+(sum>>BASEBITS);
+    }
 
-	for (j=NLEN;j<DNLEN-2;j++)
-	{
-		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
-		d[j]=(chunk)sum&MASK;
-		sum=d[j+1]+(sum>>BASEBITS);
-	}
+    for (j=NLEN; j<DNLEN-2; j++)
+    {
+        for (i=j-NLEN+1; i<NLEN; i++) sum+=(dchunk)d[i]*md[j-i];
+        d[j]=(chunk)sum&MASK;
+        sum=d[j+1]+(sum>>BASEBITS);
+    }
 
-	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-	d[DNLEN-2]=(chunk)sum&MASK;
-	sum=d[DNLEN-1]+(sum>>BASEBITS);
-	d[DNLEN-1]=(chunk)sum&MASK;
+    sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
+    d[DNLEN-2]=(chunk)sum&MASK;
+    sum=d[DNLEN-1]+(sum>>BASEBITS);
+    d[DNLEN-1]=(chunk)sum&MASK;
 
-	BIG_sducopy(a,d);
-	BIG_norm(a);
+    BIG_sducopy(a,d);
+    BIG_norm(a);
 
 #else
-	chunk m, carry;
-	for (i=0;i<NLEN;i++)
-	{
-		if (MConst==-1) m=(-d[i])&MASK;
-		else
-		{
-			if (MConst==1) m=d[i];
-			else m=(MConst*d[i])&MASK;
-		}
-		carry=0;
-		for (j=0;j<NLEN;j++)
-			carry=muladd(m,md[j],carry,&d[i+j]);
-		d[NLEN+i]+=carry;
-	}
-	BIG_sducopy(a,d);
-	BIG_norm(a);
+    chunk m, carry;
+    for (i=0; i<NLEN; i++)
+    {
+        if (MConst==-1) m=(-d[i])&MASK;
+        else
+        {
+            if (MConst==1) m=d[i];
+            else m=(MConst*d[i])&MASK;
+        }
+        carry=0;
+        for (j=0; j<NLEN; j++)
+            carry=muladd(m,md[j],carry,&d[i+j]);
+        d[NLEN+i]+=carry;
+    }
+    BIG_sducopy(a,d);
+    BIG_norm(a);
 
 #endif
 }
@@ -209,25 +210,25 @@ void FP_mod(BIG a,DBIG d)
 /* SU= 48 */
 int FP_iszilch(BIG x)
 {
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	BIG_mod(x,m);
-	return BIG_iszilch(x);
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    BIG_mod(x,m);
+    return BIG_iszilch(x);
 }
 
 /* output FP */
 /* SU= 48 */
 void FP_output(BIG r)
 {
-	BIG c;
-	BIG_copy(c,r);
-	FP_redc(c);
-	BIG_output(c);
+    BIG c;
+    BIG_copy(c,r);
+    FP_redc(c);
+    BIG_output(c);
 }
 
 void FP_rawoutput(BIG r)
 {
-	BIG_rawoutput(r);
+    BIG_rawoutput(r);
 }
 
 #ifdef GET_STATS
@@ -241,101 +242,101 @@ int tdadd=0,rdadd=0,tdneg=0,rdneg=0;
 /* SU= 88 */
 void FP_mul(BIG r,BIG a,BIG b)
 {
-	DBIG d;
-	chunk ea=EXCESS(a);
-	chunk eb=EXCESS(b);
-	if ((ea+1)*(eb+1)+1>=FEXCESS)
-	{
+    DBIG d;
+    chunk ea=EXCESS(a);
+    chunk eb=EXCESS(b);
+    if ((ea+1)*(eb+1)+1>=FEXCESS)
+    {
 #ifdef DEBUG_REDUCE
-		printf("Product too large - reducing it %d %d\n",ea,eb);
+        printf("Product too large - reducing it %d %d\n",ea,eb);
 #endif
-		FP_reduce(a);  /* it is sufficient to fully reduce just one of them < p */
+        FP_reduce(a);  /* it is sufficient to fully reduce just one of them < p */
 #ifdef GET_STATS
-		rmul++;
-	}
-	tmul++;
+        rmul++;
+    }
+    tmul++;
 #else
-	}
+    }
 #endif
 
-	BIG_mul(d,a,b);
-	FP_mod(r,d);
+    BIG_mul(d,a,b);
+    FP_mod(r,d);
 }
 
 /* multiplication by an integer, r=a*c */
 /* SU= 136 */
 void FP_imul(BIG r,BIG a,int c)
 {
-	DBIG d;
-	BIG m;
-	int s=0;
-	chunk afx;
-	BIG_norm(a);
-	if (c<0)
-	{
-		c=-c;
-		s=1;
-	}
-	afx=(EXCESS(a)+1)*(c+1)+1;
-	if (c<NEXCESS && afx<FEXCESS)
-		BIG_imul(r,a,c);
-	else
-	{
-		if (afx<FEXCESS)
-		{
-			BIG_pmul(r,a,c);
-		}
-		else
-		{
-			BIG_rcopy(m,Modulus);
-			BIG_pxmul(d,a,c);
-			BIG_dmod(r,d,m);
-		}
-	}
-	if (s) FP_neg(r,r);
-	BIG_norm(r);
+    DBIG d;
+    BIG m;
+    int s=0;
+    chunk afx;
+    BIG_norm(a);
+    if (c<0)
+    {
+        c=-c;
+        s=1;
+    }
+    afx=(EXCESS(a)+1)*(c+1)+1;
+    if (c<NEXCESS && afx<FEXCESS)
+        BIG_imul(r,a,c);
+    else
+    {
+        if (afx<FEXCESS)
+        {
+            BIG_pmul(r,a,c);
+        }
+        else
+        {
+            BIG_rcopy(m,Modulus);
+            BIG_pxmul(d,a,c);
+            BIG_dmod(r,d,m);
+        }
+    }
+    if (s) FP_neg(r,r);
+    BIG_norm(r);
 }
 
 /* Set r=a^2 mod m */
 /* SU= 88 */
 void FP_sqr(BIG r,BIG a)
 {
-	DBIG d;
-	chunk ea=EXCESS(a);
-	if ((ea+1)*(ea+1)+1>=FEXCESS)
-	{
+    DBIG d;
+    chunk ea=EXCESS(a);
+    if ((ea+1)*(ea+1)+1>=FEXCESS)
+    {
 #ifdef DEBUG_REDUCE
-		printf("Product too large - reducing it %d\n",ea);
+        printf("Product too large - reducing it %d\n",ea);
 #endif
-		FP_reduce(a);
+        FP_reduce(a);
 #ifdef GET_STATS
-		rsqr++;
-	}
-	tsqr++;
+        rsqr++;
+    }
+    tsqr++;
 #else
-	}
+    }
 #endif
-	BIG_sqr(d,a);
-	FP_mod(r,d);
+    BIG_sqr(d,a);
+    FP_mod(r,d);
 }
 
 /* SU= 16 */
 /* Set r=a+b */
 void FP_add(BIG r,BIG a,BIG b)
 {
-	BIG_add(r,a,b);
-	if (EXCESS(r)+2>=FEXCESS)  /* +2 because a and b not normalised */
-	{
+    BIG_add(r,a,b);
+    if (EXCESS(r)+2>=FEXCESS)  /* +2 because a and b not normalised */
+    {
 #ifdef DEBUG_REDUCE
-		printf("Sum too large - reducing it %d\n",EXCESS(r));
+        printf("Sum too large - reducing it %d\n",EXCESS(r));
 #endif
-		FP_reduce(r);
+        FP_reduce(r);
 #ifdef GET_STATS
-		radd++;
-	}
-	tadd++;
+        radd++;
+    }
+    tadd++;
 #else
-	}
+    }
 #endif
 }
 
@@ -343,49 +344,54 @@ void FP_add(BIG r,BIG a,BIG b)
 /* SU= 56 */
 void FP_sub(BIG r,BIG a,BIG b)
 {
-	BIG n;
-	FP_neg(n,b);
-	FP_add(r,a,n);
+    BIG n;
+    FP_neg(n,b);
+    FP_add(r,a,n);
 }
 
 /* SU= 48 */
 /* Fully reduce a mod Modulus */
 void FP_reduce(BIG a)
 {
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	BIG_mod(a,m);
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    BIG_mod(a,m);
 }
 
 /* Set r=-a mod Modulus */
 /* SU= 64 */
 void FP_neg(BIG r,BIG a)
 {
-	int sb;
-	chunk ov;
-	BIG m;
+    int sb;
+    chunk ov;
+    BIG m;
 
-	BIG_rcopy(m,Modulus);
-	BIG_norm(a);
+    BIG_rcopy(m,Modulus);
+    BIG_norm(a);
 
-	ov=EXCESS(a);
-	sb=1; while(ov!=0) {sb++;ov>>=1;}  /* only unpredictable branch */
+    ov=EXCESS(a);
+    sb=1;
+    while(ov!=0)
+    {
+        sb++;    /* only unpredictable branch */
+        ov>>=1;
+    }
 
-	BIG_fshl(m,sb);
-	BIG_sub(r,m,a);
+    BIG_fshl(m,sb);
+    BIG_sub(r,m,a);
 
-	if (EXCESS(r)>=FEXCESS)
-	{
+    if (EXCESS(r)>=FEXCESS)
+    {
 #ifdef DEBUG_REDUCE
-		printf("Negation too large -  reducing it %d\n",EXCESS(r));
+        printf("Negation too large -  reducing it %d\n",EXCESS(r));
 #endif
-		FP_reduce(r);
+        FP_reduce(r);
 #ifdef GET_STATS
-		rneg++;
-	}
-	tneg++;
+        rneg++;
+    }
+    tneg++;
 #else
-	}
+    }
 #endif
 
 }
@@ -394,75 +400,76 @@ void FP_neg(BIG r,BIG a)
 /* SU= 56 */
 void FP_div2(BIG r,BIG a)
 {
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	BIG_norm(a);
-	if (BIG_parity(a)==0)
-	{
-		BIG_copy(r,a);
-		BIG_fshr(r,1);
-	}
-	else
-	{
-		BIG_add(r,a,m);
-		BIG_norm(r);
-		BIG_fshr(r,1);
-	}
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    BIG_norm(a);
+    if (BIG_parity(a)==0)
+    {
+        BIG_copy(r,a);
+        BIG_fshr(r,1);
+    }
+    else
+    {
+        BIG_add(r,a,m);
+        BIG_norm(r);
+        BIG_fshr(r,1);
+    }
 }
 
 /* set w=1/x */
 void FP_inv(BIG w,BIG x)
 {
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	BIG_copy(w,x);
-	FP_redc(w);
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    BIG_copy(w,x);
+    FP_redc(w);
 
-	BIG_invmodp(w,w,m);
-	FP_nres(w);
+    BIG_invmodp(w,w,m);
+    FP_nres(w);
 }
 
 /* SU=8 */
 /* set n=1 */
 void FP_one(BIG n)
 {
-	BIG_one(n); FP_nres(n);
+    BIG_one(n);
+    FP_nres(n);
 }
 
 /* Set r=a^b mod Modulus */
 /* SU= 136 */
 void FP_pow(BIG r,BIG a,BIG b)
 {
-	BIG w,z,zilch;
-	int bt;
-	BIG_zero(zilch);
+    BIG w,z,zilch;
+    int bt;
+    BIG_zero(zilch);
 
-	BIG_norm(b);
-	BIG_copy(z,b);
-	BIG_copy(w,a);
-	FP_one(r);
-	while(1)
-	{
-		bt=BIG_parity(z);
-		BIG_fshr(z,1);
-		if (bt) FP_mul(r,r,w);
-		if (BIG_comp(z,zilch)==0) break;
-		FP_sqr(w,w);
-	}
-	FP_reduce(r);
+    BIG_norm(b);
+    BIG_copy(z,b);
+    BIG_copy(w,a);
+    FP_one(r);
+    while(1)
+    {
+        bt=BIG_parity(z);
+        BIG_fshr(z,1);
+        if (bt) FP_mul(r,r,w);
+        if (BIG_comp(z,zilch)==0) break;
+        FP_sqr(w,w);
+    }
+    FP_reduce(r);
 }
 
 /* is r a QR? */
 int FP_qr(BIG r)
 {
-	int j;
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	FP_redc(r);
-	j=BIG_jacobi(r,m);
-	FP_nres(r);
-	if (j==1) return 1;
-	return 0;
+    int j;
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    FP_redc(r);
+    j=BIG_jacobi(r,m);
+    FP_nres(r);
+    if (j==1) return 1;
+    return 0;
 
 }
 
@@ -470,26 +477,33 @@ int FP_qr(BIG r)
 /* SU= 160 */
 void FP_sqrt(BIG r,BIG a)
 {
-	BIG v,i,b;
-	BIG m;
-	BIG_rcopy(m,Modulus);
-	BIG_mod(a,m);
-	BIG_copy(b,m);
-	if (MOD8==5)
-	{
-		BIG_dec(b,5); BIG_norm(b); BIG_fshr(b,3); /* (p-5)/8 */
-		BIG_copy(i,a); BIG_fshl(i,1);
-		FP_pow(v,i,b);
-		FP_mul(i,i,v); FP_mul(i,i,v);
-		BIG_dec(i,1);
-		FP_mul(r,a,v); FP_mul(r,r,i);
-		BIG_mod(r,m);
-	}
-	if (MOD8==3 || MOD8==7)
-	{
-		BIG_inc(b,1); BIG_norm(b); BIG_fshr(b,2); /* (p+1)/4 */
-		FP_pow(r,a,b);
-	}
+    BIG v,i,b;
+    BIG m;
+    BIG_rcopy(m,Modulus);
+    BIG_mod(a,m);
+    BIG_copy(b,m);
+    if (MOD8==5)
+    {
+        BIG_dec(b,5);
+        BIG_norm(b);
+        BIG_fshr(b,3); /* (p-5)/8 */
+        BIG_copy(i,a);
+        BIG_fshl(i,1);
+        FP_pow(v,i,b);
+        FP_mul(i,i,v);
+        FP_mul(i,i,v);
+        BIG_dec(i,1);
+        FP_mul(r,a,v);
+        FP_mul(r,r,i);
+        BIG_mod(r,m);
+    }
+    if (MOD8==3 || MOD8==7)
+    {
+        BIG_inc(b,1);
+        BIG_norm(b);
+        BIG_fshr(b,2); /* (p+1)/4 */
+        FP_pow(r,a,b);
+    }
 }
 
 /*
