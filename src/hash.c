@@ -39,15 +39,17 @@ under the License.
 #define H6 0x1F83D9ABL
 #define H7 0x5BE0CD19L
 
-static const unsign32 K[64]={
-0x428a2f98L,0x71374491L,0xb5c0fbcfL,0xe9b5dba5L,0x3956c25bL,0x59f111f1L,0x923f82a4L,0xab1c5ed5L,
-0xd807aa98L,0x12835b01L,0x243185beL,0x550c7dc3L,0x72be5d74L,0x80deb1feL,0x9bdc06a7L,0xc19bf174L,
-0xe49b69c1L,0xefbe4786L,0x0fc19dc6L,0x240ca1ccL,0x2de92c6fL,0x4a7484aaL,0x5cb0a9dcL,0x76f988daL,
-0x983e5152L,0xa831c66dL,0xb00327c8L,0xbf597fc7L,0xc6e00bf3L,0xd5a79147L,0x06ca6351L,0x14292967L,
-0x27b70a85L,0x2e1b2138L,0x4d2c6dfcL,0x53380d13L,0x650a7354L,0x766a0abbL,0x81c2c92eL,0x92722c85L,
-0xa2bfe8a1L,0xa81a664bL,0xc24b8b70L,0xc76c51a3L,0xd192e819L,0xd6990624L,0xf40e3585L,0x106aa070L,
-0x19a4c116L,0x1e376c08L,0x2748774cL,0x34b0bcb5L,0x391c0cb3L,0x4ed8aa4aL,0x5b9cca4fL,0x682e6ff3L,
-0x748f82eeL,0x78a5636fL,0x84c87814L,0x8cc70208L,0x90befffaL,0xa4506cebL,0xbef9a3f7L,0xc67178f2L};
+static const unsign32 K[64]=
+{
+    0x428a2f98L,0x71374491L,0xb5c0fbcfL,0xe9b5dba5L,0x3956c25bL,0x59f111f1L,0x923f82a4L,0xab1c5ed5L,
+    0xd807aa98L,0x12835b01L,0x243185beL,0x550c7dc3L,0x72be5d74L,0x80deb1feL,0x9bdc06a7L,0xc19bf174L,
+    0xe49b69c1L,0xefbe4786L,0x0fc19dc6L,0x240ca1ccL,0x2de92c6fL,0x4a7484aaL,0x5cb0a9dcL,0x76f988daL,
+    0x983e5152L,0xa831c66dL,0xb00327c8L,0xbf597fc7L,0xc6e00bf3L,0xd5a79147L,0x06ca6351L,0x14292967L,
+    0x27b70a85L,0x2e1b2138L,0x4d2c6dfcL,0x53380d13L,0x650a7354L,0x766a0abbL,0x81c2c92eL,0x92722c85L,
+    0xa2bfe8a1L,0xa81a664bL,0xc24b8b70L,0xc76c51a3L,0xd192e819L,0xd6990624L,0xf40e3585L,0x106aa070L,
+    0x19a4c116L,0x1e376c08L,0x2748774cL,0x34b0bcb5L,0x391c0cb3L,0x4ed8aa4aL,0x5b9cca4fL,0x682e6ff3L,
+    0x748f82eeL,0x78a5636fL,0x84c87814L,0x8cc70208L,0x90befffaL,0xa4506cebL,0xbef9a3f7L,0xc67178f2L
+};
 
 #define PAD  0x80
 #define ZERO 0
@@ -66,20 +68,30 @@ static const unsign32 K[64]={
 
 /* SU= 72 */
 static void HASH_transform(amcl_hash *sh)
-{ /* basic transformation step */
+{
+    /* basic transformation step */
     unsign32 a,b,c,d,e,f,g,h,t1,t2;
     int j;
-    for (j=16;j<64;j++)
+    for (j=16; j<64; j++)
         sh->w[j]=theta1(sh->w[j-2])+sh->w[j-7]+theta0(sh->w[j-15])+sh->w[j-16];
 
-    a=sh->h[0]; b=sh->h[1]; c=sh->h[2]; d=sh->h[3];
-    e=sh->h[4]; f=sh->h[5]; g=sh->h[6]; h=sh->h[7];
+    a=sh->h[0];
+    b=sh->h[1];
+    c=sh->h[2];
+    d=sh->h[3];
+    e=sh->h[4];
+    f=sh->h[5];
+    g=sh->h[6];
+    h=sh->h[7];
 
-    for (j=0;j<64;j++)
-    { /* 64 times - mush it up */
+    for (j=0; j<64; j++)
+    {
+        /* 64 times - mush it up */
         t1=h+Sig1(e)+Ch(e,f,g)+K[j]+sh->w[j];
         t2=Sig0(a)+Maj(a,b,c);
-        h=g; g=f; f=e;
+        h=g;
+        g=f;
+        f=e;
         e=d+t1;
         d=c;
         c=b;
@@ -87,15 +99,22 @@ static void HASH_transform(amcl_hash *sh)
         a=t1+t2;
     }
 
-    sh->h[0]+=a; sh->h[1]+=b; sh->h[2]+=c; sh->h[3]+=d;
-    sh->h[4]+=e; sh->h[5]+=f; sh->h[6]+=g; sh->h[7]+=h;
+    sh->h[0]+=a;
+    sh->h[1]+=b;
+    sh->h[2]+=c;
+    sh->h[3]+=d;
+    sh->h[4]+=e;
+    sh->h[5]+=f;
+    sh->h[6]+=g;
+    sh->h[7]+=h;
 }
 
 /* Initialise Hash function */
 void HASH_init(amcl_hash *sh)
-{ /* re-initialise */
+{
+    /* re-initialise */
     int i;
-    for (i=0;i<64;i++) sh->w[i]=0L;
+    for (i=0; i<64; i++) sh->w[i]=0L;
     sh->length[0]=sh->length[1]=0L;
     sh->h[0]=H0;
     sh->h[1]=H1;
@@ -109,7 +128,8 @@ void HASH_init(amcl_hash *sh)
 
 /* process a single byte */
 void HASH_process(amcl_hash *sh,int byte)
-{ /* process the next message byte */
+{
+    /* process the next message byte */
     int cnt;
 //printf("byt= %x\n",byte);
     cnt=(int)((sh->length[0]/32)%16);
@@ -118,14 +138,19 @@ void HASH_process(amcl_hash *sh,int byte)
     sh->w[cnt]|=(unsign32)(byte&0xFF);
 
     sh->length[0]+=8;
-    if (sh->length[0]==0L) { sh->length[1]++; sh->length[0]=0L; }
+    if (sh->length[0]==0L)
+    {
+        sh->length[1]++;
+        sh->length[0]=0L;
+    }
     if ((sh->length[0]%512)==0) HASH_transform(sh);
 }
 
 /* SU= 24 */
 /* Generate 32-byte Hash */
 void HASH_hash(amcl_hash *sh,char digest[32])
-{ /* pad message and finish - supply digest */
+{
+    /* pad message and finish - supply digest */
     int i;
     unsign32 len0,len1;
     len0=sh->length[0];
@@ -135,8 +160,9 @@ void HASH_hash(amcl_hash *sh,char digest[32])
     sh->w[14]=len1;
     sh->w[15]=len0;
     HASH_transform(sh);
-    for (i=0;i<32;i++)
-    { /* convert to bytes */
+    for (i=0; i<32; i++)
+    {
+        /* convert to bytes */
         digest[i]=(char)((sh->h[i/4]>>(8*(3-i%4))) & 0xffL);
     }
     HASH_init(sh);

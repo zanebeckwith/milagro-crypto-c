@@ -28,8 +28,8 @@ under the License.
 
 int main()
 {
-  char info[200] = {0};
-  version(info);
-  printf("%s\n", info);
-  return 0;
+    char info[200] = {0};
+    version(info);
+    printf("%s\n", info);
+    return 0;
 }
