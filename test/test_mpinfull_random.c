@@ -324,14 +324,14 @@ int main()
         }
       }
 
-      MPIN_HASH_ALL(&HCID,&U,&UT,&SEC,&Y,&Z,&T,&HM);  
+      MPIN_HASH_ALL(&HCID,&U,&UT,&SEC,&Y,&R,&W,&HM);  
       MPIN_CLIENT_KEY(&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);      
       printf("Client Key = "); 
       OCT_output(&CK);
 
       /* Server will use the hashed ID if anonymous connection required.
       MPIN_HASH_ID(&ID,&HSID);
-      MPIN_HASH_ALL(&HSID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
+      MPIN_HASH_ALL(&HSID,NULL,&UT,&SEC,&Y,&R,&W,&HM);
       */
       MPIN_SERVER_KEY(&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
       printf("Server Key = "); 
