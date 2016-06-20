@@ -30,6 +30,7 @@ There is also an example usage program in this file.
 """
 import cffi
 import platform
+import os
 
 # MPIN Group Size
 PGS = 32
@@ -823,6 +824,73 @@ def server_key(z, server_secret, w, hm, hid, u, ut):
     return error_code, server_aes_key, server_aes_key_val
 
 
+def aes_gcm_encrypt(aes_key,iv,header,plaintext):
+    """AES-GCM Encryption
+
+    AES-GCM Encryption 
+    
+    Args::
+
+        aes_key: AES Key
+	iv: Initializartion vector
+	header: header
+	plaintext: Plaintext to be encrypted
+           
+    Returns::
+        
+        ciphertext: resultant ciphertext
+        tag: checksum
+        
+        
+    Raises:
+        
+    """
+    aes_key1, aes_key1_val = make_octet(None,aes_key)
+    iv1, iv1_val = make_octet(None,iv)
+    header1, header1_val = make_octet(None,header)
+    plaintext1, plaintext1_val = make_octet(None,plaintext)        
+    tag1, tag1_val = make_octet(PAS)
+    ciphertext1, ciphertext1_val = make_octet(len(plaintext))
+
+    libmpin.MPIN_AES_GCM_ENCRYPT(aes_key1, iv1, header1, plaintext1, ciphertext1, tag1)
+    tag = to_hex(tag1)
+    ciphertext = to_hex(ciphertext1)    
+
+    return ciphertext.decode("hex"), tag.decode("hex")
+
+def aes_gcm_decrypt(aes_key,iv,header,ciphertext):
+    """AES-GCM Decryption
+
+    AES-GCM Deryption 
+    
+    Args::
+
+        aes_key: AES Key
+	iv: Initializartion vector
+	header: header
+        ciphertext: ciphertext
+           
+    Returns::
+        
+	plaintext: resultant plaintext
+        tag: checksum
+                
+    Raises:
+        
+    """
+    aes_key1, aes_key1_val = make_octet(None,aes_key)
+    iv1, iv1_val = make_octet(None,iv)
+    header1, header1_val = make_octet(None,header)
+    ciphertext1, ciphertext1_val = make_octet(None,ciphertext)        
+    tag1, tag1_val = make_octet(PAS)
+    plaintext1, plaintext1_val = make_octet(len(ciphertext))
+
+    libmpin.MPIN_AES_GCM_DECRYPT(aes_key1, iv1, header1, ciphertext1, plaintext1,tag1)
+    tag = to_hex(tag1)
+    plaintext = to_hex(plaintext1)    
+
+    return plaintext.decode("hex"), tag.decode("hex")
+
 if __name__ == "__main__":
     # Print hex values
     DEBUG = False
@@ -1094,3 +1162,22 @@ if __name__ == "__main__":
             if rtn != 0:
                 print "ERROR: Generating SK %s" % rtn
             print "Server AES Key: %s" % to_hex(SK)
+
+    client_aes_key_hex = to_hex(CK)
+    client_aes_key = client_aes_key_hex.decode("hex")
+    print client_aes_key.encode("hex")    
+    plaintext = "A test message"
+    print plaintext
+    header_hex = "1554a69ecbf04e507eb6985a234613246206c85f8af73e61ab6e2382a26f457d";
+    header = header_hex.decode("hex")
+    print header.encode("hex")
+    iv_hex = "2b213af6b0edf6972bf996fb";
+    iv = iv_hex.decode("hex")
+    print iv.encode("hex")    
+    ciphertext, tag = aes_gcm_encrypt(client_aes_key,iv,header,plaintext)
+    print "ciphertext ", ciphertext.encode("hex")
+    print "tag ", tag.encode("hex")        
+
+    plaintext2, tag2 = aes_gcm_decrypt(client_aes_key,iv,header,ciphertext)
+    print "plaintext2 ", plaintext2
+    print "tag2 ", tag2.encode("hex")        
