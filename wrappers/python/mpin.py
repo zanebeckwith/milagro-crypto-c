@@ -36,7 +36,7 @@ import os
 PGS = 32
 # MPIN Field Size
 PFS = 32
-G1 = 2*PFS + 1
+G1 = 2*PFS+1
 G2 = 4*PFS
 GT = 12*PFS
 # Hash Size
@@ -146,7 +146,7 @@ def make_octet(length, value=None):
     Returns::
         
         oct_ptr: octet pointer
-        val: data associated with octet
+        val: data associated with octet to prevent garbage collection
 
     Raises:
         
@@ -232,17 +232,18 @@ def hash_id(mpin_id):
            
     Returns::
         
-        hash_mpin_id: octet point to the hash of the M-Pin ID
-        hash_mpin_id_val: Data contained in octet
+        hash_mpin_id: hash of the M-Pin ID
         
     Raises:
         
     """
     # Hash value of mpin_id
-    hash_mpin_id, hash_mpin_id_val = make_octet(HASH_BYTES)
-    libmpin.MPIN_HASH_ID(mpin_id, hash_mpin_id)
+    mpin_id1, mpin_id1_val = make_octet(None,mpin_id)    
+    hash_mpin_id1, hash_mpin_id1_val = make_octet(HASH_BYTES)
+    libmpin.MPIN_HASH_ID(mpin_id1, hash_mpin_id1)
 
-    return hash_mpin_id, hash_mpin_id_val
+    hash_mpin_id_hex = to_hex(hash_mpin_id1)
+    return hash_mpin_id_hex.decode("hex")
 
 def random_generate(rng):
     """Generate a random group element
@@ -256,16 +257,16 @@ def random_generate(rng):
     Returns::
 
         error_code: error from the C function
-        s: A pointer to octet of a random group element
-        s_val: Data contained in octet
+        s: random group element
         
     Raises:
         
     """
-    s, s_val = make_octet(PGS)
-    error_code = libmpin.MPIN_RANDOM_GENERATE(rng, s)
+    s1, s_val = make_octet(PGS)
+    error_code = libmpin.MPIN_RANDOM_GENERATE(rng, s1)
 
-    return error_code, s, s_val
+    s_hex = to_hex(s1)
+    return error_code, s_hex.decode("hex")
 
 def get_server_secret(master_secret):
     """Create a server secret in G2 from a master secret
@@ -279,16 +280,17 @@ def get_server_secret(master_secret):
     Returns::
 
         error_code: error from the C function        
-        server_secret: A pointer to octet pointer of the server secret
-        server_secret_val: Data contained in octet
+        server_secret: Server secret
         
     Raises:
         
     """
-    server_secret, server_secret_val  = make_octet(G2)
-    error_code = libmpin.MPIN_GET_SERVER_SECRET(master_secret, server_secret)
+    master_secret1, master_secret1_val = make_octet(None,master_secret)    
+    server_secret1, server_secret1_val  = make_octet(G2)
+    error_code = libmpin.MPIN_GET_SERVER_SECRET(master_secret1, server_secret1)
 
-    return error_code, server_secret, server_secret_val
+    server_secret_hex = to_hex(server_secret1)
+    return error_code, server_secret_hex.decode("hex")
 
 def recombine_G2(q1,q2):
     """Add two members from the group G1
@@ -304,15 +306,17 @@ def recombine_G2(q1,q2):
 
         error_code: error from the C function        
         q: An output member of G1 = Q1+Q2
-        q_val: Data contained in octet
         
     Raises:
         
     """
-    q, q_val  = make_octet(G2)
-    error_code =  libmpin.MPIN_RECOMBINE_G2(q1, q2, q)
+    q11, q11_val = make_octet(None,q1)
+    q21, q21_val = make_octet(None,q2)            
+    q1, q1_val  = make_octet(G2)
+    error_code =  libmpin.MPIN_RECOMBINE_G2(q11, q21, q1)
 
-    return error_code, q, q_val
+    q_hex = to_hex(q1)
+    return error_code, q_hex.decode("hex")
 
 def get_client_secret(master_secret, hash_mpin_id):
     """Create a client secret in G1 from a master secret and the hash of the M-Pin Id
@@ -327,16 +331,18 @@ def get_client_secret(master_secret, hash_mpin_id):
     Returns::
 
         error_code: error from the C function        
-        client_secret: Pointer to octet of client secret
-        client_secret_val: Data contained in octet
+        client_secret: Client secret
         
     Raises:
         
     """
-    client_secret, client_secret_val  = make_octet(G1)
-    error_code = libmpin.MPIN_GET_CLIENT_SECRET(master_secret, hash_mpin_id, client_secret)
+    master_secret1, master_secret1_val = make_octet(None,master_secret)
+    hash_mpin_id1, hash_mpin_id1_val = make_octet(None,hash_mpin_id)
+    client_secret1, client_secret1_val  = make_octet(G1)
+    error_code = libmpin.MPIN_GET_CLIENT_SECRET(master_secret1, hash_mpin_id1, client_secret1)
 
-    return error_code, client_secret, client_secret_val
+    client_secret_hex = to_hex(client_secret1)
+    return error_code, client_secret_hex.decode("hex")
 
 def recombine_G1(q1,q2):
     """Add two members from the group G1
@@ -352,15 +358,17 @@ def recombine_G1(q1,q2):
 
         error_code: error from the C function        
         q: An output member of G1 = Q1+Q2
-        q_val: Data contained in octet
         
     Raises:
         
     """
-    q, q_val  = make_octet(G1)
-    error_code =  libmpin.MPIN_RECOMBINE_G1(q1, q2, q)
+    q11, q11_val = make_octet(None,q1)
+    q21, q21_val = make_octet(None,q2)            
+    q1, q1_val  = make_octet(G1)
+    error_code =  libmpin.MPIN_RECOMBINE_G1(q11, q21, q1)
 
-    return error_code, q, q_val
+    q_hex = to_hex(q1)
+    return error_code, q_hex.decode("hex")
 
 def get_client_permit(epoch_days, master_secret, hash_mpin_id):
     """Create a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
@@ -375,16 +383,18 @@ def get_client_permit(epoch_days, master_secret, hash_mpin_id):
     Returns::
 
         error_code: error from the C function        
-        time_permit: Pointer to octet of time permit
-        time_permit_val: Data contained in octet
+        time_permit: Time permit
         
     Raises:
         
     """
-    time_permit, time_permit_val = make_octet(G1)
-    error_code = libmpin.MPIN_GET_CLIENT_PERMIT(epoch_days, master_secret, hash_mpin_id, time_permit)
+    master_secret1, master_secret1_val = make_octet(None,master_secret)
+    hash_mpin_id1, hash_mpin_id1_val = make_octet(None,hash_mpin_id)    
+    time_permit1, time_permit1_val = make_octet(G1)
+    error_code = libmpin.MPIN_GET_CLIENT_PERMIT(epoch_days, master_secret1, hash_mpin_id1, time_permit1)
 
-    return error_code, time_permit, time_permit_val
+    time_permit_hex = to_hex(time_permit1)
+    return error_code, time_permit_hex.decode("hex")
 
 def extract_pin(mpin_id, pin, client_secret):
     """Extract a PIN from client secret
@@ -405,9 +415,13 @@ def extract_pin(mpin_id, pin, client_secret):
     Raises:
         
     """
-    error_code = libmpin.MPIN_EXTRACT_PIN(mpin_id, pin, client_secret)
+    mpin_id1, mpin_id1_val = make_octet(None,mpin_id)
+    client_secret1, client_secret1_val  = make_octet(None,client_secret)
+    
+    error_code = libmpin.MPIN_EXTRACT_PIN(mpin_id1, pin, client_secret1)
 
-    return error_code, client_secret
+    client_secret_hex = to_hex(client_secret1)
+    return error_code, client_secret_hex.decode("hex")
 
 def precompute(token, hash_mpin_id):
     """Precompute values for use by the client side of M-Pin Full
@@ -423,19 +437,20 @@ def precompute(token, hash_mpin_id):
 
         error_code: error from the C function        
         pc1: Precomputed value one 
-        pc1_val: Precomputed value one data        
         pc2: Precomputed value two
-        pc2_val: Precomputed value two data        
-
         
     Raises:
         
     """
-    pc1, pc1_val = make_octet(GT)
-    pc2, pc2_val = make_octet(GT)
-    error_code = libmpin.MPIN_PRECOMPUTE(TOKEN, hash_mpin_id, pc1, pc2)
+    token1, token1_val = make_octet(None,token)
+    hash_mpin_id1, hash_mpin_id1_val = make_octet(None,hash_mpin_id)    
+    pc11, pc11_val = make_octet(GT)
+    pc21, pc21_val = make_octet(GT)
+    error_code = libmpin.MPIN_PRECOMPUTE(token1, hash_mpin_id1, pc11, pc21)
 
-    return error_code, pc1, pc1_val, pc2, pc2_val
+    pc1_hex = to_hex(pc11)
+    pc2_hex = to_hex(pc21)
+    return error_code, pc1_hex.decode("hex"), pc2_hex.decode("hex")
 
 def client_1(epoch_date, mpin_id, rng, x, pin, token, time_permit):
     """Perform first pass of the client side of the 2-pass version of the M-Pin protocol
@@ -460,27 +475,33 @@ def client_1(epoch_date, mpin_id, rng, x, pin, token, time_permit):
 
         error_code: error from the C function
         x: Randomly generated integer if R!=NULL, otherwise must be provided as an input
-        x_val: x data
 	u: u = x.H(ID)
-        u_data: u data
 	ut: ut = x.(H(ID)+H(epoch_date|H(ID)))
-        ut_data: ut data
 	v: v = CS+TP, where CS is the reconstructed client secret and TP is the time permit
-        v_date: v data        
         
     Raises:
         
     """
+    mpin_id1, mpin_id1_val = make_octet(None,mpin_id)    
+    token1, token1_val  = make_octet(None,token)
+    time_permit1, time_permit1_val  = make_octet(None,time_permit)
+    
     if rng is not None:
-        x, x_val = make_octet(PGS)
+        x1, x1_val = make_octet(PGS)
+    else:
+        x1, x1_val = make_octet(None,x)        
 
-    u, u_val = make_octet(G1)    
-    ut, ut_val = make_octet(G1)
-    v, v_val = make_octet(G1)
+    u1, u1_val = make_octet(G1)    
+    ut1, ut1_val = make_octet(G1)
+    v1, v1_val = make_octet(G1)
   
-    error_code = libmpin.MPIN_CLIENT_1(epoch_date, mpin_id, rng, x, pin, token, v, u, ut, time_permit)
+    error_code = libmpin.MPIN_CLIENT_1(epoch_date, mpin_id1, rng, x1, pin, token1, v1, u1, ut1, time_permit1)
 
-    return error_code, x, x_val, u, u_val, ut, ut_val, v, v_val,
+    x_hex = to_hex(x1)
+    u_hex = to_hex(u1)    
+    ut_hex = to_hex(ut1)
+    v_hex = to_hex(v1)    
+    return error_code, x_hex.decode("hex"),u_hex.decode("hex"), ut_hex.decode("hex"), v_hex.decode("hex")
 
 def client_2(x,y,sec):
     """Perform second pass of the client side of the 3-pass version of the M-Pin protocol
@@ -497,14 +518,17 @@ def client_2(x,y,sec):
 
         error_code: error from the C function
 	v: v = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
-        v_date: v data        
         
     Raises:
         
     """
-    error_code = libmpin.MPIN_CLIENT_2(x,y,sec)
+    x1, x1_val = make_octet(None,x)
+    y1, y1_val = make_octet(None,y)
+    sec1, sec1_val = make_octet(None,sec)        
+    error_code = libmpin.MPIN_CLIENT_2(x1,y1,sec1)
 
-    return error_code, sec
+    sec_hex = to_hex(sec1)
+    return error_code, sec_hex.decode("hex")
 
 def client(epoch_date, mpin_id, rng, x, pin, token, time_permit, message, epoch_time):
     """Perform client side of the one-pass version of the M-Pin protocol
@@ -531,61 +555,78 @@ def client(epoch_date, mpin_id, rng, x, pin, token, time_permit, message, epoch_
 
         error_code: error from the C function
         x: Randomly generated integer if R!=NULL, otherwise must be provided as an input
-        x_val: x data
 	u: u = x.H(ID)
-        u_data: u data
 	ut: ut = x.(H(ID)+H(epoch_date|H(ID)))
-        ut_data: ut data
 	v: v = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
-        v_date: v data        
 	y: y = t H(t|U) or y = H(t|UT) if Time Permits enabled
-        y_date: y data
         
     Raises:
         
     """
+    mpin_id1, mpin_id1_val = make_octet(None,mpin_id)    
+    token1, token1_val = make_octet(None,token)
+    time_permit1, time_permit1_val  = make_octet(None,time_permit)
+    
     if rng is not None:
-        x, x_val = make_octet(PGS)
+        x1, x1_val = make_octet(PGS)
+    else:
+        x1, x1_val = make_octet(None,x)
 
     if message is None:
-        message = ffi.NULL
-        
-    u, u_val = make_octet(G1)    
-    ut, ut_val = make_octet(G1)
-    v, v_val = make_octet(G1)
-    y, y_val = make_octet(PGS)
+        message1 = ffi.NULL
+    else:
+        message1, message1_val = make_octet(None,message)                
+    
+    u1, u1_val = make_octet(G1)    
+    ut1, ut1_val = make_octet(G1)
+    v1, v1_val = make_octet(G1)
+    y1, y1_val = make_octet(PGS)
   
-    error_code = libmpin.MPIN_CLIENT(epoch_date, mpin_id, rng, x, pin, token, v, u, ut, time_permit, message, epoch_time, y)
+    error_code = libmpin.MPIN_CLIENT(epoch_date, mpin_id1, rng, x1, pin, token1, v1, u1, ut1, time_permit1, message1, epoch_time, y1)
 
-    return error_code, x, x_val, u, u_val, ut, ut_val, v, v_val, y, y_val
+    x_hex = to_hex(x1)
+    u_hex = to_hex(u1)    
+    ut_hex = to_hex(ut1)
+    v_hex = to_hex(v1)
+    y_hex = to_hex(y1)        
+    return error_code, x_hex.decode("hex"),u_hex.decode("hex"), ut_hex.decode("hex"), v_hex.decode("hex"), y_hex.decode("hex")
 
-def get_G1_multiple(rng, type, G):
+
+def get_G1_multiple(rng, type, x, P):
     """Find a random multiple of a point in G1
 
-    Find a random multiple of a point in G1
+    Calculate W=x*P where random x < q is the order of the group of points on the curve.
+    When rng is None x is passed in otherwise it is passed out.
+
+    If type=0 then P is. point on the curve or else P is an octet that has to be
+    mapped to the curve
     
     Args::
 
         rng: Pointer to cryptographically secure pseudo-random number generator instance
         type: determines type of action to be taken
-        G: if type=0 a point in G1, else an octet to be mapped to G1
+        P: if type=0 a point in G1, else an octet to be mapped to G1
            
     Returns::
 
         error_code: error from the C function
         x: an output internally randomly generated if rng!=None, otherwise must be provided as an input
-        x_val: x data
-        W: W = x.G or W = x.M(G), where M(.) is a mapping when type = 0
-        W_val: W data
+        W: W = x.P or W = x.M(P), where M(.) is a mapping when type = 0
         
     Raises:
         
     """
-    x, x_val = make_octet(PGS)
-    W, W_val = make_octet(G1)
-    error_code = libmpin.MPIN_GET_G1_MULTIPLE(rng, type, x, G, W)
+    if rng is not None:
+        x1, x1_val = make_octet(PGS)
+    else:
+        x1, x1_val = make_octet(None,x)            
+    P1, P1_val = make_octet(None,P)            
+    W1, W1_val = make_octet(G1)
+    error_code = libmpin.MPIN_GET_G1_MULTIPLE(rng, type, x1, P1, W1)
 
-    return error_code, x, x_val, W, W_val
+    x_hex = to_hex(x1)
+    W_hex = to_hex(W1)    
+    return error_code, x_hex.decode("hex"), W_hex.decode("hex")
 
 def server_1(epoch_date, mpin_id):
     """Perform first pass of the server side of the 3-pass version of the M-Pin protocol
@@ -593,7 +634,7 @@ def server_1(epoch_date, mpin_id):
     Perform first pass of the server side of the 3-pass version of the M-Pin protocol
     If Time Permits are disabled, set epoch_date = 0, and UT and HTID are not generated
     and can be set to NULL. If Time Permits are enabled, and PIN error detection is OFF,
-    U and HID are not needed and can be set to NULL. If Time Permits are enabled,
+    U and HID are not needed and caxn be set to NULL. If Time Permits are enabled,
     and PIN error detection is ON, U, UT, HID and HTID are all required.
     
     Args::
@@ -603,23 +644,24 @@ def server_1(epoch_date, mpin_id):
            
     Returns::
 
-        hid:  H(mpin_id). H is a map to a point on the curve
-        hid_val:hid data
-        htid: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
-        htid_val: htid data
+        HID:  H(mpin_id). H is a map to a point on the curve
+        HTID: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
         
     Raises:
         
     """
-    htid, htid_val = make_octet(G1)
-    hid, hid_val = make_octet(G1)
+    mpin_id1, mpin_id1_val = make_octet(None,mpin_id)    
+    HTID1, HTID1_val = make_octet(G1)
+    HID1, HID1_val = make_octet(G1)
   
-    libmpin.MPIN_SERVER_1(epoch_date, mpin_id, hid, htid)
+    libmpin.MPIN_SERVER_1(epoch_date, mpin_id1, HID1, HTID1)
 
-    return hid, hid_val, htid, htid_val
+    HID_hex = to_hex(HID1)
+    HTID_hex = to_hex(HTID1)    
+    return HID_hex.decode("hex"), HTID_hex.decode("hex")
 
 
-def server_2(epoch_date, hid, htid, y, server_secret, u, ut, v):
+def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
     """Perform third pass on the server side of the 3-pass version of the M-Pin protocol
 
     Perform server side of the one-pass version of the M-Pin protocol. If Time
@@ -631,8 +673,8 @@ def server_2(epoch_date, hid, htid, y, server_secret, u, ut, v):
     Args::
 
 	epoch_date: Date, in days since the epoch. Set to 0 if Time permits disabled
-        hid:  H(mpin_id). H is a map to a point on the curve
-        htid: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
+        HID:  H(mpin_id). H is a map to a point on the curve
+        HTID: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
         y: locally generated random number        
         server_secret: Server secret
 	u: u = x.H(ID)
@@ -643,19 +685,27 @@ def server_2(epoch_date, hid, htid, y, server_secret, u, ut, v):
 
         error_code: error from the C function
         e: value to help the Kangaroos to find the PIN error, or NULL if not required
-        e_val: e data
         f: value to help the Kangaroos to find the PIN error, or NULL if not required
-        f_val: f data
         
     Raises:
         
     """
-    e, e_val = make_octet(GT)
-    f, f_val = make_octet(GT)
+    HID1, HID1_val = make_octet(None,HID)
+    HTID1, HTID1_val = make_octet(None,HTID)
+    y1, y1_val = make_octet(None,y)
+    server_secret1, server_secret1_val = make_octet(None,server_secret)
+    u1, u1_val = make_octet(None,u)
+    ut1, ut1_val = make_octet(None,ut)
+    v1, v1_val = make_octet(None,v)    
+    
+    e1, e1_val = make_octet(GT)
+    f1, f1_val = make_octet(GT)
   
-    error_code = libmpin.MPIN_SERVER_2(epoch_date, hid, htid, y, server_secret, u, ut, v, e, f)
+    error_code = libmpin.MPIN_SERVER_2(epoch_date, HID1, HTID1, y1, server_secret1, u1, ut1, v1, e1, f1)
 
-    return error_code, e, e_val, f, f_val
+    e_hex = to_hex(e1)
+    f_hex = to_hex(f1)    
+    return error_code, e_hex.decode("hex"), f_hex.decode("hex")
 
 def server(epoch_date, server_secret, u, ut, v, mpin_id, message, epoch_time):
     """Perform server side of the one-pass version of the M-Pin protocol
@@ -680,32 +730,40 @@ def server(epoch_date, server_secret, u, ut, v, mpin_id, message, epoch_time):
     Returns::
 
         error_code: error from the C function
-        hid:  H(mpin_id). H is a map to a point on the curve
-        hid_val:hid data
-        htid: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
-        htid_val: htid data
+        HID:  H(mpin_id). H is a map to a point on the curve
+        HTID: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
         e: value to help the Kangaroos to find the PIN error, or NULL if not required
-        e_val: e data
         f: value to help the Kangaroos to find the PIN error, or NULL if not required
-        f_val: f data
 	y: y = t H(t|U) or y = H(t|UT) if Time Permits enabled used for debug
-        y_date: y data
         
     Raises:
         
     """
     if message is None:
-        message = ffi.NULL
+        message1 = ffi.NULL
+    else:
+        message1, message1_val = make_octet(None,message)                
 
-    htid, htid_val = make_octet(G1)
-    hid, hid_val = make_octet(G1)
-    e, e_val = make_octet(GT)
-    f, f_val = make_octet(GT)
-    y, y_val = make_octet(PGS)
+    server_secret1, server_secret1_val = make_octet(None,server_secret)
+    u1, u1_val = make_octet(None,u)
+    ut1, ut1_val = make_octet(None,ut)
+    v1, v1_val = make_octet(None,v)    
+    mpin_id1, mpin_id1_val = make_octet(None,mpin_id)
+    
+    HTID1, HTID1_val = make_octet(G1)
+    HID1, HID1_val = make_octet(G1)
+    e1, e1_val = make_octet(GT)
+    f1, f1_val = make_octet(GT)
+    y1, y1_val = make_octet(PGS)
   
-    error_code = libmpin.MPIN_SERVER(epoch_date, hid, htid, y, server_secret, u, ut, v, e, f, mpin_id, message, epoch_time)
+    error_code = libmpin.MPIN_SERVER(epoch_date, HID1, HTID1, y1, server_secret1, u1, ut1, v1, e1, f1, mpin_id1, message1, epoch_time)
 
-    return error_code, hid, hid_val, htid, htid_val, e, e_val, f, f_val, y, y_val
+    HID_hex = to_hex(HID1)
+    HTID_hex = to_hex(HTID1)    
+    e_hex = to_hex(e1)
+    f_hex = to_hex(f1)
+    y_hex = to_hex(y1)        
+    return error_code, HID_hex.decode("hex"), HTID_hex.decode("hex"), e_hex.decode("hex"), f_hex.decode("hex"), y_hex.decode("hex")
 
 
 def kangaroo(e,f):
@@ -725,7 +783,9 @@ def kangaroo(e,f):
     Raises:
         
     """
-    pin_error = libmpin.MPIN_KANGAROO(e, f)
+    e1, e1_val = make_octet(None,e)
+    f1, f1_val = make_octet(None,f)    
+    pin_error = libmpin.MPIN_KANGAROO(e1, f1)
 
     return pin_error
 
@@ -748,17 +808,26 @@ def hash_all(hash_mpin_id, u, ut, v, y, r, w):
     Returns::
 
         hm: hash of the input values
-        hm_data: hm data
         
     Raises:
         
     """
     if ut is None:
-        ut = ffi.NULL
-    hm, hm_val = make_octet(HASH_BYTES)  
-    libmpin.MPIN_HASH_ALL(hash_mpin_id,u,ut,v,y,r,w,hm);
+        ut1 = ffi.NULL
+    else:
+        ut1, ut1_val = make_octet(None,ut)
+    hash_mpin_id1, hash_mpin_id1_val = make_octet(None,hash_mpin_id)        
+    u1, u1_val = make_octet(None,u)
+    v1, v1_val = make_octet(None,v)
+    y1, y1_val = make_octet(None,y)
+    r1, r1_val = make_octet(None,r)
+    w1, w1_val = make_octet(None,w)
+    
+    hm1, hm1_val = make_octet(HASH_BYTES)  
+    libmpin.MPIN_HASH_ALL(hash_mpin_id1,u1,ut1,v1,y1,r1,w1,hm1)
 
-    return hm, hm_val
+    hm_hex = to_hex(hm1)
+    return hm_hex.decode("hex")
 
 def client_key(pc1, pc2, pin, r, x, hm, t):
     """Calculate Key on Client side for M-Pin Full
@@ -779,18 +848,24 @@ def client_key(pc1, pc2, pin, r, x, hm, t):
 
         error_code: error code from the C function
         client_aes_key: client AES key
-        client_aes_key_val: client_aes_key data
         
     Raises:
         
     """
-    client_aes_key, client_aes_key_val = make_octet(PAS)
-    error_code = libmpin.MPIN_CLIENT_KEY(pc1, pc2, pin, r, x, hm, t, client_aes_key)
+    pc11, pc11_val = make_octet(None,pc1)
+    pc21, pc21_val = make_octet(None,pc2)
+    r1, r1_val = make_octet(None,r)
+    x1, x1_val = make_octet(None,x)
+    hm1, hm1_val = make_octet(None,hm)
+    t1, t1_val = make_octet(None,t)    
+    client_aes_key1, client_aes_key_val1 = make_octet(PAS)
+    error_code = libmpin.MPIN_CLIENT_KEY(pc11, pc21, pin, r1, x1, hm1, t1, client_aes_key1)
 
-    return error_code, client_aes_key, client_aes_key_val
+    client_aes_key_hex = to_hex(client_aes_key1)
+    return error_code, client_aes_key_hex.decode("hex")
 
 
-def server_key(z, server_secret, w, hm, hid, u, ut):
+def server_key(z, server_secret, w, hm, HID, u, ut):
     """Calculate Key on Server side for M-Pin Full
 
     Calculate Key on Server side for M-Pin Full.Uses UT internally for the
@@ -802,7 +877,7 @@ def server_key(z, server_secret, w, hm, hid, u, ut):
 	server_secret: server secret
 	w: random number generated by the server
 	hm: hash of the protocol transcript
-        hid: H(mpin_id). H is a map to a point on the curve
+        HID: H(mpin_id). H is a map to a point on the curve
 	u: u = x.H(ID)
 	ut: ut = x.(H(ID)+H(epoch_date|H(ID)))
            
@@ -810,18 +885,26 @@ def server_key(z, server_secret, w, hm, hid, u, ut):
 
         error_code: error code from the C function
         server_aes_key: server AES key
-        server_aes_key_val: server_aes_key data
         
     Raises:
         
     """
     if ut is None:
-        ut =  ffi.NULL
-        
-    server_aes_key, server_aes_key_val = make_octet(PAS)
-    error_code = libmpin.MPIN_SERVER_KEY(z, server_secret, w, hm, hid, u, ut, server_aes_key)
+        ut1 = ffi.NULL
+    else:
+        ut1, ut1_val = make_octet(None,ut)
+    z1, z1_val = make_octet(None,z)
+    server_secret1, server_secret1_val = make_octet(None,server_secret)    
+    w1, w1_val = make_octet(None,w)
+    hm1, hm1_val = make_octet(None,hm)
+    HID1, HID1_val = make_octet(None,HID)        
+    u1, u1_val = make_octet(None,u)
+    
+    server_aes_key1, server_aes_key1_val = make_octet(PAS)
+    error_code = libmpin.MPIN_SERVER_KEY(z1, server_secret1, w1, hm1, HID1, u1, ut1, server_aes_key1)
 
-    return error_code, server_aes_key, server_aes_key_val
+    server_aes_key_hex = to_hex(server_aes_key1)
+    return error_code, server_aes_key_hex.decode("hex")
 
 
 def aes_gcm_encrypt(aes_key,iv,header,plaintext):
@@ -895,9 +978,9 @@ if __name__ == "__main__":
     # Print hex values
     DEBUG = False
     # Require user input
-    INPUT = False
+    INPUT = True
     ONE_PASS = True
-    TIME_PERMITS = False
+    TIME_PERMITS = True
     MPIN_FULL = True
     PIN_ERROR = True
     USE_ANONYMOUS = False
@@ -911,111 +994,103 @@ if __name__ == "__main__":
     seedHex = "3ade3d4a5c698e8910bf92f25d97ceeb7c25ed838901a5cb5db2cf25434c1fe76c7f79b7af2e5e1e4988e4294dbd9bd9fa3960197fb7aec373609fb890d74b16a4b14b2ae7e23b75f15d36c21791272372863c4f8af39980283ae69a79cf4e48e908f9e0"
     seed = seedHex.decode("hex")
 
-    # Identity
-    if INPUT:
-        identity = raw_input("Please enter identity:")
-    else:
-        identity = "user@miracl.com"
-    MPIN_ID, MPIN_ID_val = make_octet(None,identity)
-
-    X, X_val = make_octet(PGS)
-
-    # Assign a seed value
-    RAW, RAW_val = make_octet(None,seed)
-    if DEBUG:
-        print "RAW: %s" % to_hex(RAW)
-
     # random number generator
-    # rng = ffi.new("csprng*")
-    # libmpin.MPIN_CREATE_CSPRNG(RNG, RAW)
     rng = create_csprng(seed)
 
-    # Hash MPIN_ID
-    HASH_MPIN_ID, HASH_MPIN_ID_val = hash_id(MPIN_ID)
+    # Identity
+    if INPUT:
+        mpin_id = raw_input("Please enter identity:")
+    else:
+        mpin_id = "user@miracl.com"
+
+    x = "a5a5"
+
+    # Hash mpin_id
+    hash_mpin_id = hash_id(mpin_id)
     if DEBUG:
-        print "MPIN_ID: %s" % to_hex(MPIN_ID)
-        print "HASH_MPIN_ID: %s" % to_hex(HASH_MPIN_ID)
+        print "mpin_id: %s" % mpin_id.encode("hex")
+        print "hash_mpin_id: %s" % hash_mpin_id.encode("hex")
 
     if USE_ANONYMOUS:
-        pID = HASH_MPIN_ID
+        pID = hash_mpin_id
     else:
-        pID = MPIN_ID
+        pID = mpin_id
         
     # Generate master secret for MIRACL and Customer
-    rtn,MS1,MS1_val = random_generate(rng)
+    rtn,ms1 = random_generate(rng)
     if rtn != 0:
         print "random_generate(rng) Error %s", rtn
-    rtn,MS2,MS2_val = random_generate(rng)        
+    rtn,ms2 = random_generate(rng)        
     if rtn != 0:
         print "random_generate(rng) Error %s", rtn
     if DEBUG:
-        print "MS1: %s" % to_hex(MS1)
-        print "MS2: %s" % to_hex(MS2)
+        print "ms1: %s" % to_hex(ms1)
+        print "ms2: %s" % to_hex(ms2)
 
     # Generate server secret shares
-    rtn,SS1,SS1_val = get_server_secret(MS1)
+    rtn,ss1 = get_server_secret(ms1)
     if rtn != 0:
-        print "get_server_secret(MS1) Error %s" % rtn
-    rtn,SS2,SS2_val = get_server_secret(MS2)        
+        print "get_server_secret(ms1) Error %s" % rtn
+    rtn,ss2 = get_server_secret(ms2)        
     if rtn != 0:
-        print "get_server_secret(MS2) Error %s" % rtn
+        print "get_server_secret(ms2) Error %s" % rtn
     if DEBUG:
-        print "SS1: %s" % to_hex(SS1)
-        print "SS2: %s" % to_hex(SS2)
+        print "ss1: %s" % to_hex(ss1)
+        print "ss2: %s" % to_hex(ss2)
 
     # Combine server secret shares
-    rtn, SERVER_SECRET, SERVER_SECRET_val = recombine_G2(SS1, SS2)
+    rtn, server_secret = recombine_G2(ss1, ss2)
     if rtn != 0:
-        print "recombine_G2(SS1, SS2) Error %s" % rtn
+        print "recombine_G2(ss1, ss2) Error %s" % rtn
     if DEBUG:
-        print "SERVER_SECRET: %s" % to_hex(SERVER_SECRET)
+        print "server_secret: %s" % to_hex(server_secret)
 
     # Generate client secret shares
-    rtn, CS1, CS1_val = get_client_secret(MS1, HASH_MPIN_ID)
+    rtn, cs1 = get_client_secret(ms1, hash_mpin_id)
     if rtn != 0:
-        print "get_client_secret(MS1, HASH_MPIN_ID) Error %s" % rtn
-    rtn, CS2, CS2_val = get_client_secret(MS2, HASH_MPIN_ID)
+        print "get_client_secret(ms1, hash_mpin_id) Error %s" % rtn
+    rtn, cs2 = get_client_secret(ms2, hash_mpin_id)
     if rtn != 0:
-        print "get_client_secret(MS2, HASH_MPIN_ID) Error %s" % rtn
+        print "get_client_secret(ms2, hash_mpin_id) Error %s" % rtn
     if DEBUG:
-        print "CS1: %s" % to_hex(CS1)
-        print "CS2: %s" % to_hex(CS2)
+        print "cs1: %s" % to_hex(cs1)
+        print "cs2: %s" % to_hex(cs2)
 
-    # Combine client secret shares : TOKEN is the full client secret
-    rtn, TOKEN, TOKEN_val = recombine_G1(CS1, CS2)
+    # Combine client secret shares 
+    rtn, client_secret = recombine_G1(cs1, cs2)
     if rtn != 0:
-        print "recombine_G1(CS1, CS2) Error %s" % rtn
-    print "Client Secret: %s" % to_hex(TOKEN)
+        print "recombine_G1(cs1, cs2) Error %s" % rtn
+    print "Client Secret: %s" % client_secret.encode("hex")
 
     # Generate Time Permit shares
     if DEBUG:
         print "Date %s" % date
-    rtn, TP1, TP1_val = get_client_permit(date, MS1, HASH_MPIN_ID)
+    rtn, tp1 = get_client_permit(date, ms1, hash_mpin_id)
     if rtn != 0:
-        print "get_client_permit(date, MS1, HASH_MPIN_ID) Error %s" % rtn
-    rtn, TP2, TP2_val = get_client_permit(date, MS2, HASH_MPIN_ID)
+        print "get_client_permit(date, ms1, hash_mpin_id) Error %s" % rtn
+    rtn, tp2 = get_client_permit(date, ms2, hash_mpin_id)
     if rtn != 0:
-        print "get_client_permit(date, MS2, HASH_MPIN_ID) Error %s" % rtn
+        print "get_client_permit(date, ms2, hash_mpin_id) Error %s" % rtn
     if DEBUG:
-        print "TP1: %s" % to_hex(TP1)
-        print "TP2: %s" % to_hex(TP2)
+        print "tp1: %s" % tp1.encode("hex")
+        print "tp2: %s" % tp2.encode("hex")
 
     # Combine Time Permit shares
-    rtn, TIME_PERMIT, TIME_PERMIT_val = recombine_G1(TP1, TP2)
+    rtn, time_permit = recombine_G1(tp1, tp2)
     if rtn != 0:
-        print "recombine_G1(TP1, TP2) Error %s" % rtn
+        print "recombine_G1(tp1, tp2) Error %s" % rtn
     if DEBUG:
-        print "TIME_PERMIT: %s" % to_hex(TIME_PERMIT)
+        print "time_permit: %s" % time_permit.encode("hex")
 
     # Client extracts PIN from secret to create Token
     if INPUT:
         PIN = int(raw_input("Please enter four digit PIN to create M-Pin Token:"))
     else:
         PIN = 1234
-    rtn, TOKEN = extract_pin(MPIN_ID, PIN, TOKEN)
+    rtn, token = extract_pin(mpin_id, PIN, client_secret)
     if rtn != 0:
-        print "extract_pin(MPIN_ID, PIN, TOKEN) Error %s" % rtn
-    print "Token: %s" % to_hex(TOKEN)
+        print "extract_pin(mpin_id, PIN, token) Error %s" % rtn
+    print "Token: %s" % token.encode("hex")
 
     if ONE_PASS:
         print "M-Pin One Pass"
@@ -1023,58 +1098,60 @@ if __name__ == "__main__":
             PIN = int(raw_input("Please enter PIN to authenticate:"))
         else:
             PIN = 1234
-        TimeValue = get_time()
+        epoch_time = get_time()
         if DEBUG:
-            print "TimeValue %s" % TimeValue
+            print "epoch_time %s" % epoch_time
 
         # Client precomputation
         if MPIN_FULL:
-            rtn, PC1, PC1_val, PC2, PC2_val = precompute(TOKEN, HASH_MPIN_ID)
+            rtn, pc1, pc2 = precompute(token, hash_mpin_id)
 
         # Client MPIN
-        rtn, X, X_val, U, U_val, UT, UT_val, V, V_val, Y, Y_val = client(date, MPIN_ID, rng, X, PIN, TOKEN, TIME_PERMIT, None, TimeValue)
+        rtn, x, u, ut, v, y = client(date, mpin_id, rng, x, PIN, token, time_permit, None, epoch_time)
         if rtn != 0:
             print "MPIN_CLIENT ERROR %s" % rtn
 
         # Client sends Z=r.ID to Server
         if MPIN_FULL:
-            rtn, R, R_val, Z, Z_val = get_G1_multiple(rng, 1, HASH_MPIN_ID)
+            rtn, r, Z = get_G1_multiple(rng, 1, None, hash_mpin_id)
 
         # Server MPIN
-        rtn, HID, HID_val, HTID, HTID_val, E, E_val, F, F_val, Y2, Y2_val = server(date, SERVER_SECRET, U, UT, V, pID, None, TimeValue)
+        rtn, HID, HTID, E, F, y2 = server(date, server_secret, u, ut, v, pID, None, epoch_time)
+        if DEBUG:
+            print "y2 ", y2.encode("hex")
         if rtn != 0:
-            print "ERROR: Single Pass %s is not authenticated" % identity
+            print "ERROR: %s is not authenticated" % mpin_id
             if PIN_ERROR:
                 err = kangaroo(E, F)
                 print "Client PIN error %d " % err
             raise SystemExit, 0
         else:
-            print "SUCCESS: %s is authenticated" % identity
+            print "SUCCESS: %s is authenticated" % mpin_id
 
         if date:
             prHID = HTID
         else:
             prHID = HID
-            UT = None
+            ut = None
 
         # Server sends T=w.ID to client
         if MPIN_FULL:
-            rtn, W, W_val, T, T_val = get_G1_multiple(rng, 0, prHID)
+            rtn, w, T = get_G1_multiple(rng, 0, None, prHID)
             if rtn != 0:
                 print "ERROR: Generating T %s" % rtn
 
         if MPIN_FULL:
-            HM, HM_val = hash_all(HASH_MPIN_ID,U,UT,V,Y,R,W)
+            HM = hash_all(hash_mpin_id,u,ut,v,y,r,w)
             
-            rtn, CK, CK_val = client_key(PC1, PC2, PIN, R, X, HM, T)
+            rtn, client_aes_key = client_key(pc1, pc2, PIN, r, x, HM, T)
             if rtn != 0:
-                print "ERROR: Generating CK %s" % rtn            
-            print "Client AES Key: %s" % to_hex(CK)
+                print "ERROR: Generating client_aes_key %s" % rtn            
+            print "Client AES Key: %s" % client_aes_key.encode("hex")
 
-            rtn, SK, SK_val = server_key(Z, SERVER_SECRET, W, HM, HID, U, UT)
+            rtn, server_aes_key = server_key(Z, server_secret, w, HM, HID, u, ut)
             if rtn != 0:
-                print "ERROR: Generating SK %s" % rtn            
-            print "Server AES Key: %s" % to_hex(SK)
+                print "ERROR: Generating server_aes_key %s" % rtn            
+            print "Server AES Key: %s" % server_aes_key.encode("hex")
 
     else:
         print "M-Pin Three Pass"
@@ -1083,59 +1160,45 @@ if __name__ == "__main__":
         else:
             PIN = 1234
         if MPIN_FULL:
-            rtn, PC1, PC1_val, PC2, PC2_val = precompute(TOKEN, HASH_MPIN_ID)
+            rtn, pc1, pc2 = precompute(token, hash_mpin_id)
             if rtn != 0:
-                print "precompute(TOKEN, HASH_MPIN_ID) ERROR %s" % rtn
+                print "precompute(token, hash_mpin_id) ERROR %s" % rtn
 
         # Client first pass
-        rtn, X, X_val, U, U_val, UT, UT_val, SEC, SEC_val = client_1(date, MPIN_ID, rng, X, PIN, TOKEN, TIME_PERMIT)
-        if DEBUG:
-            print "X: %s" % to_hex(X)
-            print "U: %s" % to_hex(U)
-            print "UT: %s" % to_hex(UT)
-            print "SEC: %s" % to_hex(SEC)                                
+        rtn, x, u, ut, SEC = client_1(date, mpin_id, rng, x, PIN, token, time_permit)
         if rtn != 0:
             print "client_1  ERROR %s" % rtn
         if DEBUG:
-            print "X: %s" % to_hex(X)
+            print "x: %s" % to_hex(x)
 
         # Server calculates H(ID) and H(T|H(ID)) (if time permits enabled),
         # and maps them to points on the curve HID and HTID resp.
-        HID, HID_val, HTID, HTID_val = server_1(date, pID)
-        if DEBUG:
-            print "HID: %s" % to_hex(HID)
-            print "HTID: %s" % to_hex(HTID)            
+        HID, HTID = server_1(date, pID)
 
-        # Server generates Random number Y and sends it to Client
-        rtn, Y, Y_val = random_generate(rng)
-        if DEBUG:
-            print "X: %s" % to_hex(X)        
+        # Server generates Random number y and sends it to Client
+        rtn, y = random_generate(rng)
         if rtn != 0:
             print "random_generate(rng) Error %s" % rtn
-        if DEBUG:
-            print "Y: %s" % to_hex(Y)
 
         # Client second pass
-        rtn, V = client_2(X, Y, SEC)
-        if DEBUG:
-            print "V: %s" % to_hex(V)        
+        rtn, v = client_2(x, y, SEC)
         if rtn != 0:
-            print "client_2(X, Y, SEC) Error %s" % rtn
+            print "client_2(x, y, SEC) Error %s" % rtn
 
         # Server second pass
-        rtn, E, E_val, F, F_val = server_2(date, HID, HTID, Y, SERVER_SECRET, U, UT, V)
+        rtn, E, F = server_2(date, HID, HTID, y, server_secret, u, ut, v)
         if rtn != 0:
-            print "ERROR: Multi Pass %s is not authenticated" % identity
+            print "ERROR: %s is not authenticated" % mpin_id
             if PIN_ERROR:
                 err = kangaroo(E, F)
                 print "Client PIN error %d " % err
             raise SystemExit, 0
         else:
-            print "SUCCESS: %s is authenticated" % identity
+            print "SUCCESS: %s is authenticated" % mpin_id
 
         # Client sends Z=r.ID to Server
         if MPIN_FULL:
-            rtn, R, R_val, Z, Z_val = get_G1_multiple(rng, 1, HASH_MPIN_ID)
+            rtn, r, Z = get_G1_multiple(rng, 1, None, hash_mpin_id)
             if rtn != 0:
                 print "ERROR: Generating Z %s" % rtn
 
@@ -1143,41 +1206,37 @@ if __name__ == "__main__":
             prHID = HTID
         else:
             prHID = HID
-            UT = None
+            ut = None
 
         # Server sends T=w.ID to client
         if MPIN_FULL:
-            rtn, W, W_val, T, T_val = get_G1_multiple(rng, 0, prHID)
+            rtn, w, T = get_G1_multiple(rng, 0, None, prHID)
             if rtn != 0:
                 print "ERROR: Generating T %s" % rtn
 
-            HM, HM_val = hash_all(HASH_MPIN_ID,U,UT,V,Y,R,W);
+            HM = hash_all(hash_mpin_id,u,ut,v,y,r,w);
 
-            rtn, CK, CK_val = client_key(PC1, PC2, PIN, R, X, HM, T)
+            rtn, client_aes_key = client_key(pc1, pc2, PIN, r, x, HM, T)
             if rtn != 0:
-                print "ERROR: Generating CK %s" % rtn
-            print "Client AES Key: %s" % to_hex(CK)
+                print "ERROR: Generating client_aes_key %s" % rtn
+            print "Client AES Key: %s" % client_aes_key.encode("hex")
 
-            rtn, SK, SK_val = server_key(Z, SERVER_SECRET, W, HM, HID, U, UT)
+            rtn, server_aes_key = server_key(Z, server_secret, w, HM, HID, u, ut)
             if rtn != 0:
-                print "ERROR: Generating SK %s" % rtn
-            print "Server AES Key: %s" % to_hex(SK)
+                print "ERROR: Generating server_aes_key %s" % rtn
+            print "Server AES Key: %s" % server_aes_key.encode("hex")
 
-    client_aes_key_hex = to_hex(CK)
-    client_aes_key = client_aes_key_hex.decode("hex")
-    print client_aes_key.encode("hex")    
-    plaintext = "A test message"
-    print plaintext
-    header_hex = "1554a69ecbf04e507eb6985a234613246206c85f8af73e61ab6e2382a26f457d";
-    header = header_hex.decode("hex")
-    print header.encode("hex")
-    iv_hex = "2b213af6b0edf6972bf996fb";
-    iv = iv_hex.decode("hex")
-    print iv.encode("hex")    
-    ciphertext, tag = aes_gcm_encrypt(client_aes_key,iv,header,plaintext)
-    print "ciphertext ", ciphertext.encode("hex")
-    print "tag ", tag.encode("hex")        
-
-    plaintext2, tag2 = aes_gcm_decrypt(client_aes_key,iv,header,ciphertext)
-    print "plaintext2 ", plaintext2
-    print "tag2 ", tag2.encode("hex")        
+    if MPIN_FULL:
+        plaintext = "A test message"
+        print "message to encrypt: ", plaintext
+        header_hex = "1554a69ecbf04e507eb6985a234613246206c85f8af73e61ab6e2382a26f457d";
+        header = header_hex.decode("hex")
+        iv_hex = "2b213af6b0edf6972bf996fb";
+        iv = iv_hex.decode("hex")
+        ciphertext, tag = aes_gcm_encrypt(client_aes_key,iv,header,plaintext)
+        print "ciphertext ", ciphertext.encode("hex")
+        print "tag1 ", tag.encode("hex")        
+    
+        plaintext2, tag2 = aes_gcm_decrypt(server_aes_key,iv,header,ciphertext)
+        print "decrypted message: ", plaintext2
+        print "tag2 ", tag2.encode("hex")        
