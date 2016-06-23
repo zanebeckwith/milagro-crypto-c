@@ -486,10 +486,11 @@ def client_1(epoch_date, mpin_id, rng, x, pin, token, time_permit):
     token1, token1_val  = make_octet(None,token)
     time_permit1, time_permit1_val  = make_octet(None,time_permit)
     
-    if rng is not None:
-        x1, x1_val = make_octet(PGS)
+    if rng is None:
+        x1, x1_val = make_octet(None,x)
+        rng = ffi.NULL        
     else:
-        x1, x1_val = make_octet(None,x)        
+        x1, x1_val = make_octet(PGS)
 
     u1, u1_val = make_octet(G1)    
     ut1, ut1_val = make_octet(G1)
@@ -974,6 +975,52 @@ def aes_gcm_decrypt(aes_key,iv,header,ciphertext):
 
     return plaintext.decode("hex"), tag.decode("hex")
 
+def generate_otp(rng):
+    """Generate a random six digit one time password
+
+    Generate a random six digit one time password
+    
+    Args::
+        
+        rng: Pointer to cryptographically secure pseudo-random number generator instance
+           
+    Returns::
+
+        error_code: error from the C function
+        otp: One time password
+        
+    Raises:
+        
+    """
+    otp = libmpin.generateOTP(rng)
+
+    return otp
+
+
+def generate_random(rng, random_value_in):
+    """Generate a random octet
+
+    Generate a random octet
+    
+    Args::
+        
+        rng: Pointer to cryptographically secure pseudo-random number generator instance
+        randon_value_in: Gives length of random number 
+           
+    Returns::
+
+        random_value: Random value
+        
+    Raises:
+        
+    """
+    random_value1, random_value1_val = make_octet(len(random_value_in))
+    libmpin.generateRandom(rng, random_value1)
+
+    random_value_hex = to_hex(random_value1)
+    return random_value_hex.decode("hex")
+
+
 if __name__ == "__main__":
     # Print hex values
     DEBUG = False
@@ -1017,10 +1064,10 @@ if __name__ == "__main__":
         pID = mpin_id
         
     # Generate master secret for MIRACL and Customer
-    rtn,ms1 = random_generate(rng)
+    rtn, ms1 = random_generate(rng)
     if rtn != 0:
         print "random_generate(rng) Error %s", rtn
-    rtn,ms2 = random_generate(rng)        
+    rtn, ms2 = random_generate(rng)        
     if rtn != 0:
         print "random_generate(rng) Error %s", rtn
     if DEBUG:
@@ -1028,10 +1075,10 @@ if __name__ == "__main__":
         print "ms2: %s" % to_hex(ms2)
 
     # Generate server secret shares
-    rtn,ss1 = get_server_secret(ms1)
+    rtn, ss1 = get_server_secret(ms1)
     if rtn != 0:
         print "get_server_secret(ms1) Error %s" % rtn
-    rtn,ss2 = get_server_secret(ms2)        
+    rtn, ss2 = get_server_secret(ms2)        
     if rtn != 0:
         print "get_server_secret(ms2) Error %s" % rtn
     if DEBUG:
@@ -1165,7 +1212,7 @@ if __name__ == "__main__":
                 print "precompute(token, hash_mpin_id) ERROR %s" % rtn
 
         # Client first pass
-        rtn, x, u, ut, SEC = client_1(date, mpin_id, rng, x, PIN, token, time_permit)
+        rtn, x, u, ut, sec = client_1(date, mpin_id, rng, x, PIN, token, time_permit)
         if rtn != 0:
             print "client_1  ERROR %s" % rtn
         if DEBUG:
@@ -1181,9 +1228,9 @@ if __name__ == "__main__":
             print "random_generate(rng) Error %s" % rtn
 
         # Client second pass
-        rtn, v = client_2(x, y, SEC)
+        rtn, v = client_2(x, y, sec)
         if rtn != 0:
-            print "client_2(x, y, SEC) Error %s" % rtn
+            print "client_2(x, y, sec) Error %s" % rtn
 
         # Server second pass
         rtn, E, F = server_2(date, HID, HTID, y, server_secret, u, ut, v)
