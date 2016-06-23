@@ -3,7 +3,6 @@
 set(AMCL_HEADERS
 ecdh.h  
 rsa.h    
-DLLDefines.h 
 utils.h) 
 
 if(BUILD_MPIN)
