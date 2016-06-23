@@ -1026,7 +1026,7 @@ if __name__ == "__main__":
     DEBUG = False
     # Require user input
     INPUT = True
-    ONE_PASS = True
+    ONE_PASS = False
     TIME_PERMITS = True
     MPIN_FULL = True
     PIN_ERROR = True
@@ -1049,8 +1049,6 @@ if __name__ == "__main__":
         mpin_id = raw_input("Please enter identity:")
     else:
         mpin_id = "user@miracl.com"
-
-    x = "a5a5"
 
     # Hash mpin_id
     hash_mpin_id = hash_id(mpin_id)
@@ -1154,7 +1152,7 @@ if __name__ == "__main__":
             rtn, pc1, pc2 = precompute(token, hash_mpin_id)
 
         # Client MPIN
-        rtn, x, u, ut, v, y = client(date, mpin_id, rng, x, PIN, token, time_permit, None, epoch_time)
+        rtn, x, u, ut, v, y = client(date, mpin_id, rng, None, PIN, token, time_permit, None, epoch_time)
         if rtn != 0:
             print "MPIN_CLIENT ERROR %s" % rtn
 
@@ -1212,7 +1210,7 @@ if __name__ == "__main__":
                 print "precompute(token, hash_mpin_id) ERROR %s" % rtn
 
         # Client first pass
-        rtn, x, u, ut, sec = client_1(date, mpin_id, rng, x, PIN, token, time_permit)
+        rtn, x, u, ut, sec = client_1(date, mpin_id, rng, None, PIN, token, time_permit)
         if rtn != 0:
             print "client_1  ERROR %s" % rtn
         if DEBUG:
@@ -1261,7 +1259,7 @@ if __name__ == "__main__":
             if rtn != 0:
                 print "ERROR: Generating T %s" % rtn
 
-            HM = hash_all(hash_mpin_id,u,ut,v,y,r,w);
+            HM = hash_all(hash_mpin_id,u,ut,v,y,r,w)
 
             rtn, client_aes_key = client_key(pc1, pc2, PIN, r, x, HM, T)
             if rtn != 0:
@@ -1276,9 +1274,9 @@ if __name__ == "__main__":
     if MPIN_FULL:
         plaintext = "A test message"
         print "message to encrypt: ", plaintext
-        header_hex = "1554a69ecbf04e507eb6985a234613246206c85f8af73e61ab6e2382a26f457d";
+        header_hex = "1554a69ecbf04e507eb6985a234613246206c85f8af73e61ab6e2382a26f457d"
         header = header_hex.decode("hex")
-        iv_hex = "2b213af6b0edf6972bf996fb";
+        iv_hex = "2b213af6b0edf6972bf996fb"
         iv = iv_hex.decode("hex")
         ciphertext, tag = aes_gcm_encrypt(client_aes_key,iv,header,plaintext)
         print "ciphertext ", ciphertext.encode("hex")
