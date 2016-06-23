@@ -27,108 +27,108 @@ under the License.
 
 int main()
 {
-  int i,PIN1,PIN2,rtn;
+    int i,PIN1,PIN2,rtn;
 
-  char id[256];
-  octet ID = {0,sizeof(id),id};
+    char id[256];
+    octet ID = {0,sizeof(id),id};
 
-  char x[PGS],y1[PGS],y2[PGS];
-  octet X={sizeof(x), sizeof(x),x};
-  octet Y1={sizeof(y1),sizeof(y1),y1};
-  octet Y2={sizeof(y2),sizeof(y2),y2};
+    char x[PGS],y1[PGS],y2[PGS];
+    octet X= {sizeof(x), sizeof(x),x};
+    octet Y1= {sizeof(y1),sizeof(y1),y1};
+    octet Y2= {sizeof(y2),sizeof(y2),y2};
 
-  /* Master secret shares */
-  char ms1[PGS], ms2[PGS];
-  octet MS1={sizeof(ms1),sizeof(ms1),ms1};
-  octet MS2={sizeof(ms2),sizeof(ms2),ms2};
+    /* Master secret shares */
+    char ms1[PGS], ms2[PGS];
+    octet MS1= {sizeof(ms1),sizeof(ms1),ms1};
+    octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
 
-  /* Hash values of client ID */
-  char hcid[32];
-  octet HCID={sizeof(hcid),sizeof(hcid), hcid};
+    /* Hash values of client ID */
+    char hcid[32];
+    octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
 
-  /* Hash values of messages */
-  char hm[HASH_BYTES];
-  octet HM={sizeof(hm),sizeof(hm), hm};
+    /* Hash values of messages */
+    char hm[HASH_BYTES];
+    octet HM= {sizeof(hm),sizeof(hm), hm};
 
-  /* Client secret and shares */
-  char cs1[2*PFS+1], cs2[2*PFS+1], sec[2*PFS+1];
-  octet SEC={sizeof(sec),sizeof(sec),sec};
-  octet CS1={sizeof(cs1),sizeof(cs1), cs1};
-  octet CS2={sizeof(cs2),sizeof(cs2), cs2};
+    /* Client secret and shares */
+    char cs1[2*PFS+1], cs2[2*PFS+1], sec[2*PFS+1];
+    octet SEC= {sizeof(sec),sizeof(sec),sec};
+    octet CS1= {sizeof(cs1),sizeof(cs1), cs1};
+    octet CS2= {sizeof(cs2),sizeof(cs2), cs2};
 
-  /* Server secret and shares */
-  char ss1[4*PFS], ss2[4*PFS], serverSecret[4*PFS];
-  octet ServerSecret={sizeof(serverSecret),sizeof(serverSecret),serverSecret};
-  octet SS1={sizeof(ss1),sizeof(ss1),ss1};
-  octet SS2={sizeof(ss2),sizeof(ss2),ss2};
+    /* Server secret and shares */
+    char ss1[4*PFS], ss2[4*PFS], serverSecret[4*PFS];
+    octet ServerSecret= {sizeof(serverSecret),sizeof(serverSecret),serverSecret};
+    octet SS1= {sizeof(ss1),sizeof(ss1),ss1};
+    octet SS2= {sizeof(ss2),sizeof(ss2),ss2};
 
-  /* Time Permit and shares */
-  char tp1[2*PFS+1], tp2[2*PFS+1], tp[2*PFS+1];
-  octet TP={sizeof(tp),sizeof(tp),tp};
-  octet TP1={sizeof(tp1),sizeof(tp1),tp1};
-  octet TP2={sizeof(tp2),sizeof(tp2),tp2};
+    /* Time Permit and shares */
+    char tp1[2*PFS+1], tp2[2*PFS+1], tp[2*PFS+1];
+    octet TP= {sizeof(tp),sizeof(tp),tp};
+    octet TP1= {sizeof(tp1),sizeof(tp1),tp1};
+    octet TP2= {sizeof(tp2),sizeof(tp2),tp2};
 
-  /* Token stored on device */
-  char token[2*PFS+1];
-  octet TOKEN={sizeof(token),sizeof(token),token};
+    /* Token stored on device */
+    char token[2*PFS+1];
+    octet TOKEN= {sizeof(token),sizeof(token),token};
 
-  /* Precomputed values stored on device */
-  char g1[12*PFS],g2[12*PFS];
-  octet G1={0,sizeof(g1),g1};
-  octet G2={0,sizeof(g2),g2};
+    /* Precomputed values stored on device */
+    char g1[12*PFS],g2[12*PFS];
+    octet G1= {0,sizeof(g1),g1};
+    octet G2= {0,sizeof(g2),g2};
 
-  char ut[2*PFS+1];
-  octet UT={sizeof(ut),sizeof(ut),ut};
+    char ut[2*PFS+1];
+    octet UT= {sizeof(ut),sizeof(ut),ut};
 
-  char hid[2*PFS+1],htid[2*PFS+1];
-  octet HID={0,sizeof(hid),hid};
-  octet HTID={0,sizeof(htid),htid};
+    char hid[2*PFS+1],htid[2*PFS+1];
+    octet HID= {0,sizeof(hid),hid};
+    octet HTID= {0,sizeof(htid),htid};
 
-  char e[12*PFS], f[12*PFS];
-  octet E={sizeof(e),sizeof(e),e};
-  octet F={sizeof(f),sizeof(f),f};
+    char e[12*PFS], f[12*PFS];
+    octet E= {sizeof(e),sizeof(e),e};
+    octet F= {sizeof(f),sizeof(f),f};
 
-  char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
-  char ck[PAS],sk[PAS];
-  octet R={0,sizeof(r),r};
-  octet Z={0,sizeof(z),z};
-  octet W={0,sizeof(w),w};
-  octet T={0,sizeof(t),t};
-  octet SK={0,sizeof(sk),sk};
-  octet CK={0,sizeof(ck),ck};
+    char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
+    char ck[PAS],sk[PAS];
+    octet R= {0,sizeof(r),r};
+    octet Z= {0,sizeof(z),z};
+    octet W= {0,sizeof(w),w};
+    octet T= {0,sizeof(t),t};
+    octet SK= {0,sizeof(sk),sk};
+    octet CK= {0,sizeof(ck),ck};
 
-  int TimeValue = 0;
+    int TimeValue = 0;
 
-  PIN1 = 1234;
-  PIN2 = 1234;
+    PIN1 = 1234;
+    PIN2 = 1234;
 
-  /* Assign the End-User an ID */
-  char* user = "testuser@miracl.com";
-  OCT_jstring(&ID,user);
-  printf("CLIENT: ID %s\n", user);
+    /* Assign the End-User an ID */
+    char* user = "testuser@miracl.com";
+    OCT_jstring(&ID,user);
+    printf("CLIENT: ID %s\n", user);
 
-  int date = 0;
-  char seed[100] = {0};
-  octet SEED = {0,sizeof(seed),seed};
-  csprng RNG;
+    int date = 0;
+    char seed[100] = {0};
+    octet SEED = {0,sizeof(seed),seed};
+    csprng RNG;
 
-  /* unrandom seed value! */
-  SEED.len=100;
-  for (i=0;i<100;i++) SEED.val[i]=i+1;
+    /* unrandom seed value! */
+    SEED.len=100;
+    for (i=0; i<100; i++) SEED.val[i]=i+1;
 
-  /* initialise random number generator */
-  MPIN_CREATE_CSPRNG(&RNG,&SEED);
+    /* initialise random number generator */
+    MPIN_CREATE_CSPRNG(&RNG,&SEED);
 
-  /* Hash ID */
-  MPIN_HASH_ID(&ID,&HCID);
-  OCT_output(&HCID);
+    /* Hash ID */
+    MPIN_HASH_ID(&ID,&HCID);
+    OCT_output(&HCID);
 
-  /* When set only send hashed IDs to server */
-  octet *pID;
+    /* When set only send hashed IDs to server */
+    octet *pID;
 #ifdef USE_ANONYMOUS
-  pID = &HCID;
+    pID = &HCID;
 #else
-  pID = &ID;
+    pID = &ID;
 #endif
 
   /* Generate Client master secret for MIRACL and Customer */
@@ -292,4 +292,5 @@ int main()
 
   printf("SUCCESS\n");
   return 0;
+
 }

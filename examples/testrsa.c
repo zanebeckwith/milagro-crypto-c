@@ -28,52 +28,56 @@ under the License.
 int main()
 {
     int i;
-	unsigned long ran;
- 	char m[RFS],ml[RFS],c[RFS],e[RFS],raw[100];
+    unsigned long ran;
+    char m[RFS],ml[RFS],c[RFS],e[RFS],raw[100];
     rsa_public_key pub;
     rsa_private_key priv;
     csprng RNG;
-	octet M={0,sizeof(m),m};
-	octet ML={0,sizeof(ml),ml};
-	octet C={0,sizeof(c),c};
-	octet E={0,sizeof(e),e};
-	octet RAW={0,sizeof(raw),raw};
+    octet M= {0,sizeof(m),m};
+    octet ML= {0,sizeof(ml),ml};
+    octet C= {0,sizeof(c),c};
+    octet E= {0,sizeof(e),e};
+    octet RAW= {0,sizeof(raw),raw};
 
-	time((time_t *)&ran);
+    time((time_t *)&ran);
 
     RAW.len=100;				/* fake random seed source */
     RAW.val[0]=ran;
     RAW.val[1]=ran>>8;
     RAW.val[2]=ran>>16;
     RAW.val[3]=ran>>24;
-    for (i=4;i<100;i++) RAW.val[i]=i;
+    for (i=4; i<100; i++) RAW.val[i]=i;
 
     RSA_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 //for (i=0;i<10;i++)
 //{
 
-	printf("Generating public/private key pair\n");
+    printf("Generating public/private key pair\n");
     RSA_KEY_PAIR(&RNG,65537,&priv,&pub);
 
-	printf("Encrypting test string\n");
-	OCT_jstring(&M,(char *)"Hello World\n");
-	RSA_OAEP_ENCODE(&M,&RNG,NULL,&E); /* OAEP encode message m to e  */
+    printf("Encrypting test string\n");
+    OCT_jstring(&M,(char *)"Hello World\n");
+    RSA_OAEP_ENCODE(&M,&RNG,NULL,&E); /* OAEP encode message m to e  */
 
-	RSA_ENCRYPT(&pub,&E,&C);     /* encrypt encoded message */
-	printf("Ciphertext= "); OCT_output(&C);
+    RSA_ENCRYPT(&pub,&E,&C);     /* encrypt encoded message */
+    printf("Ciphertext= ");
+    OCT_output(&C);
 
-	printf("Decrypting test string\n");
+    printf("Decrypting test string\n");
     RSA_DECRYPT(&priv,&C,&ML);   /* ... and then decrypt it */
 
     RSA_OAEP_DECODE(NULL,&ML);    /* decode it */
-	OCT_output_string(&ML);
+    OCT_output_string(&ML);
 
-    OCT_clear(&M); OCT_clear(&ML);   /* clean up afterwards */
-    OCT_clear(&C); OCT_clear(&RAW); OCT_clear(&E);
+    OCT_clear(&M);
+    OCT_clear(&ML);   /* clean up afterwards */
+    OCT_clear(&C);
+    OCT_clear(&RAW);
+    OCT_clear(&E);
 //}
-	RSA_KILL_CSPRNG(&RNG);
+    RSA_KILL_CSPRNG(&RNG);
 
-	RSA_PRIVATE_KEY_KILL(&priv);
+    RSA_PRIVATE_KEY_KILL(&priv);
 
-	return 0;
+    return 0;
 }

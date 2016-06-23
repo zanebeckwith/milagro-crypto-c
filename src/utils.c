@@ -25,33 +25,48 @@ under the License.
 
 void hex2bytes(char *hex, char *bin)
 {
-  int i;
-  char v;
-  int len=strlen(hex);
-  for (i = 0; i < len/2; i++) {
-    char c = hex[2*i];
-    if (c >= '0' && c <= '9') {
-        v = c - '0';
-    } else if (c >= 'A' && c <= 'F') {
-        v = c - 'A' + 10;
-    } else if (c >= 'a' && c <= 'f') {
-        v = c - 'a' + 10;
-    } else {
-        v = 0;
+    int i;
+    char v;
+    int len=strlen(hex);
+    for (i = 0; i < len/2; i++)
+    {
+        char c = hex[2*i];
+        if (c >= '0' && c <= '9')
+        {
+            v = c - '0';
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+            v = c - 'A' + 10;
+        }
+        else if (c >= 'a' && c <= 'f')
+        {
+            v = c - 'a' + 10;
+        }
+        else
+        {
+            v = 0;
+        }
+        v <<= 4;
+        c = hex[2*i + 1];
+        if (c >= '0' && c <= '9')
+        {
+            v += c - '0';
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+            v += c - 'A' + 10;
+        }
+        else if (c >= 'a' && c <= 'f')
+        {
+            v += c - 'a' + 10;
+        }
+        else
+        {
+            v = 0;
+        }
+        bin[i] = v;
     }
-    v <<= 4;
-    c = hex[2*i + 1];
-    if (c >= '0' && c <= '9') {
-        v += c - '0';
-    } else if (c >= 'A' && c <= 'F') {
-        v += c - 'A' + 10;
-    } else if (c >= 'a' && c <= 'f') {
-        v += c - 'a' + 10;
-    } else {
-        v = 0;
-    }
-    bin[i] = v;
-  }
 }
 
 /*! \brief Generate a random six digit one time password
@@ -63,21 +78,21 @@ void hex2bytes(char *hex, char *bin)
  */
 int generateOTP(csprng* RNG)
 {
-  int OTP=0;
+    int OTP=0;
 
-  int i = 0;
-  int val = 0;
-  char byte[6] = {0};
+    int i = 0;
+    int val = 0;
+    char byte[6] = {0};
 
-  /* Generate random 6 digit random value */
-  for (i=0;i<6;i++)
+    /* Generate random 6 digit random value */
+    for (i=0; i<6; i++)
     {
-       byte[i]=RAND_byte(RNG);
-       val = byte[i];
-       OTP = ((abs(val) % 10) * pow(10.0,i)) + OTP;
+        byte[i]=RAND_byte(RNG);
+        val = byte[i];
+        OTP = ((abs(val) % 10) * pow(10.0,i)) + OTP;
     }
 
-  return OTP;
+    return OTP;
 }
 
 /*! \brief Generate a random Octet
@@ -89,9 +104,9 @@ int generateOTP(csprng* RNG)
  */
 void generateRandom(csprng *RNG,octet *randomValue)
 {
-  int i;
-  for (i=0;i<randomValue->len;i++)
-    randomValue->val[i]=RAND_byte(RNG);
+    int i;
+    for (i=0; i<randomValue->len; i++)
+        randomValue->val[i]=RAND_byte(RNG);
 }
 
 

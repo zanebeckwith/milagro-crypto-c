@@ -27,16 +27,16 @@ RUN mkdir -p /root/C/milagro-crypto-c
 ADD ./ /root/C/milagro-crypto-c
 RUN rm -rf /root/C/milagro-crypto-c/target/build
 WORKDIR /root/C/milagro-crypto-c
-RUN mkdir -p /root/C/milagro-crypto-c/target/build && \
+RUN mkdir -p /root/C/milagro-crypto-c/target/build/coverage && \
     cd target/build && \
-    cmake-D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
+    cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     lcov --zerocounters --directory . && \
-    lcov --capture --initial --directory . --output-file amcl && \
+    lcov --capture --initial --directory . --output-file coverage/amcl && \
     make test && \
-    lcov --no-checksum --directory . --capture --output-file amcl.info && \
-    genhtml amcl.info && \
+    lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
+    genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info && \
     make doc && \
     make clean && \
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../.. && \

@@ -37,26 +37,26 @@ extern void mymain();
 
 void start()
 {
-	char stack[MAXSTACK];
-	int i;
-	for (i=0;i<MAXSTACK;i++) stack[i]=0x55;
+    char stack[MAXSTACK];
+    int i;
+    for (i=0; i<MAXSTACK; i++) stack[i]=0x55;
 }
 
 void finish()
 {
-	char stack[MAXSTACK];
-	int i;
-	for (i=0;i<MAXSTACK;i++)
-		if (stack[i]!=0x55) break;
-	printf("Max Stack usage = %d\n",MAXSTACK-i);
+    char stack[MAXSTACK];
+    int i;
+    for (i=0; i<MAXSTACK; i++)
+        if (stack[i]!=0x55) break;
+    printf("Max Stack usage = %d\n",MAXSTACK-i);
 }
 
 int main()
 {
- start();
+    start();
 
- mymain();
+    mymain();
 
- finish();
- return 0;
+    finish();
+    return 0;
 }

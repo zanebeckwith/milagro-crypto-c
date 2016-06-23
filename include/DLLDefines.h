@@ -32,7 +32,7 @@ building a DLL on windows. */
 
 #if defined (_MSC_VER)
 
- #define DLL_EXPORT extern
+#define DLL_EXPORT extern
 /* This code does not work with cl */
 /*  #if defined(sok_EXPORTS) || defined(mpin_EXPORTS) */
 /*    #define  DLL_EXPORT __declspec(dllexport) */
@@ -42,7 +42,7 @@ building a DLL on windows. */
 
 #else /* defined (_WIN32) */
 
- #define DLL_EXPORT extern
+#define DLL_EXPORT extern
 
 #endif
 

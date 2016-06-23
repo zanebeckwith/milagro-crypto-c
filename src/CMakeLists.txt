@@ -23,10 +23,6 @@ ff.c)
 # Build AMCL
 add_library(amcl ${LIB_TYPE} ${SOURCES_AMCL} version.c)
 
-if (BUILD_COVERAGE)
-  target_link_libraries(amcl gcov)
-endif (BUILD_COVERAGE)
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   if(BUILD_SHARED_LIBS)
     message(STATUS "Build shared libs")

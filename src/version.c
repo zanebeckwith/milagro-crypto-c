@@ -27,6 +27,6 @@ under the License.
  */
 void version(char* info)
 {
-  sprintf(info,"Version: %d.%d.%d OS: %s FIELD CHOICE: %s CURVE TYPE: %s WORD_LENGTH: %d", AMCL_VERSION_MAJOR, AMCL_VERSION_MINOR, AMCL_VERSION_PATCH, OS, FIELD_CHOICE, CURVE_TYPE, CHUNK);
+    sprintf(info,"Version: %d.%d.%d OS: %s FIELD CHOICE: %s CURVE TYPE: %s WORD_LENGTH: %d", AMCL_VERSION_MAJOR, AMCL_VERSION_MINOR, AMCL_VERSION_PATCH, OS, FIELD_CHOICE, CURVE_TYPE, CHUNK);
 }
 

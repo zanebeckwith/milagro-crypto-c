@@ -38,21 +38,21 @@ static void hashit(octet *p,int n,octet *w)
 
     HASH_init(&sha);
     if (p!=NULL)
-        for (i=0;i<p->len;i++) HASH_process(&sha,p->val[i]);
-	if (n>=0)
+        for (i=0; i<p->len; i++) HASH_process(&sha,p->val[i]);
+    if (n>=0)
     {
         c[0]=(n>>24)&0xff;
         c[1]=(n>>16)&0xff;
         c[2]=(n>>8)&0xff;
         c[3]=(n)&0xff;
-		for (i=0;i<4;i++) HASH_process(&sha,c[i]);
+        for (i=0; i<4; i++) HASH_process(&sha,c[i]);
     }
 
     HASH_hash(&sha,hh);
 
     OCT_empty(w);
     OCT_jbytes(w,hh,32);
-    for (i=0;i<32;i++) hh[i]=0;
+    for (i=0; i<32; i++) hh[i]=0;
 }
 
 /* Initialise a Cryptographically Strong Random Number Generator from
@@ -70,75 +70,76 @@ void RSA_KILL_CSPRNG(csprng *RNG)
 /* generate an RSA key pair */
 
 void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB)
-{ /* IEEE1363 A16.11/A16.12 more or less */
+{
+    /* IEEE1363 A16.11/A16.12 more or less */
 
     BIG t[HFLEN],p1[HFLEN],q1[HFLEN];
 
-	for (;;)
-	{
+    for (;;)
+    {
 
-		FF_random(PRIV->p,RNG,HFLEN);
-		while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
-		while (!FF_prime(PRIV->p,RNG,HFLEN))
-			FF_inc(PRIV->p,4,HFLEN);
+        FF_random(PRIV->p,RNG,HFLEN);
+        while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
+        while (!FF_prime(PRIV->p,RNG,HFLEN))
+            FF_inc(PRIV->p,4,HFLEN);
 
-		FF_copy(p1,PRIV->p,HFLEN);
-		FF_dec(p1,1,HFLEN);
+        FF_copy(p1,PRIV->p,HFLEN);
+        FF_dec(p1,1,HFLEN);
 
-		if (FF_cfactor(p1,e,HFLEN)) continue;
-		break;
-	}
+        if (FF_cfactor(p1,e,HFLEN)) continue;
+        break;
+    }
 
-	for (;;)
-	{
-		FF_random(PRIV->q,RNG,HFLEN);
-		while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
-		while (!FF_prime(PRIV->q,RNG,HFLEN))
-			FF_inc(PRIV->q,4,HFLEN);
+    for (;;)
+    {
+        FF_random(PRIV->q,RNG,HFLEN);
+        while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
+        while (!FF_prime(PRIV->q,RNG,HFLEN))
+            FF_inc(PRIV->q,4,HFLEN);
 
-		FF_copy(q1,PRIV->q,HFLEN);
-		FF_dec(q1,1,HFLEN);
-		if (FF_cfactor(q1,e,HFLEN)) continue;
+        FF_copy(q1,PRIV->q,HFLEN);
+        FF_dec(q1,1,HFLEN);
+        if (FF_cfactor(q1,e,HFLEN)) continue;
 
-		break;
-	}
+        break;
+    }
 
-	FF_mul(PUB->n,PRIV->p,PRIV->q,HFLEN);
-	PUB->e=e;
+    FF_mul(PUB->n,PRIV->p,PRIV->q,HFLEN);
+    PUB->e=e;
 
-	FF_copy(t,p1,HFLEN);
-	FF_shr(t,HFLEN);
-	FF_init(PRIV->dp,e,HFLEN);
-	FF_invmodp(PRIV->dp,PRIV->dp,t,HFLEN);
-	if (FF_parity(PRIV->dp)==0) FF_add(PRIV->dp,PRIV->dp,t,HFLEN);
-	FF_norm(PRIV->dp,HFLEN);
+    FF_copy(t,p1,HFLEN);
+    FF_shr(t,HFLEN);
+    FF_init(PRIV->dp,e,HFLEN);
+    FF_invmodp(PRIV->dp,PRIV->dp,t,HFLEN);
+    if (FF_parity(PRIV->dp)==0) FF_add(PRIV->dp,PRIV->dp,t,HFLEN);
+    FF_norm(PRIV->dp,HFLEN);
 
-	FF_copy(t,q1,HFLEN);
-	FF_shr(t,HFLEN);
-	FF_init(PRIV->dq,e,HFLEN);
-	FF_invmodp(PRIV->dq,PRIV->dq,t,HFLEN);
-	if (FF_parity(PRIV->dq)==0) FF_add(PRIV->dq,PRIV->dq,t,HFLEN);
-	FF_norm(PRIV->dq,HFLEN);
+    FF_copy(t,q1,HFLEN);
+    FF_shr(t,HFLEN);
+    FF_init(PRIV->dq,e,HFLEN);
+    FF_invmodp(PRIV->dq,PRIV->dq,t,HFLEN);
+    if (FF_parity(PRIV->dq)==0) FF_add(PRIV->dq,PRIV->dq,t,HFLEN);
+    FF_norm(PRIV->dq,HFLEN);
 
-	FF_invmodp(PRIV->c,PRIV->p,PRIV->q,HFLEN);
+    FF_invmodp(PRIV->c,PRIV->p,PRIV->q,HFLEN);
 
-	return;
+    return;
 }
 
 /* Mask Generation Function */
 
 void MGF1(octet *z,int olen,octet *mask)
 {
-	char h[32];
-    octet H={0,sizeof(h),h};
-	int hlen=32;
+    char h[32];
+    octet H= {0,sizeof(h),h};
+    int hlen=32;
     int counter,cthreshold;
 
     OCT_empty(mask);
 
     cthreshold=ROUNDUP(olen,hlen);
 
-    for (counter=0;counter<cthreshold;counter++)
+    for (counter=0; counter<cthreshold; counter++)
     {
         hashit(z,counter,&H);
         if (mask->len+hlen>olen) OCT_jbytes(mask,H.val,olen%hlen);
@@ -155,8 +156,8 @@ int RSA_OAEP_ENCODE(octet *m,csprng *RNG,octet *p,octet *f)
     int mlen=m->len;
     int hlen,seedlen;
     char dbmask[RFS],seed[32];
-	octet DBMASK={0,sizeof(dbmask),dbmask};
-	octet SEED={0,sizeof(seed),seed};
+    octet DBMASK= {0,sizeof(dbmask),dbmask};
+    octet SEED= {0,sizeof(seed),seed};
 
     hlen=seedlen=32;
     if (mlen>olen-hlen-seedlen-1) return 0;
@@ -181,7 +182,7 @@ int RSA_OAEP_ENCODE(octet *m,csprng *RNG,octet *p,octet *f)
 
     OCT_joctet(f,&DBMASK);
 
-	OCT_pad(f,RFS);
+    OCT_pad(f,RFS);
     OCT_clear(&SEED);
     OCT_clear(&DBMASK);
 
@@ -196,9 +197,9 @@ int RSA_OAEP_DECODE(octet *p,octet *f)
     int i,k,olen=RFS-1;
     int hlen,seedlen;
     char dbmask[RFS],seed[32],chash[32];;
-	octet DBMASK={0,sizeof(dbmask),dbmask};
-	octet SEED={0,sizeof(seed),seed};
-	octet CHASH={0,sizeof(chash),chash};
+    octet DBMASK= {0,sizeof(dbmask),dbmask};
+    octet SEED= {0,sizeof(seed),seed};
+    octet CHASH= {0,sizeof(chash),chash};
 
     seedlen=hlen=32;;
     if (olen<seedlen+hlen+1) return 0;
@@ -206,12 +207,12 @@ int RSA_OAEP_DECODE(octet *p,octet *f)
     hashit(p,-1,&CHASH);
 
     x=f->val[0];
-    for (i=seedlen;i<olen;i++)
+    for (i=seedlen; i<olen; i++)
         DBMASK.val[i-seedlen]=f->val[i+1];
     DBMASK.len=olen-seedlen;
 
     MGF1(&DBMASK,seedlen,&SEED);
-    for (i=0;i<seedlen;i++) SEED.val[i]^=f->val[i+1];
+    for (i=0; i<seedlen; i++) SEED.val[i]^=f->val[i+1];
     MGF1(&SEED,olen-seedlen,f);
     OCT_xor(&DBMASK,f);
 
@@ -222,7 +223,7 @@ int RSA_OAEP_DECODE(octet *p,octet *f)
     OCT_clear(&SEED);
     OCT_clear(&CHASH);
 
-    for (k=0;;k++)
+    for (k=0;; k++)
     {
         if (k>=DBMASK.len)
         {
@@ -250,54 +251,54 @@ int RSA_OAEP_DECODE(octet *p,octet *f)
 void RSA_PRIVATE_KEY_KILL(rsa_private_key *PRIV)
 {
     FF_zero(PRIV->p,HFLEN);
-	FF_zero(PRIV->q,HFLEN);
-	FF_zero(PRIV->dp,HFLEN);
-	FF_zero(PRIV->dq,HFLEN);
-	FF_zero(PRIV->c,HFLEN);
+    FF_zero(PRIV->q,HFLEN);
+    FF_zero(PRIV->dp,HFLEN);
+    FF_zero(PRIV->dq,HFLEN);
+    FF_zero(PRIV->c,HFLEN);
 }
 
 /* RSA encryption with the public key */
 void RSA_ENCRYPT(rsa_public_key *PUB,octet *F,octet *G)
 {
-	BIG f[FFLEN];
-	FF_fromOctet(f,F,FFLEN);
+    BIG f[FFLEN];
+    FF_fromOctet(f,F,FFLEN);
 
     FF_power(f,f,PUB->e,PUB->n,FFLEN);
 
-	FF_toOctet(G,f,FFLEN);
+    FF_toOctet(G,f,FFLEN);
 }
 
 /* RSA decryption with the private key */
 void RSA_DECRYPT(rsa_private_key *PRIV,octet *G,octet *F)
 {
-	BIG g[FFLEN],t[FFLEN],jp[HFLEN],jq[HFLEN];
+    BIG g[FFLEN],t[FFLEN],jp[HFLEN],jq[HFLEN];
 
-	FF_fromOctet(g,G,FFLEN);
+    FF_fromOctet(g,G,FFLEN);
 
-	FF_dmod(jp,g,PRIV->p,HFLEN);
-	FF_dmod(jq,g,PRIV->q,HFLEN);
+    FF_dmod(jp,g,PRIV->p,HFLEN);
+    FF_dmod(jq,g,PRIV->q,HFLEN);
 
-	FF_skpow(jp,jp,PRIV->dp,PRIV->p,HFLEN);
-	FF_skpow(jq,jq,PRIV->dq,PRIV->q,HFLEN);
+    FF_skpow(jp,jp,PRIV->dp,PRIV->p,HFLEN);
+    FF_skpow(jq,jq,PRIV->dq,PRIV->q,HFLEN);
 
 
-	FF_zero(g,FFLEN);
-	FF_copy(g,jp,HFLEN);
-	FF_mod(jp,PRIV->q,HFLEN);
-	if (FF_comp(jp,jq,HFLEN)>0)
-		FF_add(jq,jq,PRIV->q,HFLEN);
-	FF_sub(jq,jq,jp,HFLEN);
-	FF_norm(jq,HFLEN);
+    FF_zero(g,FFLEN);
+    FF_copy(g,jp,HFLEN);
+    FF_mod(jp,PRIV->q,HFLEN);
+    if (FF_comp(jp,jq,HFLEN)>0)
+        FF_add(jq,jq,PRIV->q,HFLEN);
+    FF_sub(jq,jq,jp,HFLEN);
+    FF_norm(jq,HFLEN);
 
-	FF_mul(t,PRIV->c,jq,HFLEN);
-	FF_dmod(jq,t,PRIV->q,HFLEN);
+    FF_mul(t,PRIV->c,jq,HFLEN);
+    FF_dmod(jq,t,PRIV->q,HFLEN);
 
-	FF_mul(t,jq,PRIV->p,HFLEN);
-	FF_add(g,t,g,FFLEN);
-	FF_norm(g,FFLEN);
+    FF_mul(t,jq,PRIV->p,HFLEN);
+    FF_add(g,t,g,FFLEN);
+    FF_norm(g,FFLEN);
 
-	FF_toOctet(F,g,FFLEN);
+    FF_toOctet(F,g,FFLEN);
 
-	return;
+    return;
 }
 
