@@ -66,6 +66,16 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.dll" "${PROJECT_BINARY_DIR}/test/")
 
+    add_custom_command(
+                TARGET ecdh
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libecdh.dll" "${PROJECT_BINARY_DIR}/test/")
+
+    add_custom_command(
+                TARGET rsa
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/librsa.dll" "${PROJECT_BINARY_DIR}/test/")
+
     if(BUILD_MPIN)
       message(STATUS "Copy libmpin.dll to test for testing")
       add_custom_command(
@@ -168,7 +178,8 @@ install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_WRITE GROUP_READ
         WORLD_WRITE WORLD_READ WORLD_EXECUTE)
-install (TARGETS amcl DESTINATION lib PERMISSIONS
+
+install (TARGETS amcl rsa ecdh DESTINATION lib PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)

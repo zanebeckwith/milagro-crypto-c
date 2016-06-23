@@ -114,9 +114,9 @@ Start a command prompt as an administrator
 
     git clone https://github.com/miracl/milagro-crypto-c
     cd milagro-crypto-c
-    mkdir -p target/build
-    cd target/build
-    cmake -G "MinGW Makefiles" ../..
+    mkdir target\build
+    cd target\build
+    cmake -G "MinGW Makefiles" ..\..
     mingw32-make
     mingw32-make test
     mingw32-make doc
@@ -128,7 +128,7 @@ Post install append the PATH system variable to point to the install ./lib:
 
 The build can be configured using by setting flags on the command line i.e.
 
-    cmake -G "MinGW Makefiles" -DWORD_LENGTH=64 ..
+    cmake -G "MinGW Makefiles" -D BUILD_PYTHON=on ..
 
 #### Uninstall software
 
