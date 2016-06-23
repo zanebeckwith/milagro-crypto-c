@@ -25,6 +25,6 @@ under the License.
 #include <string.h>
 #include "amcl.h"
 
-DLL_EXPORT void version(char* info);
+void version(char* info);
 
 #endif

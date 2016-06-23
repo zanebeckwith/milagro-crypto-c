@@ -69,19 +69,19 @@ under the License.
 	@param ID an octet containing the identity
 	@param HID an octet containing the hashed identity
  */
-DLL_EXPORT void MPIN_HASH_ID(octet *ID,octet *HID);
+void MPIN_HASH_ID(octet *ID,octet *HID);
 /**	@brief Get epoch time as unsigned integer
  *
 	@return current epoch time in seconds
  */
-DLL_EXPORT unsign32 MPIN_GET_TIME(void);
+unsign32 MPIN_GET_TIME(void);
 /**	@brief Generate Y=H(t,O), where t is epoch time, O is an octet, and H(.) is a hash function
  *
 	@param t is epoch time in seconds
 	@param O is an input octet
 	@param Y is the output octet
  */
-DLL_EXPORT void MPIN_GET_Y(int t,octet *O,octet *Y);
+void MPIN_GET_Y(int t,octet *O,octet *Y);
 /**	@brief Extract a PIN number from a client secret
  *
 	@param ID is the input client identity
@@ -89,7 +89,7 @@ DLL_EXPORT void MPIN_GET_Y(int t,octet *O,octet *Y);
 	@param CS is the client secret from which the PIN is to be extracted
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_EXTRACT_PIN(octet *ID,int pin,octet *CS);
+int MPIN_EXTRACT_PIN(octet *ID,int pin,octet *CS);
 /**	@brief Perform client side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
@@ -110,7 +110,7 @@ DLL_EXPORT int MPIN_EXTRACT_PIN(octet *ID,int pin,octet *CS);
 	@param y is output H(t|U) or H(t|UT) if Time Permits enabled
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_CLIENT(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
+int MPIN_CLIENT(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
 /**	@brief Perform first pass of the client side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
@@ -128,14 +128,14 @@ DLL_EXPORT int MPIN_CLIENT(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,o
 	@param TP is the input time permit
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_CLIENT_1(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
+int MPIN_CLIENT_1(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
 /**	@brief Generate a random group element
  *
 	@param R is a pointer to a cryptographically secure random number generator
 	@param S is the output random octet
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
+int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
 /**	@brief Perform second pass of the client side of the 3-pass version of the M-Pin protocol
  *
 	@param x an input, a locally generated random number
@@ -143,7 +143,7 @@ DLL_EXPORT int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
 	@param V on output = -(x+y).V
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
+int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 /**	@brief Perform server side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not generated and can be set to NULL.
@@ -164,7 +164,7 @@ DLL_EXPORT int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 	@param t is input epoch time in seconds - a timestamp
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_SERVER(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
+int MPIN_SERVER(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
 /**	@brief Perform first pass of the server side of the 3-pass version of the M-Pin protocol
  *
 	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
@@ -173,7 +173,7 @@ DLL_EXPORT int MPIN_SERVER(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet
 	@param HTID is output H(ID)+H(d|H(ID))
 	@return 0 or an error code
  */
-DLL_EXPORT void	MPIN_SERVER_1(int d,octet *ID,octet *HID,octet *HTID);
+void	MPIN_SERVER_1(int d,octet *ID,octet *HID,octet *HTID);
 /**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not needed and can be set to NULL.
@@ -191,7 +191,7 @@ DLL_EXPORT void	MPIN_SERVER_1(int d,octet *ID,octet *HID,octet *HTID);
 	@param F is an output to help the Kangaroos to find the PIN error, or NULL if not required
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F);
+int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F);
 /**	@brief Add two members from the group G1
  *
 	@param Q1 an input member of G1
@@ -199,7 +199,7 @@ DLL_EXPORT int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,oct
 	@param Q an output member of G1 = Q1+Q2
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_RECOMBINE_G1(octet *Q1,octet *Q2,octet *Q);
+int MPIN_RECOMBINE_G1(octet *Q1,octet *Q2,octet *Q);
 /**	@brief Add two members from the group G2
  *
 	@param P1 an input member of G2
@@ -207,44 +207,44 @@ DLL_EXPORT int MPIN_RECOMBINE_G1(octet *Q1,octet *Q2,octet *Q);
 	@param P an output member of G2 = P1+P2
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_RECOMBINE_G2(octet *P1,octet *P2,octet *P);
+int MPIN_RECOMBINE_G2(octet *P1,octet *P2,octet *P);
 /**	@brief Use Kangaroos to find PIN error
  *
 	@param E a member of the group GT
 	@param F a member of the group GT =  E^e
 	@return 0 if Kangaroos failed, or the PIN error e
  */
-DLL_EXPORT int MPIN_KANGAROO(octet *E,octet *F);
+int MPIN_KANGAROO(octet *E,octet *F);
 /**	@brief Encoding of a Time Permit to make it indistinguishable from a random string
  *
 	@param R is a pointer to a cryptographically secure random number generator
 	@param TP is the input time permit, obfuscated on output
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_ENCODING(csprng *R,octet *TP);
+int MPIN_ENCODING(csprng *R,octet *TP);
 /**	@brief Encoding of an obfuscated Time Permit
  *
 	@param TP is the input obfuscated time permit, restored on output
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_DECODING(octet *TP);
+int MPIN_DECODING(octet *TP);
 /**	@brief Supply today's date as days from the epoch
  *
 	@return today's date, as number of days elapsed since the epoch
  */
-DLL_EXPORT unsign32 MPIN_today(void);
+unsign32 MPIN_today(void);
 /**	@brief Initialise a random number generator
  *
 	@param R is a pointer to a cryptographically secure random number generator
 	@param S is an input truly random seed value
  */
-DLL_EXPORT void MPIN_CREATE_CSPRNG(csprng *R,octet *S);
+void MPIN_CREATE_CSPRNG(csprng *R,octet *S);
 /**	@brief Kill a random number generator
  *
 	Deletes all internal state
 	@param R is a pointer to a cryptographically secure random number generator
  */
-DLL_EXPORT void MPIN_KILL_CSPRNG(csprng *R);
+void MPIN_KILL_CSPRNG(csprng *R);
 /**	@brief Find a random multiple of a point in G1
  *
 	@param R is a pointer to a cryptographically secure random number generator
@@ -254,7 +254,7 @@ DLL_EXPORT void MPIN_KILL_CSPRNG(csprng *R);
 	@param W the output =x.G or x.M(G), where M(.) is a mapping
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
+int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
 /**	@brief Create a client secret in G1 from a master secret and the client ID
  *
 	@param S is an input master secret
@@ -262,7 +262,7 @@ DLL_EXPORT int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *
 	@param CS is the full client secret = s.H(ID)
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
+int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
 /**	@brief Create a Time Permit in G1 from a master secret and the client ID
  *
 	@param d is input date, in days since the epoch.
@@ -271,15 +271,15 @@ DLL_EXPORT int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
 	@param TP is a Time Permit for the given date = s.H(d|H(ID))
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_GET_CLIENT_PERMIT(int d,octet *S,octet *ID,octet *TP);
+int MPIN_GET_CLIENT_PERMIT(int d,octet *S,octet *ID,octet *TP);
 /**	@brief Create a server secret in G2 from a master secret
  *
 	@param S is an input master secret
 	@param SS is the server secret = s.Q where Q is a fixed generator of G2
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_GET_SERVER_SECRET(octet *S,octet *SS);
-/* DLL_EXPORT int MPIN_TEST_PAIRING(octet *,octet *); */
+int MPIN_GET_SERVER_SECRET(octet *S,octet *SS);
+/* int MPIN_TEST_PAIRING(octet *,octet *); */
 
 /* For M-Pin Full */
 /**	@brief Precompute values for use by the client side of M-Pin Full
@@ -290,7 +290,7 @@ DLL_EXPORT int MPIN_GET_SERVER_SECRET(octet *S,octet *SS);
 	@param g2 precomputed output
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *g1,octet *g2);
+int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *g1,octet *g2);
 /**	@brief Calculate Key on Server side for M-Pin Full
  *
 	Uses UT internally for the key calculation, unless not available in which case U is used
@@ -304,7 +304,7 @@ DLL_EXPORT int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *g1,octet *g2);
 	@param K is the output calculated shared key
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_SERVER_KEY(octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U,octet *UT,octet *K);
+int MPIN_SERVER_KEY(octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U,octet *UT,octet *K);
 /**	@brief Calculate Key on Client side for M-Pin Full
  *
 	@param g1 precomputed input
@@ -317,7 +317,7 @@ DLL_EXPORT int MPIN_SERVER_KEY(octet *Z,octet *SS,octet *w,octet *p,octet *I,oct
 	@param K is the output calculated shared key
 	@return 0 or an error code
  */
-DLL_EXPORT int MPIN_CLIENT_KEY(octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p,octet *T,octet *K);
+int MPIN_CLIENT_KEY(octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p,octet *T,octet *K);
 
 /**	@brief AES-GCM Encryption
  *
@@ -328,7 +328,7 @@ DLL_EXPORT int MPIN_CLIENT_KEY(octet *g1,octet *g2,int pin,octet *r,octet *x,oct
 	@param C Ciphertext
 	@param T Checksum
  */
-DLL_EXPORT void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
+void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
 
 /**	@brief AES-GCM Decryption
  *
@@ -339,7 +339,7 @@ DLL_EXPORT void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet 
 	@param C Ciphertext
 	@param T Checksum
  */
-DLL_EXPORT void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
+void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
 
 /**	@brief HMAC of message M using key K to create tag of length len in octet tag
  *
@@ -350,7 +350,7 @@ DLL_EXPORT void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet 
 	@param tag is the output HMAC
 	@return 0 for bad parameters, else 1
  */
-DLL_EXPORT int MPIN_HMAC(octet *M,octet *K,int len,octet *tag);
+int MPIN_HMAC(octet *M,octet *K,int len,octet *tag);
 
 /**	@brief Password Based Key Derivation Function - generates key K from password, salt and repeat counter
  *
@@ -361,7 +361,7 @@ DLL_EXPORT int MPIN_HMAC(octet *M,octet *K,int len,octet *tag);
 	@param len is output desired length of key
 	@param K is the derived key
  */
-DLL_EXPORT void MPIN_PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
+void MPIN_PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
 
 /** @brief Hash the session transcript
 	@param I is the hashed input client ID = H(ID)
@@ -373,7 +373,7 @@ DLL_EXPORT void MPIN_PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
 	@param W is the server part response
 	@param H the output is the hash of all of the above that apply
 */
-DLL_EXPORT void MPIN_HASH_ALL(octet *I,octet *U,octet *CU,octet *V,octet *Y,octet *R,octet *W,octet *H);
+void MPIN_HASH_ALL(octet *I,octet *U,octet *CU,octet *V,octet *Y,octet *R,octet *W,octet *H);
 
 #endif
 

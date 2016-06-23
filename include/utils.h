@@ -23,8 +23,8 @@ under the License.
 #include "amcl.h"
 #include <math.h>
 
-DLL_EXPORT void hex2bytes(char *hex, char *bin);
-DLL_EXPORT void generateRandom(csprng*, octet*);
-DLL_EXPORT int generateOTP(csprng*);
+void hex2bytes(char *hex, char *bin);
+void generateRandom(csprng*, octet*);
+int generateOTP(csprng*);
 
 #endif
