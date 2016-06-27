@@ -21,6 +21,7 @@ under the License.
 /* SU=m, SU is Stack Usage */
 
 #include "amcl.h"
+#include "inttypes.h"
 
 /* Calculates x*y+c+*r */
 
@@ -119,8 +120,8 @@ void BIG_rawoutput(BIG a)
     int i;
     printf("(");
     for (i=0; i<NLEN-1; i++)
-        printf("%llx,",(long long unsigned int) a[i]);
-    printf("%llx)",(long long unsigned int) a[NLEN-1]);
+        printf("%" PRIxMAX ",",(long long unsigned int) a[i]);
+    printf("%" PRIxMAX ")",(long long unsigned int) a[NLEN-1]);
 }
 
 /* Swap a and b if d=1 */
