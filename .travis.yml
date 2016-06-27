@@ -40,7 +40,6 @@ addons:
     - winetricks
     - libwine-development
     - wine64-development-tools
-    - binfmt-support
 
 install:
   - pip install --user --upgrade pip
