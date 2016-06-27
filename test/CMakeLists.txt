@@ -4,10 +4,15 @@
 link_directories (${PROJECT_BINARY_DIR}/src)
 include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
 
+set(EXE_FILE_EXTENSION "")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  # set the executable file extension for windows tests
+  set(EXE_FILE_EXTENSION ".exe")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 #define a macro to simplify adding tests
 macro (do_test arg result)
-  add_test (${arg} ${arg})
+  add_test (${arg} ${arg}${EXE_FILE_EXTENSION})
   set_tests_properties (${arg}
     PROPERTIES PASS_REGULAR_EXPRESSION ${result}
     )
