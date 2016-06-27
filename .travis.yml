@@ -44,8 +44,8 @@ install:
 
 script:
   - echo -e "\n\n*** BUILD FOR COVERAGE ***\n"
-  - mkdir -p target/build_test/coverage
-  - cd target/build_test
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_test/coverage
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_test
   - cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../..
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
@@ -56,26 +56,26 @@ script:
   - genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info
   - make doc
   - echo -e "\n\n*** BUILD LINUX 64 ***\n\n"
-  - mkdir -p target/build_linux64
-  - cd target/build_linux64
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../..
   - make
   - make test
   - make package
   - echo -e "\n\n*** BUILD LINUX 32 ***\n\n"
-  - mkdir -p target/build_linux32
-  - cd target/build_linux32
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../..
   - make
   - make test
   - make package
   - echo -e "\n\n*** BUILD WIN 64 ***\n\n"
-  - mkdir -p target/build_win64
-  - cd target/build_win64
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win64
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win64
   - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../..
   - make
   - echo -e "\n\n*** BUILD WIN 32 ***\n\n"
-  - mkdir -p target/build_win32
-  - cd target/build_win32
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win32
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win32
   - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../..
   - make
