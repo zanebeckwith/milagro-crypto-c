@@ -25,10 +25,11 @@ RUN mkdir -p /root/.ssh
 RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
 RUN mkdir -p /root/C/milagro-crypto-c
 ADD ./ /root/C/milagro-crypto-c
-RUN rm -rf /root/C/milagro-crypto-c/target/build
 WORKDIR /root/C/milagro-crypto-c
-RUN mkdir -p /root/C/milagro-crypto-c/target/build/coverage && \
-    cd target/build && \
+RUN echo -e "\n\n*** BUILD FOR COVERAGE ***\n" && \
+rm -rf /root/C/milagro-crypto-c/target/build_test && \
+    mkdir -p /root/C/milagro-crypto-c/target/build_test/coverage && \
+    cd /root/C/milagro-crypto-c/target/build_test && \
     cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
@@ -38,11 +39,36 @@ RUN mkdir -p /root/C/milagro-crypto-c/target/build/coverage && \
     lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
     genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info && \
     make doc && \
-    make clean && \
+echo -e "\n\n*** BUILD LINUX 64 ***\n\n" && \
+    rm -rf /root/C/milagro-crypto-c/target/build_linux64 && \
+    mkdir -p /root/C/milagro-crypto-c/target/build_linux64 && \
+    cd /root/C/milagro-crypto-c/target/build_linux64 && \
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../.. && \
     make && \
     make test && \
-    make package
+    make package && \
+echo -e "\n\n*** BUILD LINUX 32 ***\n\n" && \
+    rm -rf /root/C/milagro-crypto-c/target/build_linux32 && \
+    mkdir -p /root/C/milagro-crypto-c/target/build_linux32 && \
+    cd /root/C/milagro-crypto-c/target/build_linux32 && \
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../.. && \
+    make && \
+    make test && \
+    make package && \
+echo -e "\n\n*** BUILD WIN 64 ***\n\n" && \
+    rm -rf /root/C/milagro-crypto-c/target/build_win64 && \
+    mkdir -p /root/C/milagro-crypto-c/target/build_win64 && \
+    cd /root/C/milagro-crypto-c/target/build_win64 && \
+    cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../.. && \
+    make && \
+    make test && \
+echo -e "\n\n*** BUILD WIN 32 ***\n\n" && \
+    rm -rf /root/C/milagro-crypto-c/target/build_win32 && \
+    mkdir -p /root/C/milagro-crypto-c/target/build_win32 && \
+    cd /root/C/milagro-crypto-c/target/build_win32 && \
+    cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../.. && \
+    make && \
+    make test
 EOM
 
 # docker image name

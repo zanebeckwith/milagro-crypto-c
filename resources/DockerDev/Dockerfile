@@ -50,13 +50,20 @@ ENV DISPLAY :0
 ENV GOPATH=/root/GO
 ENV PATH=$GOPATH/bin:$PATH
 
+# add i386 architecture
+RUN dpkg --add-architecture i386
+
 # add repositories and update
 RUN apt-get update && apt-get -y dist-upgrade && \
     apt-get install -y apt-utils software-properties-common python-software-properties && \
+    apt-add-repository universe && \
     apt-add-repository multiverse && \
     apt-get update
 
 # install development packages and debugging tools
 RUN apt-get install -y wget nano vim curl rsync git screen build-essential python python-dev python-pip libffi-dev autotools-dev autoconf make cmake gcc g++ alien rpm dh-make debhelper devscripts pbuilder strace lsof gdb valgrind pkg-config doxygen doxygen-latex lcov
+
+# add mingw for cross compiling the Windows version in Linux
+RUN apt-get install -y mingw-w64 binutils-mingw-w64 mingw-w64-tools mingw-w64-i686-dev mingw-w64-x86-64-dev
 
 RUN pip install --upgrade pip && pip install cffi
