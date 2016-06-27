@@ -140,9 +140,9 @@ export PYTHONPATH=/usr/lib/python2.7/dist-packages
 <p>Start a command prompt as an administrator</p>
 <pre><code>git clone https://github.com/miracl/milagro-crypto-c
 cd milagro-crypto-c
-mkdir -p target\build
-cd target\build
-cmake -G "MinGW Makefiles" ..\..
+mkdir -p target\\build
+cd target\\build
+cmake -G "MinGW Makefiles" ..\\..
 mingw32-make
 mingw32-make test
 mingw32-make doc
