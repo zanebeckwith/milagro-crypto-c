@@ -44,6 +44,7 @@ under the License.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #define AMCL_VERSION_MAJOR @AMCL_VERSION_MAJOR@
 #define AMCL_VERSION_MINOR @AMCL_VERSION_MINOR@

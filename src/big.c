@@ -119,8 +119,8 @@ void BIG_rawoutput(BIG a)
     int i;
     printf("(");
     for (i=0; i<NLEN-1; i++)
-        printf("%llx,",(long long unsigned int) a[i]);
-    printf("%llx)",(long long unsigned int) a[NLEN-1]);
+        printf("%"PRIxMAX",",(uint64_t) a[i]);
+    printf("%"PRIxMAX")",(uint64_t) a[NLEN-1]);
 }
 
 /* Swap a and b if d=1 */
