@@ -64,6 +64,6 @@ RUN apt-get update && apt-get -y dist-upgrade && \
 RUN apt-get install -y wget nano vim curl rsync git screen build-essential python python-dev python-pip libffi-dev autotools-dev autoconf make cmake gcc g++ alien rpm dh-make debhelper devscripts pbuilder strace lsof gdb valgrind pkg-config doxygen doxygen-latex lcov libc6 libc6-dev
 
 # add mingw for cross compiling the Windows version in Linux
-RUN apt-get install -y dos2unix mingw-w64 binutils-mingw-w64 mingw-w64-tools mingw-w64-i686-dev mingw-w64-x86-64-dev wine winetricks libwine-development ubuntu-restricted-extras ubuntu-restricted-addons wine64-development-tools winetricks wine binfmt-support
+RUN apt-get install -y dos2unix mingw-w64 binutils-mingw-w64 mingw-w64-tools mingw-w64-i686-dev mingw-w64-x86-64-dev wine winetricks libwine-development ubuntu-restricted-extras ubuntu-restricted-addons wine64-development-tools binfmt-support
 
 RUN pip install --upgrade pip && pip install cffi
