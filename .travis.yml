@@ -61,7 +61,6 @@ script:
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../..
   - make
   - make test
-  - make package
   - echo -e "\n\n*** BUILD LINUX 32 ***\n\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
