@@ -36,7 +36,7 @@ addons:
     - mingw-w64-tools
     - mingw-w64-i686-dev
     - mingw-w64-x86-64-dev
-    - wine
+    - wine1.6
 
 install:
   - pip install --user --upgrade pip
