@@ -64,14 +64,16 @@ RUN echo -e "\n\n*** BUILD WIN 64 ***\n\n" && \
     mkdir -p /root/C/milagro-crypto-c/target/build_win64 && \
     cd /root/C/milagro-crypto-c/target/build_win64 && \
     cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../.. && \
-    make
+    make && \
+    make test
 
 RUN echo -e "\n\n*** BUILD WIN 32 ***\n\n" && \
     rm -rf /root/C/milagro-crypto-c/target/build_win32 && \
     mkdir -p /root/C/milagro-crypto-c/target/build_win32 && \
     cd /root/C/milagro-crypto-c/target/build_win32 && \
     cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../.. && \
-    make
+    make && \
+    make test
 EOM
 
 # docker image name
