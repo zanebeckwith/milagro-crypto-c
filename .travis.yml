@@ -36,6 +36,7 @@ addons:
     - mingw-w64-tools
     - mingw-w64-i686-dev
     - mingw-w64-x86-64-dev
+    - wine
 
 install:
   - pip install --user --upgrade pip
@@ -72,8 +73,10 @@ script:
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win64
   - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../..
   - make
+  - make test
   - echo -e "\n\n*** BUILD WIN 32 ***\n\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win32
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win32
   - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../..
   - make
+  - make test
