@@ -15,7 +15,9 @@ branches:
 before_install:
     # Enable i386 for wine
     - sudo dpkg --add-architecture i386
+    - sudo apt-get update
     - sudo apt-get -y install wine
+    - wine --version
 
 addons:
   apt:
