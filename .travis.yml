@@ -12,6 +12,11 @@ branches:
     - master
     - develop
 
+before_install:
+    # Enable i386 for wine
+    - sudo dpkg --add-architecture i386
+    - sudo apt-get -y install wine
+
 addons:
   apt:
     packages:
@@ -36,7 +41,6 @@ addons:
     - mingw-w64-tools
     - mingw-w64-i686-dev
     - mingw-w64-x86-64-dev
-    - wine1.6
 
 install:
   - pip install --user --upgrade pip
