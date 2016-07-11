@@ -2,7 +2,11 @@
 
 *AMCL - Apache Milagro Crypto Library*
 
+[![Master Branch](https://img.shields.io/badge/-master:-gray.svg)](https://github.com/miracl/milagro-crypto-c/tree/master)
 [![Master Build Status](https://secure.travis-ci.org/miracl/milagro-crypto-c.png?branch=master)](https://travis-ci.org/miracl/milagro-crypto-c?branch=master)
+
+[![Develop Branch](https://img.shields.io/badge/-develop:-gray.svg)](https://github.com/miracl/milagro-crypto-c/tree/develop)
+[![Develop Build Status](https://secure.travis-ci.org/miracl/milagro-crypto-c.png?branch=develop)](https://travis-ci.org/miracl/milagro-crypto-c?branch=develop)
 
 * **category**:    Library
 * **copyright**:   2016 The Apache Software Foundation
