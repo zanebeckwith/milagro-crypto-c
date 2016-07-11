@@ -12,6 +12,13 @@ branches:
     - master
     - develop
 
+before_install:
+    # Enable i386 for wine
+    - sudo dpkg --add-architecture i386
+    - sudo apt-get update || true
+    - sudo apt-get -y install wine
+    - wine --version
+
 addons:
   apt:
     packages:
@@ -31,6 +38,11 @@ addons:
     - libffi-dev
     - doxygen
     - doxygen-latex
+    - mingw-w64
+    - binutils-mingw-w64
+    - mingw-w64-tools
+    - mingw-w64-i686-dev
+    - mingw-w64-x86-64-dev
 
 install:
   - pip install --user --upgrade pip
@@ -38,8 +50,9 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-  - mkdir -p target/build/coverage
-  - cd target/build
+  - echo -e "\n\n*** BUILD FOR COVERAGE ***\n"
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_test/coverage
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_test
   - cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../..
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
@@ -49,7 +62,27 @@ script:
   - lcov --no-checksum --directory . --capture --output-file coverage/amcl.info
   - genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info
   - make doc
-  - make clean
+  - echo -e "\n\n*** BUILD LINUX 64 ***\n\n"
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../..
+  - make
+  - make test
+  - echo -e "\n\n*** BUILD LINUX 32 ***\n\n"
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
+  - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../..
+  - make
+  - make test
+  - echo -e "\n\n*** BUILD WIN 64 ***\n\n"
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win64
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win64
+  - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../..
+  - make
+  - make test
+  - echo -e "\n\n*** BUILD WIN 32 ***\n\n"
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win32
+  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win32
+  - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../..
   - make
   - make test

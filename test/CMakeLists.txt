@@ -4,10 +4,9 @@
 link_directories (${PROJECT_BINARY_DIR}/src)
 include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
 
-
 #define a macro to simplify adding tests
 macro (do_test arg result)
-  add_test (${arg} ${arg})
+  add_test (${arg} ${TARGET_SYSTEM_EMULATOR} ${arg}${CMAKE_EXECUTABLE_SUFFIX})
   set_tests_properties (${arg}
     PROPERTIES PASS_REGULAR_EXPRESSION ${result}
     )
