@@ -48,6 +48,7 @@ install:
   - pip install --user --upgrade pip
   - pip install --user cffi
   - export PATH=$PATH:$HOME/.local/bin
+  - gem install coveralls-lcov
 
 script:
   - echo -e "\n\n*** BUILD FOR COVERAGE ***\n"
@@ -86,3 +87,5 @@ script:
   - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../..
   - make
   - make test
+after_success:
+  - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/build_test/coverage/amcl.info
