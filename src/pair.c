@@ -529,7 +529,7 @@ static void gs(BIG u[4],BIG e)
 void PAIR_G1mul(ECP *P,BIG e)
 {
 #ifdef USE_GLV   /* Note this method is patented */
-	int i,np,nn;
+	int np,nn;
 	ECP Q;
 	BIG cru,t,q;
 	BIG u[2];

@@ -269,36 +269,36 @@ void GCM_finish(gcm *g,char *tag)
 /* SU= 16
 */
 
-static void hex2bytes(char *hex,char *bin)
-{
-	int i;
-	char v;
-	int len=strlen(hex);
-	for (i = 0; i < len/2; i++) {
-        char c = hex[2*i];
-        if (c >= '0' && c <= '9') {
-            v = c - '0';
-        } else if (c >= 'A' && c <= 'F') {
-            v = c - 'A' + 10;
-        } else if (c >= 'a' && c <= 'f') {
-            v = c - 'a' + 10;
-        } else {
-            v = 0;
-        }
-        v <<= 4;
-        c = hex[2*i + 1];
-        if (c >= '0' && c <= '9') {
-            v += c - '0';
-        } else if (c >= 'A' && c <= 'F') {
-            v += c - 'A' + 10;
-        } else if (c >= 'a' && c <= 'f') {
-            v += c - 'a' + 10;
-        } else {
-            v = 0;
-        }
-        bin[i] = v;
-    }
-}
+/* static void hex2bytes(char *hex,char *bin) */
+/* { */
+/* 	int i; */
+/* 	char v; */
+/* 	int len=strlen(hex); */
+/* 	for (i = 0; i < len/2; i++) { */
+/*         char c = hex[2*i]; */
+/*         if (c >= '0' && c <= '9') { */
+/*             v = c - '0'; */
+/*         } else if (c >= 'A' && c <= 'F') { */
+/*             v = c - 'A' + 10; */
+/*         } else if (c >= 'a' && c <= 'f') { */
+/*             v = c - 'a' + 10; */
+/*         } else { */
+/*             v = 0; */
+/*         } */
+/*         v <<= 4; */
+/*         c = hex[2*i + 1]; */
+/*         if (c >= '0' && c <= '9') { */
+/*             v += c - '0'; */
+/*         } else if (c >= 'A' && c <= 'F') { */
+/*             v += c - 'A' + 10; */
+/*         } else if (c >= 'a' && c <= 'f') { */
+/*             v += c - 'a' + 10; */
+/*         } else { */
+/*             v = 0; */
+/*         } */
+/*         bin[i] = v; */
+/*     } */
+/* } */
 
 /*
 int main()

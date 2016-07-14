@@ -26,7 +26,7 @@ under the License.
 
 int main()
 {   
-    int i,bytes,res;
+    int i;
 	unsigned long ran;
  	char m[RFS],ml[RFS],c[RFS],e[RFS],s[RFS],raw[100];
     rsa_public_key pub;

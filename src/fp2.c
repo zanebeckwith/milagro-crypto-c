@@ -28,7 +28,6 @@ under the License.
 /* SU= 8 */
 int FP2_iszilch(FP2 *x)
 {
-	BIG m;
 	FP2_reduce(x);
     if (BIG_iszilch(x->a) && BIG_iszilch(x->b)) return 1;
     return 0;

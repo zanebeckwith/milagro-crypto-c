@@ -30,7 +30,7 @@ under the License.
 /* Arazi and Qi inversion mod 256 */
 static int invmod256(int a)
 {
-	int i,m,U,t1,t2,b,c;
+	int U,t1,t2,b,c;
 	t1=0;
 	c=(a>>1)&1;  
 	t1+=c;
@@ -453,7 +453,7 @@ static void FF_karmul_lower(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,BIG t[]
 
 static void FF_karmul_upper(BIG z[],BIG x[],BIG y[],BIG t[],int n)
 { /* Calculates Most Significant upper half of x*y, given lower part */
-    int i,nd2;
+    int nd2;
  
     nd2=n/2;
 	FF_radd(z,n,x,0,x,nd2,nd2);  
@@ -565,7 +565,7 @@ static void FF_reduce(BIG r[],BIG T[],BIG N[],BIG ND[],int n)
 /* r,b is of length - n */
 void FF_dmod(BIG r[],BIG a[],BIG b[],int n)
 {
-	int len,k; 
+	int k; 
 #ifndef C99	
 	BIG m[2*FFLEN];
 	BIG x[2*FFLEN];
@@ -698,8 +698,6 @@ static void FF_invmod2m(BIG U[],BIG a[],int n)
 #else
 	BIG t1[2*n],b[n],c[n];
 #endif
-	BIG w,iw;
-	DBIG pr;
 
 	FF_zero(U,n);
 	FF_zero(b,n);

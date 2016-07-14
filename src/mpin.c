@@ -122,45 +122,45 @@ static void mapit(octet *h,ECP *P)
 }
 
 /* needed for SOK */
-static void mapit2(octet *h,ECP2 *Q)
-{
-	BIG q,one,Fx,Fy,x,hv;
-	FP2 X;
-	ECP2 T,K;
-	BIG_fromBytes(hv,h->val);
-	BIG_rcopy(q,Modulus);
-	BIG_one(one);
-	BIG_mod(hv,q);
+/* static void mapit2(octet *h,ECP2 *Q) */
+/* { */
+/* 	BIG q,one,Fx,Fy,x,hv; */
+/* 	FP2 X; */
+/* 	ECP2 T,K; */
+/* 	BIG_fromBytes(hv,h->val); */
+/* 	BIG_rcopy(q,Modulus); */
+/* 	BIG_one(one); */
+/* 	BIG_mod(hv,q); */
 
-	for (;;)
-	{
-		FP2_from_BIGs(&X,one,hv);
-		if (ECP2_setx(Q,&X)) break;
-		BIG_inc(hv,1); 
-	}
+/* 	for (;;) */
+/* 	{ */
+/* 		FP2_from_BIGs(&X,one,hv); */
+/* 		if (ECP2_setx(Q,&X)) break; */
+/* 		BIG_inc(hv,1);  */
+/* 	} */
 
-/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
-	BIG_rcopy(Fx,CURVE_Fra);
-	BIG_rcopy(Fy,CURVE_Frb);
-	FP2_from_BIGs(&X,Fx,Fy);
-	BIG_rcopy(x,CURVE_Bnx);
+/* /\* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez *\/ */
+/* 	BIG_rcopy(Fx,CURVE_Fra); */
+/* 	BIG_rcopy(Fy,CURVE_Frb); */
+/* 	FP2_from_BIGs(&X,Fx,Fy); */
+/* 	BIG_rcopy(x,CURVE_Bnx); */
 
-	ECP2_copy(&T,Q);
-	ECP2_mul(&T,x);
-	ECP2_neg(&T);  /* our x is negative */
-	ECP2_copy(&K,&T);
-	ECP2_dbl(&K);
-	ECP2_add(&K,&T);
-	ECP2_affine(&K);
+/* 	ECP2_copy(&T,Q); */
+/* 	ECP2_mul(&T,x); */
+/* 	ECP2_neg(&T);  /\* our x is negative *\/ */
+/* 	ECP2_copy(&K,&T); */
+/* 	ECP2_dbl(&K); */
+/* 	ECP2_add(&K,&T); */
+/* 	ECP2_affine(&K); */
 
-	ECP2_frob(&K,&X);
-	ECP2_frob(Q,&X); ECP2_frob(Q,&X); ECP2_frob(Q,&X); 
-	ECP2_add(Q,&T);
-	ECP2_add(Q,&K);
-	ECP2_frob(&T,&X); ECP2_frob(&T,&X);
-	ECP2_add(Q,&T);
-	ECP2_affine(Q);
-}
+/* 	ECP2_frob(&K,&X); */
+/* 	ECP2_frob(Q,&X); ECP2_frob(Q,&X); ECP2_frob(Q,&X);  */
+/* 	ECP2_add(Q,&T); */
+/* 	ECP2_add(Q,&K); */
+/* 	ECP2_frob(&T,&X); ECP2_frob(&T,&X); */
+/* 	ECP2_add(Q,&T); */
+/* 	ECP2_affine(Q); */
+/* } */
 
 
 
@@ -391,7 +391,7 @@ int MPIN_RANDOM_GENERATE(csprng *RNG,octet* S)
 int MPIN_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
 {
     ECP P,R;
-    int plen,res=0;
+    int res=0;
 	char h[MODBYTES];
 	octet H={0,sizeof(h),h};
 
@@ -524,7 +524,7 @@ int MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int pin
 {
     BIG r,x;
     ECP P,T,W;
-    int plen,res=0;
+    int res=0;
 	char h[MODBYTES];
 	octet H={0,sizeof(h),h};
 
@@ -675,9 +675,9 @@ void MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 /* Implement M-Pin on server side */
 int MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
 {
-    BIG a,px,py,y;
+    BIG px,py,y;
 	FP2 qx,qy; 
-	FP12 g,g1;
+	FP12 g;
     ECP2 Q,sQ;
 	ECP P,R;
     int res=0;
@@ -781,7 +781,7 @@ int MPIN_KANGAROO(octet *E,octet *F)
 	int distance[MR_TS];
 	FP12 ge,gf,t,table[MR_TS]; 
     int res=0;
-	BIG w;
+    // BIG w;
 
 	FP12_fromOctet(&ge,E);
 	FP12_fromOctet(&gf,F);
@@ -960,10 +960,9 @@ int MPIN_SERVER_KEY(int sha,octet *Z,octet *SST,octet *W,octet *H,octet *HID,oct
 	int res=0;
 	FP12 g;
 	FP4 c;
-	FP2 qx,qy;
 	ECP R,U,A;
 	ECP2 sQ;
-	BIG w,x,y,h;
+	BIG w,h;
 
 	if (!ECP2_fromOctet(&sQ,SST)) res=MPIN_INVALID_POINT;
 	if (!ECP_fromOctet(&R,Z)) res=MPIN_INVALID_POINT; 

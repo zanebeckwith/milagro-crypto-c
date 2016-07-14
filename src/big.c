@@ -650,8 +650,7 @@ void BIG_smul(BIG c,BIG a,BIG b)
 /* SU= 80 */
 void BIG_sqr(DBIG c,BIG a)
 {
-	int i,j,last;
-	chunk carry;
+       int i,j,last;
 #ifdef dchunk
 	dchunk t,co;
 #endif
@@ -696,6 +695,7 @@ void BIG_sqr(DBIG c,BIG a)
 	c[DNLEN-1]=(chunk)co;
 
 #else
+	chunk carry;
 	BIG_dzero(c);
 	for (i=0;i<NLEN;i++)
 	{

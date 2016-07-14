@@ -39,7 +39,7 @@ under the License.
 
 int main()
 {
-  int i,pin,rtn,err,timeValue;
+  int i,pin,rtn,err;
 #ifdef PERMITS
   int date=MPIN_today();
 #else
@@ -199,6 +199,7 @@ int main()
 #endif
 
 #ifdef SINGLE_PASS
+  int timeValue;
   printf("MPIN Single Pass\n");
   timeValue = MPIN_GET_TIME();
 

@@ -29,7 +29,6 @@ under the License.
 int main()
 {   
     int i,j=0,res;
-    int result;
 	unsigned long ran;
 	char *pp="M0ng00se";
 /* These octets are automatically protected against buffer overflow attacks */

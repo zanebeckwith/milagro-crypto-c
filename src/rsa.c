@@ -172,7 +172,7 @@ void MGF1(int sha,octet *z,int olen,octet *mask)
 {
 	char h[64];
     octet H={0,sizeof(h),h};
-	int i,hlen=sha;
+	int hlen=sha;
     int counter,cthreshold;
 
     OCT_empty(mask);
@@ -197,7 +197,7 @@ const char SHA512ID[]={0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x
 int PKCS15(int sha,octet *m,octet *w)
 {
 	int olen=FF_BITS/8;
-	int i,hlen=sha;
+	int hlen=sha;
 	int idlen=19;
 	char h[64];
 	octet H={0,sizeof(h),h}; 
@@ -224,7 +224,7 @@ int PKCS15(int sha,octet *m,octet *w)
 
 int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
 { 
-    int i,slen,olen=RFS-1;
+    int slen,olen=RFS-1;
     int mlen=m->len;
     int hlen,seedlen;
     char dbmask[RFS],seed[64];

@@ -402,7 +402,7 @@ void FP4_xtr_pow(FP4 *r,FP4 *x,BIG n)
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
 void FP4_xtr_pow2(FP4 *r,FP4 *ck,FP4 *cl,FP4 *ckml,FP4 *ckm2l,BIG a,BIG b)
 {
-	int i,f2,nb;
+	int i,f2;
 	BIG d,e,w;
 	FP4 t,cu,cv,cumv,cum2v;
 
