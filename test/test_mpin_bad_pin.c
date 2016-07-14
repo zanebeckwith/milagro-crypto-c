@@ -100,7 +100,7 @@ int main()
     MPIN_CREATE_CSPRNG(&RNG,&SEED);
 
     /* Hash ID */
-    MPIN_HASH_ID(&ID,&HCID);
+    MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
     OCT_output(&HCID);
 
     /* When set only send hashed IDs to server */
@@ -187,13 +187,13 @@ int main()
 
     /* Generate Time Permit shares */
     printf("Date %d \n", date);
-    rtn = MPIN_GET_CLIENT_PERMIT(date,&MS1,&HCID,&TP1);
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
     if (rtn != 0)
     {
         printf("MPIN_GET_CLIENT_PERMIT(date,&MS1,&HCID,&TP1) Error %d\n", rtn);
         return 1;
     }
-    rtn = MPIN_GET_CLIENT_PERMIT(date,&MS2,&HCID,&TP2);
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
     if (rtn != 0)
     {
         printf("MPIN_GET_CLIENT_PERMIT(date,&MS2,&HCID,&TP2) Error %d\n", rtn);
@@ -215,7 +215,7 @@ int main()
     OCT_output(&TP);
 
     /* Client extracts PIN1 from secret to create Token */
-    rtn = MPIN_EXTRACT_PIN(&ID, PIN1, &TOKEN);
+    rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
     if (rtn != 0)
     {
         printf("MPIN_EXTRACT_PIN(&ID, PIN, &TOKEN) Error %d\n", rtn);
@@ -225,7 +225,7 @@ int main()
     OCT_output(&TOKEN);
 
     /* Client first pass */
-    rtn = MPIN_CLIENT_1(date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
+    rtn = MPIN_CLIENT_1(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT_1 ERROR %d\n", rtn);
@@ -233,7 +233,7 @@ int main()
     }
 
     /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-    MPIN_SERVER_1(date,pID,&HID,&HTID);
+    MPIN_SERVER_1(HASH_TYPE_MPIN,date,pID,&HID,&HTID);
 
     /* Server generates Random number Y and sends it to Client */
     rtn = MPIN_RANDOM_GENERATE(&RNG,&Y);

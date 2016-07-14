@@ -59,11 +59,11 @@ int main()
   octet MS2={sizeof(ms2),sizeof(ms2),ms2};
 
   /* Hash values of client ID */
-  char hcid[HASH_BYTES];
+  char hcid[PFS];
   octet HCID={sizeof(hcid),sizeof(hcid), hcid};
 
   /* Hash values of messages */
-  char hm[HASH_BYTES];
+  char hm[PFS];
   octet HM={sizeof(hm),sizeof(hm), hm};
 
   /* Client secret and shares */
@@ -198,7 +198,7 @@ int main()
       printf("PIN1 %d PIN2 %d\n", PIN1, PIN2);
 
       /* Hash ID */
-      MPIN_HASH_ID(&ID,&HCID);
+      MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
       OCT_output(&HCID);
 
       /* When set only send hashed IDs to server */
@@ -236,14 +236,14 @@ int main()
       /* Generate Time Permit shares */
       date = MPIN_today();
       printf("Date %d \n", date);
-      rtn = MPIN_GET_CLIENT_PERMIT(date,&MS1,&HCID,&TP1);
+      rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
       if (rtn != 0) {
-          printf("MPIN_GET_CLIENT_PERMIT(date,&MS1,&HCID,&TP1) Error %d\n", rtn);
+          printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
           return 1;
       }
-      rtn = MPIN_GET_CLIENT_PERMIT(date,&MS2,&HCID,&TP2);
+      rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
       if (rtn != 0) {
-          printf("MPIN_GET_CLIENT_PERMIT(date,&MS2,&HCID,&TP2) Error %d\n", rtn);
+          printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
           return 1;
       }
       printf("TP1 = 0x");
@@ -267,7 +267,7 @@ int main()
       printf("Decoded Time Permit= "); OCT_output(&TP);
 
       /* Client extracts PIN1 from secret to create Token */
-      rtn = MPIN_EXTRACT_PIN(&ID, PIN1, &TOKEN);
+      rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
       if (rtn != 0) {
           printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
           return 1;
@@ -276,10 +276,10 @@ int main()
       OCT_output(&TOKEN);
 
       /* Client precomputation */
-      MPIN_PRECOMPUTE(&TOKEN,&HCID,&G1,&G2);
+      MPIN_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
 
       /* Client first pass */
-      rtn = MPIN_CLIENT_1(date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
+      rtn = MPIN_CLIENT_1(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
       if (rtn != 0) {
           printf("MPIN_CLIENT_1 ERROR %d\n", rtn);
           return 1;
@@ -289,7 +289,7 @@ int main()
       MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
 
       /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-      MPIN_SERVER_1(date,pID,&HID,&HTID);
+      MPIN_SERVER_1(HASH_TYPE_MPIN,date,pID,&HID,&HTID);
 
       /* Server generates Random number Y and sends it to Client */
       rtn = MPIN_RANDOM_GENERATE(&RNG,&Y);
@@ -324,16 +324,16 @@ int main()
         }
       }
 
-      MPIN_HASH_ALL(&HCID,&U,&UT,&SEC,&Y,&R,&W,&HM);  
-      MPIN_CLIENT_KEY(&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);      
+      MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,&U,&UT,&SEC,&Y,&R,&W,&HM);  
+      MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);      
       printf("Client Key = "); 
       OCT_output(&CK);
 
       /* Server will use the hashed ID if anonymous connection required.
-      MPIN_HASH_ID(&ID,&HSID);
-      MPIN_HASH_ALL(&HSID,NULL,&UT,&SEC,&Y,&R,&W,&HM);
+      MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HSID);
+      MPIN_HASH_ALL(HASH_TYPE_MPIN,&HSID,NULL,&UT,&SEC,&Y,&R,&W,&HM);
       */
-      MPIN_SERVER_KEY(&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
+      MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
       printf("Server Key = "); 
       OCT_output(&SK);
 

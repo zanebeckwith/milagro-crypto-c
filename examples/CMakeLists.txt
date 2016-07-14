@@ -4,9 +4,7 @@
 link_directories (${PROJECT_BINARY_DIR}/src)
 include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
 
-add_executable (testecm testecm.c)
 add_executable (testecdh testecdh.c)
-target_link_libraries (testecm ecdh) 
 target_link_libraries (testecdh ecdh) 
 add_executable (testrsa testrsa.c)
 target_link_libraries (testrsa rsa) 

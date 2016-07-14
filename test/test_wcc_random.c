@@ -81,7 +81,7 @@ int main()
     char bTPG2[4*PFS];
     octet BTPG2= {0,sizeof(bTPG2), bTPG2};
 
-    char ahv[HASH_BYTES],alice_id[256],bhv[HASH_BYTES],bob_id[256];
+    char ahv[PFS],alice_id[256],bhv[PFS],bob_id[256];
     octet AHV= {0,sizeof(ahv),ahv};
     octet BHV= {0,sizeof(bhv),bhv};
 

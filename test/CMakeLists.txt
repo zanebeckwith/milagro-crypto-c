@@ -66,16 +66,13 @@ endif(BUILD_WCC)
 
 # General tests
 add_executable (test_rsa test_rsa.c)
-add_executable (test_ecm test_ecm.c)
 add_executable (test_ecdh test_ecdh.c)
 add_executable (test_version test_version.c)
 # Link the executable to the libraries
 target_link_libraries (test_rsa rsa) 
-target_link_libraries (test_ecm ecdh) 
 target_link_libraries (test_ecdh ecdh) 
 target_link_libraries (test_version amcl) 
 # tests  
 do_test (test_rsa "SUCCESS")
-do_test (test_ecm "SUCCESS")
 do_test (test_ecdh "SUCCESS")
 do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH} OS: ${OS} FIELD CHOICE: ${FIELD_CHOICE} CURVE TYPE: ${CURVE_TYPE} WORD_LENGTH: ${WORD_LENGTH}")

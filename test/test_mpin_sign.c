@@ -49,7 +49,7 @@ int main()
     octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
 
     /* Hash values of Client ID */
-    char hcid[32];
+    char hcid[PFS];
     octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
 
     /* Client secret and shares */
@@ -77,7 +77,8 @@ int main()
     char ut[2*PFS+1];
     octet UT= {sizeof(ut),sizeof(ut),ut};
 
-    char htid[2*PFS+1];
+    char hid[2*PFS+1],htid[2*PFS+1];
+    octet HID= {0,sizeof(hid),hid};
     octet HTID= {0,sizeof(htid),htid};
 
     char e[12*PFS], f[12*PFS];
@@ -109,7 +110,7 @@ int main()
     MPIN_CREATE_CSPRNG(&RNG,&SEED);
 
     /* Hash ID */
-    MPIN_HASH_ID(&ID,&HCID);
+    MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
     OCT_output(&HCID);
 
     /* When set only send hashed IDs to server */
@@ -197,16 +198,16 @@ int main()
     /* Generate Time Permit shares */
     date = MPIN_today();
     printf("Date %d \n", date);
-    rtn = MPIN_GET_CLIENT_PERMIT(date,&MS1,&HCID,&TP1);
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
     if (rtn != 0)
     {
-        printf("MPIN_GET_CLIENT_PERMIT(date,&MS1,&HCID,&TP1) Error %d\n", rtn);
+        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
         return 1;
     }
-    rtn = MPIN_GET_CLIENT_PERMIT(date,&MS2,&HCID,&TP2);
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
     if (rtn != 0)
     {
-        printf("MPIN_GET_CLIENT_PERMIT(date,&MS2,&HCID,&TP2) Error %d\n", rtn);
+        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
         return 1;
     }
     printf("TP1 = 0x");
@@ -225,7 +226,7 @@ int main()
     OCT_output(&TP);
 
     /* Client extracts PIN1 from secret to create Token */
-    rtn = MPIN_EXTRACT_PIN(&ID, PIN1, &TOKEN);
+    rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
     if (rtn != 0)
     {
         printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
@@ -241,7 +242,7 @@ int main()
     OCT_jstring(&M,message);
     TimeValue = MPIN_GET_TIME();
     printf("TimeValue %d \n", TimeValue);
-    rtn = MPIN_CLIENT(date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT ERROR %d\n", rtn);
@@ -253,7 +254,7 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-    rtn = MPIN_SERVER(date,NULL,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)
@@ -274,7 +275,7 @@ int main()
     OCT_jstring(&M,message);
     TimeValue = MPIN_GET_TIME();
     printf("TimeValue %d \n", TimeValue);
-    rtn = MPIN_CLIENT(date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT ERROR %d\n", rtn);
@@ -287,7 +288,7 @@ int main()
 
     /* Server  */
     TimeValue += 10;
-    rtn = MPIN_SERVER(date,NULL,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != -19)
@@ -308,7 +309,7 @@ int main()
     OCT_jstring(&M,message);
     TimeValue = MPIN_GET_TIME();
     printf("TimeValue %d \n", TimeValue);
-    rtn = MPIN_CLIENT(date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT ERROR %d\n", rtn);
@@ -323,7 +324,7 @@ int main()
     OCT_clear(&M);
     message = "bad message";
     OCT_jstring(&M,message);
-    rtn = MPIN_SERVER(date,NULL,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != -19)

@@ -42,7 +42,7 @@ int main()
     char bkeyG2[4*PFS];
     octet BKeyG2= {0,sizeof(bkeyG2), bkeyG2};
 
-    char hv[HASH_BYTES],alice_id[256],bob_id[256];
+    char hv[PFS],alice_id[256],bob_id[256];
     octet HV= {0,sizeof(hv),hv};
 
     octet IdA= {0,sizeof(alice_id),alice_id};
