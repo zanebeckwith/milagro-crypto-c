@@ -107,8 +107,8 @@ int main()
     OCT_jstring(&IdA,"alice@miracl.com");
 
     // TA: Generate Alices's sender key
-    WCC_HASH_ID(&IdA,&HV);
-    rtn = WCC_GET_G1_MULTIPLE(hashDoneOn,&MS,&HV,&AKeyG1);
+    WCC_HASH_ID(HASH_TYPE_WCC,&IdA,&HV);
+    rtn = WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC,hashDoneOn,&MS,&HV,&AKeyG1);
     if (rtn != 0)
     {
         printf("TA WCC_GET_G1_MULTIPLE() Error %d\n", rtn);
@@ -119,8 +119,8 @@ int main()
     OCT_jstring(&IdB,"bob@miracl.com");
 
     // TA: Generate Bob's receiver key
-    WCC_HASH_ID(&IdB,&HV);
-    rtn = WCC_GET_G2_MULTIPLE(hashDoneOn,&MS,&HV,&BKeyG2);
+    WCC_HASH_ID(HASH_TYPE_WCC,&IdB,&HV);
+    rtn = WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,hashDoneOn,&MS,&HV,&BKeyG2);
     if (rtn != 0)
     {
         printf("TA WCC_GET_G2_MULTIPLE() Error %d\n", rtn);
@@ -134,7 +134,7 @@ int main()
         return 1;
     }
 
-    rtn = WCC_GET_G1_MULTIPLE(hashDoneOff,&X,&IdA,&PaG1);
+    rtn = WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC,hashDoneOff,&X,&IdA,&PaG1);
     if (rtn != 0)
     {
         printf("Alice WCC_GET_G1_MULTIPLE() Error %d\n", rtn);
@@ -147,7 +147,7 @@ int main()
         printf("Bob WCC_RANDOM_GENERATE(&RNG,&W) Error %d\n", rtn);
         return 1;
     }
-    rtn = WCC_GET_G1_MULTIPLE(hashDoneOff,&W,&IdA,&PgG1);
+    rtn = WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC,hashDoneOff,&W,&IdA,&PgG1);
     if (rtn != 0)
     {
         printf("Bob WCC_GET_G1_MULTIPLE() Error %d\n", rtn);
@@ -161,7 +161,7 @@ int main()
         return 1;
     }
 
-    rtn = WCC_GET_G2_MULTIPLE(hashDoneOff,&Y,&IdB,&PbG2);
+    rtn = WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,hashDoneOff,&Y,&IdB,&PbG2);
     if (rtn != 0)
     {
         printf("Bob WCC_GET_G1_MULTIPLE() Error %d\n", rtn);
@@ -169,13 +169,13 @@ int main()
     }
 
     // pia = Hq(PaG1,PbG2,PgG1,IdB)
-    WCC_Hq(&PaG1,&PbG2,&PgG1,&IdB,&PIA);
+    WCC_Hq(HASH_TYPE_WCC,&PaG1,&PbG2,&PgG1,&IdB,&PIA);
 
     // pib = Hq(PbG2,PaG1,PgG1,IdA)
-    WCC_Hq(&PbG2,&PaG1,&PgG1,&IdA,&PIB);
+    WCC_Hq(HASH_TYPE_WCC,&PbG2,&PaG1,&PgG1,&IdA,&PIB);
 
     // Bob calculates AES Key
-    WCC_RECEIVER_KEY(date, &Y, &W,  &PIA, &PIB,  &PaG1, &PgG1, &BKeyG2, NULL, &IdA, &K2);
+    WCC_RECEIVER_KEY(HASH_TYPE_WCC,date, &Y, &W,  &PIA, &PIB,  &PaG1, &PgG1, &BKeyG2, NULL, &IdA, &K2);
     if (rtn != 0)
     {
         printf("Bob WCC_RECEIVER_KEY() Error %d\n", rtn);
@@ -183,13 +183,13 @@ int main()
     }
 
     // pia = Hq(PaG1,PbG2,PgG1,IdB)
-    WCC_Hq(&PaG1,&PbG2,&PgG1,&IdB,&PIA);
+    WCC_Hq(HASH_TYPE_WCC,&PaG1,&PbG2,&PgG1,&IdB,&PIA);
 
     // pib = Hq(PbG2,PaG1,PgG1,IdA)
-    WCC_Hq(&PbG2,&PaG1,&PgG1,&IdA,&PIB);
+    WCC_Hq(HASH_TYPE_WCC,&PbG2,&PaG1,&PgG1,&IdA,&PIB);
 
     // Alice calculates AES Key
-    rtn = WCC_SENDER_KEY(date, &X, &PIA, &PIB, &PbG2, &PgG1, &AKeyG1, NULL, &IdB, &K1);
+    rtn = WCC_SENDER_KEY(HASH_TYPE_WCC,date, &X, &PIA, &PIB, &PbG2, &PgG1, &AKeyG1, NULL, &IdB, &K1);
     if (rtn != 0)
     {
         printf("Alice WCC_SENDER_KEY() Error %d\n", rtn);
