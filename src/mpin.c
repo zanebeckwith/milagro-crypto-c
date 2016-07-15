@@ -1084,7 +1084,7 @@ int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet
 
 /* AES-GCM Encryption of octets, K is key, H is header, 
    P is plaintext, C is ciphertext, T is authentication tag */
-void AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
+void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
   gcm g;
   GCM_init(&g,K->len,K->val,IV->len,IV->val);
@@ -1097,7 +1097,7 @@ void AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 
 /* AES-GCM Decryption of octets, K is key, H is header, 
    P is plaintext, C is ciphertext, T is authentication tag */
-void AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
+void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 {
   gcm g;
   GCM_init(&g,K->len,K->val,IV->len,IV->val);

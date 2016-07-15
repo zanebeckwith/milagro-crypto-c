@@ -361,7 +361,7 @@ int MPIN_CLIENT_KEY(int h,octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p
 	@param C Ciphertext
 	@param T Checksum
  */
-void AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
+void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
 
 /**	@brief AES-GCM Decryption 
  *
@@ -372,7 +372,7 @@ void AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
 	@param C Ciphertext
 	@param T Checksum
  */
-void AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
+void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
 
 /**	@brief HMAC of message M using key K to create tag of length len in octet tag
  *
