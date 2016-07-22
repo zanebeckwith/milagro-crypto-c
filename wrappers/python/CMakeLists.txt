@@ -41,15 +41,15 @@ if(BUILD_MPIN)
   endif (USE_ANONYMOUS) 
   
 
-  if(FIELD_CHOICE STREQUAL "BNCX")
+  if(FIELD_CHOICE STREQUAL "BN254_CX")
       if (USE_ANONYMOUS)
           file(COPY TestMPINAnon.py DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python/")
-          add_test (TestMPINAnonBNCX python TestMPINAnon.py)
+          add_test (TestMPINAnonBN254_CX python TestMPINAnon.py)
       else (USE_ANONYMOUS)
           file(COPY TestMPIN.py DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python/")
-          add_test (TestMPINBNCX python TestMPIN.py)
+          add_test (TestMPINBN254_CX python TestMPIN.py)
       endif (USE_ANONYMOUS) 
-  endif(FIELD_CHOICE STREQUAL "BNCX")
+  endif(FIELD_CHOICE STREQUAL "BN254_CX")
 
 endif(BUILD_MPIN)
 
