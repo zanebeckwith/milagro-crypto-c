@@ -146,8 +146,8 @@ void BIG_rawoutput(BIG a)
 	printf("(");
 	for (i=0;i<NLEN-1;i++)
 #if CHUNK==64
-	  printf("%llx,",(long long unsigned int) a[i]);
-	printf("%llx)",(long long unsigned int) a[NLEN-1]);
+	  printf("%"PRIxMAX",",(long long unsigned int) a[i]);
+	printf("%"PRIxMAX")",(long long unsigned int) a[NLEN-1]);
 #else
 	  printf("%x,",(unsigned int) a[i]);
 	printf("%x)",(unsigned int) a[NLEN-1]);
@@ -820,7 +820,7 @@ void BIG_dshr(DBIG a,int k)
 chunk BIG_split(BIG t,BIG b,DBIG d,int n)
 {
 	int i;
-	chunk nw,carry;
+	chunk nw,carry=0;
 	int m=n%BASEBITS;
 //	BIG_dnorm(d);
 
