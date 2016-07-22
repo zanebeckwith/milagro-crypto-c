@@ -146,8 +146,8 @@ void BIG_rawoutput(BIG a)
 	printf("(");
 	for (i=0;i<NLEN-1;i++)
 #if CHUNK==64
-	  printf("%"PRIxMAX",",(long long unsigned int) a[i]);
-	printf("%"PRIxMAX")",(long long unsigned int) a[NLEN-1]);
+	  printf("%"PRIxMAX",",(uint64_t) a[i]);
+	printf("%"PRIxMAX")",(uint64_t) a[NLEN-1]);
 #else
 	  printf("%x,",(unsigned int) a[i]);
 	printf("%x)",(unsigned int) a[NLEN-1]);
