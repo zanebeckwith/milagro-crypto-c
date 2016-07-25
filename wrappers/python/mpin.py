@@ -831,7 +831,7 @@ def hash_all(hash_mpin_id, u, ut, v, y, r, w):
     w1, w1_val = make_octet(None,w)
     
     hm1, hm1_val = make_octet(HASH_BYTES)  
-    libmpin.MPIN_HASH_ALL(hash_mpin_id1,u1,ut1,v1,y1,r1,w1,hm1)
+    libmpin.MPIN_HASH_ALL(HASH_TYPE_MPIN,hash_mpin_id1,u1,ut1,v1,y1,r1,w1,hm1)
 
     hm_hex = to_hex(hm1)
     return hm_hex.decode("hex")
