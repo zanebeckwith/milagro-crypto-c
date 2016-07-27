@@ -263,7 +263,7 @@ int main()
 
   if (rtn!=0)
     {
-      printf("Server says - Bad Pin. I don't know you. Feck off.\n");
+      printf("Server says - Bad Pin.\n");
 #ifdef PINERROR
 
       err=MPIN_KANGAROO(&E,&F);
