@@ -41,42 +41,46 @@ char* V2[32] = {"7ec2d70f9883b3ff1d7963d069ff7576f3e5d782511766854cd6d6eb1ad8863
 
 int main()
 {
-  int i,otp;
-  char x[32];
-  octet X={sizeof(x),sizeof(x),x};
+    int i,otp;
+    char x[32];
+    octet X= {sizeof(x),sizeof(x),x};
 
-  char vector[32];
-  octet VECTOR={sizeof(vector),sizeof(vector),vector};
+    char vector[32];
+    octet VECTOR= {sizeof(vector),sizeof(vector),vector};
 
-  char seed[32] = {0};
-  octet SEED = {0,sizeof(seed),seed};
-  csprng RNG;
+    char seed[32] = {0};
+    octet SEED = {0,sizeof(seed),seed};
+    csprng RNG;
 
-  /* unrandom seed value! */
-  SEED.len=32;
-  for (i=0; i<32; i++) 
-    SEED.val[i]=i+1;
+    /* unrandom seed value! */
+    SEED.len=32;
+    for (i=0; i<32; i++)
+        SEED.val[i]=i+1;
 
-  /* initialise random number generator */
-  MPIN_CREATE_CSPRNG(&RNG,&SEED);
+    /* initialise random number generator */
+    MPIN_CREATE_CSPRNG(&RNG,&SEED);
 
-  for (i=0; i<nIter; i++) {
-    otp = generateOTP(&RNG);
-    if (otp != V1[i]){
-      printf("FAILURE generateOTP failure\n");
-      return 1;
+    for (i=0; i<nIter; i++)
+    {
+        otp = generateOTP(&RNG);
+        if (otp != V1[i])
+        {
+            printf("FAILURE generateOTP failure\n");
+            return 1;
+        }
     }
-  }
 
-  for (i=0; i<nIter; i++) {
-    generateRandom(&RNG,&X);
-    hex2bytes(V2[i], vector);
-    if (!OCT_comp(&X,&VECTOR)){
-      printf("FAILURE generateRandom failure\n");
-      return 1;
+    for (i=0; i<nIter; i++)
+    {
+        generateRandom(&RNG,&X);
+        OCT_fromHex(&VECTOR,V2[i]);
+        if (!OCT_comp(&X,&VECTOR))
+        {
+            printf("FAILURE generateRandom failure\n");
+            return 1;
+        }
     }
-  }
 
-  printf("SUCCESS\n");
-  return 0;
+    printf("SUCCESS\n");
+    return 0;
 }

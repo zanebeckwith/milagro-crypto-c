@@ -24,7 +24,7 @@ under the License.
  * @brief RSA Header file for implementation of RSA protocol
  *
  * declares functions
- * 
+ *
  */
 
 #ifndef RSA_H
@@ -73,7 +73,7 @@ extern int PKCS15(int h,octet *M,octet *W);
 	@param F is the output encoding, ready for RSA encryption
 	@return 1 if OK, else 0
  */
-extern int	OAEP_ENCODE(int h,octet *M,csprng *R,octet *P,octet *F); 
+extern int	OAEP_ENCODE(int h,octet *M,csprng *R,octet *P,octet *F);
 /**	@brief OAEP unpadding of a message after RSA decryption
  *
 	Unpadding is done in-place
@@ -89,7 +89,7 @@ extern int  OAEP_DECODE(int h,octet *P,octet *F);
 	@param F is input padded message
 	@param G is the output ciphertext
  */
-extern void RSA_ENCRYPT(rsa_public_key* PUB,octet *F,octet *G); 
+extern void RSA_ENCRYPT(rsa_public_key* PUB,octet *F,octet *G);
 /**	@brief RSA decryption of ciphertext
  *
 	@param PRIV the input RSA private key
@@ -97,7 +97,7 @@ extern void RSA_ENCRYPT(rsa_public_key* PUB,octet *F,octet *G);
 	@param F is output plaintext (requires unpadding)
 
  */
-extern void RSA_DECRYPT(rsa_private_key* PRIV,octet *G,octet *F);  
+extern void RSA_DECRYPT(rsa_private_key* PRIV,octet *G,octet *F);
 /**	@brief Destroy an RSA private Key
  *
 	@param PRIV the input RSA private key. Destroyed on output.

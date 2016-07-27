@@ -26,7 +26,7 @@ under the License.
  * Allows some user configuration
  * defines structures
  * declares functions
- * 
+ *
  */
 
 #ifndef MPIN_H
@@ -76,7 +76,7 @@ void MPIN_HASH_ID(int h,octet *ID,octet *HID);
 	@return current epoch time in seconds
  */
 unsign32 MPIN_GET_TIME(void);
-/**	@brief Generate Y=H(s,O), where s is epoch time, O is an octet, and H(.) is a hash function 
+/**	@brief Generate Y=H(s,O), where s is epoch time, O is an octet, and H(.) is a hash function
  *
   	@param h is the hash type
 	@param t is epoch time in seconds
@@ -92,7 +92,7 @@ void MPIN_GET_Y(int h,int t,octet *O,octet *Y);
 	@param CS is the client secret from which the PIN is to be extracted
 	@return 0 or an error code
  */
-int MPIN_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS); 
+int MPIN_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
 /**	@brief Perform client side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
@@ -201,21 +201,21 @@ void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
 int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F);
 /**	@brief Add two members from the group G1
  *
-	@param Q1 an input member of G1 
-	@param Q2 an input member of G1 
+	@param Q1 an input member of G1
+	@param Q2 an input member of G1
 	@param Q an output member of G1 = Q1+Q2
 	@return 0 or an error code
  */
 int MPIN_RECOMBINE_G1(octet *Q1,octet *Q2,octet *Q);
 /**	@brief Add two members from the group G2
  *
-	@param P1 an input member of G2 
-	@param P2 an input member of G2 
+	@param P1 an input member of G2
+	@param P2 an input member of G2
 	@param P an output member of G2 = P1+P2
 	@return 0 or an error code
  */
 int MPIN_RECOMBINE_G2(octet *P1,octet *P2,octet *P);
-/**	@brief Use Kangaroos to find PIN error 
+/**	@brief Use Kangaroos to find PIN error
  *
 	@param E a member of the group GT
 	@param F a member of the group GT =  E^e
@@ -225,13 +225,13 @@ int MPIN_KANGAROO(octet *E,octet *F);
 /**	@brief Encoding of a Time Permit to make it indistinguishable from a random string
  *
 	@param R is a pointer to a cryptographically secure random number generator
-	@param TP is the input time permit, obfuscated on output 
+	@param TP is the input time permit, obfuscated on output
 	@return 0 or an error code
  */
 int MPIN_ENCODING(csprng *R,octet *TP);
-/**	@brief Encoding of an obfuscated Time Permit 
+/**	@brief Encoding of an obfuscated Time Permit
  *
-	@param TP is the input obfuscated time permit, restored on output 
+	@param TP is the input obfuscated time permit, restored on output
 	@return 0 or an error code
  */
 int MPIN_DECODING(octet *TP);
@@ -272,7 +272,7 @@ int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
 	@return 0 or an error code
  */
 int MPIN_GET_G2_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
-/** @brief Hash the session transcript 
+/** @brief Hash the session transcript
  	@param h is the hash type
 	@param I is the hashed input client ID = H(ID)
 	@param U is the client output = x.H(ID)
@@ -291,28 +291,28 @@ void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,
 	@param CS is the full client secret = s.H(ID)
 	@return 0 or an error code
  */
-int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS); 
+int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
 /**	@brief Create a Time Permit in G1 from a master secret and the client ID
  *
   	@param h is the hash type
-	@param d is input date, in days since the epoch. 
+	@param d is input date, in days since the epoch.
 	@param S is an input master secret
 	@param ID is the input client identity
 	@param TP is a Time Permit for the given date = s.H(d|H(ID))
 	@return 0 or an error code
  */
-int MPIN_GET_CLIENT_PERMIT(int h,int d,octet *S,octet *ID,octet *TP); 
+int MPIN_GET_CLIENT_PERMIT(int h,int d,octet *S,octet *ID,octet *TP);
 /**	@brief Create a server secret in G2 from a master secret
  *
 	@param S is an input master secret
 	@param SS is the server secret = s.Q where Q is a fixed generator of G2
 	@return 0 or an error code
  */
-int MPIN_GET_SERVER_SECRET(octet *S,octet *SS); 
+int MPIN_GET_SERVER_SECRET(octet *S,octet *SS);
 /* int MPIN_TEST_PAIRING(octet *,octet *); */
 
 /* For M-Pin Full */
-/**	@brief Precompute values for use by the client side of M-Pin Full 
+/**	@brief Precompute values for use by the client side of M-Pin Full
  *
 	@param T is the input M-Pin token (the client secret with PIN portion removed)
 	@param ID is the input client identity
@@ -343,7 +343,7 @@ int MPIN_SERVER_KEY(int h,octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U
 	@param g1 precomputed input
 	@param g2 precomputed input
 	@param pin is the input PIN number
-	@param r is an input, a locally generated random number 
+	@param r is an input, a locally generated random number
 	@param x is an input, a locally generated random number
 	@param p is an input, hash of the protocol transcript
 	@param T is the input Server-side Diffie-Hellman component
@@ -363,7 +363,7 @@ int MPIN_CLIENT_KEY(int h,octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p
  */
 void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
 
-/**	@brief AES-GCM Decryption 
+/**	@brief AES-GCM Decryption
  *
 	@param K  AES key
 	@param IV Initialization vector

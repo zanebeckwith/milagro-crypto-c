@@ -67,123 +67,123 @@ under the License.
 // Define some OIDs
 
 // Elliptic Curve with SHA256
-static char eccsha256[8]={0x2a,0x86,0x48,0xce,0x3d,0x04,0x03,0x02};
-static octet ECCSHA256={8,sizeof(eccsha256),eccsha256};
+static char eccsha256[8]= {0x2a,0x86,0x48,0xce,0x3d,0x04,0x03,0x02};
+static octet ECCSHA256= {8,sizeof(eccsha256),eccsha256};
 
 // Elliptic Curve with SHA384
-static char eccsha384[8]={0x2a,0x86,0x48,0xce,0x3d,0x04,0x03,0x03};
-static octet ECCSHA384={8,sizeof(eccsha384),eccsha384};
+static char eccsha384[8]= {0x2a,0x86,0x48,0xce,0x3d,0x04,0x03,0x03};
+static octet ECCSHA384= {8,sizeof(eccsha384),eccsha384};
 
 // Elliptic Curve with SHA512
-static char eccsha512[8]={0x2a,0x86,0x48,0xce,0x3d,0x04,0x03,0x04};
-static octet ECCSHA512={8,sizeof(eccsha512),eccsha512};
+static char eccsha512[8]= {0x2a,0x86,0x48,0xce,0x3d,0x04,0x03,0x04};
+static octet ECCSHA512= {8,sizeof(eccsha512),eccsha512};
 
 // EC Public Key
-static char ecpk[7]={0x2a,0x86,0x48,0xce,0x3d,0x02,0x01};
-static octet ECPK={7,sizeof(ecpk),ecpk};
+static char ecpk[7]= {0x2a,0x86,0x48,0xce,0x3d,0x02,0x01};
+static octet ECPK= {7,sizeof(ecpk),ecpk};
 
 // C25519 curve
-static char prime25519[9]={0x2B,0x06,0x01,0x04,0x01,0xDA,0x47,0x0F,0x01}; /*****/
-static octet PRIME25519={9,sizeof(prime25519),prime25519};
+static char prime25519[9]= {0x2B,0x06,0x01,0x04,0x01,0xDA,0x47,0x0F,0x01}; /*****/
+static octet PRIME25519= {9,sizeof(prime25519),prime25519};
 
 // NIST256 curve
-static char prime256v1[8]={0x2a,0x86,0x48,0xce,0x3d,0x03,0x01,0x07};
-static octet PRIME256V1={8,sizeof(prime256v1),prime256v1};
+static char prime256v1[8]= {0x2a,0x86,0x48,0xce,0x3d,0x03,0x01,0x07};
+static octet PRIME256V1= {8,sizeof(prime256v1),prime256v1};
 
 // NIST384 curve
-static char secp384r1[5]={0x2B,0x81,0x04,0x00,0x22};
-static octet SECP384R1={5,sizeof(secp384r1),secp384r1};
+static char secp384r1[5]= {0x2B,0x81,0x04,0x00,0x22};
+static octet SECP384R1= {5,sizeof(secp384r1),secp384r1};
 
 // NIST521 curve
-static char secp521r1[5]={0x2B,0x81,0x04,0x00,0x23};
-static octet SECP521R1={5,sizeof(secp521r1),secp521r1};
+static char secp521r1[5]= {0x2B,0x81,0x04,0x00,0x23};
+static octet SECP521R1= {5,sizeof(secp521r1),secp521r1};
 
 // RSA Public Key
-static char rsapk[9]={0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x01};
-static octet RSAPK={9,sizeof(rsapk),rsapk};
+static char rsapk[9]= {0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x01};
+static octet RSAPK= {9,sizeof(rsapk),rsapk};
 
 // RSA with SHA256
-static char rsasha256[9]={0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x0b};
-static octet RSASHA256={9,sizeof(rsasha256),rsasha256};
+static char rsasha256[9]= {0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x0b};
+static octet RSASHA256= {9,sizeof(rsasha256),rsasha256};
 
 // RSA with SHA384
-static char rsasha384[9]={0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x0c}; 
-static octet RSASHA384={9,sizeof(rsasha384),rsasha384};
+static char rsasha384[9]= {0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x0c};
+static octet RSASHA384= {9,sizeof(rsasha384),rsasha384};
 
 // RSA with SHA512
-static char rsasha512[9]={0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x0d}; 
-static octet RSASHA512={9,sizeof(rsasha512),rsasha512};
+static char rsasha512[9]= {0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x0d};
+static octet RSASHA512= {9,sizeof(rsasha512),rsasha512};
 
 // countryName
-static char cn[3]={0x55,0x04,0x06};
-static octet CN={3,sizeof(cn),cn};
+static char cn[3]= {0x55,0x04,0x06};
+static octet CN= {3,sizeof(cn),cn};
 
 // stateName
-static char sn[3]={0x55,0x04,0x08};
-static octet SN={3,sizeof(sn),sn};
+static char sn[3]= {0x55,0x04,0x08};
+static octet SN= {3,sizeof(sn),sn};
 
 // localName
-static char ln[3]={0x55,0x04,0x07};
-static octet LN={3,sizeof(ln),ln};
+static char ln[3]= {0x55,0x04,0x07};
+static octet LN= {3,sizeof(ln),ln};
 
 // orgName
-static char on[3]={0x55,0x04,0x0A};
-static octet ON={3,sizeof(on),on};
+static char on[3]= {0x55,0x04,0x0A};
+static octet ON= {3,sizeof(on),on};
 
 // unitName
-static char un[3]={0x55,0x04,0x0B};
-static octet UN={3,sizeof(un),un};
+static char un[3]= {0x55,0x04,0x0B};
+static octet UN= {3,sizeof(un),un};
 
 // myName
-static char mn[3]={0x55,0x04,0x03};
-static octet MN={3,sizeof(mn),mn};
+static char mn[3]= {0x55,0x04,0x03};
+static octet MN= {3,sizeof(mn),mn};
 
 // emailName
-static char en[9]={0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x09,0x01};
-static octet EN={9,sizeof(en),en};
+static char en[9]= {0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x09,0x01};
+static octet EN= {9,sizeof(en),en};
 
 
 /* Check expected TAG and return ASN.1 field length. If tag=0 skip check. */
 static int getalen(int tag,char *b,int j)
 {
-	int len;
+    int len;
 
-	if (tag!=0 && (unsigned char)b[j]!=tag) return -1; // not a valid tag
-	j++;
+    if (tag!=0 && (unsigned char)b[j]!=tag) return -1; // not a valid tag
+    j++;
 
-	if ((unsigned char)b[j]==0x81)
-	{
-		j++;
-		len=(unsigned char)b[j];
-	}
-	else if ((unsigned char)b[j]==0x82)
-	{
-		j++;
-		len=256*b[j++];
-		len+=(unsigned char)b[j];
-	}
-	else 
-	{
-		len=(unsigned char)b[j];
-		if (len>127) return -1;
-	}
-	return len;
+    if ((unsigned char)b[j]==0x81)
+    {
+        j++;
+        len=(unsigned char)b[j];
+    }
+    else if ((unsigned char)b[j]==0x82)
+    {
+        j++;
+        len=256*b[j++];
+        len+=(unsigned char)b[j];
+    }
+    else
+    {
+        len=(unsigned char)b[j];
+        if (len>127) return -1;
+    }
+    return len;
 }
 
 /* jump over length field */
 static int skip(int len)
 {
-	if (len<128) return 2;
-	if (len>=128 && len<256) return 3;
-	return 4;
+    if (len<128) return 2;
+    if (len>=128 && len<256) return 3;
+    return 4;
 }
 
 /* round length up to nearest 8-byte length */
 static int bround(int len)
 {
-	if (len%8==0) return len;
-	return len+(8-len%8);
-	
+    if (len%8==0) return len;
+    return len+(8-len%8);
+
 }
 
 //	Input signed cert as octet, and extract signature
@@ -193,333 +193,398 @@ static int bround(int len)
 
 pktype X509_extract_cert_sig(octet *sc,octet *sig)
 {
-	int i,j,k,fin,len,rlen,sj,type,ex;
-	char soid[8];
-	octet SOID={0,sizeof(soid),soid};
-	pktype ret;
+    int i,j,k,fin,len,rlen,sj,type,ex;
+    char soid[8];
+    octet SOID= {0,sizeof(soid),soid};
+    pktype ret;
 
-	ret.type=0; ret.hash=0;
+    ret.type=0;
+    ret.hash=0;
 
-	j=0;
-		
-	len=getalen(SEQ,sc->val,j);		// Check for expected SEQ clause, and get length
-	if (len<0) return ret;			// if not a SEQ clause, there is a problem, exit
-	j+=skip(len);					// skip over length to clause contents. Add len to skip clause
+    j=0;
 
-	if (len+j!=sc->len) return ret;
+    len=getalen(SEQ,sc->val,j);		// Check for expected SEQ clause, and get length
+    if (len<0) return ret;			// if not a SEQ clause, there is a problem, exit
+    j+=skip(len);					// skip over length to clause contents. Add len to skip clause
 
-	len=getalen(SEQ,sc->val,j);
-	if (len<0) return ret;
-	j+=skip(len)+len; // jump over cert to signature OID
+    if (len+j!=sc->len) return ret;
 
-	len=getalen(SEQ,sc->val,j);
-	if (len<0) return ret;
-	j+=skip(len);
+    len=getalen(SEQ,sc->val,j);
+    if (len<0) return ret;
+    j+=skip(len)+len; // jump over cert to signature OID
 
-	sj=j+len; // Needed to jump over signature OID
+    len=getalen(SEQ,sc->val,j);
+    if (len<0) return ret;
+    j+=skip(len);
+
+    sj=j+len; // Needed to jump over signature OID
 
 // dive in to extract OID
-	len=getalen(OID,sc->val,j);
-	if (len<0) return ret;
-	j+=skip(len);
+    len=getalen(OID,sc->val,j);
+    if (len<0) return ret;
+    j+=skip(len);
 
-	fin=j+len;
-	SOID.len=len;
-	for (i=0;j<fin;j++)
-			SOID.val[i++]= sc->val[j];
+    fin=j+len;
+    SOID.len=len;
+    for (i=0; j<fin; j++)
+        SOID.val[i++]= sc->val[j];
 
-	// check OID here..
+    // check OID here..
 
-	if (OCT_comp(&ECCSHA256,&SOID)) {ret.type=ECC; ret.hash=H256;} 
-	if (OCT_comp(&ECCSHA384,&SOID)) {ret.type=ECC; ret.hash=H384;}
-	if (OCT_comp(&ECCSHA512,&SOID)) {ret.type=ECC; ret.hash=H512;} 
-	if (OCT_comp(&RSASHA256,&SOID)) {ret.type=RSA; ret.hash=H256;}
-	if (OCT_comp(&RSASHA384,&SOID)) {ret.type=RSA; ret.hash=H384;}
-	if (OCT_comp(&RSASHA512,&SOID)) {ret.type=RSA; ret.hash=H512;}
+    if (OCT_comp(&ECCSHA256,&SOID))
+    {
+        ret.type=ECC;
+        ret.hash=H256;
+    }
+    if (OCT_comp(&ECCSHA384,&SOID))
+    {
+        ret.type=ECC;
+        ret.hash=H384;
+    }
+    if (OCT_comp(&ECCSHA512,&SOID))
+    {
+        ret.type=ECC;
+        ret.hash=H512;
+    }
+    if (OCT_comp(&RSASHA256,&SOID))
+    {
+        ret.type=RSA;
+        ret.hash=H256;
+    }
+    if (OCT_comp(&RSASHA384,&SOID))
+    {
+        ret.type=RSA;
+        ret.hash=H384;
+    }
+    if (OCT_comp(&RSASHA512,&SOID))
+    {
+        ret.type=RSA;
+        ret.hash=H512;
+    }
 
-	if (ret.type==0) return ret; // unsupported type
+    if (ret.type==0) return ret; // unsupported type
 
-	j=sj;  // jump out to signature
+    j=sj;  // jump out to signature
 
-	len=getalen(BIT,sc->val,j);
-	if (len<0) {ret.type=0; return ret;}
-	j+=skip(len);
-	j++; len--; // skip bit shift (hopefully 0!)
+    len=getalen(BIT,sc->val,j);
+    if (len<0)
+    {
+        ret.type=0;
+        return ret;
+    }
+    j+=skip(len);
+    j++;
+    len--; // skip bit shift (hopefully 0!)
 
-	if (ret.type==ECC)
-	{ // signature in the form (r,s)
-		len=getalen(SEQ,sc->val,j);
-		if (len<0) {ret.type=0; return ret;}
-		j+=skip(len);
+    if (ret.type==ECC)
+    {
+        // signature in the form (r,s)
+        len=getalen(SEQ,sc->val,j);
+        if (len<0)
+        {
+            ret.type=0;
+            return ret;
+        }
+        j+=skip(len);
 
-	// pick up r part of signature
-		len=getalen(INT,sc->val,j);
-		if (len<0) {ret.type=0; return ret;}
-		j+=skip(len);
+        // pick up r part of signature
+        len=getalen(INT,sc->val,j);
+        if (len<0)
+        {
+            ret.type=0;
+            return ret;
+        }
+        j+=skip(len);
 
-		if (sc->val[j]==0)
-		{ // skip leading zero
-			j++;
-			len--;
-		}
-		rlen=bround(len);
+        if (sc->val[j]==0)
+        {
+            // skip leading zero
+            j++;
+            len--;
+        }
+        rlen=bround(len);
 
-		ex=rlen-len;
-		sig->len=2*rlen;
+        ex=rlen-len;
+        sig->len=2*rlen;
 
-		i=0;
-		for (k=0;k<ex;k++)
-			sig->val[i++]=0;
+        i=0;
+        for (k=0; k<ex; k++)
+            sig->val[i++]=0;
 
-		fin=j+len;
-		for (;j<fin;j++)
-				sig->val[i++]= sc->val[j];
+        fin=j+len;
+        for (; j<fin; j++)
+            sig->val[i++]= sc->val[j];
 
-	// pick up s part of signature
-		len=getalen(INT,sc->val,j);
-		if (len<0) {ret.type=0; return ret;}
-		j+=skip(len);
+        // pick up s part of signature
+        len=getalen(INT,sc->val,j);
+        if (len<0)
+        {
+            ret.type=0;
+            return ret;
+        }
+        j+=skip(len);
 
-		if (sc->val[j]==0)
-		{ // skip leading zeros
-			j++;
-			len--;
-		}
-		rlen=bround(len);
-		ex=rlen-len;
-		for (k=0;k<ex;k++)
-			sig->val[i++]=0;
+        if (sc->val[j]==0)
+        {
+            // skip leading zeros
+            j++;
+            len--;
+        }
+        rlen=bround(len);
+        ex=rlen-len;
+        for (k=0; k<ex; k++)
+            sig->val[i++]=0;
 
-		fin=j+len;
-		for (;j<fin;j++)
-				sig->val[i++]= sc->val[j];
+        fin=j+len;
+        for (; j<fin; j++)
+            sig->val[i++]= sc->val[j];
 
-	}
-	if (ret.type==RSA)
-	{
-		rlen=bround(len);
-		ex=rlen-len;
+    }
+    if (ret.type==RSA)
+    {
+        rlen=bround(len);
+        ex=rlen-len;
 
-		sig->len=rlen;
-		i=0;
-		for (k=0;k<ex;k++)
-			sig->val[i++]=0;
+        sig->len=rlen;
+        i=0;
+        for (k=0; k<ex; k++)
+            sig->val[i++]=0;
 
-		fin=j+len;
-		for (;j<fin;j++)
-				sig->val[i++]= sc->val[j];
+        fin=j+len;
+        for (; j<fin; j++)
+            sig->val[i++]= sc->val[j];
 
-	}
-	if (ret.hash==H256) ret.curve=NIST256;
-	if (ret.hash==H384) ret.curve=NIST384;
-	if (ret.hash==H512) ret.curve=NIST521;
+    }
+    if (ret.hash==H256) ret.curve=NIST256;
+    if (ret.hash==H384) ret.curve=NIST384;
+    if (ret.hash==H512) ret.curve=NIST521;
 
-	return ret;
+    return ret;
 }
 
 // Extract certificate from signed cert
 int X509_extract_cert(octet *sc,octet *cert)
 {
-	int i,j,fin,len,k;
+    int i,j,fin,len,k;
 
-	j=0;
-	len=getalen(SEQ,sc->val,j);
+    j=0;
+    len=getalen(SEQ,sc->val,j);
 
-	if (len<0) return 0;
-	j+=skip(len);
+    if (len<0) return 0;
+    j+=skip(len);
 
-	k=j;
+    k=j;
 
-	len=getalen(SEQ,sc->val,j);
-	if (len<0) return 0;
-	j+=skip(len);
+    len=getalen(SEQ,sc->val,j);
+    if (len<0) return 0;
+    j+=skip(len);
 
-	fin=j+len;
-	cert->len=fin-k;
-	for (i=k;i<fin;i++) cert->val[i-k]=sc->val[i];
+    fin=j+len;
+    cert->len=fin-k;
+    for (i=k; i<fin; i++) cert->val[i-k]=sc->val[i];
 
-	return 1;
+    return 1;
 }
 
 // Extract Public Key from inside Certificate
 pktype X509_extract_public_key(octet *c,octet *key)
 {
-	int i,j,fin,len,sj;
-	char koid[12];     /*****/
-	octet KOID={0,sizeof(koid),koid};
-	pktype ret;
+    int i,j,fin,len,sj;
+    char koid[12];     /*****/
+    octet KOID= {0,sizeof(koid),koid};
+    pktype ret;
 
-	ret.type=ret.hash=0;
-	ret.curve=-1;
+    ret.type=ret.hash=0;
+    ret.curve=-1;
 
-	j=0;
+    j=0;
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len);
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len);
 
-	if (len+j!=c->len) return ret;
+    if (len+j!=c->len) return ret;
 
-	len=getalen(0,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len)+len; //jump over version clause
+    len=getalen(0,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len)+len; //jump over version clause
 
-	len=getalen(INT,c->val,j);
+    len=getalen(INT,c->val,j);
 
-	if (len>0) j+=skip(len)+len; // jump over serial number clause (if there is one)
+    if (len>0) j+=skip(len)+len; // jump over serial number clause (if there is one)
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len)+len;  // jump over signature algorithm
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len)+len;  // jump over signature algorithm
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len)+len; // skip issuer
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len)+len; // skip issuer
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len)+len; // skip validity
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len)+len; // skip validity
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len)+len; // skip subject
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len)+len; // skip subject
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len); // 
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len); //
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len);
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len);
 
 // ** Maybe dive in and check Public Key OIDs here?
 // ecpublicKey & prime256v1, secp384r1 or secp521r1 for ECC
 // rsapublicKey for RSA
 
-	sj=j+len;
+    sj=j+len;
 
-	len=getalen(OID,c->val,j);
-	if (len<0) return ret;
-	j+=skip(len);
+    len=getalen(OID,c->val,j);
+    if (len<0) return ret;
+    j+=skip(len);
 
-	fin=j+len;
-	KOID.len=len;
-	for (i=0;j<fin;j++)
-			KOID.val[i++]= c->val[j];
+    fin=j+len;
+    KOID.len=len;
+    for (i=0; j<fin; j++)
+        KOID.val[i++]= c->val[j];
 
-	ret.type=0;
-	if (OCT_comp(&ECPK,&KOID)) ret.type=ECC;
-	if (OCT_comp(&RSAPK,&KOID)) ret.type=RSA;
+    ret.type=0;
+    if (OCT_comp(&ECPK,&KOID)) ret.type=ECC;
+    if (OCT_comp(&RSAPK,&KOID)) ret.type=RSA;
 
-	if (ret.type==0) return ret;
+    if (ret.type==0) return ret;
 
-	if (ret.type==ECC)
-	{ // which elliptic curve?
-		len=getalen(OID,c->val,j);
-		if (len<0) {ret.type=0; return ret;}
-		j+=skip(len);
+    if (ret.type==ECC)
+    {
+        // which elliptic curve?
+        len=getalen(OID,c->val,j);
+        if (len<0)
+        {
+            ret.type=0;
+            return ret;
+        }
+        j+=skip(len);
 
-		fin=j+len;
-		KOID.len=len;
-		for (i=0;j<fin;j++)
-				KOID.val[i++]= c->val[j];
+        fin=j+len;
+        KOID.len=len;
+        for (i=0; j<fin; j++)
+            KOID.val[i++]= c->val[j];
 
-		if (OCT_comp(&PRIME25519,&KOID)) ret.curve=C25519;   /*****/
-		if (OCT_comp(&PRIME256V1,&KOID)) ret.curve=NIST256;
-		if (OCT_comp(&SECP384R1,&KOID)) ret.curve=NIST384;
-		if (OCT_comp(&SECP521R1,&KOID)) ret.curve=NIST521;
-	}
+        if (OCT_comp(&PRIME25519,&KOID)) ret.curve=C25519;   /*****/
+        if (OCT_comp(&PRIME256V1,&KOID)) ret.curve=NIST256;
+        if (OCT_comp(&SECP384R1,&KOID)) ret.curve=NIST384;
+        if (OCT_comp(&SECP521R1,&KOID)) ret.curve=NIST521;
+    }
 
-	j=sj; // skip to actual Public Key
+    j=sj; // skip to actual Public Key
 
-	len=getalen(BIT,c->val,j);
-	if (len<0) {ret.type=0; return ret;}
-	j+=skip(len); // 
-	j++; len--; // skip bit shift (hopefully 0!)
+    len=getalen(BIT,c->val,j);
+    if (len<0)
+    {
+        ret.type=0;
+        return ret;
+    }
+    j+=skip(len); //
+    j++;
+    len--; // skip bit shift (hopefully 0!)
 
 // extract key
-	if (ret.type==ECC)
-	{
-		key->len=len;
-		fin=j+len;
-		for (i=0;j<fin;j++)
-			key->val[i++]= c->val[j];
+    if (ret.type==ECC)
+    {
+        key->len=len;
+        fin=j+len;
+        for (i=0; j<fin; j++)
+            key->val[i++]= c->val[j];
 
-	}
-	if (ret.type==RSA)
-	{ // Key is (modulus,exponent) - assume exponent is 65537
-		len=getalen(SEQ,c->val,j);
-		if (len<0) {ret.type=0; return ret;}
-		j+=skip(len); // 
+    }
+    if (ret.type==RSA)
+    {
+        // Key is (modulus,exponent) - assume exponent is 65537
+        len=getalen(SEQ,c->val,j);
+        if (len<0)
+        {
+            ret.type=0;
+            return ret;
+        }
+        j+=skip(len); //
 
-		len=getalen(INT,c->val,j); // get modulus
-		if (len<0) {ret.type=0; return ret;}
-		j+=skip(len); // 
-		if (c->val[j]==0)
-		{
-			j++; len--; // remove leading zero
-		}
+        len=getalen(INT,c->val,j); // get modulus
+        if (len<0)
+        {
+            ret.type=0;
+            return ret;
+        }
+        j+=skip(len); //
+        if (c->val[j]==0)
+        {
+            j++;
+            len--; // remove leading zero
+        }
 
-		key->len=len;
-		fin=j+len;
-		for (i=0;j<fin;j++)
-			key->val[i++]= c->val[j];
+        key->len=len;
+        fin=j+len;
+        for (i=0; j<fin; j++)
+            key->val[i++]= c->val[j];
 
-	}
-	return ret;
+    }
+    return ret;
 }
 
-// Find pointer to main sections of cert, before extracting individual field 
+// Find pointer to main sections of cert, before extracting individual field
 // Find index to issuer in cert
 int X509_find_issuer(octet *c)
 {
-	int j,len;
-	j=0;
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len);
+    int j,len;
+    j=0;
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len);
 
-	if (len+j!=c->len) return 0;
+    if (len+j!=c->len) return 0;
 
-	len=getalen(0,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len)+len; //jump over version clause
+    len=getalen(0,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len)+len; //jump over version clause
 
-	len=getalen(INT,c->val,j);
+    len=getalen(INT,c->val,j);
 
-	if (len>0) j+=skip(len)+len; // jump over serial number clause (if there is one)
+    if (len>0) j+=skip(len)+len; // jump over serial number clause (if there is one)
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len)+len;  // jump over signature algorithm
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len)+len;  // jump over signature algorithm
 
-	return j;
+    return j;
 }
 
 // Find index to validity period
 int X509_find_validity(octet *c)
 {
-	int j,len;
-	j=X509_find_issuer(c);
+    int j,len;
+    j=X509_find_issuer(c);
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len)+len; // skip issuer
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len)+len; // skip issuer
 
-	return j;
+    return j;
 }
 
 // Find index to subject in cert
 int X509_find_subject(octet *c)
 {
-	int j,len;
-	j=X509_find_validity(c);
+    int j,len;
+    j=X509_find_validity(c);
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len)+len; // skip validity
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len)+len; // skip validity
 
-	return j;
+    return j;
 }
 
 // NOTE: When extracting cert information, we actually return just an index to the data inside the cert, and maybe its length
@@ -530,98 +595,100 @@ int X509_find_subject(octet *c)
 
 int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
 {
-	int i,j,k,fin,len,tlen;
-	char foid[50];  /*****/
-	octet FOID={0,sizeof(foid),foid};
+    int i,j,k,fin,len,tlen;
+    char foid[50];  /*****/
+    octet FOID= {0,sizeof(foid),foid};
 
-	j=start;
-	
-	tlen=getalen(SEQ,c->val,j);
-	if (tlen<0) return 0;
-	j+=skip(tlen);
+    j=start;
 
-	for (k=j;j<k+tlen;)
-	{ // search for Owner OID
-		len=getalen(SET,c->val,j);
-		if (len<0) return 0;
-		j+=skip(len);
-		len=getalen(SEQ,c->val,j);
-		if (len<0) return 0;
-		j+=skip(len);
-		len=getalen(OID,c->val,j);
-		if (len<0) return 0;
-		j+=skip(len);
-		fin=j+len;  // extract OID
-		FOID.len=len;
-		for (i=0;j<fin;j++)
-			FOID.val[i++]= c->val[j];
-		len=getalen(ANY,c->val,j);  // get text, could be any type
-		if (len<0) return 0;
+    tlen=getalen(SEQ,c->val,j);
+    if (tlen<0) return 0;
+    j+=skip(tlen);
 
-		j+=skip(len);
-		if (OCT_comp(&FOID,SOID))
-		{ // if its the right one return
-			*flen=len;
-			return j;
-		}
-		j+=len;  // skip over it
-	}
-	*flen=0; /*****/
-	return 0;
+    for (k=j; j<k+tlen;)
+    {
+        // search for Owner OID
+        len=getalen(SET,c->val,j);
+        if (len<0) return 0;
+        j+=skip(len);
+        len=getalen(SEQ,c->val,j);
+        if (len<0) return 0;
+        j+=skip(len);
+        len=getalen(OID,c->val,j);
+        if (len<0) return 0;
+        j+=skip(len);
+        fin=j+len;  // extract OID
+        FOID.len=len;
+        for (i=0; j<fin; j++)
+            FOID.val[i++]= c->val[j];
+        len=getalen(ANY,c->val,j);  // get text, could be any type
+        if (len<0) return 0;
+
+        j+=skip(len);
+        if (OCT_comp(&FOID,SOID))
+        {
+            // if its the right one return
+            *flen=len;
+            return j;
+        }
+        j+=len;  // skip over it
+    }
+    *flen=0; /*****/
+    return 0;
 }
 
 // Find start date of certificate validity period
 int X509_find_start_date(octet *c,int start)
 {
-	int j,len;
-	j=start;
+    int j,len;
+    j=start;
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len);
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len);
 
-	len=getalen(UTC,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len);
-	return j;
+    len=getalen(UTC,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len);
+    return j;
 }
 
 // Find expiry date of certificate validity period
 int X509_find_expiry_date(octet *c,int start)
 {
-	int i,j,len;
-	j=start;
+    int i,j,len;
+    j=start;
 
-	len=getalen(SEQ,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len);
+    len=getalen(SEQ,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len);
 
-	len=getalen(UTC,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len)+len;
+    len=getalen(UTC,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len)+len;
 
-	len=getalen(UTC,c->val,j);
-	if (len<0) return 0;
-	j+=skip(len);
+    len=getalen(UTC,c->val,j);
+    if (len<0) return 0;
+    j+=skip(len);
 
-	return j;
+    return j;
 }
 
 void print_out(char *des,octet *c,int index,int len)
 {
-	int i;
-	printf("%s [",des);
-	for (i=0;i<len;i++)
-		printf("%c",c->val[index+i]);
-	printf("]\n");
+    int i;
+    printf("%s [",des);
+    for (i=0; i<len; i++)
+        printf("%c",c->val[index+i]);
+    printf("]\n");
 }
 
 void print_date(char *des,octet *c,int index)
 {
-	int i=index;
-	printf("%s [",des);
-	if (i==0) printf("]\n");
-	else printf("20%c%c-%c%c-%c%c %c%c:%c%c:%c%c]\n",c->val[i],c->val[i+1],c->val[i+2],c->val[i+3],c->val[i+4],c->val[i+5],c->val[i+6],c->val[i+7],c->val[i+8],c->val[i+9],c->val[i+10],c->val[i+11]);
+    int i=index;
+    printf("%s [",des);
+    if (i==0) printf("]\n");
+    else printf("20%c%c-%c%c-%c%c %c%c:%c%c:%c%c]\n",c->val[i],c->val[i+1],c->val[i+2],c->val[i+3],c->val[i+4],c->val[i+5],c->val[i+6],c->val[i+7],c->val[i+8],c->val[i+9],c->val[i+10],c->val[i+11]);
 }
 
 
@@ -692,296 +759,316 @@ char cert_b64[]="MIICZjCCAccCAQMwCgYIKoZIzj0EAwQwgZQxCzAJBgNVBAYTAklFMRAwDgYDVQQ
 #endif
 
 char io[5000];
-octet IO={0,sizeof(io),io};
+octet IO= {0,sizeof(io),io};
 
 #define MAXMODBYTES 72
 #define MAXFFLEN 16
 
 char sig[MAXMODBYTES*MAXFFLEN];
-octet SIG={0,sizeof(sig),sig};
+octet SIG= {0,sizeof(sig),sig};
 
 char r[MAXMODBYTES];
-octet R={0,sizeof(r),r};
+octet R= {0,sizeof(r),r};
 
 char s[MAXMODBYTES];
-octet S={0,sizeof(s),s};
+octet S= {0,sizeof(s),s};
 
 char cakey[MAXMODBYTES*MAXFFLEN];
-octet CAKEY={0,sizeof(cakey),cakey};
+octet CAKEY= {0,sizeof(cakey),cakey};
 
 char certkey[MAXMODBYTES*MAXFFLEN];
-octet CERTKEY={0,sizeof(certkey),certkey};
+octet CERTKEY= {0,sizeof(certkey),certkey};
 
 char h[5000];
-octet H={0,sizeof(h),h};
+octet H= {0,sizeof(h),h};
 
 char hh[5000];
-octet HH={0,sizeof(hh),hh};
+octet HH= {0,sizeof(hh),hh};
 
 int main()
 {
-	int i,res,len,sha;
-	int c,ic;
-	rsa_public_key PK;
-	pktype st,ca,pt;
+    int i,res,len,sha;
+    int c,ic;
+    rsa_public_key PK;
+    pktype st,ca,pt;
 
-	printf("First check signature on self-signed cert and extract CA public key\n");
-	OCT_frombase64(&IO,ca_b64);
-	printf("CA Self-Signed Cert= \n"); OCT_output(&IO);
-	printf("\n");
+    printf("First check signature on self-signed cert and extract CA public key\n");
+    OCT_frombase64(&IO,ca_b64);
+    printf("CA Self-Signed Cert= \n");
+    OCT_output(&IO);
+    printf("\n");
 
-	st=X509_extract_cert_sig(&IO,&SIG); // returns signature type
+    st=X509_extract_cert_sig(&IO,&SIG); // returns signature type
 
-	if (st.type==0)
-	{
-		printf("Unable to extract cert signature\n");
-		return 0;
-	}
+    if (st.type==0)
+    {
+        printf("Unable to extract cert signature\n");
+        return 0;
+    }
 
-	if (st.type==ECC)
-	{
-		OCT_chop(&SIG,&S,SIG.len/2);
-		OCT_copy(&R,&SIG);
-		printf("ECC SIG= \n"); 
-		OCT_output(&R);
-		OCT_output(&S);
-		printf("\n");
-	}
+    if (st.type==ECC)
+    {
+        OCT_chop(&SIG,&S,SIG.len/2);
+        OCT_copy(&R,&SIG);
+        printf("ECC SIG= \n");
+        OCT_output(&R);
+        OCT_output(&S);
+        printf("\n");
+    }
 
-	if (st.type==RSA)
-	{
-		printf("RSA SIG= \n");
-		OCT_output(&SIG);
-		printf("\n");
-	}
+    if (st.type==RSA)
+    {
+        printf("RSA SIG= \n");
+        OCT_output(&SIG);
+        printf("\n");
+    }
 
-	if (st.hash==H256) printf("Hashed with SHA256\n");
-	if (st.hash==H384) printf("Hashed with SHA384\n"); 
-	if (st.hash==H512) printf("Hashed with SHA512\n");
-	
+    if (st.hash==H256) printf("Hashed with SHA256\n");
+    if (st.hash==H384) printf("Hashed with SHA384\n");
+    if (st.hash==H512) printf("Hashed with SHA512\n");
+
 // Extract Cert from signed Cert
 
-	c=X509_extract_cert(&IO,&H);
+    c=X509_extract_cert(&IO,&H);
 
-	printf("\nCert= \n"); OCT_output(&H);
-	printf("\n");
+    printf("\nCert= \n");
+    OCT_output(&H);
+    printf("\n");
 
 // show some details
-	printf("Issuer Details\n");
-	ic=X509_find_issuer(&H);
-	c=X509_find_entity_property(&H,&ON,ic,&len);
-	print_out("owner=",&H,c,len);
-	c=X509_find_entity_property(&H,&CN,ic,&len);
-	print_out("country=",&H,c,len);
-	c=X509_find_entity_property(&H,&EN,ic,&len);
-	print_out("email=",&H,c,len);
-	printf("\n");
+    printf("Issuer Details\n");
+    ic=X509_find_issuer(&H);
+    c=X509_find_entity_property(&H,&ON,ic,&len);
+    print_out("owner=",&H,c,len);
+    c=X509_find_entity_property(&H,&CN,ic,&len);
+    print_out("country=",&H,c,len);
+    c=X509_find_entity_property(&H,&EN,ic,&len);
+    print_out("email=",&H,c,len);
+    printf("\n");
 
-	ca=X509_extract_public_key(&H,&CAKEY);
+    ca=X509_extract_public_key(&H,&CAKEY);
 
-	if (ca.type==0)
-	{
-		printf("Not supported by library\n");
-		return 0;
-	}
-	if (ca.type!=st.type)
-	{
-		printf("Not self-signed\n");
-	}
+    if (ca.type==0)
+    {
+        printf("Not supported by library\n");
+        return 0;
+    }
+    if (ca.type!=st.type)
+    {
+        printf("Not self-signed\n");
+    }
 
-	if (ca.type==ECC) {printf("EXTRACTED ECC PUBLIC KEY= \n"); OCT_output(&CAKEY);}
-	if (ca.type==RSA) {printf("EXTRACTED RSA PUBLIC KEY= \n"); OCT_output(&CAKEY);}
-	printf("\n");
+    if (ca.type==ECC)
+    {
+        printf("EXTRACTED ECC PUBLIC KEY= \n");
+        OCT_output(&CAKEY);
+    }
+    if (ca.type==RSA)
+    {
+        printf("EXTRACTED RSA PUBLIC KEY= \n");
+        OCT_output(&CAKEY);
+    }
+    printf("\n");
 
-// Cert is self-signed - so check signature 
+// Cert is self-signed - so check signature
 
-	printf("Checking Self-Signed Signature\n");
-	if (ca.type==ECC)
-	{
-		if (ca.curve!=CHOICE)
-		{
-			printf("Curve is not supported\n");
-			return 0;
-		}
-		res=ECP_PUBLIC_KEY_VALIDATE(1,&CAKEY);
-		if (res!=0)
-		{
-			printf("ECP Public Key is invalid!\n");
-			return 0;
-		}
-		else printf("ECP Public Key is Valid\n");
+    printf("Checking Self-Signed Signature\n");
+    if (ca.type==ECC)
+    {
+        if (ca.curve!=CHOICE)
+        {
+            printf("Curve is not supported\n");
+            return 0;
+        }
+        res=ECP_PUBLIC_KEY_VALIDATE(1,&CAKEY);
+        if (res!=0)
+        {
+            printf("ECP Public Key is invalid!\n");
+            return 0;
+        }
+        else printf("ECP Public Key is Valid\n");
 
-		sha=0;
+        sha=0;
 
-		if (st.hash==H256) sha=SHA256;
-		if (st.hash==H384) sha=SHA384;
-		if (st.hash==H512) sha=SHA512;
-		if (st.hash==0)
-		{
-			printf("Hash Function not supported\n");
-			return 0;
-		}
+        if (st.hash==H256) sha=SHA256;
+        if (st.hash==H384) sha=SHA384;
+        if (st.hash==H512) sha=SHA512;
+        if (st.hash==0)
+        {
+            printf("Hash Function not supported\n");
+            return 0;
+        }
 
-		if (ECPVP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
-		{
-			printf("***ECDSA Verification Failed\n");
-			return 0;
-		}
-		else 
-			printf("ECDSA Signature/Verification succeeded \n");
-	}
+        if (ECPVP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
+        {
+            printf("***ECDSA Verification Failed\n");
+            return 0;
+        }
+        else
+            printf("ECDSA Signature/Verification succeeded \n");
+    }
 
-	if (ca.type==RSA)
-	{
-		PK.e=65537; // assuming this!
-		FF_fromOctet(PK.n,&CAKEY,FFLEN);
+    if (ca.type==RSA)
+    {
+        PK.e=65537; // assuming this!
+        FF_fromOctet(PK.n,&CAKEY,FFLEN);
 
-		sha=0;
+        sha=0;
 
-		if (st.hash==H256) sha=SHA256;
-		if (st.hash==H384) sha=SHA384;
-		if (st.hash==H512) sha=SHA512;
-		if (st.hash==0)
-		{
-			printf("Hash Function not supported\n");
-			return 0;
-		}
-		PKCS15(sha,&H,&H);
+        if (st.hash==H256) sha=SHA256;
+        if (st.hash==H384) sha=SHA384;
+        if (st.hash==H512) sha=SHA512;
+        if (st.hash==0)
+        {
+            printf("Hash Function not supported\n");
+            return 0;
+        }
+        PKCS15(sha,&H,&H);
 
-		RSA_ENCRYPT(&PK,&SIG,&HH);
+        RSA_ENCRYPT(&PK,&SIG,&HH);
 
-		if (OCT_comp(&H,&HH))
-			printf("RSA Signature/Verification succeeded \n");
-		else
-		{
-			printf("***RSA Verification Failed\n");
-			return 0;
-		}
-	}
+        if (OCT_comp(&H,&HH))
+            printf("RSA Signature/Verification succeeded \n");
+        else
+        {
+            printf("***RSA Verification Failed\n");
+            return 0;
+        }
+    }
 
-	printf("\nNext check CA signature on cert, and extract public key\n");
+    printf("\nNext check CA signature on cert, and extract public key\n");
 
-	OCT_frombase64(&IO,cert_b64);
-	printf("Example Cert= \n"); OCT_output(&IO);
-	printf("\n");
+    OCT_frombase64(&IO,cert_b64);
+    printf("Example Cert= \n");
+    OCT_output(&IO);
+    printf("\n");
 
-	st=X509_extract_cert_sig(&IO,&SIG);
+    st=X509_extract_cert_sig(&IO,&SIG);
 
-	if (st.type==0)
-	{
-		printf("Unable to check cert signature\n");
-		return 0;
-	}
+    if (st.type==0)
+    {
+        printf("Unable to check cert signature\n");
+        return 0;
+    }
 
-	if (st.type==ECC)
-	{
-		OCT_chop(&SIG,&S,SIG.len/2);
-		OCT_copy(&R,&SIG);
-		printf("SIG= \n"); 
-		OCT_output(&R);
+    if (st.type==ECC)
+    {
+        OCT_chop(&SIG,&S,SIG.len/2);
+        OCT_copy(&R,&SIG);
+        printf("SIG= \n");
+        OCT_output(&R);
 
-		OCT_output(&S);
+        OCT_output(&S);
 
-		printf("\n");
-	}
+        printf("\n");
+    }
 
-	if (st.type==RSA)
-	{
-		printf("SIG= \n");
-		OCT_output(&SIG);
-		printf("\n");
-	}
-		
-	c=X509_extract_cert(&IO,&H);
+    if (st.type==RSA)
+    {
+        printf("SIG= \n");
+        OCT_output(&SIG);
+        printf("\n");
+    }
 
-	printf("Cert= \n"); OCT_output(&H);
-	printf("\n");
+    c=X509_extract_cert(&IO,&H);
 
-	printf("Subject Details\n");
-	ic=X509_find_subject(&H);
-	c=X509_find_entity_property(&H,&ON,ic,&len);
-	print_out("owner=",&H,c,len);
-	c=X509_find_entity_property(&H,&CN,ic,&len);
-	print_out("country=",&H,c,len);
-	c=X509_find_entity_property(&H,&EN,ic,&len);
-	print_out("email=",&H,c,len);
-	printf("\n");
+    printf("Cert= \n");
+    OCT_output(&H);
+    printf("\n");
 
-	ic=X509_find_validity(&H);
-	c=X509_find_start_date(&H,ic);
-	print_date("start date= ",&H,c);
-	c=X509_find_expiry_date(&H,ic);
-	print_date("expiry date=",&H,c);
-	printf("\n");
+    printf("Subject Details\n");
+    ic=X509_find_subject(&H);
+    c=X509_find_entity_property(&H,&ON,ic,&len);
+    print_out("owner=",&H,c,len);
+    c=X509_find_entity_property(&H,&CN,ic,&len);
+    print_out("country=",&H,c,len);
+    c=X509_find_entity_property(&H,&EN,ic,&len);
+    print_out("email=",&H,c,len);
+    printf("\n");
 
-	pt=X509_extract_public_key(&H,&CERTKEY);
+    ic=X509_find_validity(&H);
+    c=X509_find_start_date(&H,ic);
+    print_date("start date= ",&H,c);
+    c=X509_find_expiry_date(&H,ic);
+    print_date("expiry date=",&H,c);
+    printf("\n");
 
-	if (pt.type==0)
-	{
-		printf("Not supported by library\n");
-		return 0;
-	}
+    pt=X509_extract_public_key(&H,&CERTKEY);
 
-	if (pt.type==ECC) {printf("EXTRACTED ECC PUBLIC KEY= \n"); OCT_output(&CERTKEY);}
-	if (pt.type==RSA) {printf("EXTRACTED RSA PUBLIC KEY= \n"); OCT_output(&CERTKEY);}
+    if (pt.type==0)
+    {
+        printf("Not supported by library\n");
+        return 0;
+    }
 
-	printf("\n");
+    if (pt.type==ECC)
+    {
+        printf("EXTRACTED ECC PUBLIC KEY= \n");
+        OCT_output(&CERTKEY);
+    }
+    if (pt.type==RSA)
+    {
+        printf("EXTRACTED RSA PUBLIC KEY= \n");
+        OCT_output(&CERTKEY);
+    }
 
-/* Check CA signature */
+    printf("\n");
 
-	if (ca.type==ECC)
-	{
-		printf("Checking CA's ECC Signature on Cert\n");
-		res=ECP_PUBLIC_KEY_VALIDATE(1,&CAKEY);
-		if (res!=0)
-			printf("ECP Public Key is invalid!\n");
-		else printf("ECP Public Key is Valid\n");
+    /* Check CA signature */
 
-		sha=0;
+    if (ca.type==ECC)
+    {
+        printf("Checking CA's ECC Signature on Cert\n");
+        res=ECP_PUBLIC_KEY_VALIDATE(1,&CAKEY);
+        if (res!=0)
+            printf("ECP Public Key is invalid!\n");
+        else printf("ECP Public Key is Valid\n");
 
-		if (st.hash==H256) sha=SHA256;
-		if (st.hash==H384) sha=SHA384;
-		if (st.hash==H512) sha=SHA512;
-		if (st.hash==0)
-		{
-			printf("Hash Function not supported\n");
-			return 0;
-		}
+        sha=0;
 
-		if (ECPVP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
-			printf("***ECDSA Verification Failed\n");
-		else 
-			printf("ECDSA Signature/Verification succeeded \n");
-	}
+        if (st.hash==H256) sha=SHA256;
+        if (st.hash==H384) sha=SHA384;
+        if (st.hash==H512) sha=SHA512;
+        if (st.hash==0)
+        {
+            printf("Hash Function not supported\n");
+            return 0;
+        }
 
-	if (ca.type==RSA)
-	{
-		printf("Checking CA's RSA Signature on Cert\n");
-		PK.e=65537; // assuming this!
-		FF_fromOctet(PK.n,&CAKEY,FFLEN);
+        if (ECPVP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
+            printf("***ECDSA Verification Failed\n");
+        else
+            printf("ECDSA Signature/Verification succeeded \n");
+    }
 
-		sha=0;
+    if (ca.type==RSA)
+    {
+        printf("Checking CA's RSA Signature on Cert\n");
+        PK.e=65537; // assuming this!
+        FF_fromOctet(PK.n,&CAKEY,FFLEN);
 
-		if (st.hash==H256) sha=SHA256;
-		if (st.hash==H384) sha=SHA384;
-		if (st.hash==H512) sha=SHA512;
-		if (st.hash==0)
-		{
-			printf("Hash Function not supported\n");
-			return 0;
-		}
-		PKCS15(sha,&H,&H);
+        sha=0;
 
-		RSA_ENCRYPT(&PK,&SIG,&HH);
+        if (st.hash==H256) sha=SHA256;
+        if (st.hash==H384) sha=SHA384;
+        if (st.hash==H512) sha=SHA512;
+        if (st.hash==0)
+        {
+            printf("Hash Function not supported\n");
+            return 0;
+        }
+        PKCS15(sha,&H,&H);
 
-		if (OCT_comp(&H,&HH))
-			printf("RSA Signature/Verification succeeded \n");
-		else
-			printf("***RSA Verification Failed\n");
+        RSA_ENCRYPT(&PK,&SIG,&HH);
 
-	}
+        if (OCT_comp(&H,&HH))
+            printf("RSA Signature/Verification succeeded \n");
+        else
+            printf("***RSA Verification Failed\n");
 
-	return 0;
+    }
+
+    return 0;
 }
 
 #endif

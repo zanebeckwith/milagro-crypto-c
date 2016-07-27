@@ -24,7 +24,7 @@ under the License.
  * @brief ECDH Header file for implementation of standard EC protocols
  *
  * declares functions
- * 
+ *
  */
 
 #ifndef ECDH_H

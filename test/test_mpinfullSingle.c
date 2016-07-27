@@ -131,166 +131,185 @@ int main()
     pID = &ID;
 #endif
 
-  /* Generate Client master secret for MIRACL and Customer */
-  rtn = MPIN_RANDOM_GENERATE(&RNG,&MS1);
-  if (rtn != 0) {
-      printf("MPIN_RANDOM_GENERATE(&RNG,&MS1) Error %d\n", rtn);
-      return 1;
-  }
-  rtn = MPIN_RANDOM_GENERATE(&RNG,&MS2);
-  if (rtn != 0) {
-      printf("MPIN_RANDOM_GENERATE(&RNG,&MS2) Error %d\n", rtn);
-      return 1;
-  }
-  printf("MASTER SECRET MIRACL:= 0x");
-  OCT_output(&MS1);
-  printf("MASTER SECRET CUSTOMER:= 0x");
-  OCT_output(&MS2);
+    /* Generate Client master secret for MIRACL and Customer */
+    rtn = MPIN_RANDOM_GENERATE(&RNG,&MS1);
+    if (rtn != 0)
+    {
+        printf("MPIN_RANDOM_GENERATE(&RNG,&MS1) Error %d\n", rtn);
+        return 1;
+    }
+    rtn = MPIN_RANDOM_GENERATE(&RNG,&MS2);
+    if (rtn != 0)
+    {
+        printf("MPIN_RANDOM_GENERATE(&RNG,&MS2) Error %d\n", rtn);
+        return 1;
+    }
+    printf("MASTER SECRET MIRACL:= 0x");
+    OCT_output(&MS1);
+    printf("MASTER SECRET CUSTOMER:= 0x");
+    OCT_output(&MS2);
 
-  /* Generate server secret shares */
-  rtn = MPIN_GET_SERVER_SECRET(&MS1,&SS1);
-  if (rtn != 0) {
-      printf("MPIN_GET_SERVER_SECRET(&MS1,&SS1) Error %d\n", rtn);
-      return 1;
-  }
-  rtn = MPIN_GET_SERVER_SECRET(&MS2,&SS2);
-  if (rtn != 0) {
-      printf("MPIN_GET_SERVER_SECRET(&MS2,&SS2) Error %d\n", rtn);
-      return 1;
-  }
-  printf("SS1 = 0x");
-  OCT_output(&SS1);
-  printf("SS2 = 0x");
-  OCT_output(&SS2);
+    /* Generate server secret shares */
+    rtn = MPIN_GET_SERVER_SECRET(&MS1,&SS1);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_SERVER_SECRET(&MS1,&SS1) Error %d\n", rtn);
+        return 1;
+    }
+    rtn = MPIN_GET_SERVER_SECRET(&MS2,&SS2);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_SERVER_SECRET(&MS2,&SS2) Error %d\n", rtn);
+        return 1;
+    }
+    printf("SS1 = 0x");
+    OCT_output(&SS1);
+    printf("SS2 = 0x");
+    OCT_output(&SS2);
 
-  /* Combine server secret share */
-  rtn = MPIN_RECOMBINE_G2(&SS1, &SS2, &ServerSecret);
-  if (rtn != 0) {
-      printf("MPIN_RECOMBINE_G2(&SS1, &SS2, &ServerSecret) Error %d\n", rtn);
-      return 1;
-  }
-  printf("ServerSecret = 0x");
-  OCT_output(&ServerSecret);
+    /* Combine server secret share */
+    rtn = MPIN_RECOMBINE_G2(&SS1, &SS2, &ServerSecret);
+    if (rtn != 0)
+    {
+        printf("MPIN_RECOMBINE_G2(&SS1, &SS2, &ServerSecret) Error %d\n", rtn);
+        return 1;
+    }
+    printf("ServerSecret = 0x");
+    OCT_output(&ServerSecret);
 
-  /* Generate client secret shares */
-  rtn = MPIN_GET_CLIENT_SECRET(&MS1,&HCID,&CS1);
-  if (rtn != 0) {
-      printf("MPIN_GET_CLIENT_SECRET(&MS1,&HCID,&CS1) Error %d\n", rtn);
-      return 1;
-  }
-  rtn = MPIN_GET_CLIENT_SECRET(&MS2,&HCID,&CS2);
-  if (rtn != 0) {
-      printf("MPIN_GET_CLIENT_SECRET(&MS2,&HCID,&CS2) Error %d\n", rtn);
-      return 1;
-  }
-  printf("CS1 = 0x");
-  OCT_output(&CS1);
-  printf("CS2 = 0x");
-  OCT_output(&CS2);
+    /* Generate client secret shares */
+    rtn = MPIN_GET_CLIENT_SECRET(&MS1,&HCID,&CS1);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_CLIENT_SECRET(&MS1,&HCID,&CS1) Error %d\n", rtn);
+        return 1;
+    }
+    rtn = MPIN_GET_CLIENT_SECRET(&MS2,&HCID,&CS2);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_CLIENT_SECRET(&MS2,&HCID,&CS2) Error %d\n", rtn);
+        return 1;
+    }
+    printf("CS1 = 0x");
+    OCT_output(&CS1);
+    printf("CS2 = 0x");
+    OCT_output(&CS2);
 
-  /* Combine client secret shares : TOKEN is the full client secret */
-  rtn = MPIN_RECOMBINE_G1(&CS1, &CS2, &TOKEN);
-  if (rtn != 0) {
-      printf("MPIN_RECOMBINE_G1(&CS1, &CS2, &TOKEN) Error %d\n", rtn);
-      return 1;
-  }
-  printf("Client Secret = 0x");
-  OCT_output(&TOKEN);
+    /* Combine client secret shares : TOKEN is the full client secret */
+    rtn = MPIN_RECOMBINE_G1(&CS1, &CS2, &TOKEN);
+    if (rtn != 0)
+    {
+        printf("MPIN_RECOMBINE_G1(&CS1, &CS2, &TOKEN) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Client Secret = 0x");
+    OCT_output(&TOKEN);
 
-  /* Generate Time Permit shares */
-  date = MPIN_today();
-  printf("Date %d \n", date);
-  rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
-  if (rtn != 0) {
-      printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
-      return 1;
-  }
-  rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
-  if (rtn != 0) {
-      printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
-      return 1;
-  }
-  printf("TP1 = 0x");
-  OCT_output(&TP1);
-  printf("TP2 = 0x");
-  OCT_output(&TP2);
+    /* Generate Time Permit shares */
+    date = MPIN_today();
+    printf("Date %d \n", date);
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
+        return 1;
+    }
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
+        return 1;
+    }
+    printf("TP1 = 0x");
+    OCT_output(&TP1);
+    printf("TP2 = 0x");
+    OCT_output(&TP2);
 
-  /* Combine Time Permit shares */
-  rtn = MPIN_RECOMBINE_G1(&TP1, &TP2, &TP);
-  if (rtn != 0) {
-      printf("MPIN_RECOMBINE_G1(&TP1, &TP2, &TP) Error %d\n", rtn);
-      return 1;
-  }
-  printf("Time Permit = 0x");
-  OCT_output(&TP);
+    /* Combine Time Permit shares */
+    rtn = MPIN_RECOMBINE_G1(&TP1, &TP2, &TP);
+    if (rtn != 0)
+    {
+        printf("MPIN_RECOMBINE_G1(&TP1, &TP2, &TP) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Time Permit = 0x");
+    OCT_output(&TP);
 
-  /* This encoding makes Time permit look random */
-  if (MPIN_ENCODING(&RNG,&TP)!=0) printf("Encoding error\n");
-  printf("Encoded Time Permit= "); OCT_output(&TP);
-  if (MPIN_DECODING(&TP)!=0) printf("Decoding error\n");
-  printf("Decoded Time Permit= "); OCT_output(&TP);
+    /* This encoding makes Time permit look random */
+    if (MPIN_ENCODING(&RNG,&TP)!=0) printf("Encoding error\n");
+    printf("Encoded Time Permit= ");
+    OCT_output(&TP);
+    if (MPIN_DECODING(&TP)!=0) printf("Decoding error\n");
+    printf("Decoded Time Permit= ");
+    OCT_output(&TP);
 
-  /* Client extracts PIN1 from secret to create Token */
-  rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
-  if (rtn != 0) {
-      printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
-      return 1;
-  }
-  printf("Token = 0x");
-  OCT_output(&TOKEN);
+    /* Client extracts PIN1 from secret to create Token */
+    rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
+    if (rtn != 0)
+    {
+        printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Token = 0x");
+    OCT_output(&TOKEN);
 
-  /* Client precomputation */
-  MPIN_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
+    /* Client precomputation */
+    MPIN_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
 
-  /* Client  */
-  TimeValue = MPIN_GET_TIME();
-  printf("TimeValue %d \n", TimeValue);
-  rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,NULL,TimeValue,&Y1);
-  if (rtn != 0) {
-      printf("MPIN_CLIENT ERROR %d\n", rtn);
-      return 1;
-  }
-  printf("Y1 = 0x");
-  OCT_output(&Y1);
-  printf("V = 0x");
-  OCT_output(&SEC);
+    /* Client  */
+    TimeValue = MPIN_GET_TIME();
+    printf("TimeValue %d \n", TimeValue);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,NULL,TimeValue,&Y1);
+    if (rtn != 0)
+    {
+        printf("MPIN_CLIENT ERROR %d\n", rtn);
+        return 1;
+    }
+    printf("Y1 = 0x");
+    OCT_output(&Y1);
+    printf("V = 0x");
+    OCT_output(&SEC);
 
-  /* Client sends Z=r.ID to Server */
-  MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
+    /* Client sends Z=r.ID to Server */
+    MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
 
-  /* Server  */
-  rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,NULL,TimeValue);
+    /* Server  */
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,NULL,TimeValue);
 
-  printf("Y2 = 0x");
-  OCT_output(&Y2);
-  if (rtn != 0) {
-      printf("FAILURE Invalid Token Error Code %d\n", rtn);
-      return 1;
-  } else {
-      printf("SUCCESS Error Code %d\n", rtn);
-  }
+    printf("Y2 = 0x");
+    OCT_output(&Y2);
+    if (rtn != 0)
+    {
+        printf("FAILURE Invalid Token Error Code %d\n", rtn);
+        return 1;
+    }
+    else
+    {
+        printf("SUCCESS Error Code %d\n", rtn);
+    }
 
-  /* Server sends T=w.ID to client */
-  MPIN_GET_G1_MULTIPLE(&RNG,0,&W,&HTID,&T);
-  printf("T = 0x");
-  OCT_output(&T);
+    /* Server sends T=w.ID to client */
+    MPIN_GET_G1_MULTIPLE(&RNG,0,&W,&HTID,&T);
+    printf("T = 0x");
+    OCT_output(&T);
 
-  MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y1,&R,&W,&HM);  
-  MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);      
-  printf("Client Key = "); 
-  OCT_output(&CK);
+    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y1,&R,&W,&HM);
+    MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
+    printf("Client Key = ");
+    OCT_output(&CK);
 
-  MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y2,&R,&W,&HM);
-  MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
-  printf("Server Key = "); 
-  OCT_output(&SK);
+    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y2,&R,&W,&HM);
+    MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
+    printf("Server Key = ");
+    OCT_output(&SK);
 
-  if (!OCT_comp(&CK,&SK)) {
-      printf("FAILURE Keys are different\n");
-      return 1;
-  }
+    if (!OCT_comp(&CK,&SK))
+    {
+        printf("FAILURE Keys are different\n");
+        return 1;
+    }
 
-  printf("SUCCESS\n");
-  return 0;
+    printf("SUCCESS\n");
+    return 0;
 
 }

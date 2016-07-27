@@ -33,71 +33,83 @@ static int hashit(int sha,octet *p,int n,octet *w)
 {
     int i,c[4],hlen;
     hash256 sha256;
-	hash512 sha512;
+    hash512 sha512;
     char hh[64];
 
-	switch (sha)
-	{
-	case SHA256:
-		HASH256_init(&sha256); break;
-	case SHA384:
-		HASH384_init(&sha512); break;
-	case SHA512:
-		HASH512_init(&sha512); break;
-	}
-    
-	hlen=sha;
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_init(&sha256);
+        break;
+    case SHA384:
+        HASH384_init(&sha512);
+        break;
+    case SHA512:
+        HASH512_init(&sha512);
+        break;
+    }
 
-    if (p!=NULL) for (i=0;i<p->len;i++)
-	{	
-		switch(sha)
-		{
-		case SHA256:
-			HASH256_process(&sha256,p->val[i]); break;
-		case SHA384:
-			HASH384_process(&sha512,p->val[i]); break;
-		case SHA512:
-			HASH512_process(&sha512,p->val[i]); break;
-		}
-	}
-	if (n>=0)
+    hlen=sha;
+
+    if (p!=NULL) for (i=0; i<p->len; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,p->val[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,p->val[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,p->val[i]);
+                break;
+            }
+        }
+    if (n>=0)
     {
         c[0]=(n>>24)&0xff;
         c[1]=(n>>16)&0xff;
         c[2]=(n>>8)&0xff;
         c[3]=(n)&0xff;
-		for (i=0;i<4;i++)
-		{
-			switch(sha)
-			{
-			case SHA256:
-				HASH256_process(&sha256,c[i]); break;
-			case SHA384:
-				HASH384_process(&sha512,c[i]); break;
-			case SHA512:
-				HASH512_process(&sha512,c[i]); break;
-			}
-		}
+        for (i=0; i<4; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,c[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,c[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,c[i]);
+                break;
+            }
+        }
     }
-	  
-	switch (sha)
-	{
-	case SHA256:
-		HASH256_hash(&sha256,hh); break;
-	case SHA384:
-		HASH384_hash(&sha512,hh); break;
-	case SHA512:
-		HASH512_hash(&sha512,hh); break;
-	}
-   
+
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_hash(&sha256,hh);
+        break;
+    case SHA384:
+        HASH384_hash(&sha512,hh);
+        break;
+    case SHA512:
+        HASH512_hash(&sha512,hh);
+        break;
+    }
+
     OCT_empty(w);
     OCT_jbytes(w,hh,hlen);
-    for (i=0;i<hlen;i++) hh[i]=0;
+    for (i=0; i<hlen; i++) hh[i]=0;
 
-	return hlen;
+    return hlen;
 }
 
-/* Initialise a Cryptographically Strong Random Number Generator from 
+/* Initialise a Cryptographically Strong Random Number Generator from
    an octet of raw random data */
 void RSA_CREATE_CSPRNG(csprng *RNG,octet *RAW)
 {
@@ -112,73 +124,74 @@ void RSA_KILL_CSPRNG(csprng *RNG)
 /* generate an RSA key pair */
 
 void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB)
-{ /* IEEE1363 A16.11/A16.12 more or less */
+{
+    /* IEEE1363 A16.11/A16.12 more or less */
     BIG t[HFLEN],p1[HFLEN],q1[HFLEN];
-    
-	for (;;)
-	{
 
-		FF_random(PRIV->p,RNG,HFLEN);
-		while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
-		while (!FF_prime(PRIV->p,RNG,HFLEN))
-			FF_inc(PRIV->p,4,HFLEN);
-		
-		FF_copy(p1,PRIV->p,HFLEN);
-		FF_dec(p1,1,HFLEN);
+    for (;;)
+    {
 
-		if (FF_cfactor(p1,e,HFLEN)) continue;
-		break;
-	}
+        FF_random(PRIV->p,RNG,HFLEN);
+        while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
+        while (!FF_prime(PRIV->p,RNG,HFLEN))
+            FF_inc(PRIV->p,4,HFLEN);
 
-	for (;;)
-	{
-		FF_random(PRIV->q,RNG,HFLEN);
-		while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
-		while (!FF_prime(PRIV->q,RNG,HFLEN))
-			FF_inc(PRIV->q,4,HFLEN);
+        FF_copy(p1,PRIV->p,HFLEN);
+        FF_dec(p1,1,HFLEN);
 
-		FF_copy(q1,PRIV->q,HFLEN);	
-		FF_dec(q1,1,HFLEN);
-		if (FF_cfactor(q1,e,HFLEN)) continue;
+        if (FF_cfactor(p1,e,HFLEN)) continue;
+        break;
+    }
 
-		break;
-	}
+    for (;;)
+    {
+        FF_random(PRIV->q,RNG,HFLEN);
+        while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
+        while (!FF_prime(PRIV->q,RNG,HFLEN))
+            FF_inc(PRIV->q,4,HFLEN);
 
-	FF_mul(PUB->n,PRIV->p,PRIV->q,HFLEN);
-	PUB->e=e;
+        FF_copy(q1,PRIV->q,HFLEN);
+        FF_dec(q1,1,HFLEN);
+        if (FF_cfactor(q1,e,HFLEN)) continue;
 
-	FF_copy(t,p1,HFLEN);
-	FF_shr(t,HFLEN);
-	FF_init(PRIV->dp,e,HFLEN);
-	FF_invmodp(PRIV->dp,PRIV->dp,t,HFLEN);
-	if (FF_parity(PRIV->dp)==0) FF_add(PRIV->dp,PRIV->dp,t,HFLEN);
-	FF_norm(PRIV->dp,HFLEN);
+        break;
+    }
 
-	FF_copy(t,q1,HFLEN);
-	FF_shr(t,HFLEN);
-	FF_init(PRIV->dq,e,HFLEN);
-	FF_invmodp(PRIV->dq,PRIV->dq,t,HFLEN);
-	if (FF_parity(PRIV->dq)==0) FF_add(PRIV->dq,PRIV->dq,t,HFLEN);
-	FF_norm(PRIV->dq,HFLEN);
+    FF_mul(PUB->n,PRIV->p,PRIV->q,HFLEN);
+    PUB->e=e;
 
-	FF_invmodp(PRIV->c,PRIV->p,PRIV->q,HFLEN);
+    FF_copy(t,p1,HFLEN);
+    FF_shr(t,HFLEN);
+    FF_init(PRIV->dp,e,HFLEN);
+    FF_invmodp(PRIV->dp,PRIV->dp,t,HFLEN);
+    if (FF_parity(PRIV->dp)==0) FF_add(PRIV->dp,PRIV->dp,t,HFLEN);
+    FF_norm(PRIV->dp,HFLEN);
 
-	return;
+    FF_copy(t,q1,HFLEN);
+    FF_shr(t,HFLEN);
+    FF_init(PRIV->dq,e,HFLEN);
+    FF_invmodp(PRIV->dq,PRIV->dq,t,HFLEN);
+    if (FF_parity(PRIV->dq)==0) FF_add(PRIV->dq,PRIV->dq,t,HFLEN);
+    FF_norm(PRIV->dq,HFLEN);
+
+    FF_invmodp(PRIV->c,PRIV->p,PRIV->q,HFLEN);
+
+    return;
 }
 
 /* Mask Generation Function */
 
 void MGF1(int sha,octet *z,int olen,octet *mask)
 {
-	char h[64];
-    octet H={0,sizeof(h),h};
-	int hlen=sha;
+    char h[64];
+    octet H= {0,sizeof(h),h};
+    int hlen=sha;
     int counter,cthreshold;
 
     OCT_empty(mask);
 
     cthreshold=ROUNDUP(olen,hlen);
-    for (counter=0;counter<cthreshold;counter++)
+    for (counter=0; counter<cthreshold; counter++)
     {
         hashit(sha,z,counter,&H);
         if (mask->len+hlen>olen) OCT_jbytes(mask,H.val,olen%hlen);
@@ -188,56 +201,56 @@ void MGF1(int sha,octet *z,int olen,octet *mask)
 }
 
 /* SHAXXX identifier strings */
-const char SHA256ID[]={0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01,0x05,0x00,0x04,0x20};
-const char SHA384ID[]={0x30,0x41,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x02,0x05,0x00,0x04,0x30};
-const char SHA512ID[]={0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x03,0x05,0x00,0x04,0x40};
+const char SHA256ID[]= {0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01,0x05,0x00,0x04,0x20};
+const char SHA384ID[]= {0x30,0x41,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x02,0x05,0x00,0x04,0x30};
+const char SHA512ID[]= {0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x03,0x05,0x00,0x04,0x40};
 
 /* PKCS 1.5 padding of a message to be signed */
 
 int PKCS15(int sha,octet *m,octet *w)
 {
-	int olen=FF_BITS/8;
-	int hlen=sha;
-	int idlen=19;
-	char h[64];
-	octet H={0,sizeof(h),h}; 
+    int olen=FF_BITS/8;
+    int hlen=sha;
+    int idlen=19;
+    char h[64];
+    octet H= {0,sizeof(h),h};
 
     if (olen<idlen+hlen+10) return 0;
-	hashit(sha,m,-1,&H);
+    hashit(sha,m,-1,&H);
 
-	OCT_empty(w);
-	OCT_jbyte(w,0x00,1);
+    OCT_empty(w);
+    OCT_jbyte(w,0x00,1);
     OCT_jbyte(w,0x01,1);
     OCT_jbyte(w,0xff,olen-idlen-hlen-3);
     OCT_jbyte(w,0x00,1);
 
     if (hlen==32) OCT_jbytes(w,(char *)SHA256ID,idlen);
-	if (hlen==48) OCT_jbytes(w,(char *)SHA384ID,idlen);
-	if (hlen==64) OCT_jbytes(w,(char *)SHA512ID,idlen);
+    if (hlen==48) OCT_jbytes(w,(char *)SHA384ID,idlen);
+    if (hlen==64) OCT_jbytes(w,(char *)SHA512ID,idlen);
 
-	OCT_joctet(w,&H);
+    OCT_joctet(w,&H);
 
-	return 1;
+    return 1;
 }
 
 /* OAEP Message Encoding for Encryption */
 
 int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
-{ 
+{
     int slen,olen=RFS-1;
     int mlen=m->len;
     int hlen,seedlen;
     char dbmask[RFS],seed[64];
-	octet DBMASK={0,sizeof(dbmask),dbmask};   
-	octet SEED={0,sizeof(seed),seed};
+    octet DBMASK= {0,sizeof(dbmask),dbmask};
+    octet SEED= {0,sizeof(seed),seed};
 
     hlen=seedlen=sha;
     if (mlen>olen-hlen-seedlen-1) return 0;
-    if (m==f) return 0;  /* must be distinct octets */ 
+    if (m==f) return 0;  /* must be distinct octets */
 
     hashit(sha,p,-1,f);
 
-    slen=olen-mlen-hlen-seedlen-1;      
+    slen=olen-mlen-hlen-seedlen-1;
 
     OCT_jbyte(f,0,slen);
     OCT_jbyte(f,0x1,1);
@@ -254,7 +267,7 @@ int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
 
     OCT_joctet(f,&DBMASK);
 
-	OCT_pad(f,RFS);
+    OCT_pad(f,RFS);
     OCT_clear(&SEED);
     OCT_clear(&DBMASK);
 
@@ -269,9 +282,9 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     int i,k,olen=RFS-1;
     int hlen,seedlen;
     char dbmask[RFS],seed[64],chash[64];
-	octet DBMASK={0,sizeof(dbmask),dbmask};   
-	octet SEED={0,sizeof(seed),seed};
-	octet CHASH={0,sizeof(chash),chash};
+    octet DBMASK= {0,sizeof(dbmask),dbmask};
+    octet SEED= {0,sizeof(seed),seed};
+    octet CHASH= {0,sizeof(chash),chash};
 
     seedlen=hlen=sha;
     if (olen<seedlen+hlen+1) return 0;
@@ -279,12 +292,12 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     hashit(sha,p,-1,&CHASH);
 
     x=f->val[0];
-    for (i=seedlen;i<olen;i++)
-        DBMASK.val[i-seedlen]=f->val[i+1]; 
+    for (i=seedlen; i<olen; i++)
+        DBMASK.val[i-seedlen]=f->val[i+1];
     DBMASK.len=olen-seedlen;
 
     MGF1(sha,&DBMASK,seedlen,&SEED);
-    for (i=0;i<seedlen;i++) SEED.val[i]^=f->val[i+1];
+    for (i=0; i<seedlen; i++) SEED.val[i]^=f->val[i+1];
     MGF1(sha,&SEED,olen-seedlen,f);
     OCT_xor(&DBMASK,f);
 
@@ -295,7 +308,7 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     OCT_clear(&SEED);
     OCT_clear(&CHASH);
 
-    for (k=0;;k++)
+    for (k=0;; k++)
     {
         if (k>=DBMASK.len)
         {
@@ -306,7 +319,7 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     }
 
     t=DBMASK.val[k];
-    if (!comp || x!=0 || t!=0x01) 
+    if (!comp || x!=0 || t!=0x01)
     {
         OCT_clear(&DBMASK);
         return 0;
@@ -323,54 +336,54 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
 void RSA_PRIVATE_KEY_KILL(rsa_private_key *PRIV)
 {
     FF_zero(PRIV->p,HFLEN);
-	FF_zero(PRIV->q,HFLEN);
-	FF_zero(PRIV->dp,HFLEN);
-	FF_zero(PRIV->dq,HFLEN);
-	FF_zero(PRIV->c,HFLEN);
+    FF_zero(PRIV->q,HFLEN);
+    FF_zero(PRIV->dp,HFLEN);
+    FF_zero(PRIV->dq,HFLEN);
+    FF_zero(PRIV->c,HFLEN);
 }
 
 /* RSA encryption with the public key */
 void RSA_ENCRYPT(rsa_public_key *PUB,octet *F,octet *G)
 {
-	BIG f[FFLEN];
-	FF_fromOctet(f,F,FFLEN);
+    BIG f[FFLEN];
+    FF_fromOctet(f,F,FFLEN);
 
     FF_power(f,f,PUB->e,PUB->n,FFLEN);
 
-	FF_toOctet(G,f,FFLEN);
+    FF_toOctet(G,f,FFLEN);
 }
 
 /* RSA decryption with the private key */
 void RSA_DECRYPT(rsa_private_key *PRIV,octet *G,octet *F)
 {
-	BIG g[FFLEN],t[FFLEN],jp[HFLEN],jq[HFLEN];
+    BIG g[FFLEN],t[FFLEN],jp[HFLEN],jq[HFLEN];
 
-	FF_fromOctet(g,G,FFLEN);	
-	
-	FF_dmod(jp,g,PRIV->p,HFLEN);
-	FF_dmod(jq,g,PRIV->q,HFLEN);
+    FF_fromOctet(g,G,FFLEN);
 
-	FF_skpow(jp,jp,PRIV->dp,PRIV->p,HFLEN);
-	FF_skpow(jq,jq,PRIV->dq,PRIV->q,HFLEN);
+    FF_dmod(jp,g,PRIV->p,HFLEN);
+    FF_dmod(jq,g,PRIV->q,HFLEN);
+
+    FF_skpow(jp,jp,PRIV->dp,PRIV->p,HFLEN);
+    FF_skpow(jq,jq,PRIV->dq,PRIV->q,HFLEN);
 
 
-	FF_zero(g,FFLEN);
-	FF_copy(g,jp,HFLEN);
-	FF_mod(jp,PRIV->q,HFLEN);
-	if (FF_comp(jp,jq,HFLEN)>0)
-		FF_add(jq,jq,PRIV->q,HFLEN);
-	FF_sub(jq,jq,jp,HFLEN);
-	FF_norm(jq,HFLEN);
+    FF_zero(g,FFLEN);
+    FF_copy(g,jp,HFLEN);
+    FF_mod(jp,PRIV->q,HFLEN);
+    if (FF_comp(jp,jq,HFLEN)>0)
+        FF_add(jq,jq,PRIV->q,HFLEN);
+    FF_sub(jq,jq,jp,HFLEN);
+    FF_norm(jq,HFLEN);
 
-	FF_mul(t,PRIV->c,jq,HFLEN);
-	FF_dmod(jq,t,PRIV->q,HFLEN);
+    FF_mul(t,PRIV->c,jq,HFLEN);
+    FF_dmod(jq,t,PRIV->q,HFLEN);
 
-	FF_mul(t,jq,PRIV->p,HFLEN);
-	FF_add(g,t,g,FFLEN);
-	FF_norm(g,FFLEN);
- 
-	FF_toOctet(F,g,FFLEN);
+    FF_mul(t,jq,PRIV->p,HFLEN);
+    FF_add(g,t,g,FFLEN);
+    FF_norm(g,FFLEN);
 
-	return;
+    FF_toOctet(F,g,FFLEN);
+
+    return;
 }
 

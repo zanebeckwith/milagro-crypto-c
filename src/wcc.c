@@ -96,73 +96,85 @@ static void hashit(int sha,int n,octet *x,octet *w)
 {
     int i,c[4],hlen;
     hash256 sha256;
-	hash512 sha512;
+    hash512 sha512;
     char hh[64];
-	
-	switch (sha)
-	{
-	case SHA256:
-		HASH256_init(&sha256); break;
-	case SHA384:
-		HASH384_init(&sha512); break;
-	case SHA512:
-		HASH512_init(&sha512); break;
-	}
-    
-	hlen=sha;
 
-	if (n>0)
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_init(&sha256);
+        break;
+    case SHA384:
+        HASH384_init(&sha512);
+        break;
+    case SHA512:
+        HASH512_init(&sha512);
+        break;
+    }
+
+    hlen=sha;
+
+    if (n>0)
     {
         c[0]=(n>>24)&0xff;
         c[1]=(n>>16)&0xff;
         c[2]=(n>>8)&0xff;
         c[3]=(n)&0xff;
-		for (i=0;i<4;i++)
-		{
-			switch(sha)
-			{
-			case SHA256:
-				HASH256_process(&sha256,c[i]); break;
-			case SHA384:
-				HASH384_process(&sha512,c[i]); break;
-			case SHA512:
-				HASH512_process(&sha512,c[i]); break;
-			}
-		}
+        for (i=0; i<4; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,c[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,c[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,c[i]);
+                break;
+            }
+        }
     }
-    if (x!=NULL) for (i=0;i<x->len;i++)
-	{
-		switch(sha)
-		{
-		case SHA256:
-			HASH256_process(&sha256,x->val[i]); break;
-		case SHA384:
-			HASH384_process(&sha512,x->val[i]); break;
-		case SHA512:
-			HASH512_process(&sha512,x->val[i]); break;
-		}
-	}
+    if (x!=NULL) for (i=0; i<x->len; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,x->val[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,x->val[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,x->val[i]);
+                break;
+            }
+        }
 
-    for (i=0;i<hlen;i++) hh[i]=0;	
-	switch (sha)
-	{
-	case SHA256:
-		HASH256_hash(&sha256,hh); break;
-	case SHA384:
-		HASH384_hash(&sha512,hh); break;
-	case SHA512:
-		HASH512_hash(&sha512,hh); break;
-	}
+    for (i=0; i<hlen; i++) hh[i]=0;
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_hash(&sha256,hh);
+        break;
+    case SHA384:
+        HASH384_hash(&sha512,hh);
+        break;
+    case SHA512:
+        HASH512_hash(&sha512,hh);
+        break;
+    }
 
     OCT_empty(w);
-	
-	if (hlen>=MODBYTES)
-		OCT_jbytes(w,hh,MODBYTES);
-	else
-	{
-		OCT_jbytes(w,hh,hlen);
-		OCT_jbyte(w,0,MODBYTES-hlen);
-	}
+
+    if (hlen>=MODBYTES)
+        OCT_jbytes(w,hh,MODBYTES);
+    else
+    {
+        OCT_jbytes(w,hh,hlen);
+        OCT_jbyte(w,0,MODBYTES-hlen);
+    }
 }
 
 /*! \brief Hash EC Points and Id to an integer
@@ -186,11 +198,11 @@ void WCC_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
 {
     BIG q,hs;
 
-    // hv has to store two points in G1, One in G2 and the Id length 
+    // hv has to store two points in G1, One in G2 and the Id length
     char hv[2000];
-    octet HV={0,sizeof(hv),hv};
+    octet HV= {0,sizeof(hv),hv};
     char ht[HASH_BYTES];
-    octet HT={0,sizeof(ht),ht};
+    octet HT= {0,sizeof(ht),ht};
 
     BIG_rcopy(q,CURVE_Order);
 
@@ -457,7 +469,7 @@ int WCC_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pibOct,
     octet xPgG1Oct= {0,sizeof(xpgg1), xpgg1};
 
     char hv[6*PFS+1];
-    octet HV={0,sizeof(hv),hv};
+    octet HV= {0,sizeof(hv),hv};
     char ht[HASH_BYTES];
     octet HT= {0,sizeof(ht),ht};
 
@@ -613,7 +625,7 @@ int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct
     octet wPaG1Oct= {0,sizeof(wpag1), wpag1};
 
     char hv[6*PFS+1];
-    octet HV={0,sizeof(hv),hv};
+    octet HV= {0,sizeof(hv),hv};
     char ht[HASH_BYTES];
     octet HT= {0,sizeof(ht),ht};
 

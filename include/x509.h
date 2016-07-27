@@ -27,16 +27,17 @@ under the License.
  *
  * defines structures
  * declares functions
- * 
+ *
  */
 
 #ifndef X509_H
 #define X509_H
 
-typedef struct {
-int type;
-int hash;
-int curve;
+typedef struct
+{
+    int type;
+    int hash;
+    int curve;
 } pktype;
 
 /* X.509 functions */
