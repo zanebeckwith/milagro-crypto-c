@@ -4,7 +4,7 @@
 link_directories (${PROJECT_BINARY_DIR}/src)
 include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
 
-#define a macro to simplify adding tests
+#define macro to simplify adding tests
 macro (do_test arg result)
   add_test (${arg} ${TARGET_SYSTEM_EMULATOR} ${arg}${CMAKE_EXECUTABLE_SUFFIX})
   set_tests_properties (${arg}
@@ -25,6 +25,7 @@ if(BUILD_MPIN)
   add_executable (test_mpinfullSingle test_mpinfullSingle.c)
   add_executable (test_mpinfull_random test_mpinfull_random.c)
   add_executable (test_utils test_utils.c)
+  add_executable (test_hash test_hash.c)
   # Link the executable to the libraries
   target_link_libraries (test_mpin mpin) 
   target_link_libraries (test_mpin_sign mpin) 
@@ -38,6 +39,7 @@ if(BUILD_MPIN)
   target_link_libraries (test_mpinfullSingle mpin) 
   target_link_libraries (test_mpinfull_random mpin) 
   target_link_libraries (test_utils mpin) 
+  target_link_libraries (test_hash mpin) 
   # tests
   do_test (test_mpin "SUCCESS Error Code 0")
   do_test (test_mpin_sign "TEST PASSED")
@@ -51,6 +53,10 @@ if(BUILD_MPIN)
   do_test (test_mpinfullSingle "SUCCESS")
   do_test (test_mpinfull_random "Iteration ${MPIN_RANDOM_TESTS} SUCCESS")
   do_test (test_utils "SUCCESS")
+  add_test(NAME test_hash256 COMMAND test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/256/SHA256ShortMsg.rsp sha256)
+  set_tests_properties (test_hash256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+  add_test(NAME test_hash512 COMMAND test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/512/SHA512ShortMsg.rsp sha512)
+  set_tests_properties (test_hash512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif(BUILD_MPIN)
 
 if(BUILD_WCC)

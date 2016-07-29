@@ -23,59 +23,44 @@ under the License.
 #include "amcl.h"
 #include "utils.h"
 
-void hex2bytes(char *hex, char *bin)
+void amcl_hex2bin(const char *src, char *dst, int src_len)
 {
-    int i;
-    char v;
-    int len=strlen(hex);
-    for (i = 0; i < len/2; i++)
-    {
-        char c = hex[2*i];
-        if (c >= '0' && c <= '9')
-        {
-            v = c - '0';
-        }
-        else if (c >= 'A' && c <= 'F')
-        {
-            v = c - 'A' + 10;
-        }
-        else if (c >= 'a' && c <= 'f')
-        {
-            v = c - 'a' + 10;
-        }
-        else
-        {
-            v = 0;
-        }
-        v <<= 4;
-        c = hex[2*i + 1];
-        if (c >= '0' && c <= '9')
-        {
-            v += c - '0';
-        }
-        else if (c >= 'A' && c <= 'F')
-        {
-            v += c - 'A' + 10;
-        }
-        else if (c >= 'a' && c <= 'f')
-        {
-            v += c - 'a' + 10;
-        }
-        else
-        {
-            v = 0;
-        }
-        bin[i] = v;
+  int i;
+  char v;
+  for (i = 0; i < src_len/2; i++) {
+    char c = src[2*i];
+    if (c >= '0' && c <= '9') {
+        v = c - '0';
+    } else if (c >= 'A' && c <= 'F') {
+        v = c - 'A' + 10;
+    } else if (c >= 'a' && c <= 'f') {
+        v = c - 'a' + 10;
+    } else {
+        v = 0;
     }
+    v <<= 4;
+    c = src[2*i + 1];
+    if (c >= '0' && c <= '9') {
+        v += c - '0';
+    } else if (c >= 'A' && c <= 'F') {
+        v += c - 'A' + 10;
+    } else if (c >= 'a' && c <= 'f') {
+        v += c - 'a' + 10;
+    } else {
+        v = 0;
+    }
+    dst[i] = v;
+  }
 }
 
-/*! \brief Generate a random six digit one time password
- *
- *  Generates a random six digit one time password
- *
- *  @param  RNG             random number generator
- *  @return OTP             One Time Password
- */
+void amcl_bin2hex(char *src, char *dst, int src_len)
+{
+  int i;
+  for (i = 0; i < src_len; i++) {
+    sprintf(&dst[i*2],"%02x", (unsigned char) src[i]);
+  }
+}
+
 int generateOTP(csprng* RNG)
 {
     int OTP=0;
@@ -95,13 +80,6 @@ int generateOTP(csprng* RNG)
     return OTP;
 }
 
-/*! \brief Generate a random Octet
- *
- *  Generate a random Octet
- *
- *  @param  RNG            random number generator
- *  @param randomValue     random Octet
- */
 void generateRandom(csprng *RNG,octet *randomValue)
 {
     int i;
