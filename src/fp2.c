@@ -21,6 +21,7 @@ under the License.
 /* SU=m, m is Stack Usage (no lazy )*/
 
 /* FP2 elements are of the form a+ib, where i is sqrt(-1) */
+
 #include "amcl.h"
 
 /* test x==0 ? */

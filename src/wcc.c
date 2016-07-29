@@ -34,32 +34,6 @@ under the License.
 
 // #define DEBUG
 
-/* general purpose hashing functions */
-static void start_hash(amcl_hash *sha)
-{
-    HASH_init(sha);
-}
-
-static void add_to_hash(amcl_hash *sha,octet *x)
-{
-    int i;
-    for (i=0; i<x->len; i++)
-    {
-        /*printf("%d,",(unsigned char)x->val[i]);*/
-        HASH_process(sha,x->val[i]);
-    }
-}
-
-static void finish_hash(amcl_hash *sha,octet *w)
-{
-    int i;
-    char hh[HASH_BYTES];
-    HASH_hash(sha,hh);
-
-    OCT_empty(w);
-    OCT_jbytes(w,hh,HASH_BYTES);
-    for (i=0; i<HASH_BYTES; i++) hh[i]=0;
-}
 
 /* map octet string to point on curve */
 static void mapit(octet *h,ECP *P)
@@ -118,28 +92,90 @@ static void mapit2(octet *h,ECP2 *Q)
 }
 
 /* Hash number (optional) and octet to octet */
-static void hashit(int n,octet *x,octet *h)
+static void hashit(int sha,int n,octet *x,octet *w)
 {
-    int i,c[4];
-    amcl_hash sha;
-    char hh[HASH_BYTES];
+    int i,c[4],hlen;
+    hash256 sha256;
+    hash512 sha512;
+    char hh[64];
 
-    HASH_init(&sha);
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_init(&sha256);
+        break;
+    case SHA384:
+        HASH384_init(&sha512);
+        break;
+    case SHA512:
+        HASH512_init(&sha512);
+        break;
+    }
+
+    hlen=sha;
+
     if (n>0)
     {
         c[0]=(n>>24)&0xff;
         c[1]=(n>>16)&0xff;
         c[2]=(n>>8)&0xff;
         c[3]=(n)&0xff;
-        for (i=0; i<4; i++) HASH_process(&sha,c[i]);
+        for (i=0; i<4; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,c[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,c[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,c[i]);
+                break;
+            }
+        }
     }
-    for (i=0; i<x->len; i++) HASH_process(&sha,x->val[i]);
-    HASH_hash(&sha,hh);
-    OCT_empty(h);
-    OCT_jbytes(h,hh,HASH_BYTES);
-    for (i=0; i<HASH_BYTES; i++) hh[i]=0;
-}
+    if (x!=NULL) for (i=0; i<x->len; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,x->val[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,x->val[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,x->val[i]);
+                break;
+            }
+        }
 
+    for (i=0; i<hlen; i++) hh[i]=0;
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_hash(&sha256,hh);
+        break;
+    case SHA384:
+        HASH384_hash(&sha512,hh);
+        break;
+    case SHA512:
+        HASH512_hash(&sha512,hh);
+        break;
+    }
+
+    OCT_empty(w);
+
+    if (hlen>=MODBYTES)
+        OCT_jbytes(w,hh,MODBYTES);
+    else
+    {
+        OCT_jbytes(w,hh,hlen);
+        OCT_jbyte(w,0,MODBYTES-hlen);
+    }
+}
 
 /*! \brief Hash EC Points and Id to an integer
  *
@@ -151,18 +187,22 @@ static void hashit(int n,octet *x,octet *h)
  *  <li> h = x % q where q is the curve order
  *  </ol>
  *
+ *  @param  sha      Hash type
  *  @param  A        EC Point
  *  @param  B        EC Point
  *  @param  C        EC Point
  *  @param  D        Identity
  *  @param  h        Integer result
  */
-void WCC_Hq(octet *A,octet *B,octet *C,octet *D,octet *h)
+void WCC_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
 {
-    int i;
-    amcl_hash sha;
-    char hh[HASH_BYTES];
     BIG q,hs;
+
+    // hv has to store two points in G1, One in G2 and the Id length
+    char hv[2000];
+    octet HV= {0,sizeof(hv),hv};
+    char ht[HASH_BYTES];
+    octet HT= {0,sizeof(ht),ht};
 
     BIG_rcopy(q,CURVE_Order);
 
@@ -181,35 +221,15 @@ void WCC_Hq(octet *A,octet *B,octet *C,octet *D,octet *h)
     printf("\n");
 #endif
 
-    HASH_init(&sha);
-    for (i=0; i<A->len; i++)
-    {
-        HASH_process(&sha,A->val[i]);
-    }
+    OCT_joctet(&HV,A);
+    OCT_joctet(&HV,B);
+    OCT_joctet(&HV,C);
+    OCT_joctet(&HV,D);
+    hashit(sha,0,&HV,&HT);
 
-    for (i=0; i<B->len; i++)
-    {
-        HASH_process(&sha,B->val[i]);
-    }
-
-    for (i=0; i<C->len; i++)
-    {
-        HASH_process(&sha,C->val[i]);
-    }
-
-    for (i=0; i<D->len; i++)
-    {
-        HASH_process(&sha,D->val[i]);
-    }
-
-    HASH_hash(&sha,hh);
-
-    BIG_fromBytes(hs,hh);
+    BIG_fromBytes(hs,HT.val);
     BIG_mod(hs,q);
-    for (i=0; i<HASH_BYTES; i++)
-    {
-        hh[i]=0;
-    }
+    OCT_clear(&HT);
     BIG_toBytes(h->val,hs);
     h->len=PGS;
 }
@@ -222,13 +242,14 @@ void WCC_Hq(octet *A,octet *B,octet *C,octet *D,octet *h)
  *  <li> VG1 = s*H1(ID)
  *  </ol>
  *
+ *  @param  sha         Hash type
  *  @param  hashDone    ID value is already hashed if set to 1
  *  @param  S           integer modulus curve order
  *  @param  ID          ID value or sha256(ID)
  *  @param  VG1         EC point VG1 = s*H1(ID)
  *  @return rtn         Returns 0 if successful or else an error code
  */
-int WCC_GET_G1_MULTIPLE(int hashDone, octet *S,octet *ID,octet *VG1)
+int WCC_GET_G1_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG1)
 {
     BIG s;
     ECP P;
@@ -241,7 +262,7 @@ int WCC_GET_G1_MULTIPLE(int hashDone, octet *S,octet *ID,octet *VG1)
     }
     else
     {
-        hashit(0,ID,&H);
+        hashit(sha,0,ID,&H);
         mapit(&H,&P);
     }
 
@@ -260,13 +281,14 @@ int WCC_GET_G1_MULTIPLE(int hashDone, octet *S,octet *ID,octet *VG1)
  *  <li> VG1 = s*H1(ID) + s*H1(date|sha256(ID))
  *  </ol>
  *
+ *  @param  sha         Hash type
  *  @param  date        Epoch days
  *  @param  S           integer modulus curve order
  *  @param  ID          ID value or sha256(ID)
  *  @param  VG1         EC point in G1
  *  @return rtn         Returns 0 if successful or else an error code
  */
-int WCC_GET_G1_TPMULT(int date, octet *S,octet *ID,octet *VG1)
+int WCC_GET_G1_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG1)
 {
     BIG s;
     ECP P,Q;
@@ -276,11 +298,11 @@ int WCC_GET_G1_TPMULT(int date, octet *S,octet *ID,octet *VG1)
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
-    hashit(0,ID,&H1);
+    hashit(sha,0,ID,&H1);
     mapit(&H1,&P);
 
     // H1(date|sha256(ID))
-    hashit(date,&H1,&H2);
+    hashit(sha,date,&H1,&H2);
     mapit(&H2,&Q);
 
     // P = P + Q
@@ -302,13 +324,14 @@ int WCC_GET_G1_TPMULT(int date, octet *S,octet *ID,octet *VG1)
  *  <li> VG2 = s*H1(ID) + s*H1(date|sha256(ID))
  *  </ol>
  *
+ *  @param  sha         Hash type
  *  @param  date        Epoch days
  *  @param  S           integer modulus curve order
  *  @param  ID          ID value or sha256(ID)
  *  @param  VG2         EC point in G2
  *  @return rtn         Returns 0 if successful or else an error code
  */
-int WCC_GET_G2_TPMULT(int date, octet *S,octet *ID,octet *VG2)
+int WCC_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2)
 {
     BIG s;
     ECP2 P,Q;
@@ -318,11 +341,11 @@ int WCC_GET_G2_TPMULT(int date, octet *S,octet *ID,octet *VG2)
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
-    hashit(0,ID,&H1);
+    hashit(sha,0,ID,&H1);
     mapit2(&H1,&P);
 
     // H1(date|sha256(ID))
-    hashit(date,&H1,&H2);
+    hashit(sha,date,&H1,&H2);
     mapit2(&H2,&Q);
 
     // P = P + Q
@@ -344,13 +367,14 @@ int WCC_GET_G2_TPMULT(int date, octet *S,octet *ID,octet *VG2)
  *  <li> VG2 = s*H2(ID)
  *  </ol>
  *
+ *  @param  sha       Hash type
  *  @param  hashDone  ID is value is already hashed if set to 1
  *  @param  S         integer modulus curve order
  *  @param  ID        ID Value or sha256(ID)
  *  @param  VG2       EC Point VG2 = s*H2(ID)
  *  @return rtn       Returns 0 if successful or else an error code
  */
-int WCC_GET_G2_MULTIPLE(int hashDone, octet *S,octet *ID,octet *VG2)
+int WCC_GET_G2_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG2)
 {
     BIG s;
     ECP2 P;
@@ -363,7 +387,7 @@ int WCC_GET_G2_MULTIPLE(int hashDone, octet *S,octet *ID,octet *VG2)
     }
     else
     {
-        hashit(0,ID,&H);
+        hashit(sha,0,ID,&H);
         mapit2(&H,&P);
     }
 
@@ -382,20 +406,21 @@ int WCC_GET_G2_MULTIPLE(int hashDone, octet *S,octet *ID,octet *VG2)
  *  <li> TPG2=s*H2(date|sha256(ID))
  *  </ol>
  *
+ *  @param  sha       Hash type
  *  @param  date      Epoch days
  *  @param  S         Master secret
  *  @param  HID       sha256(ID)
  *  @param  TPG2      Time Permit in G2
  *  @return rtn       Returns 0 if successful or else an error code
  */
-int WCC_GET_G2_PERMIT(int date,octet *S,octet *HID,octet *TPG2)
+int WCC_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2)
 {
     BIG s;
     ECP2 P;
     char h[HASH_BYTES];
     octet H= {0,sizeof(h),h};
 
-    hashit(date,HID,&H);
+    hashit(sha,date,HID,&H);
     mapit2(&H,&P);
     BIG_fromBytes(s,S->val);
     PAIR_G2mul(&P,s);
@@ -413,6 +438,7 @@ int WCC_GET_G2_PERMIT(int date,octet *S,octet *HID,octet *TPG2)
  *  <li> K=H(j,x.PgG1)
  *  </ol>
  *
+ *  @param  sha         Hash type
  *  @param  date        Epoch days
  *  @param  xOct        Random x < q where q is the curve order
  *  @param  piaOct      Hq(PaG1,PbG2,PgG1)
@@ -425,7 +451,7 @@ int WCC_GET_G2_PERMIT(int date,octet *S,octet *HID,octet *TPG2)
  *  @param  AESKeyOct   Returned AES key
  *  @return rtn         Returns 0 if successful or else an error code
  */
-int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *PbG2Oct, octet *PgG1Oct, octet *AKeyG1Oct, octet *ATPG1Oct, octet *IdBOct, octet *AESKeyOct)
+int WCC_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pibOct, octet *PbG2Oct, octet *PgG1Oct, octet *AKeyG1Oct, octet *ATPG1Oct, octet *IdBOct, octet *AESKeyOct)
 {
     ECP sAG1,ATPG1,PgG1;
     ECP2 BG2,dateBG2,PbG2;
@@ -438,11 +464,14 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
 
     FP4 c;
     BIG t,x,z,pia,pib;
-    char ht[HASH_BYTES];
-    octet HT= {0,sizeof(ht),ht};
-    amcl_hash sha;
+
     char xpgg1[2*PFS+1];
     octet xPgG1Oct= {0,sizeof(xpgg1), xpgg1};
+
+    char hv[6*PFS+1];
+    octet HV= {0,sizeof(hv),hv};
+    char ht[HASH_BYTES];
+    octet HT= {0,sizeof(ht),ht};
 
     BIG_fromBytes(x,xOct->val);
     BIG_fromBytes(pia,piaOct->val);
@@ -468,7 +497,7 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
         return WCC_INVALID_POINT;
     }
 
-    hashit(0,IdBOct,&HV1);
+    hashit(sha,0,IdBOct,&HV1);
     mapit2(&HV1,&BG2);
 
     if (!ECP_fromOctet(&sAG1,AKeyG1Oct))
@@ -496,7 +525,7 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
         }
 
         // H2(date|sha256(IdB))
-        hashit(date,&HV1,&HV2);
+        hashit(sha,date,&HV1,&HV2);
         mapit2(&HV2,&dateBG2);
 
         // sAG1 = sAG1 + ATPG1
@@ -526,26 +555,29 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
 
     // Generate AES Key : K=H(k,x.PgG1)
     FP12_trace(&c,&g);
-    HT.len=HASH_BYTES;
-    start_hash(&sha);
+
+    HV.len = 4*PFS;
     BIG_copy(t,c.a.a);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[0]),t);
+
     BIG_copy(t,c.a.b);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[PFS]),t);
+
     BIG_copy(t,c.b.a);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[PFS*2]),t);
+
     BIG_copy(t,c.b.b);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
-    add_to_hash(&sha,&xPgG1Oct);
-    finish_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[PFS*3]),t);
+
+    // Set HV.len to correct value
+    OCT_joctet(&HV,&xPgG1Oct);
+
+    hashit(sha,0,&HV,&HT);
+
     OCT_empty(AESKeyOct);
     OCT_jbytes(AESKeyOct,HT.val,PAS);
 
@@ -554,13 +586,14 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
 
 /*! \brief Calculate the receiver AES key
  *
- *  Calculate time permit in G2.
+ *  Calculate the receiver AES key
  *
  *  <ol>
  *  <li> j=e(pia.AG1+PaG1,(y+pib).BKeyG2)
  *  <li> K=H(j,w.PaG1)
  *  </ol>
  *
+ *  @param  sha         Hash type
  *  @param  date        Epoch days
  *  @param  yOct        Random y < q where q is the curve order
  *  @param  wOct        Random w < q where q is the curve order
@@ -574,7 +607,7 @@ int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *P
  *  @param  AESKeyOct   AES key returned
  *  @return rtn         Returns 0 if successful or else an error code
  */
-int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *pibOct,  octet *PaG1Oct, octet *PgG1Oct, octet *BKeyG2Oct,octet *BTPG2Oct,  octet *IdAOct, octet *AESKeyOct)
+int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct, octet *pibOct,  octet *PaG1Oct, octet *PgG1Oct, octet *BKeyG2Oct,octet *BTPG2Oct,  octet *IdAOct, octet *AESKeyOct)
 {
     ECP AG1,dateAG1,PgG1,PaG1;
     ECP2 sBG2,BTPG2;
@@ -587,11 +620,15 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
 
     FP4 c;
     BIG t,w,y,pia,pib;;
-    char ht[HASH_BYTES];
-    octet HT= {0,sizeof(ht),ht};
-    amcl_hash sha;
+
     char wpag1[2*PFS+1];
     octet wPaG1Oct= {0,sizeof(wpag1), wpag1};
+
+    char hv[6*PFS+1];
+    octet HV= {0,sizeof(hv),hv};
+    char ht[HASH_BYTES];
+    octet HT= {0,sizeof(ht),ht};
+
     BIG_fromBytes(y,yOct->val);
     BIG_fromBytes(w,wOct->val);
     BIG_fromBytes(pia,piaOct->val);
@@ -603,7 +640,7 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
     if (!ECP_fromOctet(&PgG1,PgG1Oct))
         return WCC_INVALID_POINT;
 
-    hashit(0,IdAOct,&HV1);
+    hashit(sha,0,IdAOct,&HV1);
     mapit(&HV1,&AG1);
 
     if (!ECP2_fromOctet(&sBG2,BKeyG2Oct))
@@ -616,7 +653,7 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
             return WCC_INVALID_POINT;
 
         // H1(date|sha256(AID))
-        hashit(date,&HV1,&HV2);
+        hashit(sha,date,&HV1,&HV2);
         mapit(&HV2,&dateAG1);
 
         // sBG2 = sBG2 + TPG2
@@ -646,26 +683,29 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
 
     // Generate AES Key: K=H(k,w.PaG1)
     FP12_trace(&c,&g);
-    HT.len=HASH_BYTES;
-    start_hash(&sha);
+
+    HV.len = 4*PFS;
     BIG_copy(t,c.a.a);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[0]),t);
+
     BIG_copy(t,c.a.b);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[PFS]),t);
+
     BIG_copy(t,c.b.a);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[PFS*2]),t);
+
     BIG_copy(t,c.b.b);
     FP_redc(t);
-    BIG_toBytes(&(HT.val[0]),t);
-    add_to_hash(&sha,&HT);
-    add_to_hash(&sha,&wPaG1Oct);
-    finish_hash(&sha,&HT);
+    BIG_toBytes(&(HV.val[PFS*3]),t);
+
+    // Set HV.len to correct value
+    OCT_joctet(&HV,&wPaG1Oct);
+
+    hashit(sha,0,&HV,&HT);
+
     OCT_empty(AESKeyOct);
     OCT_jbytes(AESKeyOct,HT.val,PAS);
 
@@ -688,7 +728,7 @@ int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *
 void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
     gcm g;
-    GCM_init(&g,K->val,IV->len,IV->val);
+    GCM_init(&g,K->len,K->val,IV->len,IV->val);
     GCM_add_header(&g,H->val,H->len);
     GCM_add_plain(&g,C->val,P->val,P->len);
     C->len=P->len;
@@ -711,7 +751,7 @@ void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 {
     gcm g;
-    GCM_init(&g,K->val,IV->len,IV->val);
+    GCM_init(&g,K->len,K->val,IV->len,IV->val);
     GCM_add_header(&g,H->val,H->len);
     GCM_add_cipher(&g,P->val,C->val,C->len);
     P->len=C->len;
@@ -754,12 +794,13 @@ void WCC_KILL_CSPRNG(csprng *RNG)
  *
  *   Hash ID
  *
+ *   @param  sha    Hash type
  *   @param  ID     Value to hash
  *   @param  HID    sha256 hashed value
  */
-void WCC_HASH_ID(octet *ID,octet *HID)
+void WCC_HASH_ID(int sha,octet *ID,octet *HID)
 {
-    hashit(0,ID,HID);
+    hashit(sha,0,ID,HID);
 }
 
 /*!  \brief Generate a random integer
@@ -788,20 +829,21 @@ int WCC_RANDOM_GENERATE(csprng *RNG,octet* S)
  *  <li> TPG1=s*H1(date|sha256(ID))
  *  </ol>
  *
+ *  @param  sha       Hash type
  *  @param  date      Epoch days
  *  @param  S         Master secret
  *  @param  HID       sha256(ID)
  *  @param  TPG1      Time Permit in G1
  *  @return rtn       Returns 0 if successful or else an error code
  */
-int WCC_GET_G1_PERMIT(int date,octet *S,octet *HID,octet *TPG1)
+int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG1)
 {
     BIG s;
     ECP P;
     char h[HASH_BYTES];
     octet H= {0,sizeof(h),h};
 
-    hashit(date,HID,&H);
+    hashit(sha,date,HID,&H);
     mapit(&H,&P);
     BIG_fromBytes(s,S->val);
     PAIR_G1mul(&P,s);

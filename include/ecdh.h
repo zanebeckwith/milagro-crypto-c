@@ -33,8 +33,10 @@ under the License.
 #include "amcl.h"
 
 #define EAS 16 /**< Symmetric Key size - 128 bits */
-#define EGS 32 /**< ECC Group Size */
-#define EFS 32 /**< ECC Field Size */
+#define EGS MODBYTES  /**< ECC Group Size in bytes */
+#define EFS MODBYTES  /**< ECC Field Size in bytes */
+
+#define HASH_TYPE_ECC SHA256  /**< Hash type */
 
 #define ECDH_OK                     0     /**< Function completed without error */
 /*#define ECDH_DOMAIN_ERROR          -1*/
@@ -53,51 +55,55 @@ under the License.
 	@param R is a pointer to a cryptographically secure random number generator
 	@param S is an input truly random seed value
  */
-extern void ECP_CREATE_CSPRNG(csprng *R,octet *S);
+extern void ECC_CREATE_CSPRNG(csprng *R,octet *S);
 /**	@brief Kill a random number generator
  *
 	Deletes all internal state
 	@param R is a pointer to a cryptographically secure random number generator
  */
-extern void ECP_KILL_CSPRNG(csprng *R);
+extern void ECC_KILL_CSPRNG(csprng *R);
 /**	@brief hash an octet into another octet
  *
+ 	@param h is the hash type
 	@param I input octet
 	@param O output octet - H(I)
  */
-extern void ECP_HASH(octet *I,octet *O);
+extern void HASH(int h,octet *I,octet *O);
 /**	@brief HMAC of message M using key K to create tag of length len in octet tag
  *
 	IEEE-1363 MAC1 function. Uses SHA256 internally.
+	@param h is the hash type
 	@param M input message octet
 	@param K input encryption key
 	@param len is output desired length of HMAC tag
 	@param tag is the output HMAC
 	@return 0 for bad parameters, else 1
  */
-extern int ECP_HMAC(octet *M,octet *K,int len,octet *tag);
+extern int HMAC(int h,octet *M,octet *K,int len,octet *tag);
 
 /*extern void KDF1(octet *,int,octet *);*/
 
 /**	@brief Key Derivation Function - generates key K from inputs Z and P
  *
 	IEEE-1363 KDF2 Key Derivation Function. Uses SHA256 internally.
+	@param h is the hash type
 	@param Z input octet
 	@param P input key derivation parameters - can be NULL
 	@param len is output desired length of key
 	@param K is the derived key
  */
-extern void ECP_KDF2(octet *Z,octet *P,int len,octet *K);
+extern void KDF2(int h,octet *Z,octet *P,int len,octet *K);
 /**	@brief Password Based Key Derivation Function - generates key K from password, salt and repeat counter
  *
 	PBKDF2 Password Based Key Derivation Function. Uses SHA256 internally.
+	@param h is the hash type
 	@param P input password
 	@param S input salt
 	@param rep Number of times to be iterated.
-	@param len is output desired length of key
+	@param len is output desired length
 	@param K is the derived key
  */
-extern void ECP_PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
+extern void PBKDF2(int h,octet *P,octet *S,int rep,int len,octet *K);
 /**	@brief AES encrypts a plaintext to a ciphtertext
  *
 	IEEE-1363 AES_CBC_IV0_ENCRYPT function. Encrypts in CBC mode with a zero IV, padding as necessary to create a full final block.
@@ -105,7 +111,7 @@ extern void ECP_PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
 	@param P input plaintext octet
 	@param C output ciphertext octet
  */
-extern void ECP_AES_CBC_IV0_ENCRYPT(octet *K,octet *P,octet *C);
+extern void AES_CBC_IV0_ENCRYPT(octet *K,octet *P,octet *C);
 /**	@brief AES encrypts a plaintext to a ciphtertext
  *
 	IEEE-1363 AES_CBC_IV0_DECRYPT function. Decrypts in CBC mode with a zero IV.
@@ -114,7 +120,7 @@ extern void ECP_AES_CBC_IV0_ENCRYPT(octet *K,octet *P,octet *C);
 	@param P output plaintext octet
 	@return 0 if bad input, else 1
  */
-extern int ECP_AES_CBC_IV0_DECRYPT(octet *K,octet *C,octet *P);
+extern int AES_CBC_IV0_DECRYPT(octet *K,octet *C,octet *P);
 
 /* ECDH primitives - support functions */
 /**	@brief Generate an ECC public/private key pair
@@ -143,14 +149,17 @@ extern int  ECP_PUBLIC_KEY_VALIDATE(int f,octet *W);
 	@param K the output shared key, in fact the x-coordinate of s.W
 	@return 0 or an error code
  */
-extern int ECP_SVDP_DH(octet *s,octet *W,octet *K);
+extern int ECPSVDP_DH(octet *s,octet *W,octet *K);
 /*extern int ECPSVDP_DHC(octet *,octet *,int,octet *);*/
 
+/*#if CURVETYPE!=MONTGOMERY */
+/* ECIES functions */
 /*#if CURVETYPE!=MONTGOMERY */
 /* ECIES functions */
 /**	@brief ECIES Encryption
  *
 	IEEE-1363 ECIES Encryption
+	@param h is the hash type
 	@param P1 input Key Derivation parameters
 	@param P2 input Encoding parameters
 	@param R is a pointer to a cryptographically secure random number generator
@@ -161,10 +170,11 @@ extern int ECP_SVDP_DH(octet *s,octet *W,octet *K);
 	@param C the output ciphertext
 	@param T the output HMAC tag, part of the ciphertext
  */
-extern void ECP_ECIES_ENCRYPT(octet *P1,octet *P2,csprng *R,octet *W,octet *M,int len,octet *V,octet *C,octet *T);
+extern void ECP_ECIES_ENCRYPT(int h,octet *P1,octet *P2,csprng *R,octet *W,octet *M,int len,octet *V,octet *C,octet *T);
 /**	@brief ECIES Decryption
  *
 	IEEE-1363 ECIES Decryption
+	@param h is the hash type
 	@param P1 input Key Derivation parameters
 	@param P2 input Encoding parameters
 	@param V component of the input ciphertext
@@ -174,12 +184,13 @@ extern void ECP_ECIES_ENCRYPT(octet *P1,octet *P2,csprng *R,octet *W,octet *M,in
 	@param M the output plaintext message
 	@return 1 if successful, else 0
  */
-extern int ECP_ECIES_DECRYPT(octet *P1,octet *P2,octet *V,octet *C,octet *T,octet *U,octet *M);
+extern int ECP_ECIES_DECRYPT(int h,octet *P1,octet *P2,octet *V,octet *C,octet *T,octet *U,octet *M);
 
 /* ECDSA functions */
 /**	@brief ECDSA Signature
  *
 	IEEE-1363 ECDSA Signature
+	@param h is the hash type
 	@param R is a pointer to a cryptographically secure random number generator
 	@param s the input private signing key
 	@param M the input message to be signed
@@ -187,17 +198,18 @@ extern int ECP_ECIES_DECRYPT(octet *P1,octet *P2,octet *V,octet *C,octet *T,octe
 	@param d component of the output signature
 
  */
-extern int ECP_SP_DSA(csprng *R,octet *s,octet *M,octet *c,octet *d);
+extern int ECPSP_DSA(int h,csprng *R,octet *s,octet *M,octet *c,octet *d);
 /**	@brief ECDSA Signature Verification
  *
 	IEEE-1363 ECDSA Signature Verification
+	@param h is the hash type
 	@param W the input public key
 	@param M the input message
 	@param c component of the input signature
 	@param d component of the input signature
 	@return 0 or an error code
  */
-extern int ECP_VP_DSA(octet *W,octet *M,octet *c,octet *d);
+extern int ECPVP_DSA(int h,octet *W,octet *M,octet *c,octet *d);
 /*#endif*/
 
 #endif

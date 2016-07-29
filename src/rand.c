@@ -80,10 +80,10 @@ static void fill_pool(csprng *rng)
 {
     /* hash down output of RNG to re-fill the pool */
     int i;
-    amcl_hash sh;
-    HASH_init(&sh);
-    for (i=0; i<128; i++) HASH_process(&sh,sbrand(rng));
-    HASH_hash(&sh,rng->pool);
+    hash256 sh;
+    HASH256_init(&sh);
+    for (i=0; i<128; i++) HASH256_process(&sh,sbrand(rng));
+    HASH256_hash(&sh,rng->pool);
     rng->pool_ptr=0;
 }
 
@@ -102,15 +102,15 @@ void RAND_seed(csprng *rng,int rawlen,char *raw)
     int i;
     char digest[32];
     uchar b[4];
-    amcl_hash sh;
+    hash256 sh;
     rng->pool_ptr=0;
     for (i=0; i<NK; i++) rng->ira[i]=0;
     if (rawlen>0)
     {
-        HASH_init(&sh);
+        HASH256_init(&sh);
         for (i=0; i<rawlen; i++)
-            HASH_process(&sh,raw[i]);
-        HASH_hash(&sh,digest);
+            HASH256_process(&sh,raw[i]);
+        HASH256_hash(&sh,digest);
 
         /* initialise PRNG from distilled randomness */
 

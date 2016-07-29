@@ -17,7 +17,6 @@ specific language governing permissions and limitations
 under the License.
 */
 
-
 /*** Basic Octet string maintainance routines  ***/
 /* SU=m, m is Stack Usage */
 
@@ -267,12 +266,8 @@ void OCT_frombase64(octet *w,char *b)
 {
     int i,j,k,pads,len=(int)strlen(b);
     int c,ch[4],ptr[3];
+    /* int lead=1; */
     j=k=0;
-    // initialize ch
-    for (i=0; i<4; i++)
-    {
-        ch[i]=0;
-    }
     while (j<len && k<w->max)
     {
         pads=0;
@@ -300,6 +295,7 @@ void OCT_frombase64(octet *w,char *b)
             /* don't put in leading zeros */
             /* if (lead && ptr[i]==0) continue; */
             w->val[k++]=ptr[i];
+            /* lead=0; */
         }
 
     }
@@ -366,6 +362,33 @@ void OCT_toHex(octet *src,char *dst)
         sprintf(&dst[i*2],"%02x", ch);
     }
 }
+
+static int char2int(char input)
+{
+    if(input >= '0' && input <= '9')
+        return input - '0';
+    if(input >= 'A' && input <= 'F')
+        return input - 'A' + 10;
+    if(input >= 'a' && input <= 'f')
+        return input - 'a' + 10;
+    return 0;
+}
+
+/* Convert from a hex string */
+void OCT_fromHex(octet *dst,char *src)
+{
+    int i=0;
+    int j=0;
+    OCT_clear(dst);
+
+    while(src[j]!=0)
+    {
+        dst->val[i++] = char2int(src[j])*16 + char2int(src[j+1]);
+        j += 2;
+    }
+    dst->len=i;
+}
+
 
 /* Convert an octet to a string */
 void OCT_toStr(octet *src,char *dst)

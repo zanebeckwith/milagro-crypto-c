@@ -46,6 +46,12 @@ IVL = 12
 # MPIN Symmetric Key Size
 PAS = 16
 
+# Hash function choice
+SHA256 = 32 
+SHA384 = 48
+SHA512 = 64
+HASH_TYPE_MPIN = SHA256
+
 ffi = cffi.FFI()
 ffi.cdef("""
 typedef struct {
@@ -63,41 +69,41 @@ typedef struct
     char *val;
 } octet;
 
+
+extern void MPIN_HASH_ID(int h,octet *ID,octet *HID);
 extern unsigned int MPIN_GET_TIME(void);
-extern void MPIN_Y(int,octet *,octet *);
-extern void MPIN_HASH_ID(octet *,octet *);
-extern int MPIN_EXTRACT_PIN(octet *,int,octet *);
-extern int MPIN_CLIENT(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
-extern int MPIN_CLIENT_1(int,octet *,csprng *,octet *,int,octet *,octet *,octet *,octet *,octet *);
-extern int MPIN_RANDOM_GENERATE(csprng *,octet *);
-extern int MPIN_CLIENT_2(octet *,octet *,octet *);
-extern void MPIN_SERVER_1(int,octet *,octet *,octet *);
-extern int MPIN_SERVER_2(int,octet *,octet *,octet *,octet *,octet *,octet *,octet *,octet *,octet *);
-extern int MPIN_SERVER(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
-extern int MPIN_RECOMBINE_G1(octet *,octet *,octet *);
-extern int MPIN_RECOMBINE_G2(octet *,octet *,octet *);
-extern int MPIN_KANGAROO(octet *,octet *);
-
-extern int MPIN_ENCODING(csprng *,octet *);
-extern int MPIN_DECODING(octet *);
-
+extern void MPIN_GET_Y(int h,int t,octet *O,octet *Y);
+extern int MPIN_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS); 
+extern int MPIN_CLIENT(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
+extern int MPIN_CLIENT_1(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
+extern int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
+extern int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
+extern int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
+extern void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
+extern int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F);
+extern int MPIN_RECOMBINE_G1(octet *Q1,octet *Q2,octet *Q);
+extern int MPIN_RECOMBINE_G2(octet *P1,octet *P2,octet *P);
+extern int MPIN_KANGAROO(octet *E,octet *F);
+extern int MPIN_ENCODING(csprng *R,octet *TP);
+extern int MPIN_DECODING(octet *TP);
 extern unsigned int MPIN_today(void);
-extern void MPIN_CREATE_CSPRNG(csprng *,octet *);
-extern void MPIN_KILL_CSPRNG(csprng *);
-extern int MPIN_PRECOMPUTE(octet *,octet *,octet *,octet *);
-extern int MPIN_SERVER_KEY(octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U,octet *UT,octet *K);
-extern int MPIN_CLIENT_KEY(octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p,octet *T,octet *K);
-extern int MPIN_GET_G1_MULTIPLE(csprng *,int,octet *,octet *,octet *);
-extern int MPIN_GET_CLIENT_SECRET(octet *,octet *,octet *);
-extern int MPIN_GET_CLIENT_PERMIT(int,octet *,octet *,octet *);
-extern int MPIN_GET_SERVER_SECRET(octet *,octet *);
-extern int MPIN_TEST_PAIRING(octet *,octet *);
+extern void MPIN_CREATE_CSPRNG(csprng *R,octet *S);
+extern void MPIN_KILL_CSPRNG(csprng *R);
+extern int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
+extern int MPIN_GET_G2_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
+extern void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,octet *W,octet *H);
+extern int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS); 
+extern int MPIN_GET_CLIENT_PERMIT(int h,int d,octet *S,octet *ID,octet *TP); 
+extern int MPIN_GET_SERVER_SECRET(octet *S,octet *SS); 
+extern int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *CP,octet *g1,octet *g2);
+extern int MPIN_SERVER_KEY(int h,octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U,octet *UT,octet *K);
+extern int MPIN_CLIENT_KEY(int h,octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p,octet *T,octet *K);
+extern void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
+extern void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
 extern void hex2bytes(char *hex, char *bin);
 extern void generateRandom(csprng*, octet*);
 extern int generateOTP(csprng*);
-extern void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
-extern void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
-extern void MPIN_HASH_ALL(octet *I,octet *U,octet *CU,octet *V,octet *Y,octet *R,octet *W,octet *H);
+
 
 """)
 
@@ -240,7 +246,7 @@ def hash_id(mpin_id):
     # Hash value of mpin_id
     mpin_id1, mpin_id1_val = make_octet(None,mpin_id)    
     hash_mpin_id1, hash_mpin_id1_val = make_octet(HASH_BYTES)
-    libmpin.MPIN_HASH_ID(mpin_id1, hash_mpin_id1)
+    libmpin.MPIN_HASH_ID(HASH_TYPE_MPIN, mpin_id1, hash_mpin_id1)
 
     hash_mpin_id_hex = to_hex(hash_mpin_id1)
     return hash_mpin_id_hex.decode("hex")
@@ -391,7 +397,7 @@ def get_client_permit(epoch_days, master_secret, hash_mpin_id):
     master_secret1, master_secret1_val = make_octet(None,master_secret)
     hash_mpin_id1, hash_mpin_id1_val = make_octet(None,hash_mpin_id)    
     time_permit1, time_permit1_val = make_octet(G1)
-    error_code = libmpin.MPIN_GET_CLIENT_PERMIT(epoch_days, master_secret1, hash_mpin_id1, time_permit1)
+    error_code = libmpin.MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, epoch_days, master_secret1, hash_mpin_id1, time_permit1)
 
     time_permit_hex = to_hex(time_permit1)
     return error_code, time_permit_hex.decode("hex")
@@ -418,7 +424,7 @@ def extract_pin(mpin_id, pin, client_secret):
     mpin_id1, mpin_id1_val = make_octet(None,mpin_id)
     client_secret1, client_secret1_val  = make_octet(None,client_secret)
     
-    error_code = libmpin.MPIN_EXTRACT_PIN(mpin_id1, pin, client_secret1)
+    error_code = libmpin.MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, mpin_id1, pin, client_secret1)
 
     client_secret_hex = to_hex(client_secret1)
     return error_code, client_secret_hex.decode("hex")
@@ -446,7 +452,7 @@ def precompute(token, hash_mpin_id):
     hash_mpin_id1, hash_mpin_id1_val = make_octet(None,hash_mpin_id)    
     pc11, pc11_val = make_octet(GT)
     pc21, pc21_val = make_octet(GT)
-    error_code = libmpin.MPIN_PRECOMPUTE(token1, hash_mpin_id1, pc11, pc21)
+    error_code = libmpin.MPIN_PRECOMPUTE(token1, hash_mpin_id1, ffi.NULL, pc11, pc21)
 
     pc1_hex = to_hex(pc11)
     pc2_hex = to_hex(pc21)
@@ -496,7 +502,7 @@ def client_1(epoch_date, mpin_id, rng, x, pin, token, time_permit):
     ut1, ut1_val = make_octet(G1)
     v1, v1_val = make_octet(G1)
   
-    error_code = libmpin.MPIN_CLIENT_1(epoch_date, mpin_id1, rng, x1, pin, token1, v1, u1, ut1, time_permit1)
+    error_code = libmpin.MPIN_CLIENT_1(HASH_TYPE_MPIN,epoch_date, mpin_id1, rng, x1, pin, token1, v1, u1, ut1, time_permit1)
 
     x_hex = to_hex(x1)
     u_hex = to_hex(u1)    
@@ -583,7 +589,7 @@ def client(epoch_date, mpin_id, rng, x, pin, token, time_permit, message, epoch_
     v1, v1_val = make_octet(G1)
     y1, y1_val = make_octet(PGS)
   
-    error_code = libmpin.MPIN_CLIENT(epoch_date, mpin_id1, rng, x1, pin, token1, v1, u1, ut1, time_permit1, message1, epoch_time, y1)
+    error_code = libmpin.MPIN_CLIENT(HASH_TYPE_MPIN,epoch_date, mpin_id1, rng, x1, pin, token1, v1, u1, ut1, time_permit1, message1, epoch_time, y1)
 
     x_hex = to_hex(x1)
     u_hex = to_hex(u1)    
@@ -655,7 +661,7 @@ def server_1(epoch_date, mpin_id):
     HTID1, HTID1_val = make_octet(G1)
     HID1, HID1_val = make_octet(G1)
   
-    libmpin.MPIN_SERVER_1(epoch_date, mpin_id1, HID1, HTID1)
+    libmpin.MPIN_SERVER_1(HASH_TYPE_MPIN, epoch_date, mpin_id1, HID1, HTID1)
 
     HID_hex = to_hex(HID1)
     HTID_hex = to_hex(HTID1)    
@@ -757,7 +763,7 @@ def server(epoch_date, server_secret, u, ut, v, mpin_id, message, epoch_time):
     f1, f1_val = make_octet(GT)
     y1, y1_val = make_octet(PGS)
   
-    error_code = libmpin.MPIN_SERVER(epoch_date, HID1, HTID1, y1, server_secret1, u1, ut1, v1, e1, f1, mpin_id1, message1, epoch_time)
+    error_code = libmpin.MPIN_SERVER(HASH_TYPE_MPIN, epoch_date, HID1, HTID1, y1, server_secret1, u1, ut1, v1, e1, f1, mpin_id1, message1, epoch_time)
 
     HID_hex = to_hex(HID1)
     HTID_hex = to_hex(HTID1)    
@@ -825,7 +831,7 @@ def hash_all(hash_mpin_id, u, ut, v, y, r, w):
     w1, w1_val = make_octet(None,w)
     
     hm1, hm1_val = make_octet(HASH_BYTES)  
-    libmpin.MPIN_HASH_ALL(hash_mpin_id1,u1,ut1,v1,y1,r1,w1,hm1)
+    libmpin.MPIN_HASH_ALL(HASH_TYPE_MPIN,hash_mpin_id1,u1,ut1,v1,y1,r1,w1,hm1)
 
     hm_hex = to_hex(hm1)
     return hm_hex.decode("hex")
@@ -860,7 +866,7 @@ def client_key(pc1, pc2, pin, r, x, hm, t):
     hm1, hm1_val = make_octet(None,hm)
     t1, t1_val = make_octet(None,t)    
     client_aes_key1, client_aes_key_val1 = make_octet(PAS)
-    error_code = libmpin.MPIN_CLIENT_KEY(pc11, pc21, pin, r1, x1, hm1, t1, client_aes_key1)
+    error_code = libmpin.MPIN_CLIENT_KEY(HASH_TYPE_MPIN, pc11, pc21, pin, r1, x1, hm1, t1, client_aes_key1)
 
     client_aes_key_hex = to_hex(client_aes_key1)
     return error_code, client_aes_key_hex.decode("hex")
@@ -902,7 +908,7 @@ def server_key(z, server_secret, w, hm, HID, u, ut):
     u1, u1_val = make_octet(None,u)
     
     server_aes_key1, server_aes_key1_val = make_octet(PAS)
-    error_code = libmpin.MPIN_SERVER_KEY(z1, server_secret1, w1, hm1, HID1, u1, ut1, server_aes_key1)
+    error_code = libmpin.MPIN_SERVER_KEY(HASH_TYPE_MPIN, z1, server_secret1, w1, hm1, HID1, u1, ut1, server_aes_key1)
 
     server_aes_key_hex = to_hex(server_aes_key1)
     return error_code, server_aes_key_hex.decode("hex")

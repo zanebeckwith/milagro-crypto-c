@@ -21,25 +21,11 @@ under the License.
 
 #include "amcl.h"
 
-#define P_MBITS MODBYTES*8
-#define P_MB (P_MBITS%BASEBITS)
-#define P_OMASK ((chunk)(-1)<<(P_MBITS%BASEBITS))
-#define P_EXCESS(a) ((a[NLEN-1]&P_OMASK)>>(P_MB))
-#define P_FEXCESS ((chunk)1<<(BASEBITS*NLEN-P_MBITS))
+#define P_MBITS (MODBYTES*8)
 #define P_TBITS (P_MBITS%BASEBITS)
+#define P_EXCESS(a) ((a[NLEN-1])>>(P_TBITS))
+#define P_FEXCESS ((chunk)1<<(BASEBITS*NLEN-P_MBITS))
 
-/* set x = x mod 2^m */
-static void BIG_mod2m(BIG x,int m)
-{
-    int i,wd,bt;
-    chunk msk;
-//	if (m>=MODBITS) return;
-    wd=m/BASEBITS;
-    bt=m%BASEBITS;
-    msk=((chunk)1<<bt)-1;
-    x[wd]&=msk;
-    for (i=wd+1; i<NLEN; i++) x[i]=0;
-}
 
 /* Arazi and Qi inversion mod 256 */
 static int invmod256(int a)
@@ -82,39 +68,45 @@ static int invmod256(int a)
     return U;
 }
 
-/* a=1/a mod 2^256. This is very fast! */
+/* a=1/a mod 2^BIGBITS. This is very fast! */
 void BIG_invmod2m(BIG a)
 {
     int i;
     BIG U,t1,b,c;
     BIG_zero(U);
     BIG_inc(U,invmod256(BIG_lastbits(a,8)));
-
-    for (i=8; i<256; i<<=1)
+    for (i=8; i<BIGBITS; i<<=1)
     {
         BIG_copy(b,a);
         BIG_mod2m(b,i);   // bottom i bits of a
+
         BIG_smul(t1,U,b);
         BIG_shr(t1,i); // top i bits of U*b
+
         BIG_copy(c,a);
         BIG_shr(c,i);
         BIG_mod2m(c,i); // top i bits of a
+
         BIG_smul(b,U,c);
         BIG_mod2m(b,i);  // bottom i bits of U*c
+
         BIG_add(t1,t1,b);
         BIG_smul(b,t1,U);
         BIG_copy(t1,b);  // (t1+b)*U
-
         BIG_mod2m(t1,i);				// bottom i bits of (t1+b)*U
 
         BIG_one(b);
         BIG_shl(b,i);
         BIG_sub(t1,b,t1);
         BIG_norm(t1);
+
         BIG_shl(t1,i);
+
         BIG_add(U,U,t1);
     }
     BIG_copy(a,U);
+    BIG_norm(a);
+    BIG_mod2m(a,BIGBITS);
 }
 
 /*
@@ -181,7 +173,7 @@ int FF_iszilch(BIG x[],int n)
     return 1;
 }
 
-/* shift right by 256-bit words */
+/* shift right by BIGBITS-bit words */
 static void FF_shrw(BIG a[],int n)
 {
     int i;
@@ -192,7 +184,7 @@ static void FF_shrw(BIG a[],int n)
     }
 }
 
-/* shift left by 256-bit words */
+/* shift left by BIGBITS-bit words */
 static void FF_shlw(BIG a[],int n)
 {
     int i;
@@ -230,7 +222,7 @@ void FF_init(BIG x[],sign32 m,int n)
     int i;
     BIG_zero(x[0]);
 #if CHUNK<64
-    x[0][0]=(chunk)(m&MASK);
+    x[0][0]=(chunk)(m&BMASK);
     x[0][1]=(chunk)(m>>BASEBITS);
 #else
     x[0][0]=(chunk)m;
@@ -268,12 +260,14 @@ static void FF_rinc(BIG z[],int zp,BIG y[],int yp,int n)
 }
 
 /* recursive sub */
-/* static void FF_rsub(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n) */
-/* { */
-/* 	int i; */
-/* 	for (i=0;i<n;i++) */
-/* 		BIG_sub(z[zp+i],x[xp+i],y[yp+i]); */
-/* } */
+/*
+static void FF_rsub(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n)
+{
+	int i;
+	for (i=0;i<n;i++)
+		BIG_sub(z[zp+i],x[xp+i],y[yp+i]);
+}
+*/
 
 /* recursive dec */
 static void FF_rdec(BIG z[],int zp,BIG y[],int yp,int n)
@@ -326,6 +320,7 @@ static void FF_rnorm(BIG z[],int zp,int n)
     for (i=0; i<n-1; i++)
     {
         carry=BIG_norm(z[zp+i]);
+
         z[zp+i][NLEN-1]^=carry<<P_TBITS; /* remove it */
         z[zp+i+1][0]+=carry;
     }
@@ -373,7 +368,18 @@ void FF_output(BIG x[],int n)
     FF_norm(x,n);
     for (i=n-1; i>=0; i--)
     {
-        BIG_output(x[i]);// printf(" ");
+        BIG_output(x[i]);
+        printf(" ");
+    }
+}
+
+void FF_rawoutput(BIG x[],int n)
+{
+    int i;
+    for (i=n-1; i>=0; i--)
+    {
+        BIG_rawoutput(x[i]);
+        printf(" ");
     }
 }
 
@@ -413,19 +419,16 @@ static void FF_karmul(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,BIG t[],int t
     if (n==1)
     {
         BIG_mul(t[tp],x[xp],y[yp]);
-        BIG_split(z[zp+1],z[zp],t[tp],256);
+        BIG_split(z[zp+1],z[zp],t[tp],BIGBITS);
         return;
     }
 
     nd2=n/2;
     FF_radd(z,zp,x,xp,x,xp+nd2,nd2);
-#if CHUNK<64
     FF_rnorm(z,zp,nd2);  /* needs this if recursion level too deep */
-#endif
+
     FF_radd(z,zp+nd2,y,yp,y,yp+nd2,nd2);
-#if CHUNK<64
     FF_rnorm(z,zp+nd2,nd2);
-#endif
     FF_karmul(t,tp,z,zp,z,zp+nd2,t,tp+n,nd2);
     FF_karmul(z,zp,x,xp,y,yp,t,tp+n,nd2);
     FF_karmul(z,zp+n,x,xp+nd2,y,yp+nd2,t,tp+n,nd2);
@@ -441,7 +444,7 @@ static void FF_karsqr(BIG z[],int zp,BIG x[],int xp,BIG t[],int tp,int n)
     if (n==1)
     {
         BIG_sqr(t[tp],x[xp]);
-        BIG_split(z[zp+1],z[zp],t[tp],256);
+        BIG_split(z[zp+1],z[zp],t[tp],BIGBITS);
         return;
     }
     nd2=n/2;
@@ -461,13 +464,10 @@ static void FF_karmul_lower(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,BIG t[]
     if (n==1)
     {
         /* only calculate bottom half of product */
-        //	BIG_mul(d,x[xp],y[yp]);
-        //	BIG_split(z[zp],z[zp],d,256);
         BIG_smul(z[zp],x[xp],y[yp]);
         return;
     }
     nd2=n/2;
-
     FF_karmul(z,zp,x,xp,y,yp,t,tp+n,nd2);
     FF_karmul_lower(t,tp,x,xp+nd2,y,yp,t,tp+n,nd2);
     FF_rinc(z,zp+nd2,t,tp,nd2);
@@ -506,6 +506,8 @@ void FF_mul(BIG z[],BIG x[],BIG y[],int n)
 #else
     BIG t[2*n];
 #endif
+//	FF_norm(x,n); /* change here */
+//	FF_norm(y,n); /* change here */
     FF_karmul(z,0,x,0,y,0,t,0,n);
 }
 
@@ -517,6 +519,8 @@ static void FF_lmul(BIG z[],BIG x[],BIG y[],int n)
 #else
     BIG t[2*n];
 #endif
+//	FF_norm(x,n); /* change here */
+//	FF_norm(y,n); /* change here */
     FF_karmul_lower(z,0,x,0,y,0,t,0,n);
 }
 
@@ -555,6 +559,7 @@ void FF_sqr(BIG z[],BIG x[],int n)
 #else
     BIG t[2*n];
 #endif
+//	FF_norm(x,n); /* change here */
     FF_karsqr(z,0,x,0,t,0,n);
 }
 
@@ -570,8 +575,10 @@ static void FF_reduce(BIG r[],BIG T[],BIG N[],BIG ND[],int n)
     BIG m[n];
 #endif
     FF_sducopy(r,T,n);  /* keep top half of T */
+    //FF_norm(T,n); /* change here */
     FF_karmul_lower(m,0,T,0,ND,0,t,0,n);  /* m=T.(1/N) mod R */
 
+    //FF_norm(N,n);  /* change here */
     FF_karmul_upper(T,N,m,t,n);  /* T=mN */
     FF_sducopy(m,T,n);
 
@@ -597,11 +604,10 @@ void FF_dmod(BIG r[],BIG a[],BIG b[],int n)
     FF_copy(x,a,2*n);
     FF_norm(x,2*n);
     FF_dsucopy(m,b,n);
-    k=256*n;
+    k=BIGBITS*n;
 
     while (k>0)
     {
-        //	len=2*n-((256*n-k)/256);  // reduce length as numbers get smaller?
         FF_shr(m,2*n);
 
         if (FF_comp(x,m,2*n)>=0)
@@ -719,12 +725,16 @@ static void FF_invmod2m(BIG U[],BIG a[],int n)
 #ifndef C99
     BIG t1[FFLEN],b[FFLEN],c[FFLEN];
 #else
-    BIG t1[n],b[n],c[n];
+    BIG t1[2*n],b[n],c[n];
 #endif
+
     FF_zero(U,n);
+    FF_zero(b,n);
+    FF_zero(c,n);
+    FF_zero(t1,2*n);
+
     BIG_copy(U[0],a[0]);
     BIG_invmod2m(U[0]);
-
     for (i=1; i<n; i<<=1)
     {
         FF_copy(b,a,i);
@@ -745,6 +755,7 @@ static void FF_invmod2m(BIG U[],BIG a[],int n)
         FF_shlw(t1,i);
         FF_add(U,U,t1,2*i);
     }
+
     FF_norm(U,n);
 }
 
@@ -784,13 +795,14 @@ static void FF_modmul(BIG z[],BIG x[],BIG y[],BIG p[],BIG ND[],int n)
 #endif
     chunk ex=P_EXCESS(x[n-1]);
     chunk ey=P_EXCESS(y[n-1]);
-    if ((ex+1)*(ey+1)+1>=P_FEXCESS)
+    if ((ex+1)>=(P_FEXCESS-1)/(ey+1))
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d %d\n",ex,ey);
 #endif
         FF_mod(x,p,n);
     }
+
     FF_mul(d,x,y,n);
     FF_reduce(z,d,p,ND,n);
 }
@@ -803,7 +815,7 @@ static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
     BIG d[2*n];
 #endif
     chunk ex=P_EXCESS(x[n-1]);
-    if ((ex+1)*(ex+1)+1>=P_FEXCESS)
+    if ((ex+1)>=(P_FEXCESS-1)/(ex+1))
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ex);
@@ -832,7 +844,7 @@ void FF_skpow(BIG r[],BIG x[],BIG e[],BIG p[],int n)
 
     for (i=8*MODBYTES*n-1; i>=0; i--)
     {
-        b=BIG_bit(e[i/256],i%256);
+        b=BIG_bit(e[i/BIGBITS],i%BIGBITS);
         FF_modmul(r,R0,R1,p,ND,n);
 
         FF_cswap(R0,R1,b,n);
@@ -916,14 +928,16 @@ void FF_pow(BIG r[],BIG x[],BIG e[],BIG p[],int n)
     BIG w[n],ND[n];
 #endif
     FF_invmod2m(ND,p,n);
+
     FF_copy(w,x,n);
     FF_one(r,n);
     FF_nres(r,p,n);
     FF_nres(w,p,n);
+
     for (i=8*MODBYTES*n-1; i>=0; i--)
     {
         FF_modsqr(r,r,p,ND,n);
-        b=BIG_bit(e[i/256],i%256);
+        b=BIG_bit(e[i/BIGBITS],i%BIGBITS);
         if (b==1) FF_modmul(r,r,w,p,ND,n);
     }
     FF_redc(r,p,ND,n);
@@ -938,7 +952,9 @@ void FF_pow2(BIG r[],BIG x[],BIG e,BIG y[],BIG f,BIG p[],int n)
 #else
     BIG xn[n],yn[n],xy[n],ND[n];
 #endif
+
     FF_invmod2m(ND,p,n);
+
     FF_copy(xn,x,n);
     FF_copy(yn,y,n);
     FF_nres(xn,p,n);
@@ -1003,7 +1019,6 @@ int FF_cfactor(BIG w[],sign32 s,int n)
     g=(sign32)x[0][0];
 #endif
     r=igcd(s,g);
-//printf("r= %d\n",r);
     if (r>1) return 1;
     return 0;
 }
@@ -1020,13 +1035,13 @@ int FF_prime(BIG p[],csprng *rng,int n)
     sign32 sf=4849845;/* 3*5*.. *19 */
 
     FF_norm(p,n);
+
     if (FF_cfactor(p,sf,n)) return 0;
 
     FF_one(unity,n);
     FF_sub(nm1,p,unity,n);
     FF_norm(nm1,n);
     FF_copy(d,nm1,n);
-
     while (FF_parity(d)==0)
     {
         FF_shr(d,n);
@@ -1053,6 +1068,7 @@ int FF_prime(BIG p[],csprng *rng,int n)
         if (loop) continue;
         return 0;
     }
+
     return 1;
 }
 

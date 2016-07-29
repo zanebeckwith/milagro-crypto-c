@@ -320,9 +320,10 @@ int ECP_set(ECP *P,BIG x,BIG y)
     BIG_copy(y2,y);
 
     FP_nres(y2);
-
     FP_sqr(y2,y2);
     FP_reduce(y2);
+
+
 
     BIG_copy(rhs,x);
     FP_nres(rhs);
@@ -579,9 +580,9 @@ void ECP_dbl(ECP *P)
 
     BIG_imul(w3,w3,4);
     FP_neg(w1,w3);
-#if CHUNK<64
+
     BIG_norm(w1);
-#endif
+
     FP_sqr(P->x,w8);
     FP_add(P->x,P->x,w1);
     FP_add(P->x,P->x,w1);
@@ -599,9 +600,7 @@ void ECP_dbl(ECP *P)
     FP_add(w2,w2,w2);
     FP_sub(w3,w3,P->x);
     FP_mul(P->y,w8,w3);
-//#if CHUNK<64
-//	BIG_norm(w2);
-//#endif
+
     FP_sub(P->y,P->y,w2);
 
     BIG_norm(P->y);
@@ -620,9 +619,9 @@ void ECP_dbl(ECP *P)
     if (CURVE_A==1) BIG_copy(E,C);
     if (CURVE_A==-1) FP_neg(E,C);
     FP_add(F,E,D);
-#if CHUNK<64
+
     BIG_norm(F);
-#endif
+
     FP_sqr(H,P->z);
     FP_add(H,H,H);
     FP_sub(J,F,H);
@@ -646,9 +645,6 @@ void ECP_dbl(ECP *P)
     FP_sub(B,P->x,P->z);
     FP_sqr(BB,B);
     FP_sub(C,AA,BB);
-//#if CHUNK<64
-//	BIG_norm(C);
-//#endif
 
     FP_mul(P->x,AA,BB);
     FP_imul(A,C,(CURVE_A+2)/4);
@@ -790,9 +786,8 @@ void ECP_add(ECP *P,ECP *Q)
     FP_sub(F,B,E);
     FP_add(G,B,E);
 
-    FP_add(C,C,D);
-
     if (CURVE_A==1) FP_sub(E,D,C);
+    FP_add(C,C,D);
 
     FP_add(B,P->x,P->y);
     FP_add(D,Q->x,Q->y);
@@ -953,6 +948,9 @@ void ECP_mul(ECP *P,BIG e)
 
     ECP_copy(&Q,P);
     ECP_dbl(&Q);
+
+//printf("Q= ");ECP_output(&Q); printf("\n");
+
     ECP_copy(&W[0],P);
 
     for (i=1; i<8; i++)
@@ -960,6 +958,8 @@ void ECP_mul(ECP *P,BIG e)
         ECP_copy(&W[i],&W[i-1]);
         ECP_add(&W[i],&Q);
     }
+
+//printf("W[1]= ");ECP_output(&W[1]); printf("\n");
 
     /* convert the table to affine */
 #if CURVETYPE==WEIERSTRASS

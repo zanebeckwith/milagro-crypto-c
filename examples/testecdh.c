@@ -66,7 +66,7 @@ int main()
     RAW.val[3]=ran>>24;
     for (i=0; i<100; i++) RAW.val[i]=i;
 
-    ECP_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
+    ECC_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
 //for (j=0;j<100;j++)
 //{
@@ -80,13 +80,16 @@ int main()
 
     /* private key S0 of size EGS bytes derived from Password and Salt */
 
-    ECP_PBKDF2(&PW,&SALT,1000,EGS,&S0);
+    PBKDF2(HASH_TYPE_ECC,&PW,&SALT,1000,EGS,&S0);
+
     printf("Alices private key= 0x");
     OCT_output(&S0);
 
     /* Generate Key pair S/W */
 
     ECP_KEY_PAIR_GENERATE(NULL,&S0,&W0);
+    printf("Alices public key= 0x");
+    OCT_output(&W0);
 
     res=ECP_PUBLIC_KEY_VALIDATE(1,&W0);
     if (res!=0)
@@ -94,9 +97,6 @@ int main()
         printf("ECP Public Key is invalid!\n");
         return 0;
     }
-
-    printf("Alice's public key= 0x");
-    OCT_output(&W0);
 
     /* Random private key for other party */
     ECP_KEY_PAIR_GENERATE(&RNG,&S1,&W1);
@@ -113,8 +113,8 @@ int main()
 
     /* Calculate common key using DH - IEEE 1363 method */
 
-    ECP_SVDP_DH(&S0,&W1,&Z0);
-    ECP_SVDP_DH(&S1,&W0,&Z1);
+    ECPSVDP_DH(&S0,&W1,&Z0);
+    ECPSVDP_DH(&S1,&W0,&Z1);
 
     if (!OCT_comp(&Z0,&Z1))
     {
@@ -122,12 +122,14 @@ int main()
         return 0;
     }
 
-    ECP_KDF2(&Z0,NULL,EAS,&KEY);
+    KDF2(HASH_TYPE_ECC,&Z0,NULL,EAS,&KEY);
 
     printf("Alice's DH Key=  0x");
     OCT_output(&KEY);
     printf("Servers DH Key=  0x");
     OCT_output(&KEY);
+
+#if CURVETYPE != MONTGOMERY
 
     printf("Testing ECIES\n");
 
@@ -144,7 +146,7 @@ int main()
     M.len=17;
     for (i=0; i<=16; i++) M.val[i]=i;
 
-    ECP_ECIES_ENCRYPT(&P1,&P2,&RNG,&W1,&M,12,&V,&C,&T);
+    ECP_ECIES_ENCRYPT(HASH_TYPE_ECC,&P1,&P2,&RNG,&W1,&M,12,&V,&C,&T);
 
     printf("Ciphertext= \n");
     printf("V= 0x");
@@ -154,7 +156,7 @@ int main()
     printf("T= 0x");
     OCT_output(&T);
 
-    if (!ECP_ECIES_DECRYPT(&P1,&P2,&V,&C,&T,&S1,&M))
+    if (!ECP_ECIES_DECRYPT(HASH_TYPE_ECC,&P1,&P2,&V,&C,&T,&S1,&M))
     {
         printf("*** ECIES Decryption Failed\n");
         return 0;
@@ -167,7 +169,7 @@ int main()
 
     printf("Testing ECDSA\n");
 
-    if (ECP_SP_DSA(&RNG,&S0,&M,&CS,&DS)!=0)
+    if (ECPSP_DSA(HASH_TYPE_ECC,&RNG,&S0,&M,&CS,&DS)!=0)
     {
         printf("***ECDSA Signature Failed\n");
         return 0;
@@ -178,7 +180,7 @@ int main()
     printf("Signature D = 0x");
     OCT_output(&DS);
 
-    if (ECP_VP_DSA(&W0,&M,&CS,&DS)!=0)
+    if (ECPVP_DSA(HASH_TYPE_ECC,&W0,&M,&CS,&DS)!=0)
     {
         printf("***ECDSA Verification Failed\n");
         return 0;
@@ -186,7 +188,9 @@ int main()
     else printf("ECDSA Signature/Verification succeeded %d\n",j);
 //}
 //printf("Test Completed Successfully\n");
-    ECP_KILL_CSPRNG(&RNG);
+
+#endif
+    ECC_KILL_CSPRNG(&RNG);
 
     return 0;
 }

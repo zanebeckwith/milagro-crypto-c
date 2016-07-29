@@ -73,22 +73,35 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Select word length
-set(WORD_LENGTH "32" CACHE STRING "Word length. See amcl.h.in for explanation")
+set(WORD_LENGTH "32" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
 set(Word_Length_Values "16;32;64")
 set_property(CACHE WORD_LENGTH PROPERTY STRINGS ${Word_Length_Values})
 message(STATUS "WORD_LENGTH='${WORD_LENGTH}'")
 
 # Select Field
-set(FIELD_CHOICE "BNCX" CACHE STRING "Choice of Field. See amcl.h.in for explanation")
-set(Field_Values "BN;BNCX;BNT;BNT2;NIST;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256")
+set(FIELD_CHOICE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h.in for explanation")
+set(Field_Values "NIST256;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN_CURVES;BN454;BN646;BN254;BN254_CX;BN254_T;BN254_T2;BLS_CURVES;BLS455")
 set_property(CACHE FIELD_CHOICE PROPERTY STRINGS ${Field_Values})
 message(STATUS "FIELD_CHOICE='${FIELD_CHOICE}'")
 
 # Select Curve type
-set(CURVE_TYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See amcl.h.in for explanation")
+set(CURVE_TYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See ./include/amcl.h.in for explanation")
 set(Curve_Values "WEIERSTRASS;EDWARDS;MONTGOMERY")
 set_property(CACHE CURVE_TYPE PROPERTY STRINGS ${Curve_Values})
 message(STATUS "CURVE_TYPE='${CURVE_TYPE}'")
+
+# Select Finite field support
+set(FF_LEN "8" CACHE STRING "Finite field support. See ./include/amcl.h.in for explanation")
+set(ff_len_values "4;8;16")
+set_property(CACHE FF_LEN PROPERTY STRINGS ${ff_Len_values})
+message(STATUS "FF_LEN='${FF_LEN}'")
+
+# configure arch header file to pass CMake settings
+# to the source code
+configure_file (
+  "${PROJECT_SOURCE_DIR}/include/arch.h.in"
+  "${PROJECT_BINARY_DIR}/include/arch.h"
+  )
 
 # configure amcl header file to pass CMake settings
 # to the source code
@@ -140,10 +153,10 @@ if (BUILD_PYTHON)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; from os.path import dirname; print dirname(get_python_lib())" OUTPUT_VARIABLE PYTHON_SITE_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  if((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
-    file(COPY "${PROJECT_SOURCE_DIR}/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
-    file(RENAME "${PROJECT_BINARY_DIR}/wrappers/python/BNCX.json" "${PROJECT_BINARY_DIR}/wrappers/python/MPINTestVectors.json")
-  endif((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
+  if((FIELD_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
+    file(COPY "${PROJECT_SOURCE_DIR}/testVectors/mpin/BN254_CX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
+    file(RENAME "${PROJECT_BINARY_DIR}/wrappers/python/BN254_CX.json" "${PROJECT_BINARY_DIR}/wrappers/python/MPINTestVectors.json")
+  endif((FIELD_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
   add_subdirectory (wrappers/python)
 endif (BUILD_PYTHON)
 

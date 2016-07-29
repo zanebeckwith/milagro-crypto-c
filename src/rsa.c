@@ -17,7 +17,6 @@ specific language governing permissions and limitations
 under the License.
 */
 
-
 /* RSA Functions - see main program below */
 
 #include <stdio.h>
@@ -30,29 +29,84 @@ under the License.
 #define ROUNDUP(a,b) ((a)-1)/(b)+1
 
 /* general purpose hash function w=hash(p|n|x|y) */
-static void hashit(octet *p,int n,octet *w)
+static int hashit(int sha,octet *p,int n,octet *w)
 {
-    int i,c[4];
-    amcl_hash sha;
-    char hh[32];
+    int i,c[4],hlen;
+    hash256 sha256;
+    hash512 sha512;
+    char hh[64];
 
-    HASH_init(&sha);
-    if (p!=NULL)
-        for (i=0; i<p->len; i++) HASH_process(&sha,p->val[i]);
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_init(&sha256);
+        break;
+    case SHA384:
+        HASH384_init(&sha512);
+        break;
+    case SHA512:
+        HASH512_init(&sha512);
+        break;
+    }
+
+    hlen=sha;
+
+    if (p!=NULL) for (i=0; i<p->len; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,p->val[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,p->val[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,p->val[i]);
+                break;
+            }
+        }
     if (n>=0)
     {
         c[0]=(n>>24)&0xff;
         c[1]=(n>>16)&0xff;
         c[2]=(n>>8)&0xff;
         c[3]=(n)&0xff;
-        for (i=0; i<4; i++) HASH_process(&sha,c[i]);
+        for (i=0; i<4; i++)
+        {
+            switch(sha)
+            {
+            case SHA256:
+                HASH256_process(&sha256,c[i]);
+                break;
+            case SHA384:
+                HASH384_process(&sha512,c[i]);
+                break;
+            case SHA512:
+                HASH512_process(&sha512,c[i]);
+                break;
+            }
+        }
     }
 
-    HASH_hash(&sha,hh);
+    switch (sha)
+    {
+    case SHA256:
+        HASH256_hash(&sha256,hh);
+        break;
+    case SHA384:
+        HASH384_hash(&sha512,hh);
+        break;
+    case SHA512:
+        HASH512_hash(&sha512,hh);
+        break;
+    }
 
     OCT_empty(w);
-    OCT_jbytes(w,hh,32);
-    for (i=0; i<32; i++) hh[i]=0;
+    OCT_jbytes(w,hh,hlen);
+    for (i=0; i<hlen; i++) hh[i]=0;
+
+    return hlen;
 }
 
 /* Initialise a Cryptographically Strong Random Number Generator from
@@ -72,7 +126,6 @@ void RSA_KILL_CSPRNG(csprng *RNG)
 void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB)
 {
     /* IEEE1363 A16.11/A16.12 more or less */
-
     BIG t[HFLEN],p1[HFLEN],q1[HFLEN];
 
     for (;;)
@@ -128,42 +181,74 @@ void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB
 
 /* Mask Generation Function */
 
-void MGF1(octet *z,int olen,octet *mask)
+void MGF1(int sha,octet *z,int olen,octet *mask)
 {
-    char h[32];
+    char h[64];
     octet H= {0,sizeof(h),h};
-    int hlen=32;
+    int hlen=sha;
     int counter,cthreshold;
 
     OCT_empty(mask);
 
     cthreshold=ROUNDUP(olen,hlen);
-
     for (counter=0; counter<cthreshold; counter++)
     {
-        hashit(z,counter,&H);
+        hashit(sha,z,counter,&H);
         if (mask->len+hlen>olen) OCT_jbytes(mask,H.val,olen%hlen);
         else                     OCT_joctet(mask,&H);
     }
     OCT_clear(&H);
 }
 
+/* SHAXXX identifier strings */
+const char SHA256ID[]= {0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01,0x05,0x00,0x04,0x20};
+const char SHA384ID[]= {0x30,0x41,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x02,0x05,0x00,0x04,0x30};
+const char SHA512ID[]= {0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x03,0x05,0x00,0x04,0x40};
+
+/* PKCS 1.5 padding of a message to be signed */
+
+int PKCS15(int sha,octet *m,octet *w)
+{
+    int olen=FF_BITS/8;
+    int hlen=sha;
+    int idlen=19;
+    char h[64];
+    octet H= {0,sizeof(h),h};
+
+    if (olen<idlen+hlen+10) return 0;
+    hashit(sha,m,-1,&H);
+
+    OCT_empty(w);
+    OCT_jbyte(w,0x00,1);
+    OCT_jbyte(w,0x01,1);
+    OCT_jbyte(w,0xff,olen-idlen-hlen-3);
+    OCT_jbyte(w,0x00,1);
+
+    if (hlen==32) OCT_jbytes(w,(char *)SHA256ID,idlen);
+    if (hlen==48) OCT_jbytes(w,(char *)SHA384ID,idlen);
+    if (hlen==64) OCT_jbytes(w,(char *)SHA512ID,idlen);
+
+    OCT_joctet(w,&H);
+
+    return 1;
+}
+
 /* OAEP Message Encoding for Encryption */
 
-int RSA_OAEP_ENCODE(octet *m,csprng *RNG,octet *p,octet *f)
+int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
 {
     int slen,olen=RFS-1;
     int mlen=m->len;
     int hlen,seedlen;
-    char dbmask[RFS],seed[32];
+    char dbmask[RFS],seed[64];
     octet DBMASK= {0,sizeof(dbmask),dbmask};
     octet SEED= {0,sizeof(seed),seed};
 
-    hlen=seedlen=32;
+    hlen=seedlen=sha;
     if (mlen>olen-hlen-seedlen-1) return 0;
     if (m==f) return 0;  /* must be distinct octets */
 
-    hashit(p,-1,f);
+    hashit(sha,p,-1,f);
 
     slen=olen-mlen-hlen-seedlen-1;
 
@@ -173,10 +258,10 @@ int RSA_OAEP_ENCODE(octet *m,csprng *RNG,octet *p,octet *f)
 
     OCT_rand(&SEED,RNG,seedlen);
 
-    MGF1(&SEED,olen-seedlen,&DBMASK);
+    MGF1(sha,&SEED,olen-seedlen,&DBMASK);
 
     OCT_xor(&DBMASK,f);
-    MGF1(&DBMASK,seedlen,f);
+    MGF1(sha,&DBMASK,seedlen,f);
 
     OCT_xor(f,&SEED);
 
@@ -191,29 +276,29 @@ int RSA_OAEP_ENCODE(octet *m,csprng *RNG,octet *p,octet *f)
 
 /* OAEP Message Decoding for Decryption */
 
-int RSA_OAEP_DECODE(octet *p,octet *f)
+int OAEP_DECODE(int sha,octet *p,octet *f)
 {
     int comp,x,t;
     int i,k,olen=RFS-1;
     int hlen,seedlen;
-    char dbmask[RFS],seed[32],chash[32];;
+    char dbmask[RFS],seed[64],chash[64];
     octet DBMASK= {0,sizeof(dbmask),dbmask};
     octet SEED= {0,sizeof(seed),seed};
     octet CHASH= {0,sizeof(chash),chash};
 
-    seedlen=hlen=32;;
+    seedlen=hlen=sha;
     if (olen<seedlen+hlen+1) return 0;
     if (!OCT_pad(f,olen+1)) return 0;
-    hashit(p,-1,&CHASH);
+    hashit(sha,p,-1,&CHASH);
 
     x=f->val[0];
     for (i=seedlen; i<olen; i++)
         DBMASK.val[i-seedlen]=f->val[i+1];
     DBMASK.len=olen-seedlen;
 
-    MGF1(&DBMASK,seedlen,&SEED);
+    MGF1(sha,&DBMASK,seedlen,&SEED);
     for (i=0; i<seedlen; i++) SEED.val[i]^=f->val[i+1];
-    MGF1(&SEED,olen-seedlen,f);
+    MGF1(sha,&SEED,olen-seedlen,f);
     OCT_xor(&DBMASK,f);
 
     comp=OCT_ncomp(&CHASH,&DBMASK,hlen);

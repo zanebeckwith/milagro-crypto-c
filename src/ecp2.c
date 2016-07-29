@@ -322,9 +322,9 @@ int ECP2_dbl(ECP2 *P)
     FP2_imul(&w3,&w3,4);
 
     FP2_neg(&w1,&w3);
-#if CHUNK<64
+
     FP2_norm(&w1);
-#endif
+
     FP2_sqr(&(P->x),&w8);
     FP2_add(&(P->x),&(P->x),&w1);
     FP2_add(&(P->x),&(P->x),&w1);
@@ -342,9 +342,7 @@ int ECP2_dbl(ECP2 *P)
     FP2_sub(&w3,&w3,&(P->x));
 
     FP2_mul(&(P->y),&w8,&w3);
-//#if CHUNK<64
-//	FP2_norm(&w2);
-//#endif
+
     FP2_sub(&(P->y),&(P->y),&w2);
 
 
