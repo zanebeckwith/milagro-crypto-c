@@ -58,10 +58,10 @@ int main()
     H.len=lenH;
     IV.len=lenIV;
 
-    hex2bytes(MT, m);
-    hex2bytes(HT, h);
-    hex2bytes(NT, iv);
-    hex2bytes(KT, k);
+    OCT_fromHex(&M, MT);
+    OCT_fromHex(&H, HT);
+    OCT_fromHex(&IV, NT);
+    OCT_fromHex(&K, KT);
 
     printf("Plaintext: ");
     OCT_output(&M);
