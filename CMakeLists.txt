@@ -17,6 +17,7 @@ message(STATUS "Generator - ${CMAKE_GENERATOR}")
 # Add options for build
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 option (BUILD_PYTHON "Build Python" OFF)
+option (BUILD_GOLANG "Build Golang" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
 option (BUILD_WCC "Build WCC" OFF)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
@@ -159,6 +160,12 @@ if (BUILD_PYTHON)
   endif((FIELD_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
   add_subdirectory (wrappers/python)
 endif (BUILD_PYTHON)
+
+if (BUILD_GOLANG)
+  set(GO_PATH "$ENV{HOME}/go2" CACHE STRING "GOPATH")
+  message(STATUS "Build Golang: GOPATH='${GO_PATH}'")
+  add_subdirectory (wrappers/go)
+endif (BUILD_GOLANG)
 
 # Build Documentation
 if (BUILD_DOXYGEN)
