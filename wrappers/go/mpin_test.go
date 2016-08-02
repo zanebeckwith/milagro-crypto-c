@@ -28,6 +28,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var HASH_TYPE_MPIN = SHA256
+
 const nIter int = 100
 
 // Set to true if library built with "-D USE_ANONYMOUS=on"
@@ -72,7 +74,7 @@ func TestGoodPIN(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -94,25 +96,25 @@ func TestGoodPIN(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -156,7 +158,7 @@ func TestBadPIN(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -178,25 +180,25 @@ func TestBadPIN(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -240,7 +242,7 @@ func TestBadToken(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -262,26 +264,26 @@ func TestBadToken(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, _, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, _, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Send UT as V to model bad token
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], UT[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], UT[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -322,7 +324,7 @@ func TestRandom(t *testing.T) {
 		_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 		// Either Client or TA calculates Hash(ID)
-		HCID := MPIN_HASH_ID(ID)
+		HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 		// Generate server secret share 1
 		_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -344,25 +346,25 @@ func TestRandom(t *testing.T) {
 		_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 		// Generate time permit share 1
-		_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+		_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 		// Generate time permit share 2
-		_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+		_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 		// Combine time permit shares
 		_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 		// Create token
-		_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+		_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 		// Send U, UT, V, timeValue and Message to server
 		var X [EGS]byte
-		_, _, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+		_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 		if USE_ANONYMOUS {
-			got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+			got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 		} else {
-			got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+			got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 		}
 		assert.Equal(t, want, got, "Should be equal")
 	}
@@ -406,7 +408,7 @@ func TestGoodSignature(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -428,26 +430,26 @@ func TestGoodSignature(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Authenticate
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -490,7 +492,7 @@ func TestSignatureExpired(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -512,27 +514,27 @@ func TestSignatureExpired(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	timeValue += 10
 	// Authenticate
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -575,7 +577,7 @@ func TestBadSignature(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -597,27 +599,27 @@ func TestBadSignature(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Authenticate
 	MESSAGE[0] = 00
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -658,7 +660,7 @@ func TestPINError(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -680,27 +682,27 @@ func TestPINError(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	var E []byte
 	var F []byte
 	if USE_ANONYMOUS {
-		_, _, _, _, E, F = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		_, _, _, _, E, F = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		_, _, _, _, E, F = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		_, _, _, _, E, F = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 
 	got := MPIN_KANGAROO(E[:], F[:])
@@ -743,7 +745,7 @@ func TestMPINFull(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -765,23 +767,23 @@ func TestMPINFull(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Precomputation
 	_, G1, G2 := MPIN_PRECOMPUTE(TOKEN[:], HCID)
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, XOut, _, V, U, UT := MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, XOut, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Send Z=r.ID to Server
 	var R [EGS]byte
@@ -792,9 +794,9 @@ func TestMPINFull(t *testing.T) {
 	var HTID []byte
 	var Y []byte
 	if USE_ANONYMOUS {
-		_, HID, HTID, Y, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		_, HID, HTID, Y, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		_, HID, HTID, Y, _, _ = MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		_, HID, HTID, Y, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 
 	// send T=w.ID to client
@@ -802,15 +804,15 @@ func TestMPINFull(t *testing.T) {
 	_, WOut, T := MPIN_GET_G1_MULTIPLE(&rng, 0, W[:], HTID[:])
 
 	// Hash all values
-	HM := MPIN_HASH_ALL(HCID[:], U[:], UT[:], Y[:], V[:], Z[:], T[:])
+	HM := MPIN_HASH_ALL(HASH_TYPE_MPIN, HCID[:], U[:], UT[:], Y[:], V[:], Z[:], T[:])
 
-	_, AES_KEY_SERVER := MPIN_SERVER_KEY(Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
+	_, AES_KEY_SERVER := MPIN_SERVER_KEY(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
 	got := hex.EncodeToString(AES_KEY_SERVER[:])
 	if got != want {
 		t.Errorf("%s != %s", want, got)
 	}
 
-	_, AES_KEY_CLIENT := MPIN_CLIENT_KEY(PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
+	_, AES_KEY_CLIENT := MPIN_CLIENT_KEY(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
 	got = hex.EncodeToString(AES_KEY_CLIENT[:])
 
 	assert.Equal(t, want, got, "Should be equal")
@@ -846,7 +848,7 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -868,28 +870,28 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
 	var X [EGS]byte
-	_, XOut, SEC, U, UT := MPIN_CLIENT_1(date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+	_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
-		HID, HTID = MPIN_SERVER_1(date, HCID)
+		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
 	} else {
-		HID, HTID = MPIN_SERVER_1(date, ID)
+		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
 	}
 	_, Y := MPIN_RANDOM_GENERATE(&rng)
 
@@ -931,7 +933,7 @@ func TestTwoPassBadPIN(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -953,28 +955,28 @@ func TestTwoPassBadPIN(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
 	var X [EGS]byte
-	_, XOut, SEC, U, UT := MPIN_CLIENT_1(date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+	_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
-		HID, HTID = MPIN_SERVER_1(date, HCID)
+		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
 	} else {
-		HID, HTID = MPIN_SERVER_1(date, ID)
+		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
 	}
 	_, Y := MPIN_RANDOM_GENERATE(&rng)
 
@@ -1016,7 +1018,7 @@ func TestTwoPassBadToken(t *testing.T) {
 	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(ID)
+	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -1038,28 +1040,28 @@ func TestTwoPassBadToken(t *testing.T) {
 	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
 	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
 	var X [EGS]byte
-	_, XOut, SEC, U, UT := MPIN_CLIENT_1(date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+	_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
-		HID, HTID = MPIN_SERVER_1(date, HCID)
+		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
 	} else {
-		HID, HTID = MPIN_SERVER_1(date, ID)
+		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
 	}
 	_, Y := MPIN_RANDOM_GENERATE(&rng)
 
@@ -1101,7 +1103,7 @@ func TestRandomTwoPass(t *testing.T) {
 		_, MS2 := MPIN_RANDOM_GENERATE(&rng)
 
 		// Either Client or TA calculates Hash(ID)
-		HCID := MPIN_HASH_ID(ID)
+		HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 		// Generate server secret share 1
 		_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
@@ -1123,28 +1125,28 @@ func TestRandomTwoPass(t *testing.T) {
 		_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
 
 		// Generate time permit share 1
-		_, TP1 := MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+		_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 		// Generate time permit share 2
-		_, TP2 := MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+		_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 		// Combine time permit shares
 		_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
 
 		// Create token
-		_, TOKEN := MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+		_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 		// Client Pass 1
 		var X [EGS]byte
-		_, XOut, SEC, U, UT := MPIN_CLIENT_1(date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+		_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 		// Server Pass 1
 		var HID []byte
 		var HTID []byte
 		if USE_ANONYMOUS {
-			HID, HTID = MPIN_SERVER_1(date, HCID)
+			HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
 		} else {
-			HID, HTID = MPIN_SERVER_1(date, ID)
+			HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
 		}
 		_, Y := MPIN_RANDOM_GENERATE(&rng)
 

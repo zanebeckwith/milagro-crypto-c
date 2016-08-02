@@ -48,7 +48,7 @@ const GTS = 12 * EFS
 const SHA256 int = 32 
 const SHA384 int = 48
 const SHA512 int = 64
-var HASH_TYPE_MPIN = SHA256
+
 
 func OCT_free(valOctet *C.octet) {
 	C.free(unsafe.Pointer(valOctet.val))
@@ -144,7 +144,7 @@ func MPIN_CREATE_CSPRNG(SEED []byte) (C.csprng) {
         return RNG
 }
 
-func MPIN_HASH_ID(ID []byte) (HASHID []byte) {
+func MPIN_HASH_ID(HASH_TYPE int, ID []byte) (HASHID []byte) {
 	// Form Octets
 	IDStr := string(ID)
 	IDOct := GetOctet(IDStr)
@@ -153,7 +153,7 @@ func MPIN_HASH_ID(ID []byte) (HASHID []byte) {
 	defer OCT_free(&HASHIDOct)
 
 	// Hash MPIN_ID
-	C.MPIN_HASH_ID(C.int(HASH_TYPE_MPIN),&IDOct, &HASHIDOct)
+	C.MPIN_HASH_ID(C.int(HASH_TYPE),&IDOct, &HASHIDOct)
 
 	// Convert octet to bytes
 	HASHID = OCT_toBytes(&HASHIDOct)
@@ -259,7 +259,7 @@ func MPIN_GET_CLIENT_SECRET(S []byte, ID []byte) (errorCode int, CS []byte) {
 }
 
 /* Time Permit TP=S*(date|H(ID)) where S is master secret */
-func MPIN_GET_CLIENT_PERMIT(date int, S, ID []byte) (errorCode int, TP []byte) {
+func MPIN_GET_CLIENT_PERMIT(HASH_TYPE, date int, S, ID []byte) (errorCode int, TP []byte) {
 	// Form Octets
 	SStr := string(S)
 	SOct := GetOctet(SStr)
@@ -270,7 +270,7 @@ func MPIN_GET_CLIENT_PERMIT(date int, S, ID []byte) (errorCode int, TP []byte) {
 	TPOct := GetOctetZero(G1S)
 	defer OCT_free(&TPOct)
 
-	rtn := C.MPIN_GET_CLIENT_PERMIT(C.int(HASH_TYPE_MPIN), C.int(date), &SOct, &IDOct, &TPOct)
+	rtn := C.MPIN_GET_CLIENT_PERMIT(C.int(HASH_TYPE), C.int(date), &SOct, &IDOct, &TPOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -280,7 +280,7 @@ func MPIN_GET_CLIENT_PERMIT(date int, S, ID []byte) (errorCode int, TP []byte) {
 }
 
 /* Extract PIN from CS for identity CID to form TOKEN */
-func MPIN_EXTRACT_PIN(ID []byte, PIN int, CS []byte) (errorCode int, TOKEN []byte) {
+func MPIN_EXTRACT_PIN(HASH_TYPE int, ID []byte, PIN int, CS []byte) (errorCode int, TOKEN []byte) {
 	// Form Octets
 	IDStr := string(ID)
 	IDOct := GetOctet(IDStr)
@@ -289,7 +289,7 @@ func MPIN_EXTRACT_PIN(ID []byte, PIN int, CS []byte) (errorCode int, TOKEN []byt
 	CSOct := GetOctet(CSStr)
 	defer OCT_free(&CSOct)
 
-	rtn := C.MPIN_EXTRACT_PIN(C.int(HASH_TYPE_MPIN), &IDOct, C.int(PIN), &CSOct)
+	rtn := C.MPIN_EXTRACT_PIN(C.int(HASH_TYPE), &IDOct, C.int(PIN), &CSOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -300,7 +300,7 @@ func MPIN_EXTRACT_PIN(ID []byte, PIN int, CS []byte) (errorCode int, TOKEN []byt
 
 
 /* One pass MPIN Client. Using C RNG */
-func MPIN_CLIENT(date int, ID []byte, RNG *C.csprng, X []byte, PIN int, TOKEN []byte, TP []byte, MESSAGE []byte, TimeValue int) (errorCode int, XOut, Y, SEC, U, UT []byte) {
+func MPIN_CLIENT(HASH_TYPE, date int, ID []byte, RNG *C.csprng, X []byte, PIN int, TOKEN []byte, TP []byte, MESSAGE []byte, TimeValue int) (errorCode int, XOut, Y, SEC, U, UT []byte) {
 	// Form Octets
 	IDStr := string(ID)
 	IDOct := GetOctet(IDStr)
@@ -327,7 +327,7 @@ func MPIN_CLIENT(date int, ID []byte, RNG *C.csprng, X []byte, PIN int, TOKEN []
 	YOct := GetOctetZero(EGS)
 	defer OCT_free(&YOct)
 
-	rtn := C.MPIN_CLIENT(C.int(HASH_TYPE_MPIN), C.int(date), &IDOct, RNG, &XOct, C.int(PIN), &TOKENOct, &SECOct, &UOct, &UTOct, &TPOct, &MESSAGEOct, C.int(TimeValue), &YOct)
+	rtn := C.MPIN_CLIENT(C.int(HASH_TYPE), C.int(date), &IDOct, RNG, &XOct, C.int(PIN), &TOKENOct, &SECOct, &UOct, &UTOct, &TPOct, &MESSAGEOct, C.int(TimeValue), &YOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -394,7 +394,7 @@ func MPIN_GET_G1_MULTIPLE(RNG *C.csprng, typ int, X []byte, G []byte) (errorCode
 }
 
 /* One pass MPIN Server */
-func MPIN_SERVER(date, TimeValue int, SS, U, UT, V, ID, MESSAGE []byte) (errorCode int, HID, HTID, Y, E, F []byte) {
+func MPIN_SERVER(HASH_TYPE, date, TimeValue int, SS, U, UT, V, ID, MESSAGE []byte) (errorCode int, HID, HTID, Y, E, F []byte) {
 	SSStr := string(SS)
 	SSOct := GetOctet(SSStr)
 	defer OCT_free(&SSOct)
@@ -425,7 +425,7 @@ func MPIN_SERVER(date, TimeValue int, SS, U, UT, V, ID, MESSAGE []byte) (errorCo
 	FOct := GetOctetZero(GTS)
 	defer OCT_free(&FOct)
 
-	rtn := C.MPIN_SERVER(C.int(HASH_TYPE_MPIN), C.int(date), &HIDOct, &HTIDOct, &YOct, &SSOct, &UOct, &UTOct, &VOct, &EOct, &FOct, &IDOct, &MESSAGEOct, C.int(TimeValue))
+	rtn := C.MPIN_SERVER(C.int(HASH_TYPE), C.int(date), &HIDOct, &HTIDOct, &YOct, &SSOct, &UOct, &UTOct, &VOct, &EOct, &FOct, &IDOct, &MESSAGEOct, C.int(TimeValue))
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -455,7 +455,7 @@ func MPIN_KANGAROO(E []byte, F []byte) (PINError int) {
 
 /* calculate common key on server side */
 /* Z=r.A - no time permits involved */
-func MPIN_SERVER_KEY(Z, SS, W, P, I, U, UT []byte) (errorCode int, SK []byte) {
+func MPIN_SERVER_KEY(HASH_TYPE int, Z, SS, W, P, I, U, UT []byte) (errorCode int, SK []byte) {
 	ZStr := string(Z)
 	ZOct := GetOctet(ZStr)
 	defer OCT_free(&ZOct)
@@ -481,7 +481,7 @@ func MPIN_SERVER_KEY(Z, SS, W, P, I, U, UT []byte) (errorCode int, SK []byte) {
 	SKOct := GetOctetZero(EAS)
 	defer OCT_free(&SKOct)
 
-	rtn := C.MPIN_SERVER_KEY(C.int(HASH_TYPE_MPIN), &ZOct, &SSOct, &WOct, &POct, &IOct, &UOct, &UTOct, &SKOct)
+	rtn := C.MPIN_SERVER_KEY(C.int(HASH_TYPE), &ZOct, &SSOct, &WOct, &POct, &IOct, &UOct, &UTOct, &SKOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -492,7 +492,7 @@ func MPIN_SERVER_KEY(Z, SS, W, P, I, U, UT []byte) (errorCode int, SK []byte) {
 
 /* calculate common key on client side */
 /* wCID = w.(A+AT) */
-func MPIN_CLIENT_KEY(PIN int, GT1, GT2, R, X, P, T []byte) (errorCode int, CK []byte) {
+func MPIN_CLIENT_KEY(HASH_TYPE, PIN int, GT1, GT2, R, X, P, T []byte) (errorCode int, CK []byte) {
 	GT1Str := string(GT1)
 	GT1Oct := GetOctet(GT1Str)
 	defer OCT_free(&GT1Oct)
@@ -515,7 +515,7 @@ func MPIN_CLIENT_KEY(PIN int, GT1, GT2, R, X, P, T []byte) (errorCode int, CK []
 	CKOct := GetOctetZero(EAS)
 	defer OCT_free(&CKOct)
 
-	rtn := C.MPIN_CLIENT_KEY(C.int(HASH_TYPE_MPIN), &GT1Oct, &GT2Oct, C.int(PIN), &ROct, &XOct, &POct, &TOct, &CKOct)
+	rtn := C.MPIN_CLIENT_KEY(C.int(HASH_TYPE), &GT1Oct, &GT2Oct, C.int(PIN), &ROct, &XOct, &POct, &TOct, &CKOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -615,7 +615,7 @@ func MPIN_printBinary(array []byte) {
 }
 
 /* Outputs H(CID) and H(T|H(CID)) for time permits. If no time permits set HID=HTID */
-func MPIN_SERVER_1(date int, ID []byte) (HID, HTID []byte) {
+func MPIN_SERVER_1(HASH_TYPE, date int, ID []byte) (HID, HTID []byte) {
 	// Form Octets
 	IDStr := string(ID)
 	IDOct := GetOctet(IDStr)
@@ -626,7 +626,7 @@ func MPIN_SERVER_1(date int, ID []byte) (HID, HTID []byte) {
 	HTIDOct := GetOctetZero(G1S)
 	defer OCT_free(&HTIDOct)
 
-	C.MPIN_SERVER_1(C.int(HASH_TYPE_MPIN), C.int(date), &IDOct, &HIDOct, &HTIDOct)
+	C.MPIN_SERVER_1(C.int(HASH_TYPE), C.int(date), &IDOct, &HIDOct, &HTIDOct)
 
 	// Convert octet to bytes
 	HID = OCT_toBytes(&HIDOct)
@@ -676,7 +676,7 @@ func MPIN_SERVER_2(date int, HID []byte, HTID []byte, Y []byte, SS []byte, U []b
 /* Implement step 1 on client side of MPin protocol
    When rng=nil the X value is externally generated
 */
-func MPIN_CLIENT_1(date int, ID []byte, rng *C.csprng, X []byte, PIN int, TOKEN []byte, TP []byte) (errorCode int, XOut, SEC, U, UT []byte) {
+func MPIN_CLIENT_1(HASH_TYPE, date int, ID []byte, rng *C.csprng, X []byte, PIN int, TOKEN []byte, TP []byte) (errorCode int, XOut, SEC, U, UT []byte) {
 	// Form Octets
 	IDStr := string(ID)
 	IDOct := GetOctet(IDStr)
@@ -701,7 +701,7 @@ func MPIN_CLIENT_1(date int, ID []byte, rng *C.csprng, X []byte, PIN int, TOKEN 
 	UTOct := GetOctetZero(G1S)
 	defer OCT_free(&UTOct)
 
-	rtn := C.MPIN_CLIENT_1(C.int(HASH_TYPE_MPIN), C.int(date), &IDOct, rng, &XOct, C.int(PIN), &TOKENOct, &SECOct, &UOct, &UTOct, &TPOct)
+	rtn := C.MPIN_CLIENT_1(C.int(HASH_TYPE), C.int(date), &IDOct, rng, &XOct, C.int(PIN), &TOKENOct, &SECOct, &UOct, &UTOct, &TPOct)
 
 	errorCode = int(rtn)
 	// Convert octet to bytes
@@ -735,7 +735,7 @@ func MPIN_CLIENT_2(X []byte, Y []byte, SEC []byte) (errorCode int, V []byte) {
 	return errorCode, V[:]
 }
 
-func MPIN_HASH_ALL(I, U, UT, V, Y, R, W []byte) (HM []byte) {
+func MPIN_HASH_ALL(HASH_TYPE int, I, U, UT, V, Y, R, W []byte) (HM []byte) {
 	// Form Octets
 	IStr := string(I)
 	IOct := GetOctet(IStr)
@@ -769,7 +769,7 @@ func MPIN_HASH_ALL(I, U, UT, V, Y, R, W []byte) (HM []byte) {
 	defer OCT_free(&HMOct)
 
 	// Hash values
-	C.MPIN_HASH_ALL(C.int(HASH_TYPE_MPIN), &IOct, &UOct, &UTOct, &VOct, &YOct, &ROct, &WOct, &HMOct)
+	C.MPIN_HASH_ALL(C.int(HASH_TYPE), &IOct, &UOct, &UTOct, &VOct, &YOct, &ROct, &WOct, &HMOct)
 
 	// Convert octet to bytes
 	HM = OCT_toBytes(&HMOct)

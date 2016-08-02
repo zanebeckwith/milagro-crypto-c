@@ -33,6 +33,8 @@ import (
 // Number of iterations to time functions
 const nIter int = 1000
 
+var HASH_TYPE_MPIN = mpin.SHA256
+
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
 func main() {
@@ -70,7 +72,7 @@ func main() {
 	t0 := time.Now()
 	var rtn int
 	for i := 0; i < nIter; i++ {
-		rtn, _, _, _, _, _ = mpin.MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
+		rtn, _, _, _, _, _ = mpin.MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
 	}
 	t1 := time.Now()
 	log.Printf("Number Iterations: %d Time: %v\n", nIter, t1.Sub(t0))

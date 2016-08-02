@@ -26,6 +26,8 @@ import (
 	"github.com/milagro/mpin"
 )
 
+var HASH_TYPE_MPIN = mpin.SHA256
+
 func main() {
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -79,7 +81,7 @@ func main() {
 	mpin.MPIN_printBinary(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := mpin.MPIN_HASH_ID(ID)
+	HCID := mpin.MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
 	rtn, SS1 := mpin.MPIN_GET_SERVER_SECRET(MS1[:])
@@ -137,7 +139,7 @@ func main() {
 	mpin.MPIN_printBinary(CS[:])
 
 	// Generate time permit share 1
-	rtn, TP1 := mpin.MPIN_GET_CLIENT_PERMIT(date, MS1[:], HCID)
+	rtn, TP1 := mpin.MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
 	if rtn != 0 {
 		fmt.Println("MPIN_GET_CLIENT_PERMIT Error:", rtn)
 		return
@@ -146,7 +148,7 @@ func main() {
 	mpin.MPIN_printBinary(TP1[:])
 
 	// Generate time permit share 2
-	rtn, TP2 := mpin.MPIN_GET_CLIENT_PERMIT(date, MS2[:], HCID)
+	rtn, TP2 := mpin.MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
 	if rtn != 0 {
 		fmt.Println("MPIN_GET_CLIENT_PERMIT Error:", rtn)
 		return
@@ -167,7 +169,7 @@ func main() {
 		fmt.Scan(&PIN1)
 	}
 
-	rtn, TOKEN := mpin.MPIN_EXTRACT_PIN(ID[:], PIN1, CS[:])
+	rtn, TOKEN := mpin.MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d\n", rtn)
 		return
@@ -186,7 +188,7 @@ func main() {
 	var X [mpin.EGS]byte
 	fmt.Printf("X: 0x")
 	mpin.MPIN_printBinary(X[:])
-	rtn, XOut, Y1, SEC, U, UT := mpin.MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	rtn, XOut, Y1, SEC, U, UT := mpin.MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
 		return
@@ -199,7 +201,7 @@ func main() {
 	mpin.MPIN_printBinary(SEC[:])
 
 	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := mpin.MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
+	rtn, HID, HTID, Y2, E, F := mpin.MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}
