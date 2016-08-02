@@ -31,7 +31,7 @@ RUN echo -e "\n\n*** BUILD FOR COVERAGE ***\n" && \
     rm -rf /root/C/milagro-crypto-c/target/build_test && \
     mkdir -p /root/C/milagro-crypto-c/target/build_test/coverage && \
     cd /root/C/milagro-crypto-c/target/build_test && \
-    cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
+    cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     lcov --zerocounters --directory . && \
@@ -40,6 +40,24 @@ RUN echo -e "\n\n*** BUILD FOR COVERAGE ***\n" && \
     lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
     genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info && \
     make doc
+
+RUN echo -e "\n\n*** BUILD LINUX 64 WRAPPERS ***\n\n" && \
+    rm -rf /root/C/milagro-crypto-c/target/build_linux64_wrappers && \
+    mkdir -p /root/C/milagro-crypto-c/target/build_linux64_wrappers && \
+    cd /root/C/milagro-crypto-c/target/build_linux64_wrappers && \
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_PYTHON=on -D BUILD_GO=on -D GO_PATH=${GOPATH} -D BUILD_WCC=on ../.. && \
+    make && \
+    make test && \
+    make package
+
+RUN echo -e "\n\n*** BUILD LINUX 64 ANONYMOUS ***\n\n" && \
+    rm -rf /root/C/milagro-crypto-c/target/build_linux64_anon && \
+    mkdir -p /root/C/milagro-crypto-c/target/build_linux64_anon && \
+    cd /root/C/milagro-crypto-c/target/build_linux64_anon && \
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64  -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
+    make && \
+    make test && \
+    make package
 
 RUN echo -e "\n\n*** BUILD LINUX 64 ***\n\n" && \
     rm -rf /root/C/milagro-crypto-c/target/build_linux64 && \
