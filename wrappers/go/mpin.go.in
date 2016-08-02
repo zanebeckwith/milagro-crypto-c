@@ -20,8 +20,8 @@ under the License.
 package mpin
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I/opt/amcl/include
-#cgo LDFLAGS: -L/opt/amcl/lib -lmpin  -lamcl -lm
+#cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include
+#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lmpin  -lamcl -lm
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"

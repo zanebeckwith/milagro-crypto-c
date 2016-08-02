@@ -23,7 +23,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-        "github.com/miracl/mpin"
+	"github.com/milagro/mpin"
 )
 
 func main() {
@@ -36,18 +36,13 @@ func main() {
 
 	// Epoch time in days
 	date := mpin.MPIN_today()
-        fmt.Println("date: ", date)
-
-	// Epoch time in seconds
-	timeValue := mpin.MPIN_GET_TIME()
-        fmt.Println("timeValue: ", timeValue)
 
 	// PIN variable to create token
 	PIN1 := -1
 	// PIN variable to authenticate
 	PIN2 := -1
 
-	// Seed value for Random Number Generator (RNG)
+	// Seed value for Random Number Generator
 	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
@@ -55,10 +50,6 @@ func main() {
 		return
 	}
         rng := mpin.MPIN_CREATE_CSPRNG(seed)
-
-	// Message to sign
-	var MESSAGE []byte
-	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
 	rtn, MS1 := mpin.MPIN_RANDOM_GENERATE(&rng)
@@ -177,47 +168,49 @@ func main() {
 
 	//////   Client   //////
 
-	// Precomputation
-	rtn, G1, G2 := mpin.MPIN_PRECOMPUTE(TOKEN[:], HCID)
-	if rtn != 0 {
-		fmt.Println("MPIN_PRECOMPUTE(TOKEN[:], HCID) Error:", rtn)
-		return
-	}
-
 	for PIN2 < 0 {
 		fmt.Printf("Please enter PIN to authenticate: ")
 		fmt.Scan(&PIN2)
 	}
 
-	// Send U, UT, V, timeValue and Message to server
+	////// Client Pass 1 //////
+	// Send U and UT to server
 	var X [mpin.EGS]byte
 	fmt.Printf("X: 0x")
 	mpin.MPIN_printBinary(X[:])
-	rtn, XOut, Y1, V, U, UT := mpin.MPIN_CLIENT(date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	rtn, XOut, SEC, U, UT := mpin.MPIN_CLIENT_1(date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
 		return
 	}
-	fmt.Printf("Y1: 0x")
-	mpin.MPIN_printBinary(Y1[:])
 	fmt.Printf("XOut: 0x")
 	mpin.MPIN_printBinary(XOut[:])
 
-	// Send Z=r.ID to Server
-	var R [mpin.EGS]byte
-	fmt.Printf("R: 0x")
-	mpin.MPIN_printBinary(R[:])
-	rtn, ROut, Z := mpin.MPIN_GET_G1_MULTIPLE(&rng, 1, R[:], HCID[:])
-	fmt.Printf("ROut: 0x")
-	mpin.MPIN_printBinary(ROut[:])
+	//////   Server Pass 1  //////
+	/* Calculate H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
+	HID, HTID := mpin.MPIN_SERVER_1(date, ID)
 
-	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := mpin.MPIN_SERVER(date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+	/* Send Y to Client */
+	rtn, Y := mpin.MPIN_RANDOM_GENERATE(&rng)
 	if rtn != 0 {
-		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
+		fmt.Println("MPIN_RANDOM_GENERATE Error:", rtn)
+		return
 	}
-	fmt.Printf("Y2: 0x")
-	mpin.MPIN_printBinary(Y2[:])
+	fmt.Printf("Y: 0x")
+	mpin.MPIN_printBinary(Y[:])
+
+	/* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
+	rtn, V := mpin.MPIN_CLIENT_2(XOut[:], Y[:], SEC[:])
+	if rtn != 0 {
+		fmt.Printf("FAILURE: CLIENT_2 rtn: %d\n", rtn)
+	}
+
+	/* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
+	/* If PIN error not required, set E and F = null */
+	rtn, _, _ = mpin.MPIN_SERVER_2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+	if rtn != 0 {
+		fmt.Printf("FAILURE: MPIN_SERVER_2 rtn: %d\n", rtn)
+	}
 	fmt.Printf("HID: 0x")
 	mpin.MPIN_printBinary(HID[:])
 	fmt.Printf("HTID: 0x")
@@ -225,69 +218,8 @@ func main() {
 
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)
-		err := mpin.MPIN_KANGAROO(E[:], F[:])
-		if err != 0 {
-			fmt.Printf("PIN Error %d\n", err)
-		}
 		return
 	} else {
 		fmt.Printf("Authenticated ID: %s \n", IDstr)
 	}
-
-	// send T=w.ID to client
-	var W [mpin.EGS]byte
-	fmt.Printf("W: 0x")
-	mpin.MPIN_printBinary(W[:])
-	rtn, WOut, T := mpin.MPIN_GET_G1_MULTIPLE(&rng, 0, W[:], HTID[:])
-	fmt.Printf("WOut: 0x")
-	mpin.MPIN_printBinary(WOut[:])
-	fmt.Printf("T: 0x")
-	mpin.MPIN_printBinary(T[:])
-
-        // Hash all values
-        HM := mpin.MPIN_HASH_ALL(ID[:],U[:],UT[:],Y2[:],V[:],Z[:],T[:])
-
-	rtn, AES_KEY_SERVER := mpin.MPIN_SERVER_KEY(Z[:], SS[:], WOut[:], HM[:],HID[:],U[:], UT[:])
-	fmt.Printf("Server Key =  0x")
-	mpin.MPIN_printBinary(AES_KEY_SERVER[:])
-
-	rtn, AES_KEY_CLIENT := mpin.MPIN_CLIENT_KEY(PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:],T[:])
-	fmt.Printf("Client Key =  0x")
-	mpin.MPIN_printBinary(AES_KEY_CLIENT[:])
-
-	//////   Server   //////
-
-	// Initialization vector
-	IV := mpin.GENERATE_RANDOM(&rng, 12)
-	fmt.Printf("IV: 0x")
-	mpin.MPIN_printBinary(IV[:])
-
-	// header
-	HEADER := mpin.GENERATE_RANDOM(&rng, 16)
-	fmt.Printf("HEADER: 0x")
-	mpin.MPIN_printBinary(HEADER[:])
-
-	// Input plaintext
-	plaintextStr := "A test message"
-	PLAINTEXT1 := []byte(plaintextStr)
-	fmt.Printf("String to encrypt: %s \n", plaintextStr)
-	fmt.Printf("PLAINTEXT1: 0x")
-	mpin.MPIN_printBinary(PLAINTEXT1[:])
-
-	// AES-GCM Encryption
-	CIPHERTEXT, TAG1 := mpin.MPIN_AES_GCM_ENCRYPT(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
-	fmt.Printf("CIPHERTEXT:  0x")
-	mpin.MPIN_printBinary(CIPHERTEXT[:])
-	fmt.Printf("TAG1:  0x")
-	mpin.MPIN_printBinary(TAG1[:])
-
-	// Send IV, HEADER, CIPHERTEXT and TAG1 to client
-
-	// AES-GCM Decryption
-	PLAINTEXT2, TAG2 := mpin.MPIN_AES_GCM_DECRYPT(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
-	fmt.Printf("PLAINTEXT2:  0x")
-	mpin.MPIN_printBinary(PLAINTEXT2[:])
-	fmt.Printf("TAG2:  0x")
-	mpin.MPIN_printBinary(TAG2[:])
-	fmt.Printf("Decrypted string: %s \n", string(PLAINTEXT2))
 }

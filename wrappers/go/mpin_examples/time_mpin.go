@@ -27,7 +27,7 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/miracl/mpin"
+	"github.com/milagro/mpin"
 )
 
 // Number of iterations to time functions
