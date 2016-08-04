@@ -162,7 +162,7 @@ if (BUILD_PYTHON)
 endif (BUILD_PYTHON)
 
 if (BUILD_GO)
-  set(GO_PATH "$ENV{HOME}/go" CACHE STRING "GOPATH")
+  set(GO_PATH "$ENV{GOPATH}" CACHE STRING "GOPATH")
   message(STATUS "Build Golang: GOPATH='${GO_PATH}'")
   add_subdirectory (wrappers/go)
 endif (BUILD_GO)
