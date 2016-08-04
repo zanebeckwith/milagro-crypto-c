@@ -37,119 +37,132 @@ typedef enum { false, true } bool;
 
 int main(int argc, char** argv)
 {
-  if (argc != 3) {
-    printf("usage: ./test_hash [path to test vector file] |sha256||sha512]\n");
-    exit(EXIT_FAILURE);
-  }
-
-  int i=0;
-  FILE * fp = NULL;
-  char line[LINE_LEN];
-  char * linePtr = NULL;
-  int l1=0;
-  char * Msg = NULL;
-  int MsgLen = 0;
-  const char* MsgStr = "Msg = ";
-
-  const char* MDStr = "MD = ";
-  int MDLen = 0;
-  char * MD = NULL;
-  
-  char * MD1 = NULL;
-
-  hash256 sha256;
-  hash512 sha512;
-
-  // Hash initialization
-  if (!strcmp(argv[2], "sha512")) {
-      HASH512_init(&sha512);
-  } else { 
-      HASH256_init(&sha256);
-  }
-
-  // Open file
-  fp = fopen(argv[1], "r");
-  if (fp == NULL) {
-      printf("ERROR opening test vector file\n");
-      exit(EXIT_FAILURE);
-  }
-  bool readLine = false;
-
-  int lineNo=0;
-  while ( (fgets(line, LINE_LEN, fp) != NULL)) {
-    readLine = true; 
-    if (!strncmp(line, MsgStr, strlen(MsgStr))) {
-#ifdef DEBUG
-      printf("line %d %s\n", lineNo,line);	
-#endif
-      // Find hex value in string
-      linePtr = line + strlen(MsgStr);
-
-      // Allocate memory
-      l1 = strlen(linePtr)-1;
-      MsgLen = l1/2;
-      Msg = (char*) malloc(MsgLen);
-      if (Msg==NULL) 
+    if (argc != 3)
+    {
+        printf("usage: ./test_hash [path to test vector file] |sha256||sha512]\n");
         exit(EXIT_FAILURE);
-
-      // Msg binary value
-      amcl_hex2bin(linePtr, Msg, l1);
     }
 
-    if (!strncmp(line, MDStr, strlen(MDStr))) {
-#ifdef DEBUG
-      printf("line %d %s\n", lineNo,line);	
-#endif
-      // Find hex value in string
-      linePtr = line + strlen(MDStr);
+    int i=0;
+    FILE * fp = NULL;
+    char line[LINE_LEN];
+    char * linePtr = NULL;
+    int l1=0;
+    char * Msg = NULL;
+    int MsgLen = 0;
+    const char* MsgStr = "Msg = ";
 
-      // Allocate memory
-      l1 = strlen(linePtr);
+    const char* MDStr = "MD = ";
+    int MDLen = 0;
+    char * MD = NULL;
 
-      // Allocate memory for digest
-      MDLen = l1/2;
-      MD = (char*) malloc(MDLen);
-      if (MD==NULL) 
-        exit(EXIT_FAILURE);
-      MD1 = (char*) malloc(MDLen);
-      if (MD1==NULL) 
-        exit(EXIT_FAILURE);
+    char * MD1 = NULL;
 
-      octet MD1Oct={MDLen,MDLen,MD1};
+    hash256 sha256;
+    hash512 sha512;
 
-      // Golden MD value
-      amcl_hex2bin(linePtr, MD1, l1);
-
-      if (!strcmp(argv[2], "sha512")) {
-           for (i=0;i<MsgLen;i++) 
-              HASH512_process(&sha512,Msg[i]);
-           HASH512_hash(&sha512,MD); 
-      } else { 
-           for (i=0;i<MsgLen;i++) 
-              HASH256_process(&sha256,Msg[i]);
-           HASH256_hash(&sha256,MD); 
-      }
-    
-      octet MDOct={MDLen,MDLen,MD};
-      int rc = OCT_comp(&MD1Oct,&MDOct);
-      if (!rc) {
-        printf("TEST HASH FAILED COMPARE MD LINE %d\n",lineNo);
-        exit(EXIT_FAILURE);
-      }
-      free(Msg);
-      Msg = NULL;
-      free(MD1);
-      MD1 = NULL;
-      free(MD);
-      MD = NULL;
+    // Hash initialization
+    if (!strcmp(argv[2], "sha512"))
+    {
+        HASH512_init(&sha512);
     }
-  lineNo++;
-  }
-  fclose(fp);
-  if (!readLine) {
-    printf("ERROR Empty test vector file\n");
-    exit(EXIT_FAILURE);
-  }
-  printf("SUCCESS TEST %s PASSED\n", argv[2]);
-  exit(EXIT_SUCCESS);
+    else
+    {
+        HASH256_init(&sha256);
+    }
+
+    // Open file
+    fp = fopen(argv[1], "r");
+    if (fp == NULL)
+    {
+        printf("ERROR opening test vector file\n");
+        exit(EXIT_FAILURE);
+    }
+    bool readLine = false;
+
+    int lineNo=0;
+    while ( (fgets(line, LINE_LEN, fp) != NULL))
+    {
+        readLine = true;
+        if (!strncmp(line, MsgStr, strlen(MsgStr)))
+        {
+#ifdef DEBUG
+            printf("line %d %s\n", lineNo,line);
+#endif
+            // Find hex value in string
+            linePtr = line + strlen(MsgStr);
+
+            // Allocate memory
+            l1 = strlen(linePtr)-1;
+            MsgLen = l1/2;
+            Msg = (char*) malloc(MsgLen);
+            if (Msg==NULL)
+                exit(EXIT_FAILURE);
+
+            // Msg binary value
+            amcl_hex2bin(linePtr, Msg, l1);
+        }
+
+        if (!strncmp(line, MDStr, strlen(MDStr)))
+        {
+#ifdef DEBUG
+            printf("line %d %s\n", lineNo,line);
+#endif
+            // Find hex value in string
+            linePtr = line + strlen(MDStr);
+
+            // Allocate memory
+            l1 = strlen(linePtr);
+
+            // Allocate memory for digest
+            MDLen = l1/2;
+            MD = (char*) malloc(MDLen);
+            if (MD==NULL)
+                exit(EXIT_FAILURE);
+            MD1 = (char*) malloc(MDLen);
+            if (MD1==NULL)
+                exit(EXIT_FAILURE);
+
+            octet MD1Oct= {MDLen,MDLen,MD1};
+
+            // Golden MD value
+            amcl_hex2bin(linePtr, MD1, l1);
+
+            if (!strcmp(argv[2], "sha512"))
+            {
+                for (i=0; i<MsgLen; i++)
+                    HASH512_process(&sha512,Msg[i]);
+                HASH512_hash(&sha512,MD);
+            }
+            else
+            {
+                for (i=0; i<MsgLen; i++)
+                    HASH256_process(&sha256,Msg[i]);
+                HASH256_hash(&sha256,MD);
+            }
+
+            octet MDOct= {MDLen,MDLen,MD};
+            int rc = OCT_comp(&MD1Oct,&MDOct);
+            if (!rc)
+            {
+                printf("TEST HASH FAILED COMPARE MD LINE %d\n",lineNo);
+                exit(EXIT_FAILURE);
+            }
+            free(Msg);
+            Msg = NULL;
+            free(MD1);
+            MD1 = NULL;
+            free(MD);
+            MD = NULL;
+        }
+        lineNo++;
+    }
+    fclose(fp);
+    if (!readLine)
+    {
+        printf("ERROR Empty test vector file\n");
+        exit(EXIT_FAILURE);
+    }
+    printf("SUCCESS TEST %s PASSED\n", argv[2]);
+    exit(EXIT_SUCCESS);
 }
