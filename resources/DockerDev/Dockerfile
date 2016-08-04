@@ -47,7 +47,7 @@ ENV TERM linux
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 ENV HOME /root
 ENV DISPLAY :0
-ENV GOPATH=/root/GO
+ENV GOPATH=/root
 ENV PATH=$GOPATH/bin:$PATH
 
 # add i386 architecture
@@ -71,8 +71,8 @@ RUN pip install --upgrade pip && \
     pip install --upgrade autopep8
 
 # configure GO
-RUN mkdir -p /root/GO/bin && \
-    mkdir -p /root/GO/pkg && \
-    mkdir -p /root/GO/src && \
-    echo 'export GOPATH=/root/GO' >> /root/.profile && \
+RUN mkdir -p /root/bin && \
+    mkdir -p /root/pkg && \
+    mkdir -p /root/src && \
+    echo 'export GOPATH=/root' >> /root/.profile && \
     echo 'export PATH=$GOPATH/bin:$PATH' >> /root/.profile
