@@ -23,7 +23,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-        "github.com/milagro/mpin"
+	"github.com/milagro/mpin"
 )
 
 var HASH_TYPE_MPIN = mpin.SHA256
@@ -38,11 +38,11 @@ func main() {
 
 	// Epoch time in days
 	date := mpin.MPIN_today()
-        fmt.Println("date: ", date)
+	fmt.Println("date: ", date)
 
 	// Epoch time in seconds
 	timeValue := mpin.MPIN_GET_TIME()
-        fmt.Println("timeValue: ", timeValue)
+	fmt.Println("timeValue: ", timeValue)
 
 	// PIN variable to create token
 	PIN1 := -1
@@ -56,7 +56,7 @@ func main() {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := mpin.MPIN_CREATE_CSPRNG(seed)
+	rng := mpin.MPIN_CREATE_CSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
@@ -246,14 +246,14 @@ func main() {
 	fmt.Printf("T: 0x")
 	mpin.MPIN_printBinary(T[:])
 
-        // Hash all values
-        HM := mpin.MPIN_HASH_ALL(HASH_TYPE_MPIN, ID[:],U[:],UT[:],Y2[:],V[:],Z[:],T[:])
+	// Hash all values
+	HM := mpin.MPIN_HASH_ALL(HASH_TYPE_MPIN, ID[:], U[:], UT[:], Y2[:], V[:], Z[:], T[:])
 
-	rtn, AES_KEY_SERVER := mpin.MPIN_SERVER_KEY(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:],HID[:],U[:], UT[:])
+	rtn, AES_KEY_SERVER := mpin.MPIN_SERVER_KEY(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
 	fmt.Printf("Server Key =  0x")
 	mpin.MPIN_printBinary(AES_KEY_SERVER[:])
 
-	rtn, AES_KEY_CLIENT := mpin.MPIN_CLIENT_KEY(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:],T[:])
+	rtn, AES_KEY_CLIENT := mpin.MPIN_CLIENT_KEY(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
 	fmt.Printf("Client Key =  0x")
 	mpin.MPIN_printBinary(AES_KEY_CLIENT[:])
 

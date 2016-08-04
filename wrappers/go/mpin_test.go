@@ -20,12 +20,12 @@ under the License.
 package mpin
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"testing"
-	"crypto/rand"
-	mathrand "math/rand"
 	"github.com/stretchr/testify/assert"
+	mathrand "math/rand"
+	"testing"
 )
 
 var HASH_TYPE_MPIN = SHA256
@@ -62,7 +62,7 @@ func TestGoodPIN(t *testing.T) {
 		return
 	}
 
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
@@ -146,7 +146,7 @@ func TestBadPIN(t *testing.T) {
 		return
 	}
 
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
@@ -230,7 +230,7 @@ func TestBadToken(t *testing.T) {
 		return
 	}
 
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
@@ -399,7 +399,7 @@ func TestGoodSignature(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Generate Master Secret Share 1
 	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
@@ -483,7 +483,7 @@ func TestSignatureExpired(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Generate Master Secret Share 1
 	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
@@ -568,7 +568,7 @@ func TestBadSignature(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Generate Master Secret Share 1
 	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
@@ -648,7 +648,7 @@ func TestPINError(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
@@ -733,7 +733,7 @@ func TestMPINFull(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
@@ -839,7 +839,7 @@ func TestTwoPassGoodPIN(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Generate Master Secret Share 1
 	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
@@ -924,7 +924,7 @@ func TestTwoPassBadPIN(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Generate Master Secret Share 1
 	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
@@ -1009,7 +1009,7 @@ func TestTwoPassBadToken(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := MPIN_CREATE_CSPRNG(seed)
+	rng := MPIN_CREATE_CSPRNG(seed)
 
 	// Generate Master Secret Share 1
 	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
@@ -1082,7 +1082,7 @@ func TestRandomTwoPass(t *testing.T) {
 		// Seed value for Random Number Generator (RNG)
 		seed := make([]byte, 16)
 		rand.Read(seed)
-                rng := MPIN_CREATE_CSPRNG(seed)
+		rng := MPIN_CREATE_CSPRNG(seed)
 
 		// Epoch time in days
 		date := MPIN_today()

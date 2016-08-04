@@ -45,10 +45,9 @@ const G2S = 4 * EFS
 const GTS = 12 * EFS
 
 //  Hash function choice
-const SHA256 int = 32 
+const SHA256 int = 32
 const SHA384 int = 48
 const SHA512 int = 64
-
 
 func OCT_free(valOctet *C.octet) {
 	C.free(unsafe.Pointer(valOctet.val))
@@ -134,14 +133,14 @@ func MPIN_GET_TIME() int {
 	return int(timeValue)
 }
 
-func MPIN_CREATE_CSPRNG(SEED []byte) (C.csprng) {
+func MPIN_CREATE_CSPRNG(SEED []byte) C.csprng {
 	// Form Octet
 	SEEDStr := string(SEED)
 	SEEDOct := GetOctet(SEEDStr)
 	defer OCT_free(&SEEDOct)
-        var RNG C.csprng
+	var RNG C.csprng
 	C.MPIN_CREATE_CSPRNG(&RNG, &SEEDOct)
-        return RNG
+	return RNG
 }
 
 func MPIN_HASH_ID(HASH_TYPE int, ID []byte) (HASHID []byte) {
@@ -153,7 +152,7 @@ func MPIN_HASH_ID(HASH_TYPE int, ID []byte) (HASHID []byte) {
 	defer OCT_free(&HASHIDOct)
 
 	// Hash MPIN_ID
-	C.MPIN_HASH_ID(C.int(HASH_TYPE),&IDOct, &HASHIDOct)
+	C.MPIN_HASH_ID(C.int(HASH_TYPE), &IDOct, &HASHIDOct)
 
 	// Convert octet to bytes
 	HASHID = OCT_toBytes(&HASHIDOct)
@@ -298,7 +297,6 @@ func MPIN_EXTRACT_PIN(HASH_TYPE int, ID []byte, PIN int, CS []byte) (errorCode i
 	return errorCode, TOKEN[:]
 }
 
-
 /* One pass MPIN Client. Using C RNG */
 func MPIN_CLIENT(HASH_TYPE, date int, ID []byte, RNG *C.csprng, X []byte, PIN int, TOKEN []byte, TP []byte, MESSAGE []byte, TimeValue int) (errorCode int, XOut, Y, SEC, U, UT []byte) {
 	// Form Octets
@@ -435,7 +433,7 @@ func MPIN_SERVER(HASH_TYPE, date, TimeValue int, SS, U, UT, V, ID, MESSAGE []byt
 	E = OCT_toBytes(&EOct)
 	F = OCT_toBytes(&FOct)
 
-	return errorCode, HID[:], HTID[:], Y[:], E[:], F[:] 
+	return errorCode, HID[:], HTID[:], Y[:], E[:], F[:]
 }
 
 /* Pollards kangaroos used to return PIN error */

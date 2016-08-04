@@ -38,11 +38,11 @@ func main() {
 
 	// Epoch time in days
 	date := mpin.MPIN_today()
-        fmt.Println("date: ", date)
+	fmt.Println("date: ", date)
 
 	// Epoch time in seconds
 	timeValue := mpin.MPIN_GET_TIME()
-        fmt.Println("timeValue: ", timeValue)
+	fmt.Println("timeValue: ", timeValue)
 
 	// PIN variable to create token
 	PIN1 := -1
@@ -56,7 +56,7 @@ func main() {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := mpin.MPIN_CREATE_CSPRNG(seed)
+	rng := mpin.MPIN_CREATE_CSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte

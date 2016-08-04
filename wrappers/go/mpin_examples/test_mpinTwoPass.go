@@ -51,7 +51,7 @@ func main() {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-        rng := mpin.MPIN_CREATE_CSPRNG(seed)
+	rng := mpin.MPIN_CREATE_CSPRNG(seed)
 
 	// Generate Master Secret Share 1
 	rtn, MS1 := mpin.MPIN_RANDOM_GENERATE(&rng)
