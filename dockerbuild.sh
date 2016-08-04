@@ -17,6 +17,9 @@
 # build the environment
 docker build --tag=miracl/cdev ./resources/DockerDev/
 
+# go path
+GOPATH=/root/GO
+
 # generate a docker file on the fly
 cat > Dockerfile <<- EOM
 FROM miracl/cdev
@@ -54,7 +57,7 @@ RUN echo -e "\n\n*** BUILD LINUX 64 ANONYMOUS ***\n\n" && \
     rm -rf /root/C/milagro-crypto-c/target/build_linux64_anon && \
     mkdir -p /root/C/milagro-crypto-c/target/build_linux64_anon && \
     cd /root/C/milagro-crypto-c/target/build_linux64_anon && \
-    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64  -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
     make && \
     make test && \
     make package
