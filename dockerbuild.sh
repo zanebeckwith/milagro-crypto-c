@@ -54,7 +54,6 @@ RUN echo -e "\n\n*** BUILD LINUX 64 WRAPPERS ***\n\n" && \
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_PYTHON=on -D BUILD_GO=on -D GO_PATH=${GOPATH} -D BUILD_WCC=on ../.. && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
-    go get ./... && \
     go get github.com/stretchr/testify/assert && \
     env CTEST_OUTPUT_ON_FAILURE=1 make test && \
     make package
