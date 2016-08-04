@@ -67,30 +67,35 @@ script:
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux64_anon
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux64_anon
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
   - env CTEST_OUTPUT_ON_FAILURE=1 make test
   - echo -e "\n\n*** BUILD LINUX 64 ***\n\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
   - env CTEST_OUTPUT_ON_FAILURE=1 make test
   - echo -e "\n\n*** BUILD LINUX 32 ***\n\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
   - env CTEST_OUTPUT_ON_FAILURE=1 make test
   - echo -e "\n\n*** BUILD WIN 64 ***\n\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win64
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win64
   - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
   - env CTEST_OUTPUT_ON_FAILURE=1 make test
   - echo -e "\n\n*** BUILD WIN 32 ***\n\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win32
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win32
   - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
   - make
   - env CTEST_OUTPUT_ON_FAILURE=1 make test
 after_success:

@@ -52,18 +52,10 @@ RUN echo -e "\n\n*** BUILD LINUX 64 WRAPPERS ***\n\n" && \
     mkdir -p ${PRJPATH}/target/build_linux64_wrappers && \
     cd ${PRJPATH}/target/build_linux64_wrappers && \
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_PYTHON=on -D BUILD_GO=on -D GO_PATH=${GOPATH} -D BUILD_WCC=on ../.. && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     go get ./... && \
     go get github.com/stretchr/testify/assert && \
-    env CTEST_OUTPUT_ON_FAILURE=1 LD_LIBRARY_PATH=${PRJPATH}/target/build_linux64_wrappers/wrappers/go make test && \
-    make package
-
-RUN echo -e "\n\n*** BUILD LINUX 64 WRAPPERS ***\n\n" && \
-    rm -rf ${PRJPATH}/target/build_linux64_wrappers && \
-    mkdir -p ${PRJPATH}/target/build_linux64_wrappers && \
-    cd ${PRJPATH}/target/build_linux64_wrappers && \
-    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D BUILD_PYTHON=on -D BUILD_GO=on -D GO_PATH=${GOPATH} -D BUILD_WCC=on ../.. && \
-    make && \
     env CTEST_OUTPUT_ON_FAILURE=1 make test && \
     make package
 
@@ -72,6 +64,7 @@ RUN echo -e "\n\n*** BUILD LINUX 64 ANONYMOUS ***\n\n" && \
     mkdir -p ${PRJPATH}/target/build_linux64_anon && \
     cd ${PRJPATH}/target/build_linux64_anon && \
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     env CTEST_OUTPUT_ON_FAILURE=1 make test && \
     make package
@@ -81,6 +74,7 @@ RUN echo -e "\n\n*** BUILD LINUX 64 ***\n\n" && \
     mkdir -p ${PRJPATH}/target/build_linux64 && \
     cd ${PRJPATH}/target/build_linux64 && \
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../.. && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     env CTEST_OUTPUT_ON_FAILURE=1 make test && \
     make package
@@ -90,6 +84,7 @@ RUN echo -e "\n\n*** BUILD LINUX 32 ***\n\n" && \
     mkdir -p ${PRJPATH}/target/build_linux32 && \
     cd ${PRJPATH}/target/build_linux32 && \
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../.. && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     env CTEST_OUTPUT_ON_FAILURE=1 make test && \
     make package
@@ -99,6 +94,7 @@ RUN echo -e "\n\n*** BUILD WIN 64 ***\n\n" && \
     mkdir -p ${PRJPATH}/target/build_win64 && \
     cd ${PRJPATH}/target/build_win64 && \
     cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../.. && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     env CTEST_OUTPUT_ON_FAILURE=1 make test
 
@@ -107,6 +103,7 @@ RUN echo -e "\n\n*** BUILD WIN 32 ***\n\n" && \
     mkdir -p ${PRJPATH}/target/build_win32 && \
     cd ${PRJPATH}/target/build_win32 && \
     cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../.. && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
     make && \
     env CTEST_OUTPUT_ON_FAILURE=1 make test
 EOM
