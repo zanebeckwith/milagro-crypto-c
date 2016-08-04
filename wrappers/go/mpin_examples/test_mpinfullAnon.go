@@ -23,7 +23,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/milagro/mpin"
+	"local/milagro/mpin"
 )
 
 var HASH_TYPE_MPIN = mpin.SHA256
