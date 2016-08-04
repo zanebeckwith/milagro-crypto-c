@@ -64,7 +64,6 @@ script:
   - genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info
   - make doc
   - echo -e "\n\n*** BUILD LINUX 64 ANONYMOUS ***\n\n"
-  - rm -rf /root/C/milagro-crypto-c/target/build_linux64_anon
   - mkdir -p /root/C/milagro-crypto-c/target/build_linux64_anon
   - cd /root/C/milagro-crypto-c/target/build_linux64_anon
   - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../..
