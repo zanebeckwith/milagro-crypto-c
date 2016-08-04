@@ -66,7 +66,9 @@ RUN apt-get install -y wget nano vim curl rsync git screen build-essential pytho
 # add mingw for cross compiling the Windows version in Linux
 RUN apt-get install -y dos2unix mingw-w64 binutils-mingw-w64 mingw-w64-tools mingw-w64-i686-dev mingw-w64-x86-64-dev wine winetricks libwine-development ubuntu-restricted-extras ubuntu-restricted-addons wine64-development-tools binfmt-support
 
-RUN pip install --upgrade pip && pip install cffi
+RUN pip install --upgrade pip && \
+    pip install cffi && \
+    pip install --upgrade autopep8
 
 # configure GO
 RUN mkdir -p /root/GO/bin && \
