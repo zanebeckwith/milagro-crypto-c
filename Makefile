@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all format clean dbuild
+.PHONY: help all format analyze clean dbuild
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -40,6 +40,7 @@ help:
 	@echo "The following commands are available:"
 	@echo ""
 	@echo "    make format      : Format the source code"
+	@echo "    make analyze     : Analyze the source code for security weaknesses"
 	@echo "    make clean       : Remove any build artifact"
 	@echo "    make dbuild      : build everything inside a Docker container"
 	@echo ""
@@ -54,6 +55,10 @@ format:
 	find ./wrappers/go -type f -name "*.go" -exec gofmt -s -w {} \;
 	find ./wrappers/go -type f -name "*.go.in" -exec gofmt -s -w {} \;
 	autopep8 --in-place --aggressive ./wrappers/python/*.py
+
+# Analyze the source code for security weaknesses (requires flawfinder)
+analyze:
+	flawfinder src/*.c
 
 # Remove any build artifact
 clean:
