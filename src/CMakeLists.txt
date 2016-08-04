@@ -100,6 +100,12 @@ if (BUILD_PYTHON AND BUILD_SHARED_LIBS)
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+    message(STATUS "Copy libamcl.so to wrappers/python for testing")
+    add_custom_command(
+                TARGET amcl
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.so" "${PROJECT_BINARY_DIR}/wrappers/python/")
+
     if(BUILD_MPIN)
       message(STATUS "Copy libmpin.so to wrappers/python for testing")
       add_custom_command(
@@ -173,7 +179,94 @@ if (BUILD_PYTHON AND BUILD_SHARED_LIBS)
 
 endif (BUILD_PYTHON AND BUILD_SHARED_LIBS)
 
-# Install libs and headers
+
+# Copy built libs to wrappers/go to allow testing without
+# having to install the libs.
+if (BUILD_GO AND BUILD_SHARED_LIBS)
+
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+    message(STATUS "Copy libamcl.so to wrappers/go for testing")
+    add_custom_command(
+                TARGET amcl
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+    if(BUILD_MPIN)
+      message(STATUS "Copy libmpin.so to wrappers/go for testing")
+      add_custom_command(
+                  TARGET mpin
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_MPIN)
+
+    if(BUILD_WCC)
+      message(STATUS "Copy libwcc.so to wrappers/go for testing")
+      add_custom_command(
+                  TARGET wcc
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_WCC)  
+
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    message(STATUS "Copy libamcl.dll to wrappers/go for testing")
+    add_custom_command(
+                TARGET amcl
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+    if(BUILD_MPIN)
+      message(STATUS "Copy libmpin.dll to wrappers/go for testing")
+      add_custom_command(
+                  TARGET mpin
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_MPIN)
+
+    if(BUILD_WCC)
+      message(STATUS "Copy libwcc.dll to wrappers/go for testing")
+      add_custom_command(
+                  TARGET wcc
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_WCC)
+
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+    message(STATUS "Copy libamcl.dylib to wrappers/go for testing")
+    add_custom_command(
+                TARGET amcl
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+    if(BUILD_MPIN)
+      message(STATUS "Copy libmpin.dylib to wrappers/go for testing")
+      add_custom_command(
+                  TARGET mpin
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_MPIN)
+
+    if(BUILD_WCC)
+      message(STATUS "Copy libwcc.dylib to wrappers/go for testing")
+      add_custom_command(
+                  TARGET wcc
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_WCC)  
+
+
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+
+endif (BUILD_GO AND BUILD_SHARED_LIBS)
+
+
+# Install libs
 install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_WRITE GROUP_READ
@@ -197,4 +290,3 @@ if(BUILD_WCC)
           GROUP_READ GROUP_EXECUTE
           WORLD_READ WORLD_EXECUTE)
 endif(BUILD_WCC)
-
