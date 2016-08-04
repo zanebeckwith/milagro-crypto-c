@@ -63,6 +63,13 @@ script:
   - lcov --no-checksum --directory . --capture --output-file coverage/amcl.info
   - genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info
   - make doc
+  - echo -e "\n\n*** BUILD LINUX 64 ANONYMOUS ***\n\n"
+  - rm -rf /root/C/milagro-crypto-c/target/build_linux64_anon
+  - mkdir -p /root/C/milagro-crypto-c/target/build_linux64_anon
+  - cd /root/C/milagro-crypto-c/target/build_linux64_anon
+  - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../..
+  - make
+  - make test
   - echo -e "\n\n*** BUILD LINUX 64 ***\n\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
