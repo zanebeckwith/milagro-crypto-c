@@ -4,13 +4,13 @@ if(BUILD_MPIN)
 
   # Configure go mpin wrapper
   configure_file (
-    "${CMAKE_CURRENT_SOURCE_DIR}/mpin.go.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/mpin.go"
+    "${PROJECT_SOURCE_DIR}/wrappers/go/mpin.go.in"
+    "${PROJECT_BINARY_DIR}/wrappers/go/mpin.go"
   )
 
-  file(COPY mpin_test.go DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+  file(COPY mpin_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
 
-  add_test(NAME test_golang_mpin COMMAND go test)
+  add_test(NAME test_golang_mpin COMMAND go test -race -v)
   set_tests_properties (test_golang_mpin PROPERTIES PASS_REGULAR_EXPRESSION PASS)
 
   INSTALL(DIRECTORY DESTINATION "${GO_PATH}/src/local/milagro" DIRECTORY_PERMISSIONS
