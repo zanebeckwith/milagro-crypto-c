@@ -48,10 +48,10 @@ addons:
 install:
   - pip install --user --upgrade pip
   - pip install --user cffi
-  - mkdir -p /home/travis/build/bin && \
-  - mkdir -p /home/travis/build/pkg && \
-  - mkdir -p /home/travis/build/src && \
-  - export GOPATH=/home/travis/build/
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/bin
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/pkg
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/src
+  - export GOPATH=/home/travis/build/miracl/milagro-crypto-c/target/go
   - export PATH=$GOPATH/bin:$PATH:$HOME/.local/bin
   - gem install coveralls-lcov
   - go get github.com/stretchr/testify/assert
