@@ -35,8 +35,8 @@ import platform
 PGS = 32
 # WCC Field Size
 PFS = 32
-G1 = 2*PFS + 1
-G2 = 4*PFS
+G1 = 2 * PFS + 1
+G2 = 4 * PFS
 # Length of hash
 HASH_BYTES = 32
 # AES-GCM IV length
@@ -45,7 +45,7 @@ IVL = 12
 PAS = 16
 
 # Hash function choice
-SHA256 = 32 
+SHA256 = 32
 SHA384 = 48
 SHA512 = 64
 HASH_TYPE_WCC = SHA256
@@ -118,7 +118,7 @@ def toHex(octetValue):
     val = []
     while i < octetValue[0].len:
         val.append(octetValue[0].val[i])
-        i = i+1
+        i = i + 1
     return ''.join(val).encode("hex")
 
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
     # Hash value of IdA
     AHV = ffi.new("octet*")
-    AHVval = ffi.new("char []",  HASH_BYTES)
+    AHVval = ffi.new("char []", HASH_BYTES)
     AHV[0].val = AHVval
     AHV[0].max = HASH_BYTES
     AHV[0].len = HASH_BYTES
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     # Hash value of IdB
     BHV = ffi.new("octet*")
-    BHVval = ffi.new("char []",  HASH_BYTES)
+    BHVval = ffi.new("char []", HASH_BYTES)
     BHV[0].val = BHVval
     BHV[0].max = HASH_BYTES
     BHV[0].len = HASH_BYTES
@@ -429,7 +429,7 @@ if __name__ == "__main__":
     if DEBUG:
         print "X: %s" % toHex(X)
 
-    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,X,IdA,PaG1);
+    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, X, IdA, PaG1)
     if rtn != 0:
         print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,X,IdA,PaG1) Error %s", rtn
     if DEBUG:
@@ -441,7 +441,7 @@ if __name__ == "__main__":
     if DEBUG:
         print "W: %s" % toHex(W)
 
-    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,W,IdA,PgG1);
+    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, W, IdA, PgG1)
     if rtn != 0:
         print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,W,IdA,PgG1) Error %s", rtn
     if DEBUG:
@@ -453,30 +453,53 @@ if __name__ == "__main__":
     if DEBUG:
         print "Y: %s" % toHex(Y)
 
-    rtn = libwcc.WCC_GET_G2_TPMULT(HASH_TYPE_WCC,date,Y,IdB,PbG2);
+    rtn = libwcc.WCC_GET_G2_TPMULT(HASH_TYPE_WCC, date, Y, IdB, PbG2)
     if rtn != 0:
         print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,Y,IdB,PbG2) Error %s", rtn
     if DEBUG:
         print "PbG2: %s" % toHex(PbG2)
 
     # PIA = Hq(PaG1,PbG2,PgG1,IdB)
-    libwcc.WCC_Hq(HASH_TYPE_WCC,PaG1,PbG2,PgG1,IdB,PIA);
+    libwcc.WCC_Hq(HASH_TYPE_WCC, PaG1, PbG2, PgG1, IdB, PIA)
     if DEBUG:
         print "PIA: %s" % toHex(PIA)
 
     # PIB = Hq(PbG2,PaG1,PgG1,IdA)
-    libwcc.WCC_Hq(HASH_TYPE_WCC,PbG2,PaG1,PgG1,IdA,PIB);
+    libwcc.WCC_Hq(HASH_TYPE_WCC, PbG2, PaG1, PgG1, IdA, PIB)
     if DEBUG:
         print "PIB: %s" % toHex(PIB)
-        
-    # Alice calculates AES Key 
-    rtn = libwcc.WCC_SENDER_KEY(HASH_TYPE_WCC,date, X, PIA, PIB, PbG2, PgG1, AKeyG1, ATPG1, IdB, KEY1)
+
+    # Alice calculates AES Key
+    rtn = libwcc.WCC_SENDER_KEY(
+        HASH_TYPE_WCC,
+        date,
+        X,
+        PIA,
+        PIB,
+        PbG2,
+        PgG1,
+        AKeyG1,
+        ATPG1,
+        IdB,
+        KEY1)
     if rtn != 0:
         print "libwcc.WCC_SENDER_KEY(HASH_TYPE_WCC,date, X, PIA, PIB, PbG2, PgG1, AKeyG1, ATPG1, IdB, KEY1) Error %s" % rtn
     print "{0}'s AES Key: {1}".format(alice_id, toHex(KEY1))
 
     # Bob calculates AES Key
-    rtn = libwcc.WCC_RECEIVER_KEY(HASH_TYPE_WCC,date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2)
+    rtn = libwcc.WCC_RECEIVER_KEY(
+        HASH_TYPE_WCC,
+        date,
+        Y,
+        W,
+        PIA,
+        PIB,
+        PaG1,
+        PgG1,
+        BKeyG2,
+        BTPG2,
+        IdA,
+        KEY2)
     if rtn != 0:
         print "libwcc.WCC_RECEIVER_KEY(HASH_TYPE_WCC,date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2) Error %s" % rtn
     print "{0}'s AES Key: {1}".format(bob_id, toHex(KEY2))

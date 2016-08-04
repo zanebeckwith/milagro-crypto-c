@@ -24,6 +24,7 @@ import json
 import hashlib
 import mpin
 
+
 class TestMPIN(unittest.TestCase):
     """Tests M-Pin crypto code"""
 
@@ -62,9 +63,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate server secret shares
-        rtn,ss1 = mpin.get_server_secret(ms1)
+        rtn, ss1 = mpin.get_server_secret(ms1)
         self.assertEqual(rtn, 0)
-        rtn,ss2 = mpin.get_server_secret(ms2)
+        rtn, ss2 = mpin.get_server_secret(ms2)
         self.assertEqual(rtn, 0)
 
         # Combine server secret shares
@@ -72,9 +73,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate client secret shares
-        rtn, cs1 = mpin.get_client_secret(ms1, self.hash_mpin_id)        
+        rtn, cs1 = mpin.get_client_secret(ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, cs2 = mpin.get_client_secret(ms2, self.hash_mpin_id)                
+        rtn, cs2 = mpin.get_client_secret(ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine client secret shares
@@ -82,9 +83,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate Time Permit shares
-        rtn, tp1 = mpin.get_client_permit(self.date, ms1, self.hash_mpin_id)        
+        rtn, tp1 = mpin.get_client_permit(self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, tp2 = mpin.get_client_permit(self.date, ms2, self.hash_mpin_id)        
+        rtn, tp2 = mpin.get_client_permit(self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -92,18 +93,19 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client extracts PIN from secret to create Token
-        rtn, token = mpin.extract_pin(self.mpin_id, PIN1, client_secret)        
+        rtn, token = mpin.extract_pin(self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(self.date, self.mpin_id, rng, None, PIN2, token, time_permit)        
+        rtn, x, u, ut, sec = mpin.client_1(
+            self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
-        HID, HTID = mpin.server_1(self.date, self.mpin_id)        
+        HID, HTID = mpin.server_1(self.date, self.mpin_id)
 
         # Server generates Random number Y and sends it to Client
-        rtn, y = mpin.random_generate(rng)        
+        rtn, y = mpin.random_generate(rng)
         self.assertEqual(rtn, 0)
 
         # Client second pass
@@ -111,7 +113,8 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Server second pass
-        rtn, E, F = mpin.server_2(self.date, HID, HTID, y, server_secret, u, ut, v)
+        rtn, E, F = mpin.server_2(
+            self.date, HID, HTID, y, server_secret, u, ut, v)
         self.assertEqual(rtn, 0)
 
     def test_2(self):
@@ -129,9 +132,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate server secret shares
-        rtn,ss1 = mpin.get_server_secret(ms1)
+        rtn, ss1 = mpin.get_server_secret(ms1)
         self.assertEqual(rtn, 0)
-        rtn,ss2 = mpin.get_server_secret(ms2)
+        rtn, ss2 = mpin.get_server_secret(ms2)
         self.assertEqual(rtn, 0)
 
         # Combine server secret shares
@@ -139,9 +142,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate client secret shares
-        rtn, cs1 = mpin.get_client_secret(ms1, self.hash_mpin_id)        
+        rtn, cs1 = mpin.get_client_secret(ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, cs2 = mpin.get_client_secret(ms2, self.hash_mpin_id)                
+        rtn, cs2 = mpin.get_client_secret(ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine client secret shares
@@ -149,9 +152,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate Time Permit shares
-        rtn, tp1 = mpin.get_client_permit(self.date, ms1, self.hash_mpin_id)        
+        rtn, tp1 = mpin.get_client_permit(self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, tp2 = mpin.get_client_permit(self.date, ms2, self.hash_mpin_id)        
+        rtn, tp2 = mpin.get_client_permit(self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -159,18 +162,19 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client extracts PIN from secret to create Token
-        rtn, token = mpin.extract_pin(self.mpin_id, PIN1, client_secret)        
+        rtn, token = mpin.extract_pin(self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(self.date, self.mpin_id, rng, None, PIN2, token, time_permit)        
+        rtn, x, u, ut, sec = mpin.client_1(
+            self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
-        HID, HTID = mpin.server_1(self.date, self.mpin_id)        
+        HID, HTID = mpin.server_1(self.date, self.mpin_id)
 
         # Server generates Random number Y and sends it to Client
-        rtn, y = mpin.random_generate(rng)        
+        rtn, y = mpin.random_generate(rng)
         self.assertEqual(rtn, 0)
 
         # Client second pass
@@ -178,7 +182,8 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Server second pass
-        rtn, E, F = mpin.server_2(self.date, HID, HTID, y, server_secret, u, ut, v)
+        rtn, E, F = mpin.server_2(
+            self.date, HID, HTID, y, server_secret, u, ut, v)
         self.assertEqual(rtn, -19)
 
     def test_3(self):
@@ -196,9 +201,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate server secret shares
-        rtn,ss1 = mpin.get_server_secret(ms1)
+        rtn, ss1 = mpin.get_server_secret(ms1)
         self.assertEqual(rtn, 0)
-        rtn,ss2 = mpin.get_server_secret(ms2)
+        rtn, ss2 = mpin.get_server_secret(ms2)
         self.assertEqual(rtn, 0)
 
         # Combine server secret shares
@@ -206,9 +211,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate client secret shares
-        rtn, cs1 = mpin.get_client_secret(ms1, self.hash_mpin_id)        
+        rtn, cs1 = mpin.get_client_secret(ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, cs2 = mpin.get_client_secret(ms2, self.hash_mpin_id)                
+        rtn, cs2 = mpin.get_client_secret(ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine client secret shares
@@ -216,9 +221,9 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate Time Permit shares
-        rtn, tp1 = mpin.get_client_permit(self.date, ms1, self.hash_mpin_id)        
+        rtn, tp1 = mpin.get_client_permit(self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, tp2 = mpin.get_client_permit(self.date, ms2, self.hash_mpin_id)        
+        rtn, tp2 = mpin.get_client_permit(self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -226,18 +231,19 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client extracts PIN from secret to create Token
-        rtn, token = mpin.extract_pin(self.mpin_id, PIN1, client_secret)        
+        rtn, token = mpin.extract_pin(self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(self.date, self.mpin_id, rng, None, PIN2, token, time_permit)        
+        rtn, x, u, ut, sec = mpin.client_1(
+            self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
-        HID, HTID = mpin.server_1(self.date, self.mpin_id)        
+        HID, HTID = mpin.server_1(self.date, self.mpin_id)
 
         # Server generates Random number Y and sends it to Client
-        rtn, y = mpin.random_generate(rng)        
+        rtn, y = mpin.random_generate(rng)
         self.assertEqual(rtn, 0)
 
         # Client second pass
@@ -246,7 +252,8 @@ class TestMPIN(unittest.TestCase):
 
         # Server second pass
         # v is equal to ut to model a bad token
-        rtn, E, F = mpin.server_2(self.date, HID, HTID, y, server_secret, u, ut, ut)
+        rtn, E, F = mpin.server_2(
+            self.date, HID, HTID, y, server_secret, u, ut, ut)
         self.assertEqual(rtn, -19)
 
     def test_4(self):
@@ -274,7 +281,7 @@ class TestMPIN(unittest.TestCase):
             hash_mpin_id = mpin.hash_id(rand_val)
 
             # Generate client secret shares
-            rtn, cs1 = mpin.get_client_secret(ms1, hash_mpin_id)        
+            rtn, cs1 = mpin.get_client_secret(ms1, hash_mpin_id)
             self.assertEqual(rtn, 0)
             cs1Hex = cs1.encode("hex")
             if cs1Hex in s:
@@ -303,7 +310,7 @@ class TestMPIN(unittest.TestCase):
         rng = mpin.create_csprng(self.seed)
 
         # Generate 100 byte random number
-        random = os.urandom(32)        
+        random = os.urandom(32)
 
         s = set()
         match = 0
@@ -330,9 +337,9 @@ class TestMPIN(unittest.TestCase):
         # Plaintext input
         plaintext1 = "A test message"
 
-        ciphertext, tag1 = mpin.aes_gcm_encrypt(key,iv,header,plaintext1)
+        ciphertext, tag1 = mpin.aes_gcm_encrypt(key, iv, header, plaintext1)
 
-        plaintext2, tag2 = mpin.aes_gcm_decrypt(key,iv,header,ciphertext)
+        plaintext2, tag2 = mpin.aes_gcm_decrypt(key, iv, header, ciphertext)
 
         self.assertEqual(tag1, tag2)
         self.assertEqual(plaintext1, plaintext2)
@@ -352,13 +359,14 @@ class TestMPIN(unittest.TestCase):
         # Plaintext input
         plaintext1 = "A test message"
 
-        ciphertext, tag1 = mpin.aes_gcm_encrypt(key,iv,header,plaintext1)
+        ciphertext, tag1 = mpin.aes_gcm_encrypt(key, iv, header, plaintext1)
 
         new = list(ciphertext)
         new[0] = "a"
         ciphertext_bad = ''.join(new)
 
-        plaintext2, tag2 = mpin.aes_gcm_decrypt(key,iv,header,ciphertext_bad)
+        plaintext2, tag2 = mpin.aes_gcm_decrypt(
+            key, iv, header, ciphertext_bad)
 
         self.assertNotEqual(tag1, tag2)
         self.assertNotEqual(plaintext1, plaintext2)
@@ -378,13 +386,14 @@ class TestMPIN(unittest.TestCase):
         # Plaintext input
         plaintext1 = "A test message"
 
-        ciphertext, tag1 = mpin.aes_gcm_encrypt(key,iv,header,plaintext1)
+        ciphertext, tag1 = mpin.aes_gcm_encrypt(key, iv, header, plaintext1)
 
         new = list(header)
         new[0] = "a"
         header_bad = ''.join(new)
 
-        plaintext2, tag2 = mpin.aes_gcm_decrypt(key,iv,header_bad,ciphertext)
+        plaintext2, tag2 = mpin.aes_gcm_decrypt(
+            key, iv, header_bad, ciphertext)
 
         self.assertNotEqual(tag1, tag2)
         self.assertEqual(plaintext1, plaintext2)
