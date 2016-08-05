@@ -302,16 +302,15 @@ class TestMPIN(unittest.TestCase):
         # random number generator
         rng = mpin.create_csprng(self.seed)
 
-        # Generate 100 byte random number
-        random = os.urandom(32)        
-
+        # Generate 4 byte random number
         s = set()
         match = 0
-        for i in range(1, 10000):
-            mpin.generate_random(rng, random)
+        for i in range(1, 208900):
+            random = mpin.generate_random(rng, 4)
+            # print i, "  ", random.encode("hex")
             if random in s:
-                # print i
                 match = 1
+                break
             s.add(random)
         self.assertEqual(match, 1)
 
