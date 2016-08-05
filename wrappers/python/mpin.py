@@ -1115,7 +1115,7 @@ def generate_otp(rng):
     return otp
 
 
-def generate_random(rng, random_value_in):
+def generate_random(rng, length):
     """Generate a random octet
 
     Generate a random octet
@@ -1123,7 +1123,7 @@ def generate_random(rng, random_value_in):
     Args::
 
         rng: Pointer to cryptographically secure pseudo-random number generator instance
-        randon_value_in: Gives length of random number
+        length: Gives length of random number 
 
     Returns::
 
@@ -1132,7 +1132,7 @@ def generate_random(rng, random_value_in):
     Raises:
 
     """
-    random_value1, random_value1_val = make_octet(len(random_value_in))
+    random_value1, random_value1_val = make_octet(length)
     libmpin.generateRandom(rng, random_value1)
 
     random_value_hex = to_hex(random_value1)
