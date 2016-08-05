@@ -62,59 +62,59 @@ func TestGoodPIN(t *testing.T) {
 		return
 	}
 
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -146,59 +146,59 @@ func TestBadPIN(t *testing.T) {
 		return
 	}
 
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -230,60 +230,60 @@ func TestBadToken(t *testing.T) {
 		return
 	}
 
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, _, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, _, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Send UT as V to model bad token
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -297,13 +297,13 @@ func TestRandom(t *testing.T) {
 		// Seed value for Random Number Generator (RNG)
 		seed := make([]byte, 16)
 		rand.Read(seed)
-		rng := MPIN_CREATE_CSPRNG(seed)
+		rng := CreateCSPRNG(seed)
 
 		// Epoch time in days
-		date := MPIN_today()
+		date := Today()
 
 		// Epoch time in seconds
-		timeValue := MPIN_GET_TIME()
+		timeValue := GetTime()
 
 		// PIN variable to create token
 		PIN1 := mathrand.Intn(10000)
@@ -318,53 +318,53 @@ func TestRandom(t *testing.T) {
 		var MESSAGE []byte
 
 		// Generate Master Secret Share 1
-		_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+		_, MS1 := RandomGenerate(&rng)
 
 		// Generate Master Secret Share 2
-		_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+		_, MS2 := RandomGenerate(&rng)
 
 		// Either Client or TA calculates Hash(ID)
-		HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+		HCID := HashId(HASH_TYPE_MPIN, ID)
 
 		// Generate server secret share 1
-		_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+		_, SS1 := GetServerSecret(MS1[:])
 
 		// Generate server secret share 2
-		_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+		_, SS2 := GetServerSecret(MS2[:])
 
 		// Combine server secret shares
-		_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+		_, SS := RecombineG2(SS1[:], SS2[:])
 
 		// Generate client secret share 1
-		_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+		_, CS1 := GetClientSecret(MS1[:], HCID)
 
 		// Generate client secret share 2
-		_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+		_, CS2 := GetClientSecret(MS2[:], HCID)
 
 		// Combine client secret shares
 		CS := make([]byte, G1S)
-		_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+		_, CS = RecombineG1(CS1[:], CS2[:])
 
 		// Generate time permit share 1
-		_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+		_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 		// Generate time permit share 2
-		_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+		_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 		// Combine time permit shares
-		_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+		_, TP := RecombineG1(TP1[:], TP2[:])
 
 		// Create token
-		_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+		_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 		// Send U, UT, V, timeValue and Message to server
 		var X [EGS]byte
-		_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+		_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 		if USE_ANONYMOUS {
-			got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+			got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 		} else {
-			got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+			got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 		}
 		assert.Equal(t, want, got, "Should be equal")
 	}
@@ -399,57 +399,57 @@ func TestGoodSignature(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Authenticate
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -483,58 +483,58 @@ func TestSignatureExpired(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	timeValue += 10
 	// Authenticate
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -568,58 +568,58 @@ func TestBadSignature(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Authenticate
 	MESSAGE[0] = 00
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		got, _, _, _, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -648,64 +648,64 @@ func TestPINError(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, _, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	var E []byte
 	var F []byte
 	if USE_ANONYMOUS {
-		_, _, _, _, E, F = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		_, _, _, _, E, F = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		_, _, _, _, E, F = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		_, _, _, _, E, F = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 
-	got := MPIN_KANGAROO(E[:], F[:])
+	got := Kangaroo(E[:], F[:])
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -733,86 +733,86 @@ func TestMPINFull(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Precomputation
-	_, G1, G2 := MPIN_PRECOMPUTE(TOKEN[:], HCID)
+	_, G1, G2 := Precompute(TOKEN[:], HCID)
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [EGS]byte
-	_, XOut, _, V, U, UT := MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	_, XOut, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Send Z=r.ID to Server
 	var R [EGS]byte
-	_, ROut, Z := MPIN_GET_G1_MULTIPLE(&rng, 1, R[:], HCID[:])
+	_, ROut, Z := GetG1Multiple(&rng, 1, R[:], HCID[:])
 
 	// Authenticate
 	var HID []byte
 	var HTID []byte
 	var Y []byte
 	if USE_ANONYMOUS {
-		_, HID, HTID, Y, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		_, HID, HTID, Y, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
 	} else {
-		_, HID, HTID, Y, _, _ = MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		_, HID, HTID, Y, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 
 	// send T=w.ID to client
 	var W [EGS]byte
-	_, WOut, T := MPIN_GET_G1_MULTIPLE(&rng, 0, W[:], HTID[:])
+	_, WOut, T := GetG1Multiple(&rng, 0, W[:], HTID[:])
 
 	// Hash all values
-	HM := MPIN_HASH_ALL(HASH_TYPE_MPIN, HCID[:], U[:], UT[:], Y[:], V[:], Z[:], T[:])
+	HM := HashAll(HASH_TYPE_MPIN, HCID[:], U[:], UT[:], Y[:], V[:], Z[:], T[:])
 
-	_, AES_KEY_SERVER := MPIN_SERVER_KEY(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
+	_, AES_KEY_SERVER := ServerKey(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
 	got := hex.EncodeToString(AES_KEY_SERVER[:])
 	if got != want {
 		t.Errorf("%s != %s", want, got)
 	}
 
-	_, AES_KEY_CLIENT := MPIN_CLIENT_KEY(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
+	_, AES_KEY_CLIENT := ClientKey(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
 	got = hex.EncodeToString(AES_KEY_CLIENT[:])
 
 	assert.Equal(t, want, got, "Should be equal")
@@ -839,67 +839,67 @@ func TestTwoPassGoodPIN(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
 	var X [EGS]byte
-	_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
-		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, HCID)
 	} else {
-		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, ID)
 	}
-	_, Y := MPIN_RANDOM_GENERATE(&rng)
+	_, Y := RandomGenerate(&rng)
 
 	// Client Pass 2
-	_, V := MPIN_CLIENT_2(XOut[:], Y[:], SEC[:])
+	_, V := Client2(XOut[:], Y[:], SEC[:])
 
 	// Server Pass 2
-	got, _, _ := MPIN_SERVER_2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -924,67 +924,67 @@ func TestTwoPassBadPIN(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
 	var X [EGS]byte
-	_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
-		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, HCID)
 	} else {
-		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, ID)
 	}
-	_, Y := MPIN_RANDOM_GENERATE(&rng)
+	_, Y := RandomGenerate(&rng)
 
 	// Client Pass 2
-	_, V := MPIN_CLIENT_2(XOut[:], Y[:], SEC[:])
+	_, V := Client2(XOut[:], Y[:], SEC[:])
 
 	// Server Pass 2
-	got, _, _ := MPIN_SERVER_2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -1009,68 +1009,68 @@ func TestTwoPassBadToken(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := MPIN_CREATE_CSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Generate Master Secret Share 1
-	_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS1 := RandomGenerate(&rng)
 
 	// Generate Master Secret Share 2
-	_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+	_, MS2 := RandomGenerate(&rng)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+	_, SS1 := GetServerSecret(MS1[:])
 
 	// Generate server secret share 2
-	_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+	_, SS2 := GetServerSecret(MS2[:])
 
 	// Combine server secret shares
-	_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	_, SS := RecombineG2(SS1[:], SS2[:])
 
 	// Generate client secret share 1
-	_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	_, CS1 := GetClientSecret(MS1[:], HCID)
 
 	// Generate client secret share 2
-	_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	_, CS2 := GetClientSecret(MS2[:], HCID)
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
-	_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	_, CS = RecombineG1(CS1[:], CS2[:])
 
 	// Generate time permit share 1
-	_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 	// Generate time permit share 2
-	_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 	// Combine time permit shares
-	_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	_, TP := RecombineG1(TP1[:], TP2[:])
 
 	// Create token
-	_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
 	var X [EGS]byte
-	_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
-		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, HCID)
 	} else {
-		HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, ID)
 	}
-	_, Y := MPIN_RANDOM_GENERATE(&rng)
+	_, Y := RandomGenerate(&rng)
 
 	// Client Pass 2
-	_, _ = MPIN_CLIENT_2(XOut[:], Y[:], SEC[:])
+	_, _ = Client2(XOut[:], Y[:], SEC[:])
 
 	// Server Pass 2
 	// Send UT as V to model bad token
-	got, _, _ := MPIN_SERVER_2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], UT[:])
+	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], UT[:])
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -1082,10 +1082,10 @@ func TestRandomTwoPass(t *testing.T) {
 		// Seed value for Random Number Generator (RNG)
 		seed := make([]byte, 16)
 		rand.Read(seed)
-		rng := MPIN_CREATE_CSPRNG(seed)
+		rng := CreateCSPRNG(seed)
 
 		// Epoch time in days
-		date := MPIN_today()
+		date := Today()
 
 		// PIN variable to create token
 		PIN1 := mathrand.Intn(10000)
@@ -1097,64 +1097,64 @@ func TestRandomTwoPass(t *testing.T) {
 		rand.Read(ID)
 
 		// Generate Master Secret Share 1
-		_, MS1 := MPIN_RANDOM_GENERATE(&rng)
+		_, MS1 := RandomGenerate(&rng)
 
 		// Generate Master Secret Share 2
-		_, MS2 := MPIN_RANDOM_GENERATE(&rng)
+		_, MS2 := RandomGenerate(&rng)
 
 		// Either Client or TA calculates Hash(ID)
-		HCID := MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+		HCID := HashId(HASH_TYPE_MPIN, ID)
 
 		// Generate server secret share 1
-		_, SS1 := MPIN_GET_SERVER_SECRET(MS1[:])
+		_, SS1 := GetServerSecret(MS1[:])
 
 		// Generate server secret share 2
-		_, SS2 := MPIN_GET_SERVER_SECRET(MS2[:])
+		_, SS2 := GetServerSecret(MS2[:])
 
 		// Combine server secret shares
-		_, SS := MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+		_, SS := RecombineG2(SS1[:], SS2[:])
 
 		// Generate client secret share 1
-		_, CS1 := MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+		_, CS1 := GetClientSecret(MS1[:], HCID)
 
 		// Generate client secret share 2
-		_, CS2 := MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+		_, CS2 := GetClientSecret(MS2[:], HCID)
 
 		// Combine client secret shares
 		CS := make([]byte, G1S)
-		_, CS = MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+		_, CS = RecombineG1(CS1[:], CS2[:])
 
 		// Generate time permit share 1
-		_, TP1 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+		_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 		// Generate time permit share 2
-		_, TP2 := MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+		_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 		// Combine time permit shares
-		_, TP := MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+		_, TP := RecombineG1(TP1[:], TP2[:])
 
 		// Create token
-		_, TOKEN := MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+		_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 		// Client Pass 1
 		var X [EGS]byte
-		_, XOut, SEC, U, UT := MPIN_CLIENT_1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+		_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 		// Server Pass 1
 		var HID []byte
 		var HTID []byte
 		if USE_ANONYMOUS {
-			HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, HCID)
+			HID, HTID = Server1(HASH_TYPE_MPIN, date, HCID)
 		} else {
-			HID, HTID = MPIN_SERVER_1(HASH_TYPE_MPIN, date, ID)
+			HID, HTID = Server1(HASH_TYPE_MPIN, date, ID)
 		}
-		_, Y := MPIN_RANDOM_GENERATE(&rng)
+		_, Y := RandomGenerate(&rng)
 
 		// Client Pass 2
-		_, V := MPIN_CLIENT_2(XOut[:], Y[:], SEC[:])
+		_, V := Client2(XOut[:], Y[:], SEC[:])
 
 		// Server Pass 2
-		got, _, _ := MPIN_SERVER_2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+		got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
 		assert.Equal(t, want, got, "Should be equal")
 
 	}
