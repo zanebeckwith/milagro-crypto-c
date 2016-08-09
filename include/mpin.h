@@ -178,7 +178,6 @@ int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,o
 	@param ID is the input claimed client identity
 	@param HID is output H(ID), a hash of the client ID
 	@param HTID is output H(ID)+H(d|H(ID))
-	@return 0 or an error code
  */
 void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
 /**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol

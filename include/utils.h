@@ -38,7 +38,6 @@ under the License.
 	@param src     Hex encoded string
 	@param dst     Binary string
 	@param src_len length Hex encoded string
-	@return 
 */
 void amcl_hex2bin(const char *src, char *dst, int src_len);
 
@@ -47,7 +46,6 @@ void amcl_hex2bin(const char *src, char *dst, int src_len);
 	@param src     Binary string
 	@param dst     Hex encoded string
 	@param src_len length binary string
-	@return 
 */
 void amcl_bin2hex(char *src, char *dst, int src_len);
 
