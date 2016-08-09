@@ -192,7 +192,7 @@ func main() {
 	}
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [mpin.EGS]byte
+	var X [mpin.PGS]byte
 	fmt.Printf("X: 0x")
 	mpin.PrintBinary(X[:])
 	rtn, XOut, Y1, V, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
@@ -206,7 +206,7 @@ func main() {
 	mpin.PrintBinary(XOut[:])
 
 	// Send Z=r.ID to Server
-	var R [mpin.EGS]byte
+	var R [mpin.PGS]byte
 	fmt.Printf("R: 0x")
 	mpin.PrintBinary(R[:])
 	rtn, ROut, Z := mpin.GetG1Multiple(&rng, 1, R[:], HCID[:])
@@ -237,7 +237,7 @@ func main() {
 	}
 
 	// send T=w.ID to client
-	var W [mpin.EGS]byte
+	var W [mpin.PGS]byte
 	fmt.Printf("W: 0x")
 	mpin.PrintBinary(W[:])
 	rtn, WOut, T := mpin.GetG1Multiple(&rng, 0, W[:], HTID[:])

@@ -181,7 +181,7 @@ def today():
 
     Returns::
 
-        epoch_days: epoch days
+        epoch_date: epoch days
 
     Raises:
 
@@ -305,31 +305,31 @@ def get_server_secret(master_secret):
     return error_code, server_secret_hex.decode("hex")
 
 
-def recombine_G2(q1, q2):
-    """Add two members from the group G1
+def recombine_G2(W1, W2):
+    """Add two members from the group G2
 
-    Create a server secret in G2 from a master secret
+    Add two members from the group G2
 
     Args::
 
-        q1: An input member of G2
-        q2: An input member of G2
+        W1: An input member of G2
+        W2: An input member of G2
 
     Returns::
 
         error_code: error from the C function
-        q: An output member of G1 = Q1+Q2
+        W: An output member of G1; W = W1+W2
 
     Raises:
 
     """
-    q11, q11_val = make_octet(None, q1)
-    q21, q21_val = make_octet(None, q2)
-    q1, q1_val = make_octet(G2)
-    error_code = libmpin.MPIN_RECOMBINE_G2(q11, q21, q1)
+    w11, w11_val = make_octet(None, W1)
+    w21, w21_val = make_octet(None, W2)
+    w1, w1_val = make_octet(G2)
+    error_code = libmpin.MPIN_RECOMBINE_G2(w11, w21, w1)
 
-    q_hex = to_hex(q1)
-    return error_code, q_hex.decode("hex")
+    w_hex = to_hex(w1)
+    return error_code, w_hex.decode("hex")
 
 
 def get_client_secret(master_secret, hash_mpin_id):
@@ -363,7 +363,7 @@ def get_client_secret(master_secret, hash_mpin_id):
 def recombine_G1(q1, q2):
     """Add two members from the group G1
 
-    Create a server secret in G1 from a master secret
+    Add two members from the group G1
 
     Args::
 
@@ -387,14 +387,15 @@ def recombine_G1(q1, q2):
     return error_code, q_hex.decode("hex")
 
 
-def get_client_permit(epoch_days, master_secret, hash_mpin_id):
+def get_client_permit(epoch_date, master_secret, hash_mpin_id):
     """Create a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
 
     Create a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
 
     Args::
 
-        master_secret:  An octet pointer to the master secret
+        epoch_date:  Epoch days
+        master_secret:  An octet pointer to the master secret        
         hash_mpin_id:   An octet pointer to the hash of the M-Pin ID
 
     Returns::
@@ -410,7 +411,7 @@ def get_client_permit(epoch_days, master_secret, hash_mpin_id):
     time_permit1, time_permit1_val = make_octet(G1)
     error_code = libmpin.MPIN_GET_CLIENT_PERMIT(
         HASH_TYPE_MPIN,
-        epoch_days,
+        epoch_date,
         master_secret1,
         hash_mpin_id1,
         time_permit1)
@@ -480,13 +481,13 @@ def precompute(token, hash_mpin_id):
 
 
 def client_1(epoch_date, mpin_id, rng, x, pin, token, time_permit):
-    """Perform first pass of the client side of the 2-pass version of the M-Pin protocol
+    """Perform first pass of the client side of the three pass version of the M-Pin protocol
 
-    Perform first pass of the client side of the 2-pass version of the M-Pin protocol. If Time Permits are
-    disabled, set epoch_date = 0, and UT is not generated and can be set to NULL.
-    If Time Permits are enabled, and PIN error detection is OFF, U is not generated and
-    can be set to NULL.	If Time Permits are enabled, and PIN error detection is ON, U
-    and UT are both generated.
+    Perform first pass of the client side of the three pass version of the M-Pin protocol.
+    If Time Permits are disabled then set epoch_date = 0.In this case UT is not generated0
+    and can be set to None. If Time Permits are enabled, and PIN error detection is OFF,
+    U is not generated and can be set to None. If Time Permits are enabled and PIN error
+    detection is ON then U and UT are both generated. 
 
 
     Args::
@@ -501,7 +502,7 @@ def client_1(epoch_date, mpin_id, rng, x, pin, token, time_permit):
     Returns::
 
         error_code: error from the C function
-        x: Randomly generated integer if R!=NULL, otherwise must be provided as an input
+        x: Randomly generated integer if RNG!=None, otherwise must be provided as an input
         u: u = x.H(ID)
         ut: ut = x.(H(ID)+H(epoch_date|H(ID)))
         v: v = CS+TP, where CS is the reconstructed client secret and TP is the time permit
@@ -577,11 +578,10 @@ def client(epoch_date, mpin_id, rng, x, pin, token,
     """Perform client side of the one-pass version of the M-Pin protocol
 
     Perform client side of the one-pass version of the M-Pin protocol. If Time Permits are
-    disabled, set epoch_date = 0, and UT is not generated and can be set to NULL.
+    disabled then set epoch_date = 0.In this case UT is not generated and can be set to None.
     If Time Permits are enabled, and PIN error detection is OFF, U is not generated and
-    can be set to NULL.	If Time Permits are enabled, and PIN error detection is ON, U
+    can be set to None. If Time Permits are enabled and PIN error detection is ON then U
     and UT are both generated.
-
 
     Args::
 
@@ -597,7 +597,7 @@ def client(epoch_date, mpin_id, rng, x, pin, token,
     Returns::
 
         error_code: error from the C function
-        x: Randomly generated integer if R!=NULL, otherwise must be provided as an input
+        x: Randomly generated integer if RNG!=None, otherwise must be provided as an input
         u: u = x.H(ID)
         ut: ut = x.(H(ID)+H(epoch_date|H(ID)))
         v: v = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
@@ -692,8 +692,8 @@ def server_1(epoch_date, mpin_id):
 
     Perform first pass of the server side of the 3-pass version of the M-Pin protocol
     If Time Permits are disabled, set epoch_date = 0, and UT and HTID are not generated
-    and can be set to NULL. If Time Permits are enabled, and PIN error detection is OFF,
-    U and HID are not needed and caxn be set to NULL. If Time Permits are enabled,
+    and can be set to None. If Time Permits are enabled, and PIN error detection is OFF,
+    U and HID are not needed and caxn be set to None. If Time Permits are enabled,
     and PIN error detection is ON, U, UT, HID and HTID are all required.
 
     Args::
@@ -723,10 +723,10 @@ def server_1(epoch_date, mpin_id):
 def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
     """Perform third pass on the server side of the 3-pass version of the M-Pin protocol
 
-    Perform server side of the one-pass version of the M-Pin protocol. If Time
+    Perform server side of the three-pass version of the M-Pin protocol. If Time
     Permits are disabled, set epoch_date = 0, and UT and HTID are not generated and can
-    be set to NULL. If Time Permits are enabled, and PIN error detection is OFF,
-    U and HID are not needed and can be set to NULL. If Time Permits are enabled,
+    be set to None. If Time Permits are enabled, and PIN error detection is OFF,
+    U and HID are not needed and can be set to None. If Time Permits are enabled,
     and PIN error detection is ON, U, UT, HID and HTID are all required.
 
     Args::
@@ -743,8 +743,8 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
     Returns::
 
         error_code: error from the C function
-        e: value to help the Kangaroos to find the PIN error, or NULL if not required
-        f: value to help the Kangaroos to find the PIN error, or NULL if not required
+        e: value to help the Kangaroos to find the PIN error, or None if not required
+        f: value to help the Kangaroos to find the PIN error, or None if not required
 
     Raises:
 
@@ -782,8 +782,8 @@ def server(epoch_date, server_secret, u, ut, v, mpin_id, message, epoch_time):
 
     Perform server side of the one-pass version of the M-Pin protocol. If Time
     Permits are disabled, set epoch_date = 0, and UT and HTID are not generated and can
-    be set to NULL. If Time Permits are enabled, and PIN error detection is OFF,
-    U and HID are not needed and can be set to NULL. If Time Permits are enabled,
+    be set to None. If Time Permits are enabled, and PIN error detection is OFF,
+    U and HID are not needed and can be set to None. If Time Permits are enabled,
     and PIN error detection is ON, U, UT, HID and HTID are all required.
 
     Args::
@@ -802,8 +802,8 @@ def server(epoch_date, server_secret, u, ut, v, mpin_id, message, epoch_time):
         error_code: error from the C function
         HID:  H(mpin_id). H is a map to a point on the curve
         HTID: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
-        e: value to help the Kangaroos to find the PIN error, or NULL if not required
-        f: value to help the Kangaroos to find the PIN error, or NULL if not required
+        e: value to help the Kangaroos to find the PIN error, or None if not required
+        f: value to help the Kangaroos to find the PIN error, or None if not required
         y: y = t H(t|U) or y = H(t|UT) if Time Permits enabled used for debug
 
     Raises:
@@ -852,14 +852,14 @@ def server(epoch_date, server_secret, u, ut, v, mpin_id, message, epoch_time):
 
 
 def kangaroo(e, f):
-    """Use Kangaroos to find PIN error
+    """Use Pollards Kangaroos to find PIN error
 
-    Use Kangaroos to find PIN error
+    Use Pollards Kangaroos to find PIN error
 
     Args::
 
-        e: e a member of the group GT
-        f: F a member of the group GT =  E^pin_error
+        e: a member of the group GT
+        f: a member of the group GT =  E^pin_error
 
     Returns::
 
@@ -1020,14 +1020,14 @@ def aes_gcm_encrypt(aes_key, iv, header, plaintext):
     Args::
 
         aes_key: AES Key
-        iv: Initializartion vector
+        iv: Initialization vector
         header: header
         plaintext: Plaintext to be encrypted
 
     Returns::
 
         ciphertext: resultant ciphertext
-        tag: checksum
+        tag: MAC
 
 
     Raises:
@@ -1061,14 +1061,14 @@ def aes_gcm_decrypt(aes_key, iv, header, ciphertext):
     Args::
 
         aes_key: AES Key
-        iv: Initializartion vector
+        iv: Initialization vector
         header: header
         ciphertext: ciphertext
 
     Returns::
 
         plaintext: resultant plaintext
-        tag: checksum
+        tag: MAC
 
     Raises:
 
@@ -1104,26 +1104,25 @@ def generate_otp(rng):
 
     Returns::
 
-        error_code: error from the C function
-        otp: One time password
+        OTP: One time password
 
     Raises:
 
     """
-    otp = libmpin.generateOTP(rng)
+    OTP = libmpin.generateOTP(rng)
 
-    return otp
+    return OTP
 
 
 def generate_random(rng, length):
-    """Generate a random octet
+    """Generate a random string
 
-    Generate a random octet
+    Generate a random string
 
     Args::
 
         rng: Pointer to cryptographically secure pseudo-random number generator instance
-        length: Gives length of random number 
+        length: Gives length of random byte array
 
     Returns::
 

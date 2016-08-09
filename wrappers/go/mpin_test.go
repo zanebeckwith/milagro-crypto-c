@@ -108,7 +108,7 @@ func TestGoodPIN(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	if USE_ANONYMOUS {
@@ -192,7 +192,7 @@ func TestBadPIN(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	if USE_ANONYMOUS {
@@ -276,7 +276,7 @@ func TestBadToken(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, _, _, _, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Send UT as V to model bad token
@@ -358,7 +358,7 @@ func TestRandom(t *testing.T) {
 		_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 		// Send U, UT, V, timeValue and Message to server
-		var X [EGS]byte
+		var X [PGS]byte
 		_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 		if USE_ANONYMOUS {
@@ -442,7 +442,7 @@ func TestGoodSignature(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Authenticate
@@ -526,7 +526,7 @@ func TestSignatureExpired(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	timeValue += 10
@@ -611,7 +611,7 @@ func TestBadSignature(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Authenticate
@@ -694,7 +694,7 @@ func TestPINError(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	var E []byte
@@ -782,11 +782,11 @@ func TestMPINFull(t *testing.T) {
 	_, G1, G2 := Precompute(TOKEN[:], HCID)
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [EGS]byte
+	var X [PGS]byte
 	_, XOut, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
 	// Send Z=r.ID to Server
-	var R [EGS]byte
+	var R [PGS]byte
 	_, ROut, Z := GetG1Multiple(&rng, 1, R[:], HCID[:])
 
 	// Authenticate
@@ -800,7 +800,7 @@ func TestMPINFull(t *testing.T) {
 	}
 
 	// send T=w.ID to client
-	var W [EGS]byte
+	var W [PGS]byte
 	_, WOut, T := GetG1Multiple(&rng, 0, W[:], HTID[:])
 
 	// Hash all values
@@ -882,7 +882,7 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
-	var X [EGS]byte
+	var X [PGS]byte
 	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
@@ -967,7 +967,7 @@ func TestTwoPassBadPIN(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
-	var X [EGS]byte
+	var X [PGS]byte
 	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
@@ -1052,7 +1052,7 @@ func TestTwoPassBadToken(t *testing.T) {
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 	// Client Pass 1
-	var X [EGS]byte
+	var X [PGS]byte
 	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Server Pass 1
@@ -1137,7 +1137,7 @@ func TestRandomTwoPass(t *testing.T) {
 		_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 		// Client Pass 1
-		var X [EGS]byte
+		var X [PGS]byte
 		_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 		// Server Pass 1

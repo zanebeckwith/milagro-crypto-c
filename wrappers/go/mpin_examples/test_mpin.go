@@ -185,7 +185,7 @@ func main() {
 	}
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [mpin.EGS]byte
+	var X [mpin.PGS]byte
 	fmt.Printf("X: 0x")
 	mpin.PrintBinary(X[:])
 	rtn, XOut, Y1, SEC, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
