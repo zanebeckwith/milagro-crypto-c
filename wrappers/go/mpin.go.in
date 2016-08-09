@@ -40,7 +40,7 @@ const PGS int = int(C.PGS)
 const PFS int = int(C.PFS)
 const hashBytes int = int(C.PFS)
 const IVS int = 12
-const G1S = 2 * PFS + 1
+const G1S = 2*PFS + 1
 const G2S = 4 * PFS
 const GTS = 12 * PFS
 
@@ -157,7 +157,6 @@ func GetTime() int {
 	return int(epochTime)
 }
 
-
 /*
 
 Make a Cryptographically secure pseudo-random number generator instance
@@ -223,7 +222,7 @@ Args:
 Returns:
 
     errorCode: error from the C function
-    s: random group element 
+    s: random group element
 
 */
 func RandomGenerate(RNG *C.csprng) (errorCode int, S []byte) {
@@ -413,7 +412,7 @@ func GetClientPermit(hashType, epochDate int, masterSecret, hashMPinId []byte) (
 	return errorCode, timePermit[:]
 }
 
-/* 
+/*
 
 Extract a PIN from client secret
 
@@ -517,7 +516,7 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *C.csprng, x []byte, PIN
 	return errorCode, xOut[:], y[:], V[:], U[:], UT[:]
 }
 
-/* 
+/*
 
 Precompute values for use by the client side of M-Pin Full
 
@@ -559,7 +558,7 @@ func Precompute(token, hashMPinId []byte) (errorCode int, pc1, pc2 []byte) {
 	return errorCode, pc1[:], pc2[:]
 }
 
-/* 
+/*
 
 Calculate W=x*P where random x < q is the order of the group of points on the curve.
 When RNG is nil x is passed in otherwise it is passed out.
@@ -603,7 +602,7 @@ func GetG1Multiple(RNG *C.csprng, typ int, x []byte, G []byte) (errorCode int, x
 	return errorCode, xOut[:], W[:]
 }
 
-/* 
+/*
 
 Perform server side of the one-pass version of the M-Pin protocol. If Time
 Permits are disabled, set epoch_date = 0, and UT and HTID are not generated and can
@@ -677,7 +676,7 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 	return errorCode, HID[:], HTID[:], y[:], E[:], F[:]
 }
 
-/* 
+/*
 
 Use Pollards Kangaroos to find PIN error
 
@@ -762,7 +761,7 @@ func ServerKey(hashType int, Z, serverSecret, w, HM, HID, U, UT []byte) (errorCo
 	return errorCode, serverAESKey[:]
 }
 
-/* 
+/*
 
 Calculate Key on Client side for M-Pin Full
 
@@ -822,7 +821,7 @@ Generate a random byte array
 Args:
 
     RNG: Pointer to cryptographically secure pseudo-random number generator instance
-    length: Gives length of random byte array 
+    length: Gives length of random byte array
 
 Returns:
 
@@ -841,7 +840,7 @@ func GenerateRandomByte(RNG *C.csprng, randomLen int) (randomValue []byte) {
 	return randomValue[:]
 }
 
-/* 
+/*
 
 Generate a random six digit one time password
 
@@ -859,7 +858,7 @@ func GenerateOTP(RNG *C.csprng) int {
 	return int(OTP)
 }
 
-/* 
+/*
 
 Performs AES-GCM Encryption
 
@@ -905,7 +904,7 @@ func AesGcmEncrypt(K, IV, H, P []byte) (C, T []byte) {
 	return C, T
 }
 
-/* 
+/*
 
 Performs AES-GCM Deryption
 
@@ -959,7 +958,7 @@ func PrintBinary(array []byte) {
 	fmt.Printf("\n")
 }
 
-/* 
+/*
 
 Perform first pass of the server side of the 3-pass version of the M-Pin protocol
 If Time Permits are disabled, set epoch_date = 0, and UT and HTID are not generated
@@ -1062,13 +1061,13 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 	return errorCode, E[:], F[:]
 }
 
-/* 
+/*
 
 Perform first pass of the client side of the three pass version of the M-Pin protocol.
 If Time Permits are disabled then set epoch_date = 0.In this case UT is not generated0
 and can be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
 U is not generated and can be set to nil. If Time Permits are enabled and PIN error
-detection is ON then U and UT are both generated. 
+detection is ON then U and UT are both generated.
 
 Args:
 
@@ -1163,7 +1162,7 @@ func Client2(x []byte, y []byte, SEC []byte) (errorCode int, V []byte) {
 	return errorCode, V[:]
 }
 
-/* 
+/*
 
 Hash the session transcript
 

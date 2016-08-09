@@ -395,7 +395,7 @@ def get_client_permit(epoch_date, master_secret, hash_mpin_id):
     Args::
 
         epoch_date:  Epoch days
-        master_secret:  An octet pointer to the master secret        
+        master_secret:  An octet pointer to the master secret
         hash_mpin_id:   An octet pointer to the hash of the M-Pin ID
 
     Returns::
@@ -487,7 +487,7 @@ def client_1(epoch_date, mpin_id, rng, x, pin, token, time_permit):
     If Time Permits are disabled then set epoch_date = 0.In this case UT is not generated0
     and can be set to None. If Time Permits are enabled, and PIN error detection is OFF,
     U is not generated and can be set to None. If Time Permits are enabled and PIN error
-    detection is ON then U and UT are both generated. 
+    detection is ON then U and UT are both generated.
 
 
     Args::

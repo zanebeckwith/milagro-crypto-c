@@ -247,7 +247,7 @@ func main() {
 	mpin.PrintBinary(T[:])
 
 	// Hash all values
-	HM := mpin.HashAll(HASH_TYPE_MPIN, ID[:], U[:], UT[:],  V[:], Y2[:], Z[:], T[:])
+	HM := mpin.HashAll(HASH_TYPE_MPIN, ID[:], U[:], UT[:], V[:], Y2[:], Z[:], T[:])
 
 	rtn, AES_KEY_SERVER := mpin.ServerKey(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
 	fmt.Printf("Server Key =  0x")
