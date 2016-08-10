@@ -49,12 +49,12 @@ const SHA256 int = 32
 const SHA384 int = 48
 const SHA512 int = 64
 
-// Free memory associated with octet
+// OctetFree frees memory associated with an octet
 func OctetFree(valOctet *C.octet) {
 	C.free(unsafe.Pointer(valOctet.val))
 }
 
-// Form an empty octet
+// GetOctetZero forms an empty octet
 func GetOctetZero(lenStr int) C.octet {
 	valBytes := make([]byte, lenStr)
 	val := string(valBytes)
@@ -64,7 +64,7 @@ func GetOctetZero(lenStr int) C.octet {
 	return octetVal
 }
 
-// Get octet from string
+// GetOctet forms an octet from a string
 func GetOctet(valStr string) C.octet {
 	valCS := C.CString(valStr)
 	lenCS := C.int(len(valStr))
@@ -72,7 +72,7 @@ func GetOctet(valStr string) C.octet {
 	return octetVal
 }
 
-// Get octet from hex string
+// GetOctetHex forms an octet from a hex string
 func GetOctetHex(valHex string) C.octet {
 	valBytes, err := hex.DecodeString(valHex)
 	if err != nil {
@@ -84,12 +84,12 @@ func GetOctetHex(valHex string) C.octet {
 	return octetVal
 }
 
-// Get length in bytes of octet
+// OctetLen gets length in bytes of an octet
 func OctetLen(valOctet *C.octet) int {
 	return int(valOctet.len)
 }
 
-// Convert an octet to a string
+// OctetToString convert an octet to a string
 func OctetToString(valOct *C.octet) string {
 	dstLen := OctetLen(valOct)
 	dstBytes := make([]byte, dstLen)
@@ -101,7 +101,7 @@ func OctetToString(valOct *C.octet) string {
 	return dstStr
 }
 
-// Convert an octet to bytes
+// OctetToBytes convert an octet to bytes
 func OctetToBytes(valOct *C.octet) []byte {
 	dstLen := OctetLen(valOct)
 	dstBytes := make([]byte, dstLen)
@@ -114,7 +114,7 @@ func OctetToBytes(valOct *C.octet) []byte {
 	return dstBytes
 }
 
-// Convert an octet to a hex string
+// OctetToHex convert an octet to a hex string
 func OctetToHex(valOctet *C.octet) string {
 	dstLen := OctetLen(valOctet)
 	dstBytes := make([]byte, hex.EncodedLen(dstLen))
@@ -128,7 +128,7 @@ func OctetToHex(valOctet *C.octet) string {
 
 /*
 
-Today's date as days elapsed from the epoch. This function uses the system clock
+Today returns today's date as days elapsed from the epoch. This function uses the system clock
 
 Args:
 
@@ -143,7 +143,7 @@ func Today() int {
 
 /*
 
-Time elapsed from the epoch. This function uses the system clock
+GetTime returns time elapsed from the epoch. This function uses the system clock
 
 Args:
 
@@ -159,7 +159,7 @@ func GetTime() int {
 
 /*
 
-Make a Cryptographically secure pseudo-random number generator instance
+CreateCSPRNG makes a cryptographically secure pseudo-random number generator instance
 
 Args:
 
@@ -182,7 +182,7 @@ func CreateCSPRNG(SEED []byte) C.csprng {
 
 /*
 
-Hash an M-Pin Identity to an octet
+HashId hashs an M-Pin Identity
 
 Args:
 
@@ -213,7 +213,7 @@ func HashId(hashType int, mpinId []byte) (hashMPinId []byte) {
 
 /*
 
-Generate a random group element
+RandomGenerate returns a random integer where s < q is the order of the group of points on the curve.
 
 Args:
 
@@ -241,7 +241,7 @@ func RandomGenerate(RNG *C.csprng) (errorCode int, S []byte) {
 
 /*
 
-Create a server secret in G2 from a master secret
+GetServerSecret creates a server secret in G2 from a master secret
 
 Args:
 
@@ -272,7 +272,7 @@ func GetServerSecret(masterSecret []byte) (errorCode int, serverSecret []byte) {
 
 /*
 
-Add two members from the group G1
+RecombineG1 adds two members from the group G1
 
 Args:
 
@@ -307,7 +307,7 @@ func RecombineG1(R1 []byte, R2 []byte) (errorCode int, R []byte) {
 
 /*
 
-Add two members from the group G2
+RecombineG2 adds two members from the group G2
 
 Args:
 
@@ -342,7 +342,7 @@ func RecombineG2(W1 []byte, W2 []byte) (errorCode int, W []byte) {
 
 /*
 
-Create a client secret in G1 from a master secret and the hash of the M-Pin Id
+GetClientSecret creates a client secret in G1 from a master secret and the hash of the M-Pin Id
 
 Args:
 
@@ -377,7 +377,7 @@ func GetClientSecret(masterSecret []byte, hashMPinId []byte) (errorCode int, cli
 
 /*
 
-Create a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
+GetClientPermit creates a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
 
 Args:
 
@@ -414,7 +414,7 @@ func GetClientPermit(hashType, epochDate int, masterSecret, hashMPinId []byte) (
 
 /*
 
-Extract a PIN from client secret
+ExtractPIN extracts a PIN from the client secret
 
 Args:
 
@@ -449,7 +449,7 @@ func ExtractPIN(hashType int, mpinId []byte, PIN int, clientSecret []byte) (erro
 
 /*
 
-Perform client side of the one-pass version of the M-Pin protocol. If Time Permits are
+Client performs client side of the one-pass version of the M-Pin protocol. If Time Permits are
 disabled then set epoch_date = 0.In this case UT is not generated and can be set to nil.
 If Time Permits are enabled, and PIN error detection is OFF, U is not generated and
 can be set to nil. If Time Permits are enabled and PIN error detection is ON then U
@@ -518,7 +518,7 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *C.csprng, x []byte, PIN
 
 /*
 
-Precompute values for use by the client side of M-Pin Full
+Precompute calculate values for use by the client side of M-Pin Full
 
 Args:
 
@@ -560,7 +560,7 @@ func Precompute(token, hashMPinId []byte) (errorCode int, pc1, pc2 []byte) {
 
 /*
 
-Calculate W=x*P where random x < q is the order of the group of points on the curve.
+GetG1Multiple calculates W=x*P where random x < q is the order of the group of points on the curve.
 When RNG is nil x is passed in otherwise it is passed out.
 
 If type=0 then P is. point on the curve or else P is an octet that has to be
@@ -604,7 +604,7 @@ func GetG1Multiple(RNG *C.csprng, typ int, x []byte, G []byte) (errorCode int, x
 
 /*
 
-Perform server side of the one-pass version of the M-Pin protocol. If Time
+Server performs server side of the one-pass version of the M-Pin protocol. If Time
 Permits are disabled, set epoch_date = 0, and UT and HTID are not generated and can
 be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
@@ -678,7 +678,7 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 
 /*
 
-Use Pollards Kangaroos to find PIN error
+Kangaroo uses Pollards Kangaroos to find PIN error
 
 Args:
 
@@ -706,7 +706,7 @@ func Kangaroo(E []byte, F []byte) (PINError int) {
 
 /*
 
-Calculate Key on Server side for M-Pin Full.Uses UT internally for the
+ServerKey calculates AES key on server side for M-Pin Full.Uses UT internally for the
 key calculation or uses U if UT is set to None
 
 Args:
@@ -763,7 +763,7 @@ func ServerKey(hashType int, Z, serverSecret, w, HM, HID, U, UT []byte) (errorCo
 
 /*
 
-Calculate Key on Client side for M-Pin Full
+ClientKey calculate AES key on client side for M-Pin Full
 
 Args:
 
@@ -816,7 +816,7 @@ func ClientKey(hashType, PIN int, pc1, pc2, r, x, HM, T []byte) (errorCode int, 
 
 /*
 
-Generate a random byte array
+GenerateRandomByte generates a random byte array
 
 Args:
 
@@ -842,7 +842,7 @@ func GenerateRandomByte(RNG *C.csprng, randomLen int) (randomValue []byte) {
 
 /*
 
-Generate a random six digit one time password
+GenerateOTP returns a random six digit one time password
 
 Args:
 
@@ -860,7 +860,7 @@ func GenerateOTP(RNG *C.csprng) int {
 
 /*
 
-Performs AES-GCM Encryption
+AesGcmEncrypt performs AES-GCM Encryption
 
 Args:
 
@@ -906,7 +906,7 @@ func AesGcmEncrypt(K, IV, H, P []byte) (C, T []byte) {
 
 /*
 
-Performs AES-GCM Deryption
+AesGcmDecrypt performs AES-GCM Deryption
 
 Args:
 
@@ -950,7 +950,7 @@ func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte) {
 	return P, T
 }
 
-// Print byte array as hex
+// PrintBinary print byte array as hex
 func PrintBinary(array []byte) {
 	for i := 0; i < len(array); i++ {
 		fmt.Printf("%02x", array[i])
@@ -960,7 +960,7 @@ func PrintBinary(array []byte) {
 
 /*
 
-Perform first pass of the server side of the 3-pass version of the M-Pin protocol
+Server1 performs first pass of the server side of the 3-pass version of the M-Pin protocol
 If Time Permits are disabled, set epoch_date = 0, and UT and HTID are not generated
 and can be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
@@ -1000,7 +1000,7 @@ func Server1(hashType, epochDate int, mpinId []byte) (HID, HTID []byte) {
 
 /*
 
-Perform server side of the three-pass version of the M-Pin protocol. If Time
+Server2 performs server side of the three-pass version of the M-Pin protocol. If Time
 Permits are disabled, set epoch_date = 0, and UT and HTID are not generated and can
 be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
@@ -1063,7 +1063,7 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 
 /*
 
-Perform first pass of the client side of the three pass version of the M-Pin protocol.
+Client1 performs first pass of the client side of the three pass version of the M-Pin protocol.
 If Time Permits are disabled then set epoch_date = 0.In this case UT is not generated0
 and can be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
 U is not generated and can be set to nil. If Time Permits are enabled and PIN error
@@ -1127,7 +1127,7 @@ func Client1(hashType, epochDate int, mpinId []byte, RNG *C.csprng, x []byte, PI
 
 /*
 
-Perform second pass of the client side of the 3-pass version of the M-Pin protocol
+Client2 performs second pass of the client side of the 3-pass version of the M-Pin protocol
 
 Args:
 
@@ -1164,7 +1164,7 @@ func Client2(x []byte, y []byte, SEC []byte) (errorCode int, V []byte) {
 
 /*
 
-Hash the session transcript
+HashAll hashs the session transcript
 
 Args:
 
