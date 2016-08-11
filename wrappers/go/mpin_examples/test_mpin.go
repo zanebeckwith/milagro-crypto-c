@@ -33,15 +33,15 @@ func main() {
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
 	fmt.Printf("ID: ")
-	mpin.MPIN_printBinary(ID)
+	mpin.PrintBinary(ID)
 	fmt.Printf("\n")
 
 	// Epoch time in days
-	date := mpin.MPIN_today()
+	date := mpin.Today()
 	fmt.Println("date: ", date)
 
 	// Epoch time in seconds
-	timeValue := mpin.MPIN_GET_TIME()
+	timeValue := mpin.GetTime()
 	fmt.Println("timeValue: ", timeValue)
 
 	// PIN variable to create token
@@ -56,110 +56,110 @@ func main() {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := mpin.MPIN_CREATE_CSPRNG(seed)
+	rng := mpin.CreateCSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := mpin.MPIN_RANDOM_GENERATE(&rng)
+	rtn, MS1 := mpin.RandomGenerate(&rng)
 	if rtn != 0 {
-		fmt.Println("MPIN_RANDOM_GENERATE Error:", rtn)
+		fmt.Println("RandomGenerate Error:", rtn)
 		return
 	}
 	fmt.Printf("MS1: 0x")
-	mpin.MPIN_printBinary(MS1[:])
+	mpin.PrintBinary(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := mpin.MPIN_RANDOM_GENERATE(&rng)
+	rtn, MS2 := mpin.RandomGenerate(&rng)
 	if rtn != 0 {
-		fmt.Println("MPIN_RANDOM_GENERATE Error:", rtn)
+		fmt.Println("RandomGenerate Error:", rtn)
 		return
 	}
 	fmt.Printf("MS2: 0x")
-	mpin.MPIN_printBinary(MS2[:])
+	mpin.PrintBinary(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := mpin.MPIN_HASH_ID(HASH_TYPE_MPIN, ID)
+	HCID := mpin.HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	rtn, SS1 := mpin.MPIN_GET_SERVER_SECRET(MS1[:])
+	rtn, SS1 := mpin.GetServerSecret(MS1[:])
 	if rtn != 0 {
-		fmt.Println("MPIN_GET_SERVER_SECRET Error:", rtn)
+		fmt.Println("GetServerSecret Error:", rtn)
 		return
 	}
 	fmt.Printf("SS1: 0x")
-	mpin.MPIN_printBinary(SS1[:])
+	mpin.PrintBinary(SS1[:])
 
 	// Generate server secret share 2
-	rtn, SS2 := mpin.MPIN_GET_SERVER_SECRET(MS2[:])
+	rtn, SS2 := mpin.GetServerSecret(MS2[:])
 	if rtn != 0 {
-		fmt.Println("MPIN_GET_SERVER_SECRET Error:", rtn)
+		fmt.Println("GetServerSecret Error:", rtn)
 		return
 	}
 	fmt.Printf("SS2: 0x")
-	mpin.MPIN_printBinary(SS2[:])
+	mpin.PrintBinary(SS2[:])
 
 	// Combine server secret shares
-	rtn, SS := mpin.MPIN_RECOMBINE_G2(SS1[:], SS2[:])
+	rtn, SS := mpin.RecombineG2(SS1[:], SS2[:])
 	if rtn != 0 {
-		fmt.Println("MPIN_RECOMBINE_G2(SS1, SS2) Error:", rtn)
+		fmt.Println("RecombineG2(SS1, SS2) Error:", rtn)
 		return
 	}
 	fmt.Printf("SS: 0x")
-	mpin.MPIN_printBinary(SS[:])
+	mpin.PrintBinary(SS[:])
 
 	// Generate client secret share 1
-	rtn, CS1 := mpin.MPIN_GET_CLIENT_SECRET(MS1[:], HCID)
+	rtn, CS1 := mpin.GetClientSecret(MS1[:], HCID)
 	if rtn != 0 {
-		fmt.Println("MPIN_GET_CLIENT_SECRET Error:", rtn)
+		fmt.Println("GetClientSecret Error:", rtn)
 		return
 	}
 	fmt.Printf("Client Secret Share CS1: 0x")
-	mpin.MPIN_printBinary(CS1[:])
+	mpin.PrintBinary(CS1[:])
 
 	// Generate client secret share 2
-	rtn, CS2 := mpin.MPIN_GET_CLIENT_SECRET(MS2[:], HCID)
+	rtn, CS2 := mpin.GetClientSecret(MS2[:], HCID)
 	if rtn != 0 {
-		fmt.Println("MPIN_GET_CLIENT_SECRET Error:", rtn)
+		fmt.Println("GetClientSecret Error:", rtn)
 		return
 	}
 	fmt.Printf("Client Secret Share CS2: 0x")
-	mpin.MPIN_printBinary(CS2[:])
+	mpin.PrintBinary(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, mpin.G1S)
-	rtn, CS = mpin.MPIN_RECOMBINE_G1(CS1[:], CS2[:])
+	rtn, CS = mpin.RecombineG1(CS1[:], CS2[:])
 	if rtn != 0 {
-		fmt.Println("MPIN_RECOMBINE_G1 Error:", rtn)
+		fmt.Println("RecombineG1 Error:", rtn)
 		return
 	}
 	fmt.Printf("Client Secret CS: 0x")
-	mpin.MPIN_printBinary(CS[:])
+	mpin.PrintBinary(CS[:])
 
 	// Generate time permit share 1
-	rtn, TP1 := mpin.MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	rtn, TP1 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 	if rtn != 0 {
-		fmt.Println("MPIN_GET_CLIENT_PERMIT Error:", rtn)
+		fmt.Println("GetClientPermit Error:", rtn)
 		return
 	}
 	fmt.Printf("TP1: 0x")
-	mpin.MPIN_printBinary(TP1[:])
+	mpin.PrintBinary(TP1[:])
 
 	// Generate time permit share 2
-	rtn, TP2 := mpin.MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	rtn, TP2 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 	if rtn != 0 {
-		fmt.Println("MPIN_GET_CLIENT_PERMIT Error:", rtn)
+		fmt.Println("GetClientPermit Error:", rtn)
 		return
 	}
 	fmt.Printf("TP2: 0x")
-	mpin.MPIN_printBinary(TP2[:])
+	mpin.PrintBinary(TP2[:])
 
 	// Combine time permit shares
-	rtn, TP := mpin.MPIN_RECOMBINE_G1(TP1[:], TP2[:])
+	rtn, TP := mpin.RecombineG1(TP1[:], TP2[:])
 	if rtn != 0 {
-		fmt.Println("MPIN_RECOMBINE_G1(TP1, TP2) Error:", rtn)
+		fmt.Println("RecombineG1(TP1, TP2) Error:", rtn)
 		return
 	}
 
@@ -169,13 +169,13 @@ func main() {
 		fmt.Scan(&PIN1)
 	}
 
-	rtn, TOKEN := mpin.MPIN_EXTRACT_PIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	rtn, TOKEN := mpin.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d\n", rtn)
 		return
 	}
 	fmt.Printf("Client Token TK: 0x")
-	mpin.MPIN_printBinary(TOKEN[:])
+	mpin.PrintBinary(TOKEN[:])
 
 	//////   Client   //////
 
@@ -185,36 +185,36 @@ func main() {
 	}
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [mpin.EGS]byte
+	var X [mpin.PGS]byte
 	fmt.Printf("X: 0x")
-	mpin.MPIN_printBinary(X[:])
-	rtn, XOut, Y1, SEC, U, UT := mpin.MPIN_CLIENT(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	mpin.PrintBinary(X[:])
+	rtn, XOut, Y1, SEC, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
 		return
 	}
 	fmt.Printf("Y1: 0x")
-	mpin.MPIN_printBinary(Y1[:])
+	mpin.PrintBinary(Y1[:])
 	fmt.Printf("XOut: 0x")
-	mpin.MPIN_printBinary(XOut[:])
+	mpin.PrintBinary(XOut[:])
 	fmt.Printf("V: 0x")
-	mpin.MPIN_printBinary(SEC[:])
+	mpin.PrintBinary(SEC[:])
 
 	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := mpin.MPIN_SERVER(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
+	rtn, HID, HTID, Y2, E, F := mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}
 	fmt.Printf("Y2: 0x")
-	mpin.MPIN_printBinary(Y2[:])
+	mpin.PrintBinary(Y2[:])
 	fmt.Printf("HID: 0x")
-	mpin.MPIN_printBinary(HID[:])
+	mpin.PrintBinary(HID[:])
 	fmt.Printf("HTID: 0x")
-	mpin.MPIN_printBinary(HTID[:])
+	mpin.PrintBinary(HTID[:])
 
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)
-		err := mpin.MPIN_KANGAROO(E[:], F[:])
+		err := mpin.Kangaroo(E[:], F[:])
 		if err != 0 {
 			fmt.Printf("PIN Error %d\n", err)
 		}
