@@ -23,7 +23,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"local/milagro/mpin"
+	"github.com/miracl/amcl-go-wrapper"
 )
 
 var HASH_TYPE_MPIN = mpin.SHA256

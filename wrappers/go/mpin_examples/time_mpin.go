@@ -27,7 +27,7 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"local/milagro/mpin"
+	"github.com/miracl/amcl-go-wrapper"
 )
 
 // Number of iterations to time functions
