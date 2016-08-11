@@ -21,8 +21,8 @@ option (BUILD_GO "Build Golang" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
 option (BUILD_WCC "Build WCC" OFF)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
-option (USE_PATENTS "Use alleged patents" ON)
-option (USE_ANONYMOUS "Anonymous authenticaion for M-Pin Full" OFF)
+option (USE_PATENTS "Use patents for G1 and G2 multiplication" OFF)
+option (USE_ANONYMOUS "Anonymous authentication for M-Pin Full" OFF)
 
 # Allow the developer to select if Dynamic or Static libraries are built
 # Set the default LIB_TYPE variable to STATIC
