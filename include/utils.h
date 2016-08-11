@@ -31,7 +31,6 @@ under the License.
 #define UTILS_H
 
 #include "amcl.h"
-#include <math.h>
 
 /** @brief Decode hex value
  *
