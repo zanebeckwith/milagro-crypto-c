@@ -265,6 +265,36 @@ if (BUILD_GO AND BUILD_SHARED_LIBS)
 
 endif (BUILD_GO AND BUILD_SHARED_LIBS)
 
+# Static build
+if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+    message(STATUS "Copy libamcl.so to wrappers/go for testing")
+    add_custom_command(
+                TARGET amcl
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+    if(BUILD_MPIN)
+      message(STATUS "Copy libmpin.so to wrappers/go for testing")
+      add_custom_command(
+                  TARGET mpin
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libmpin.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_MPIN)
+
+    if(BUILD_WCC)
+      message(STATUS "Copy libwcc.so to wrappers/go for testing")
+      add_custom_command(
+                  TARGET wcc
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libwcc.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+    endif(BUILD_WCC)  
+
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
 
 # Install libs
 install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
