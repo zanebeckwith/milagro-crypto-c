@@ -177,7 +177,7 @@ int main()
         /* Assign the End-User an ID */
         char id[256];
         octet ID = {0,sizeof(id),id};
-        rand_str(id,256,&RNG);
+        rand_str(id,255,&RNG);
         OCT_jstring(&ID,id);
         printf("CLIENT: ID %s\n", id);
 

@@ -185,7 +185,7 @@ int main()
         OCT_output(&MS2);
 
         // Alice's ID
-        rand_str(alice_id,256,&RNG);
+        rand_str(alice_id,255,&RNG);
         OCT_jstring(&IdA,alice_id);
         printf("ALICE ID: %s\n", alice_id);
 
@@ -245,7 +245,7 @@ int main()
         OCT_output(&ATPG1);
 
         // Bob's ID
-        rand_str(bob_id,256,&RNG);
+        rand_str(bob_id,255,&RNG);
         OCT_jstring(&IdB,bob_id);
         printf("BOB ID: %s\n", bob_id);
 
