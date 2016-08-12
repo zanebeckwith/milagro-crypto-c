@@ -84,13 +84,15 @@ int generateOTP(csprng* RNG)
     int i = 0;
     int val = 0;
     char byte[6] = {0};
+    int mult=1;
 
     /* Generate random 6 digit random value */
     for (i=0; i<6; i++)
     {
         byte[i]=RAND_byte(RNG);
         val = byte[i];
-        OTP = ((abs(val) % 10) * pow(10.0,i)) + OTP;
+        OTP = ((abs(val) % 10) * mult) + OTP;
+        mult = mult * 10;
     }
 
     return OTP;
