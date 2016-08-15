@@ -61,7 +61,7 @@ RUN apt-get update && apt-get -y dist-upgrade && \
     apt-get update
 
 # install development packages and debugging tools
-RUN apt-get install -y wget nano vim curl rsync git screen build-essential python python-dev python-pip libffi-dev autotools-dev autoconf make cmake gcc g++ golang golang-golang-x-tools alien rpm dh-make dh-golang debhelper devscripts pbuilder strace lsof gdb valgrind pkg-config doxygen doxygen-latex lcov libc6 libc6-dev astyle pylint pyflakes
+RUN apt-get install -y wget nano vim curl rsync git screen build-essential python python-dev python-pip libffi-dev autotools-dev autoconf make cmake gcc g++ golang golang-golang-x-tools alien rpm dh-make dh-golang debhelper devscripts pbuilder strace lsof gdb valgrind pkg-config doxygen doxygen-latex lcov libc6 libc6-dev astyle pylint pyflakes flawfinder
 
 # add mingw for cross compiling the Windows version in Linux
 RUN apt-get install -y dos2unix mingw-w64 binutils-mingw-w64 mingw-w64-tools mingw-w64-i686-dev mingw-w64-x86-64-dev wine winetricks libwine-development ubuntu-restricted-extras ubuntu-restricted-addons wine64-development-tools binfmt-support

@@ -33,6 +33,10 @@ RUN mkdir -p /root/.ssh && \
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
 
+RUN echo -e "\n\n*** CHECK FOR SECURITY WEAKNESSES ***\n" && \
+    cd ${PRJPATH}/src/ && \
+    flawfinder *.c
+
 RUN echo -e "\n\n*** BUILD FOR COVERAGE ***\n" && \
     rm -rf ${PRJPATH}/target/build_test && \
     mkdir -p ${PRJPATH}/target/build_test/coverage && \
