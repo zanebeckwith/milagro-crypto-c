@@ -44,6 +44,7 @@ addons:
     - mingw-w64-i686-dev
     - mingw-w64-x86-64-dev
     - golang
+    - flawfinder
 
 install:
   - pip install --user --upgrade pip
@@ -57,6 +58,9 @@ install:
   - go get github.com/stretchr/testify/assert
 
 script:
+  - echo -e "\n\n*** CHECK FOR SECURITY WEAKNESSES ***\n"
+  - cd /home/travis/build/miracl/milagro-crypto-c/src/
+  - flawfinder *.c
   - echo -e "\n\n*** BUILD FOR COVERAGE ***\n"
   - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_test/coverage
   - cd /home/travis/build/miracl/milagro-crypto-c/target/build_test
