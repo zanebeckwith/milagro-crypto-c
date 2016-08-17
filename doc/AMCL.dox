@@ -163,8 +163,29 @@ mingw32-make install
 <p>In order for this to work NSSI has to have been installed</p>
 
 
-  \section dockerbuild Docker Build
+  \section automation Automation
 
-<p>The script <a href="http://dockerbuild.sh" data-original-href="http://dockerbuild.sh">dockerbuild.sh</a> build, test and package this library inside a Docker container.</p>
+<p>This project includes a Makefile that allows you to test and build the project in a Linux machine with simple commands.<br />
+All the artifacts and reports produced using this Makefile are stored in the <em>target</em> folder.<br />
+<br />
+To see all available options:</p>
+
+<code><pre>make help</pre></code>
+
+<p>To build the project inside a Docker container (requires Docker):</p>
+
+<code><pre>make dbuild</pre></code>
+
+<p>The base Docker building environment is defined in the following Dockerfile:</p>
+
+<code><pre>resources/DockerDev/Dockerfile</pre></code>
+
+<p>To execute all the default test builds and generate reports in the current environment:</p>
+
+<code><pre>make qa</pre></code>
+
+<p>To format the code (please use this command before submitting any new code):</p>
+
+<code><pre>make format</pre></code>
 
 */
