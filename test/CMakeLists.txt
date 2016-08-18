@@ -84,4 +84,4 @@ target_link_libraries (test_version amcl)
 # tests  
 do_test (test_rsa "SUCCESS")
 do_test (test_ecdh "SUCCESS")
-do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH} OS: ${OS} FIELD CHOICE: ${FIELD_CHOICE} CURVE TYPE: ${CURVE_TYPE} WORD_LENGTH: ${WORD_LENGTH}")
+do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
