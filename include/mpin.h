@@ -38,17 +38,21 @@ under the License.
 
 #define PGS MODBYTES  /**< MPIN Group Size */
 #define PFS MODBYTES  /**< MPIN Field Size */
-#define PAS 16  /**< MPIN Symmetric Key Size */
+#define PAS 16        /**< MPIN Symmetric Key Size */
 
-#define MPIN_OK                     0  /**< Function completed without error */
-/*#define MPIN_DOMAIN_ERROR          -11
+#define MPIN_OK                     0   /**< Function completed without error */
+/*
+#define MPIN_DOMAIN_ERROR          -11
 #define MPIN_INVALID_PUBLIC_KEY    -12
-#define MPIN_ERROR                 -13*/
-#define MPIN_INVALID_POINT         -14	/**< Point is NOT on the curve */
-/*#define MPIN_DOMAIN_NOT_FOUND      -15
+#define MPIN_ERROR                 -13
+*/
+#define MPIN_INVALID_POINT         -14  /**< Point is NOT on the curve */
+/*
+#define MPIN_DOMAIN_NOT_FOUND      -15
 #define MPIN_OUT_OF_MEMORY         -16
 #define MPIN_DIV_BY_ZERO           -17
-#define MPIN_WRONG_ORDER           -18*/
+#define MPIN_WRONG_ORDER           -18
+*/
 #define MPIN_BAD_PIN               -19  /**< Bad PIN number entered */
 
 
@@ -396,4 +400,3 @@ void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T
 //void PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
 
 #endif
-

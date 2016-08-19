@@ -59,8 +59,10 @@ all: help
 
 # Format the source code
 format:
-	astyle --style=allman --recursive 'src/*.c'
-	astyle --style=allman --recursive 'test/*.c'
+	astyle --style=allman --recursive --suffix=none 'include/*.h'
+	astyle --style=allman --recursive --suffix=none 'include/*.h.in'
+	astyle --style=allman --recursive --suffix=none 'src/*.c'
+	astyle --style=allman --recursive --suffix=none 'test/*.c'
 	find ./wrappers/go -type f -name "*.go" -exec gofmt -s -w {} \;
 	find ./wrappers/go -type f -name "*.go.in" -exec gofmt -s -w {} \;
 	autopep8 --in-place --aggressive ./wrappers/python/*.py
