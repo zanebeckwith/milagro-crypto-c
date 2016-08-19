@@ -24,7 +24,7 @@ under the License.
  * @brief Support functions for M-Pin servers
  *
  * declares functions
- * 
+ *
  */
 
 #ifndef UTILS_H
