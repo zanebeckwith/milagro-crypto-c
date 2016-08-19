@@ -25,6 +25,7 @@ under the License.
 #include <string.h>
 #include "amcl.h"
 
-void version(char* info);
+/*! \brief Print version number and information about the build */
+void amcl_version(void);
 
 #endif

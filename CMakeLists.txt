@@ -65,6 +65,8 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    # Linux specific code
+   # Default install path on Linux
+   SET(CMAKE_INSTALL_PREFIX /opt/amcl)
    set(OS "Linux")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 

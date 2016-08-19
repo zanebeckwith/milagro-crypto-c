@@ -94,12 +94,11 @@
 /*** START OF USER CONFIGURABLE SECTION - set architecture and choose modulus and curve  ***/
 
 #define CHOICE @FIELD_CHOICE@ /**< Current choice of Field */
-#define FIELD_CHOICE "@FIELD_CHOICE@"
+
 /* For some moduli only one parameterisation of curve may supported. For others there is a choice of WEIERSTRASS, EDWARDS or MONTGOMERY curves. See above. */
 #define CURVETYPE @CURVE_TYPE@	/**< Note that not all curve types are supported - see above */
 
 /* Actual curve parameters associated with these choices can be found in rom.c */
-#define CURVE_TYPE "@CURVE_TYPE@"
 
 /* These next options only apply for pairings */
 #ifdef USE_PATENTS
