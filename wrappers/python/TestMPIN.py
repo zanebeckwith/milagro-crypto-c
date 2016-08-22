@@ -22,7 +22,8 @@ import unittest
 import json
 import mpin
 
-
+HASH_TYPE_MPIN = mpin.SHA256
+    
 class TestMPIN(unittest.TestCase):
     """Tests M-Pin crypto code"""
 
@@ -63,7 +64,7 @@ class TestMPIN(unittest.TestCase):
             mpin_id = vector['MPIN_ID_HEX'].decode("hex")
 
             # Hash value of MPIN_ID
-            hash_mpin_id = mpin.hash_id(mpin_id)
+            hash_mpin_id = mpin.hash_id(HASH_TYPE_MPIN, mpin_id)
             self.assertEqual(
                 vector['HASH_MPIN_ID_HEX'],
                 hash_mpin_id.encode("hex"))
@@ -84,10 +85,10 @@ class TestMPIN(unittest.TestCase):
                 client_secret.encode("hex"))
 
             # Generate Time Permit shares
-            rtn, tp1 = mpin.get_client_permit(date, ms1, hash_mpin_id)
+            rtn, tp1 = mpin.get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id)
             self.assertEqual(rtn, 0)
             self.assertEqual(vector['TP1'], tp1.encode("hex"))
-            rtn, tp2 = mpin.get_client_permit(date, ms2, hash_mpin_id)
+            rtn, tp2 = mpin.get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id)
             self.assertEqual(rtn, 0)
             self.assertEqual(vector['TP2'], tp2.encode("hex"))
 
@@ -97,7 +98,7 @@ class TestMPIN(unittest.TestCase):
             self.assertEqual(vector['TIME_PERMIT'], time_permit.encode("hex"))
 
             # Client extracts PIN from secret to create Token
-            rtn, token = mpin.extract_pin(mpin_id, PIN1, client_secret)
+            rtn, token = mpin.extract_pin(HASH_TYPE_MPIN, mpin_id, PIN1, client_secret)
             self.assertEqual(rtn, 0)
             self.assertEqual(vector['TOKEN'], token.encode("hex"))
 
@@ -105,7 +106,7 @@ class TestMPIN(unittest.TestCase):
 
             # Client first pass. Use X value from test vectors
             rtn, x, u, ut, sec = mpin.client_1(
-                date, mpin_id, None, x, PIN2, token, time_permit)
+                HASH_TYPE_MPIN, date, mpin_id, None, x, PIN2, token, time_permit)
             self.assertEqual(rtn, 0)
             self.assertEqual(vector['X'], x.encode("hex"))
             self.assertEqual(vector['U'], u.encode("hex"))
@@ -113,7 +114,7 @@ class TestMPIN(unittest.TestCase):
             self.assertEqual(vector['SEC'], sec.encode("hex"))
 
             # Server calculates H(ID) and H(T|H(ID))
-            HID, HTID = mpin.server_1(date, mpin_id)
+            HID, HTID = mpin.server_1(HASH_TYPE_MPIN, date, mpin_id)
 
             # Use Y value from test vectors
             y = vector['Y'].decode("hex")
