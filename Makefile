@@ -67,10 +67,16 @@ format:
 	find ./wrappers/go -type f -name "*.go.in" -exec gofmt -s -w {} \;
 	autopep8 --in-place --aggressive ./wrappers/python/*.py
 
-# Analyze the source code for security weaknesses (requires flawfinder)
+# Analyze the source code for security weaknesses 
 analyze:
-	mkdir -p target/
-	flawfinder src/*.c | tee target/flawfinder.log
+	@echo -e "\n\n*** Run Address Sanitizer ***\n\n"
+	mkdir -p target/build_asan
+	rm -rf target/build_asan/*
+	cd target/build_asan && \
+	cmake  -D CMAKE_BUILD_TYPE=ASan -D WORD_LENGTH=64 -D BUILD_WCC=on ../.. | tee cmake.log && \
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
+	make | tee make.log && \
+	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log
 
 # Remove any build artifact
 clean:
@@ -83,7 +89,7 @@ dbuild:
 	./dockerbuild.sh
 
 # execute all builds and tests
-qa: analyze build_coverage build_linux64wrappers build_linux64anonymous build_linux64 build_linux32 build_win64 build_win32
+qa: analyze build_coverage build_linux64wrappers build_linux64anonymous build_linux32 build_win64 build_win32
 
 # BUILD FOR COVERAGE
 build_coverage:
