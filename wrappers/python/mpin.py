@@ -1189,8 +1189,8 @@ if __name__ == "__main__":
     if rtn != 0:
         print "random_generate(rng) Error %s", rtn
     if DEBUG:
-        print "ms1: %s" % to_hex(ms1)
-        print "ms2: %s" % to_hex(ms2)
+        print "ms1: %s" % ms1.encode("hex")
+        print "ms2: %s" % ms2.encode("hex")
 
     # Generate server secret shares
     rtn, ss1 = get_server_secret(ms1)
@@ -1200,15 +1200,15 @@ if __name__ == "__main__":
     if rtn != 0:
         print "get_server_secret(ms2) Error %s" % rtn
     if DEBUG:
-        print "ss1: %s" % to_hex(ss1)
-        print "ss2: %s" % to_hex(ss2)
+        print "ss1: %s" % ss1.encode("hex")
+        print "ss2: %s" % ss2.encode("hex")
 
     # Combine server secret shares
     rtn, server_secret = recombine_G2(ss1, ss2)
     if rtn != 0:
         print "recombine_G2(ss1, ss2) Error %s" % rtn
     if DEBUG:
-        print "server_secret: %s" % to_hex(server_secret)
+        print "server_secret: %s" % server_secret.encode("hex")
 
     # Generate client secret shares
     rtn, cs1 = get_client_secret(ms1, hash_mpin_id)
@@ -1218,8 +1218,8 @@ if __name__ == "__main__":
     if rtn != 0:
         print "get_client_secret(ms2, hash_mpin_id) Error %s" % rtn
     if DEBUG:
-        print "cs1: %s" % to_hex(cs1)
-        print "cs2: %s" % to_hex(cs2)
+        print "cs1: %s" % cs1.encode("hex")
+        print "cs2: %s" % cs2.encode("hex")
 
     # Combine client secret shares
     rtn, client_secret = recombine_G1(cs1, cs2)
@@ -1337,7 +1337,7 @@ if __name__ == "__main__":
         if rtn != 0:
             print "client_1  ERROR %s" % rtn
         if DEBUG:
-            print "x: %s" % to_hex(x)
+            print "x: %s" % x.encode("hex")
 
         # Server calculates H(ID) and H(T|H(ID)) (if time permits enabled),
         # and maps them to points on the curve HID and HTID resp.
