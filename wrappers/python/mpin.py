@@ -776,7 +776,8 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
     return error_code, e_hex.decode("hex"), f_hex.decode("hex")
 
 
-def server(hash_type, epoch_date, server_secret, u, ut, v, mpin_id, message, epoch_time):
+def server(hash_type, epoch_date, server_secret,
+           u, ut, v, mpin_id, message, epoch_time):
     """Perform server side of the one-pass version of the M-Pin protocol
 
     Perform server side of the one-pass version of the M-Pin protocol. If Time
@@ -1140,10 +1141,10 @@ def generate_random(rng, length):
 if __name__ == "__main__":
     # Print hex values
     DEBUG = False
-    
+
     # Require user input
     INPUT = True
-    
+
     ONE_PASS = False
     TIME_PERMITS = True
     MPIN_FULL = True
@@ -1273,7 +1274,8 @@ if __name__ == "__main__":
             rtn, pc1, pc2 = precompute(token, hash_mpin_id)
 
         # Client MPIN
-        rtn, x, u, ut, v, y = client(HASH_TYPE_MPIN, date, mpin_id, rng, None, PIN, token, time_permit, None, epoch_time)
+        rtn, x, u, ut, v, y = client(
+            HASH_TYPE_MPIN, date, mpin_id, rng, None, PIN, token, time_permit, None, epoch_time)
         if rtn != 0:
             print "MPIN_CLIENT ERROR %s" % rtn
 
@@ -1282,7 +1284,8 @@ if __name__ == "__main__":
             rtn, r, Z = get_G1_multiple(rng, 1, None, hash_mpin_id)
 
         # Server MPIN
-        rtn, HID, HTID, E, F, y2 = server(HASH_TYPE_MPIN, date, server_secret, u, ut, v, pID, None, epoch_time)
+        rtn, HID, HTID, E, F, y2 = server(
+            HASH_TYPE_MPIN, date, server_secret, u, ut, v, pID, None, epoch_time)
         if DEBUG:
             print "y2 ", y2.encode("hex")
         if rtn != 0:
@@ -1309,13 +1312,14 @@ if __name__ == "__main__":
         if MPIN_FULL:
             HM = hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)
 
-            rtn, client_aes_key = client_key(HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)
+            rtn, client_aes_key = client_key(
+                HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)
             if rtn != 0:
                 print "ERROR: Generating client_aes_key %s" % rtn
             print "Client AES Key: %s" % client_aes_key.encode("hex")
 
-            rtn, server_aes_key = server_key(HASH_TYPE_MPIN, 
-                Z, server_secret, w, HM, HID, u, ut)
+            rtn, server_aes_key = server_key(HASH_TYPE_MPIN,
+                                             Z, server_secret, w, HM, HID, u, ut)
             if rtn != 0:
                 print "ERROR: Generating server_aes_key %s" % rtn
             print "Server AES Key: %s" % server_aes_key.encode("hex")
@@ -1332,8 +1336,8 @@ if __name__ == "__main__":
                 print "precompute(token, hash_mpin_id) ERROR %s" % rtn
 
         # Client first pass
-        rtn, x, u, ut, sec = client_1(HASH_TYPE_MPIN, 
-            date, mpin_id, rng, None, PIN, token, time_permit)
+        rtn, x, u, ut, sec = client_1(HASH_TYPE_MPIN,
+                                      date, mpin_id, rng, None, PIN, token, time_permit)
         if rtn != 0:
             print "client_1  ERROR %s" % rtn
         if DEBUG:
@@ -1384,13 +1388,14 @@ if __name__ == "__main__":
 
             HM = hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)
 
-            rtn, client_aes_key = client_key(HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)
+            rtn, client_aes_key = client_key(
+                HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)
             if rtn != 0:
                 print "ERROR: Generating client_aes_key %s" % rtn
             print "Client AES Key: %s" % client_aes_key.encode("hex")
 
-            rtn, server_aes_key = server_key(HASH_TYPE_MPIN, 
-                Z, server_secret, w, HM, HID, u, ut)
+            rtn, server_aes_key = server_key(HASH_TYPE_MPIN,
+                                             Z, server_secret, w, HM, HID, u, ut)
             if rtn != 0:
                 print "ERROR: Generating server_aes_key %s" % rtn
             print "Server AES Key: %s" % server_aes_key.encode("hex")
