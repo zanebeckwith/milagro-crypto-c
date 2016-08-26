@@ -1318,8 +1318,8 @@ if __name__ == "__main__":
                 print "ERROR: Generating client_aes_key %s" % rtn
             print "Client AES Key: %s" % client_aes_key.encode("hex")
 
-            rtn, server_aes_key = server_key(HASH_TYPE_MPIN,
-                                             Z, server_secret, w, HM, HID, u, ut)
+            rtn, server_aes_key = server_key(
+                HASH_TYPE_MPIN, Z, server_secret, w, HM, HID, u, ut)
             if rtn != 0:
                 print "ERROR: Generating server_aes_key %s" % rtn
             print "Server AES Key: %s" % server_aes_key.encode("hex")
@@ -1336,8 +1336,8 @@ if __name__ == "__main__":
                 print "precompute(token, hash_mpin_id) ERROR %s" % rtn
 
         # Client first pass
-        rtn, x, u, ut, sec = client_1(HASH_TYPE_MPIN,
-                                      date, mpin_id, rng, None, PIN, token, time_permit)
+        rtn, x, u, ut, sec = client_1(
+            HASH_TYPE_MPIN, date, mpin_id, rng, None, PIN, token, time_permit)
         if rtn != 0:
             print "client_1  ERROR %s" % rtn
         if DEBUG:
@@ -1394,8 +1394,8 @@ if __name__ == "__main__":
                 print "ERROR: Generating client_aes_key %s" % rtn
             print "Client AES Key: %s" % client_aes_key.encode("hex")
 
-            rtn, server_aes_key = server_key(HASH_TYPE_MPIN,
-                                             Z, server_secret, w, HM, HID, u, ut)
+            rtn, server_aes_key = server_key(
+                HASH_TYPE_MPIN, Z, server_secret, w, HM, HID, u, ut)
             if rtn != 0:
                 print "ERROR: Generating server_aes_key %s" % rtn
             print "Server AES Key: %s" % server_aes_key.encode("hex")

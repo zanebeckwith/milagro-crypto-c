@@ -5,7 +5,7 @@
 #
 # This file is intended to be executed in a Linux-compatible system and requires
 # the packages lised in resources/DockerDev/Dockerfile to execute the build in
-# the current environment or Dcker to use the Docker build (dbuild).
+# the current environment or Docker to use the Docker build (dbuild).
 #
 # ------------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ format:
 	astyle --style=allman --recursive --suffix=none 'test/*.c'
 	find ./wrappers/go -type f -name "*.go" -exec gofmt -s -w {} \;
 	find ./wrappers/go -type f -name "*.go.in" -exec gofmt -s -w {} \;
-	autopep8 --in-place --aggressive ./wrappers/python/*.py
+	autopep8 --in-place --aggressive --aggressive ./wrappers/python/*.py
 
 # Analyze the source code for security weaknesses 
 analyze:

@@ -102,8 +102,8 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN,
-                                           self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+        rtn, x, u, ut, sec = mpin.client_1(
+            HASH_TYPE_MPIN, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
@@ -174,8 +174,8 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN,
-                                           self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+        rtn, x, u, ut, sec = mpin.client_1(
+            HASH_TYPE_MPIN, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
@@ -246,8 +246,8 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN,
-                                           self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+        rtn, x, u, ut, sec = mpin.client_1(
+            HASH_TYPE_MPIN, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
