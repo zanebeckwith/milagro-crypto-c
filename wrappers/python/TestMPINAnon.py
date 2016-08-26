@@ -23,7 +23,8 @@ import json
 import mpin
 
 HASH_TYPE_MPIN = mpin.SHA256
-    
+
+
 class TestMPIN(unittest.TestCase):
     """Tests M-Pin crypto code"""
 
@@ -85,10 +86,12 @@ class TestMPIN(unittest.TestCase):
                 client_secret.encode("hex"))
 
             # Generate Time Permit shares
-            rtn, tp1 = mpin.get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id)
+            rtn, tp1 = mpin.get_client_permit(
+                HASH_TYPE_MPIN, date, ms1, hash_mpin_id)
             self.assertEqual(rtn, 0)
             self.assertEqual(vector['TP1'], tp1.encode("hex"))
-            rtn, tp2 = mpin.get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id)
+            rtn, tp2 = mpin.get_client_permit(
+                HASH_TYPE_MPIN, date, ms2, hash_mpin_id)
             self.assertEqual(rtn, 0)
             self.assertEqual(vector['TP2'], tp2.encode("hex"))
 
@@ -98,7 +101,8 @@ class TestMPIN(unittest.TestCase):
             self.assertEqual(vector['TIME_PERMIT'], time_permit.encode("hex"))
 
             # Client extracts PIN from secret to create Token
-            rtn, token = mpin.extract_pin(HASH_TYPE_MPIN, mpin_id, PIN1, client_secret)
+            rtn, token = mpin.extract_pin(
+                HASH_TYPE_MPIN, mpin_id, PIN1, client_secret)
             self.assertEqual(rtn, 0)
             self.assertEqual(vector['TOKEN'], token.encode("hex"))
 

@@ -26,6 +26,7 @@ import mpin
 
 HASH_TYPE_MPIN = mpin.SHA256
 
+
 class TestMPIN(unittest.TestCase):
     """Tests M-Pin crypto code"""
 
@@ -84,9 +85,11 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate Time Permit shares
-        rtn, tp1 = mpin.get_client_permit(HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
+        rtn, tp1 = mpin.get_client_permit(
+            HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, tp2 = mpin.get_client_permit(HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
+        rtn, tp2 = mpin.get_client_permit(
+            HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -94,12 +97,13 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client extracts PIN from secret to create Token
-        rtn, token = mpin.extract_pin(HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
+        rtn, token = mpin.extract_pin(
+            HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN, 
-            self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+        rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN,
+                                           self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
@@ -153,9 +157,11 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate Time Permit shares
-        rtn, tp1 = mpin.get_client_permit(HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
+        rtn, tp1 = mpin.get_client_permit(
+            HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, tp2 = mpin.get_client_permit(HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
+        rtn, tp2 = mpin.get_client_permit(
+            HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -163,12 +169,13 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client extracts PIN from secret to create Token
-        rtn, token = mpin.extract_pin(HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
+        rtn, token = mpin.extract_pin(
+            HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
-        rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN, 
-            self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+        rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN,
+                                           self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
@@ -222,9 +229,11 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Generate Time Permit shares
-        rtn, tp1 = mpin.get_client_permit(HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
+        rtn, tp1 = mpin.get_client_permit(
+            HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
-        rtn, tp2 = mpin.get_client_permit(HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
+        rtn, tp2 = mpin.get_client_permit(
+            HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -232,12 +241,13 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, 0)
 
         # Client extracts PIN from secret to create Token
-        rtn, token = mpin.extract_pin(HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
+        rtn, token = mpin.extract_pin(
+            HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
         rtn, x, u, ut, sec = mpin.client_1(HASH_TYPE_MPIN,
-            self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+                                           self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))

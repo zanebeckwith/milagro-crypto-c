@@ -18,7 +18,8 @@ fp2.c
 ecp2.c
 fp4.c
 fp12.c
-ff.c)
+ff.c
+utils.c)
 
 # Build AMCL
 add_library(amcl ${LIB_TYPE} ${SOURCES_AMCL} version.c)
@@ -36,14 +37,14 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 # Build libmpin
 if(BUILD_MPIN)
   message(STATUS "Build MPIN")
-  add_library(mpin ${LIB_TYPE} pair.c mpin.c utils.c)
+  add_library(mpin ${LIB_TYPE} pair.c mpin.c)
   target_link_libraries (mpin amcl) 
 endif(BUILD_MPIN)
 
 # Build libwcc
 if(BUILD_WCC)
   message(STATUS "Build WCC")
-  add_library(wcc ${LIB_TYPE} pair.c wcc.c utils.c)
+  add_library(wcc ${LIB_TYPE} pair.c wcc.c)
   target_link_libraries (wcc amcl) 
 endif(BUILD_WCC)
 
