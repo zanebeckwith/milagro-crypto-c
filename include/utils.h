@@ -48,6 +48,13 @@ void amcl_hex2bin(const char *src, char *dst, int src_len);
 */
 void amcl_bin2hex(char *src, char *dst, int src_len);
 
+/** @brief Print encoded binary string
+ *
+	@param src     Binary string
+	@param src_len length binary string
+*/
+void amcl_print_hex(char *src, int src_len);
+
 /*! \brief Generate a random Octet
  *
  *  Generate a random Octet

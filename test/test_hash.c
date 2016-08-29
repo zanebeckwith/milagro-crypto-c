@@ -19,7 +19,7 @@ under the License.
 
 /* Build executible after installation:
 
-  gcc -std=c99 -g ./test_hash.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lmpin -o test_hash
+  gcc -std=c99 -g ./test_hash.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -o test_hash
 
 */
 

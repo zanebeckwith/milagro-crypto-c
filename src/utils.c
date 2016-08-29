@@ -77,6 +77,17 @@ void amcl_bin2hex(char *src, char *dst, int src_len)
     }
 }
 
+
+void amcl_print_hex(char *src, int src_len)
+{
+    int i;
+    for (i = 0; i < src_len; i++)
+    {
+        printf("%02x", (unsigned char) src[i]);
+    }
+    printf("\n");
+}
+
 int generateOTP(csprng* RNG)
 {
     int OTP=0;
@@ -104,5 +115,3 @@ void generateRandom(csprng *RNG,octet *randomValue)
     for (i=0; i<randomValue->len; i++)
         randomValue->val[i]=RAND_byte(RNG);
 }
-
-

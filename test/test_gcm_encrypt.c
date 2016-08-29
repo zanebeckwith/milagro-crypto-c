@@ -19,7 +19,7 @@ under the License.
 
 /* Build executible after installation:
 
-  gcc -std=c99 -g ./test_gcm_encrypt.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lmpin -o test_gcm_encrypt
+  gcc -std=c99 -g ./test_gcm_encrypt.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -o test_gcm_encrypt
 
 */
 
