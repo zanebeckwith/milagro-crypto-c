@@ -122,8 +122,8 @@ export PYTHONPATH=/usr/lib/python2.7/dist-packages
 </code></pre>
 <p>NOTE: The build can be configured by setting flags on the command line, for example:</p>
 <ul>
-<li>cmake -DWORD_LENGTH=64 ../..</li>
-<li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../..</li>
+<li>cmake -DAMCL_CHUNK=64 ../..</li>
+<li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..</li>
 </ul>
 <p>To list other available CMake options, use:</p>
 <ul>
@@ -151,7 +151,7 @@ mingw32-make install
 <p>Post install append the PATH system variable to point to the install ./lib:</p>
 <p><em>My Computer -&gt; Properties -&gt; Advanced &gt; Environment Variables</em></p>
 <p>The build can be configured using by setting flags on the command line i.e.</p>
-<pre><code>cmake -G "MinGW Makefiles" -DWORD_LENGTH=64 ..
+<pre><code>cmake -G "MinGW Makefiles" -DAMCL_CHUNK=64 ..
 </code></pre>
 <h4>Uninstall software</h4>
 <pre><code>mingw32-make uninstall

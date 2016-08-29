@@ -41,7 +41,7 @@ if(BUILD_MPIN)
   endif (USE_ANONYMOUS) 
   
 
-  if(FIELD_CHOICE STREQUAL "BN254_CX")
+  if(AMCL_CHOICE STREQUAL "BN254_CX")
       if (USE_ANONYMOUS)
           file(COPY TestMPINAnon.py DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python/")
           add_test (Test_python_MPINAnonBN254_CX python TestMPINAnon.py)
@@ -49,7 +49,7 @@ if(BUILD_MPIN)
           file(COPY TestMPIN.py DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python/")
           add_test (Test_python_MPINBN254_CX python TestMPIN.py)
       endif (USE_ANONYMOUS) 
-  endif(FIELD_CHOICE STREQUAL "BN254_CX")
+  endif(AMCL_CHOICE STREQUAL "BN254_CX")
 
 endif(BUILD_MPIN)
 

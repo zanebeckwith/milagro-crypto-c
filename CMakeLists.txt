@@ -19,7 +19,7 @@ option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 option (BUILD_PYTHON "Build Python" OFF)
 option (BUILD_GO "Build Golang" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
-option (BUILD_WCC "Build WCC" OFF)
+option (BUILD_WCC "Build WCC" ON)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
 option (USE_PATENTS "Use patents for G1 and G2 multiplication" OFF)
 option (USE_ANONYMOUS "Anonymous authentication for M-Pin Full" OFF)
@@ -79,28 +79,28 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Select word length
-set(WORD_LENGTH "32" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
+set(AMCL_CHUNK "32" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
 set(Word_Length_Values "16;32;64")
-set_property(CACHE WORD_LENGTH PROPERTY STRINGS ${Word_Length_Values})
-message(STATUS "WORD_LENGTH='${WORD_LENGTH}'")
+set_property(CACHE AMCL_CHUNK PROPERTY STRINGS ${Word_Length_Values})
+message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
-set(FIELD_CHOICE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h.in for explanation")
+set(AMCL_CHOICE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h.in for explanation")
 set(Field_Values "NIST256;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN_CURVES;BN454;BN646;BN254;BN254_CX;BN254_T;BN254_T2;BLS_CURVES;BLS455")
-set_property(CACHE FIELD_CHOICE PROPERTY STRINGS ${Field_Values})
-message(STATUS "FIELD_CHOICE='${FIELD_CHOICE}'")
+set_property(CACHE AMCL_CHOICE PROPERTY STRINGS ${Field_Values})
+message(STATUS "AMCL_CHOICE='${AMCL_CHOICE}'")
 
 # Select Curve type
-set(CURVE_TYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See ./include/amcl.h.in for explanation")
+set(AMCL_CURVETYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See ./include/amcl.h.in for explanation")
 set(Curve_Values "WEIERSTRASS;EDWARDS;MONTGOMERY")
-set_property(CACHE CURVE_TYPE PROPERTY STRINGS ${Curve_Values})
-message(STATUS "CURVE_TYPE='${CURVE_TYPE}'")
+set_property(CACHE AMCL_CURVETYPE PROPERTY STRINGS ${Curve_Values})
+message(STATUS "AMCL_CURVETYPE='${AMCL_CURVETYPE}'")
 
 # Select Finite field support
-set(FF_LEN "8" CACHE STRING "Finite field support. See ./include/amcl.h.in for explanation")
+set(AMCL_FFLEN "8" CACHE STRING "Finite field support. See ./include/amcl.h.in for explanation")
 set(ff_len_values "4;8;16")
-set_property(CACHE FF_LEN PROPERTY STRINGS ${ff_Len_values})
-message(STATUS "FF_LEN='${FF_LEN}'")
+set_property(CACHE AMCL_FFLEN PROPERTY STRINGS ${ff_Len_values})
+message(STATUS "AMCL_FFLEN='${AMCL_FFLEN}'")
 
 # configure arch header file to pass CMake settings
 # to the source code
@@ -116,11 +116,11 @@ configure_file (
   "${PROJECT_BINARY_DIR}/include/amcl.h"
   )
 
-if(NOT(FIELD_CHOICE MATCHES "BN"))
-  message(STATUS "Field choice prevents MPIN being built")
+if(NOT(AMCL_CHOICE MATCHES "BN"))
+  message(STATUS "Curve choice prevents MPIN being built")
   set(BUILD_MPIN OFF)
-  set(BUILD_WSS OFF)
-endif(NOT(FIELD_CHOICE MATCHES "BN"))
+  set(BUILD_WCC OFF)
+endif(NOT(AMCL_CHOICE MATCHES "BN"))
 
 # test configuration
 if(BUILD_MPIN OR BUILD_WCC)
@@ -159,10 +159,10 @@ if (BUILD_PYTHON)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; from os.path import dirname; print dirname(get_python_lib())" OUTPUT_VARIABLE PYTHON_SITE_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  if((FIELD_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
+  if((AMCL_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
     file(COPY "${PROJECT_SOURCE_DIR}/testVectors/mpin/BN254_CX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
     file(RENAME "${PROJECT_BINARY_DIR}/wrappers/python/BN254_CX.json" "${PROJECT_BINARY_DIR}/wrappers/python/MPINTestVectors.json")
-  endif((FIELD_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
+  endif((AMCL_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
   add_subdirectory (wrappers/python)
 endif (BUILD_PYTHON)
 

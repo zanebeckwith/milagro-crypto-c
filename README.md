@@ -95,8 +95,8 @@ Now you can set the path to where libs and python package are installed:
 
 NOTE: The build can be configured by setting flags on the command line, for example:
 
-* cmake -DWORD_LENGTH=64 ../..
-* cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
+* cmake -DAMCL_CHUNK=64 ../..
+* cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..
 
 To list other available CMake options, use:
 
