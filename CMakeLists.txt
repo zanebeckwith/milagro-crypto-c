@@ -32,13 +32,9 @@ IF (BUILD_SHARED_LIBS)
   SET (LIB_TYPE SHARED)
 ENDIF (BUILD_SHARED_LIBS)
 
-
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "Coverage" "ASan" "Check" "CheckFull")
-endif()
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}
+    CACHE STRING "Choose the type of build: Debug Release Coverage ASan Check CheckFull"
+    FORCE)
 
 if(CMAKE_COMPILER_IS_GNUCC)
     message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
