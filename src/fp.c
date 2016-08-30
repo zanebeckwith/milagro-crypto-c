@@ -34,9 +34,17 @@ under the License.
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
-void FP_nres(BIG a) {BIG tmp; BIG_rcopy(tmp,a);}
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
-void FP_redc(BIG a) {BIG tmp; BIG_rcopy(tmp,a);}
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
@@ -76,9 +84,17 @@ void FP_mod(BIG r,DBIG d)
 /* This only applies to Curve C448, so specialised (for now) */
 #if MODTYPE == GENERALISED_MERSENNE
 
-void FP_nres(BIG a) {BIG tmp; BIG_rcopy(tmp,a);}
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
-void FP_redc(BIG a) {BIG tmp; BIG_rcopy(tmp,a);}
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
