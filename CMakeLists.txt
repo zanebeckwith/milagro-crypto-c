@@ -32,11 +32,16 @@ IF (BUILD_SHARED_LIBS)
   SET (LIB_TYPE SHARED)
 ENDIF (BUILD_SHARED_LIBS)
 
-set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}
-    CACHE STRING "Choose the type of build: None Debug Release Coverage ASan Check CheckFull"
-    FORCE)
+
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "Coverage" "ASan" "Check" "CheckFull")
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCC)
+    message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
                     OUTPUT_VARIABLE GCC_VERSION)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wextra -Wno-strict-prototypes -Wunused-value -Wcast-align -Wunused-variable -Wundef -Wformat-security")
@@ -116,11 +121,11 @@ configure_file (
   "${PROJECT_BINARY_DIR}/include/amcl.h"
   )
 
-if(NOT(AMCL_CHOICE MATCHES "BN"))
+if(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
   message(STATUS "Curve choice prevents MPIN being built")
   set(BUILD_MPIN OFF)
   set(BUILD_WCC OFF)
-endif(NOT(AMCL_CHOICE MATCHES "BN"))
+endif(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
 
 # test configuration
 if(BUILD_MPIN OR BUILD_WCC)
@@ -134,14 +139,6 @@ if(BUILD_MPIN OR BUILD_WCC)
     "${PROJECT_BINARY_DIR}/include/config.h"
   )
 endif(BUILD_MPIN OR BUILD_WCC)
-
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified.")
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
 
 # Add subdirectories
 add_subdirectory(include)
