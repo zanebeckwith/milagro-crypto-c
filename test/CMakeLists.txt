@@ -69,7 +69,7 @@ endif(BUILD_WCC)
 
 # General tests
 add_executable (test_rsa test_rsa.c)
-add_executable (test_ecdh test_ecdh.c)
+add_executable (test_ecc test_ecc.c)
 add_executable (test_version test_version.c)
 add_executable (test_hash test_hash.c)
 add_executable (test_gcm_encrypt test_gcm_encrypt.c)
@@ -78,7 +78,7 @@ add_executable (test_aes_encrypt test_aes_encrypt.c)
 add_executable (test_aes_decrypt test_aes_decrypt.c)
 # Link the executable to the libraries
 target_link_libraries (test_rsa rsa) 
-target_link_libraries (test_ecdh ecdh) 
+target_link_libraries (test_ecc ecdh) 
 target_link_libraries (test_version amcl) 
 target_link_libraries (test_hash amcl) 
 target_link_libraries (test_gcm_encrypt amcl) 
@@ -86,9 +86,9 @@ target_link_libraries (test_gcm_decrypt  amcl)
 target_link_libraries (test_aes_encrypt amcl) 
 target_link_libraries (test_aes_decrypt  amcl) 
 
-# tests  
+# smoke tests  
 do_test (test_rsa "SUCCESS")
-do_test (test_ecdh "SUCCESS")
+do_test (test_ecc "SUCCESS")
 do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
 
 # hash tests
