@@ -196,7 +196,6 @@ int main()
 
         /* Assign the End-User an ID */
         rand_str(id,255,&RNG);
-        OCT_jstring(&ID,id);
         printf("CLIENT: ID %s\n", id);
 
         srand(time(NULL));
