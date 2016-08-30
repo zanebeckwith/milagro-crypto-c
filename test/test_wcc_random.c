@@ -185,8 +185,7 @@ int main()
         OCT_output(&MS2);
 
         // Alice's ID
-        rand_str(alice_id,254,&RNG);
-        OCT_jstring(&IdA,alice_id);
+        rand_str(alice_id,255,&RNG);
         printf("ALICE ID: %s\n", alice_id);
 
         // TA: Generate Alice's sender key

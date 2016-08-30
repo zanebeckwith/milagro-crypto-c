@@ -195,8 +195,7 @@ int main()
         OCT_output(&ServerSecret);
 
         /* Assign the End-User an ID */
-        rand_str(id,254,&RNG);
-        OCT_jstring(&ID,id);
+        rand_str(id,255,&RNG);
         printf("CLIENT: ID %s\n", id);
 
         srand(time(NULL));
