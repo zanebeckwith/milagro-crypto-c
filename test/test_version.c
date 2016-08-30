@@ -23,7 +23,6 @@ under the License.
 #include <stdlib.h>
 #include <string.h>
 #include "amcl.h"
-#include "config.h"
 #include "version.h"
 
 int main()

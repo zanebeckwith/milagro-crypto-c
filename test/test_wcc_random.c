@@ -138,12 +138,12 @@ int main()
     OCT_jstring(&MESSAGE2,"Hello Alice");
 
     int byte_count = 32;
-    FILE *fp;
     char seed[32] = {0};
     octet SEED = {sizeof(seed),sizeof(seed),seed};
     csprng RNG;
 
 #ifdef __linux__
+    FILE *fp;
     fp = fopen("/dev/urandom", "r");
     if (fread(&seed, 1, byte_count, fp)) {};
     fclose(fp);

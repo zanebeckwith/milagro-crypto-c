@@ -39,7 +39,7 @@
 
 /*** START OF USER CONFIGURABLE SECTION - set architecture ***/
 
-#define CHUNK @WORD_LENGTH@		/**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
+#define CHUNK @AMCL_CHUNK@		/**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
 
 /*** END OF USER CONFIGURABLE SECTION ***/
 

@@ -93,10 +93,10 @@
 
 /*** START OF USER CONFIGURABLE SECTION - set architecture and choose modulus and curve  ***/
 
-#define CHOICE @FIELD_CHOICE@ /**< Current choice of Field */
+#define CHOICE @AMCL_CHOICE@ /**< Current choice of Field */
 
 /* For some moduli only one parameterisation of curve may supported. For others there is a choice of WEIERSTRASS, EDWARDS or MONTGOMERY curves. See above. */
-#define CURVETYPE @CURVE_TYPE@	/**< Note that not all curve types are supported - see above */
+#define CURVETYPE @AMCL_CURVETYPE@	/**< Note that not all curve types are supported - see above */
 
 /* Actual curve parameters associated with these choices can be found in rom.c */
 
@@ -108,7 +108,7 @@
 #define USE_GS_GT   /**< Not patented, so probably safe to always use this */
 
 /* Finite field support - for RSA, DH etc. */
-#define FFLEN @FF_LEN@  /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
+#define FFLEN @AMCL_FFLEN@  /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
 
 /* For debugging Only.
 #define DEBUG_REDUCE

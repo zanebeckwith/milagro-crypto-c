@@ -14,15 +14,22 @@ aes.c
 gcm.c
 oct.c
 rom.c
-fp2.c
-ecp2.c
-fp4.c
-fp12.c
 ff.c
-utils.c)
+utils.c
+version.c)
+
+if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
+  message(STATUS "Add pairing code to library")
+  set(SOURCES_PAIRING
+  fp2.c
+  ecp2.c
+  fp4.c
+  fp12.c
+  pair.c)
+endif(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
 
 # Build AMCL
-add_library(amcl ${LIB_TYPE} ${SOURCES_AMCL} version.c)
+add_library(amcl ${LIB_TYPE} ${SOURCES_AMCL} ${SOURCES_PAIRING} )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   if(BUILD_SHARED_LIBS)
@@ -37,14 +44,14 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 # Build libmpin
 if(BUILD_MPIN)
   message(STATUS "Build MPIN")
-  add_library(mpin ${LIB_TYPE} pair.c mpin.c)
+  add_library(mpin ${LIB_TYPE} mpin.c)
   target_link_libraries (mpin amcl) 
 endif(BUILD_MPIN)
 
 # Build libwcc
 if(BUILD_WCC)
   message(STATUS "Build WCC")
-  add_library(wcc ${LIB_TYPE} pair.c wcc.c)
+  add_library(wcc ${LIB_TYPE} wcc.c)
   target_link_libraries (wcc amcl) 
 endif(BUILD_WCC)
 
