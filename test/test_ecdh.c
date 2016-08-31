@@ -32,7 +32,7 @@ under the License.
 typedef enum { false, true } bool;
 
 #define LINE_LEN 500
-// #define DEBUG
+//#define DEBUG
 
 int main(int argc, char** argv)
 {
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
   const char* QCAVSxStr = "QCAVSx = ";
   octet QCAVSxOct = {EGS,EGS,QCAVSx};
 
-#if AMCL_CURVETYPE!=AMCL_MONTGOMERY
+#if CURVETYPE!=MONTGOMERY
   char QCAVSy[EGS];
   const char* QCAVSyStr = "QCAVSy = ";
   octet QCAVSyOct = {EGS,EGS,QCAVSy};
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
   const char* QIUTxStr = "QIUTx = ";
   octet QIUTxOct = {EGS,EGS,QIUTx};
 
-#if AMCL_CURVETYPE!=AMCL_MONTGOMERY
+#if CURVETYPE!=MONTGOMERY
   char QIUTy[EGS];
   const char* QIUTyStr = "QIUTy = ";
   octet QIUTyOct = {EGS,EGS,QIUTy};
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
       amcl_hex2bin(linePtr, QCAVSx, l1);
     }
 
-#if AMCL_CURVETYPE!=AMCL_MONTGOMERY
+#if CURVETYPE!=MONTGOMERY
     if (!strncmp(line, QCAVSyStr, strlen(QCAVSyStr))) {
 #ifdef DEBUG
       printf("line %d %s\n", i,line);	
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
       amcl_hex2bin(linePtr, QIUTx, l1);
     }
 
-#if AMCL_CURVETYPE!=AMCL_MONTGOMERY
+#if CURVETYPE!=MONTGOMERY
     if (!strncmp(line, QIUTyStr, strlen(QIUTyStr))) {
 #ifdef DEBUG
       printf("line %d %s\n", i,line);	
@@ -197,7 +197,7 @@ int main(int argc, char** argv)
       // Assign QIUT
       char q1[2*EFS+1];
       octet QIUTOct={0,sizeof(q1),q1};
-#if AMCL_CURVETYPE!=AMCL_MONTGOMERY
+#if CURVETYPE!=MONTGOMERY
       QIUTOct.val[0]=4;
       QIUTOct.len=1;
       OCT_joctet(&QIUTOct,&QIUTxOct);
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
       // Assign QCAVS
       char q2[2*EFS+1];
       octet QCAVSOct={0,sizeof(q2),q2};
-#if AMCL_CURVETYPE!=AMCL_MONTGOMERY
+#if CURVETYPE!=MONTGOMERY
       QCAVSOct.val[0]=4;
       QCAVSOct.len=1;
       OCT_joctet(&QCAVSOct,&QCAVSxOct);
@@ -271,6 +271,6 @@ int main(int argc, char** argv)
     printf("ERROR Empty test vector file\n");
     exit(EXIT_FAILURE);
   }
-  printf("TEST ECDH KEYPAIR PASSED\n");
+  printf("SUCCESS TEST ECDH KEYPAIR PASSED\n");
   exit(EXIT_SUCCESS);
 }

@@ -169,7 +169,7 @@ int main()
 
     printf("Testing ECDSA\n");
 
-    if (ECPSP_DSA(HASH_TYPE_ECC,&RNG,&S0,&M,&CS,&DS)!=0)
+    if (ECPSP_DSA(HASH_TYPE_ECC,&RNG,NULL,&S0,&M,&CS,&DS)!=0)
     {
         printf("***ECDSA Signature Failed\n");
         return 0;
