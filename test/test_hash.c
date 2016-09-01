@@ -163,6 +163,6 @@ int main(int argc, char** argv)
         printf("ERROR Empty test vector file\n");
         exit(EXIT_FAILURE);
     }
-    printf("SUCCESS TEST %s PASSED\n", argv[2]);
+    printf("SUCCESS TEST HASH %s PASSED\n", argv[2]);
     exit(EXIT_SUCCESS);
 }

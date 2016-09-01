@@ -541,7 +541,7 @@ int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 #if CURVETYPE!=MONTGOMERY
 
 /* IEEE ECDSA Signature, C and D are signature on F using private key S */
-int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
+int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
 {
     char h[128];
     octet H= {0,sizeof(h),h};
@@ -549,20 +549,33 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
     BIG gx,gy,r,s,f,c,d,u,vx;
     ECP G,V;
 
-    hashit(sha,F,-1,NULL,&H,MODBYTES);
+    hashit(sha,F,-1,NULL,&H,sha);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
 
     BIG_fromBytes(s,S->val);
-    BIG_fromBytes(f,H.val);
+
+    int hlen=H.len;
+    if (H.len>MODBYTES) hlen=MODBYTES;
+    BIG_fromBytesLen(f,H.val,hlen);
 
     ECP_set(&G,gx,gy);
 
     do
     {
+       if (RNG!=NULL) {
+         BIG_randomnum(u,r,RNG);
+         // Output emphemeral key for test vector generation
+         if (K!=NULL) {
+           K->len=EFS;	
+           BIG_toBytes(K->val,u);
+         } 
+       } else {
+         BIG_fromBytes(u,K->val);
+         BIG_mod(u,r);
+       }
 
-        BIG_randomnum(u,r,RNG);
 #ifdef AES_S
         BIG_mod2m(u,2*AES_S);
 #endif
@@ -604,19 +617,21 @@ int ECPVP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
     ECP G,WP;
     int valid;
 
-    hashit(sha,F,-1,NULL,&H,MODBYTES);
+    hashit(sha,F,-1,NULL,&H,sha);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
 
-    //OCT_shl(C,C->len-MODBYTES);
-    //OCT_shl(D,D->len-MODBYTES);
+    OCT_shl(C,C->len-MODBYTES);
+    OCT_shl(D,D->len-MODBYTES);
 
     BIG_fromBytes(c,C->val);
     BIG_fromBytes(d,D->val);
-    BIG_fromBytes(f,H.val);
 
-    //BIG_fromBytes(f,H.val);
+    int hlen=H.len;
+    if (hlen>MODBYTES) hlen=MODBYTES;
+
+    BIG_fromBytesLen(f,H.val,hlen);
 
     if (BIG_iszilch(c) || BIG_comp(c,r)>=0 || BIG_iszilch(d) || BIG_comp(d,r)>=0)
         res=ECDH_INVALID;
