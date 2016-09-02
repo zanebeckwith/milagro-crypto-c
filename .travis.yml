@@ -60,4 +60,4 @@ script:
   - make qa
 
 after_success:
-  - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/build_test/coverage/amcl.info
+  - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/COVERAGE/coverage/amcl.info
