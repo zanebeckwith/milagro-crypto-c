@@ -564,17 +564,21 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
 
     do
     {
-       if (RNG!=NULL) {
-         BIG_randomnum(u,r,RNG);
-         // Output emphemeral key for test vector generation
-         if (K!=NULL) {
-           K->len=EFS;	
-           BIG_toBytes(K->val,u);
-         } 
-       } else {
-         BIG_fromBytes(u,K->val);
-         BIG_mod(u,r);
-       }
+        if (RNG!=NULL)
+        {
+            BIG_randomnum(u,r,RNG);
+            // Output emphemeral key for test vector generation
+            if (K!=NULL)
+            {
+                K->len=EFS;
+                BIG_toBytes(K->val,u);
+            }
+        }
+        else
+        {
+            BIG_fromBytes(u,K->val);
+            BIG_mod(u,r);
+        }
 
 #ifdef AES_S
         BIG_mod2m(u,2*AES_S);
