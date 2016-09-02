@@ -116,21 +116,23 @@ build_item:
 buildx:
 	@echo -e "\n\n*** BUILD ${BUILD_NAME} ***\n"
 	rm -rf target/${BUILD_NAME}/*
-	mkdir -p target/${BUILD_NAME}/coverage
+	mkdir -p target/${BUILD_NAME}/coverage	
+ifeq (${BUILD_NAME},COVERAGE)
 	cd target/${BUILD_NAME} && \
 	cmake $(subst $(comma),$(space),${BUILD_PARAMS}) ../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
-	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0
-ifeq (${BUILD_NAME},COVERAGE)
-	cd target/${BUILD_NAME} && \
+	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 &&\
 	lcov --zerocounters --directory . && \
 	lcov --capture --initial --directory . --output-file coverage/amcl && \
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
 	genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info && \
 	make doc
-else
+else 
 	cd target/${BUILD_NAME} && \
+	cmake $(subst $(comma),$(space),${BUILD_PARAMS}) ../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
+	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0
 endif
 
