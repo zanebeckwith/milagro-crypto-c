@@ -116,8 +116,11 @@ build_item:
 buildx:
 	@echo -e "\n\n*** BUILD ${BUILD_NAME} ***\n"
 	rm -rf target/${BUILD_NAME}/*
-	mkdir -p target/${BUILD_NAME}/coverage	
-ifeq (${BUILD_NAME},COVERAGE)
+	mkdir -p target/${BUILD_NAME}/coverage
+ifneq ($(strip $(filter %WRAPPERS,${BUILD_NAME})),)
+	go get github.com/stretchr/testify/assert
+endif
+ifneq ($(strip $(filter %COVERAGE,${BUILD_NAME})),)
 	cd target/${BUILD_NAME} && \
 	cmake $(subst $(comma),$(space),${BUILD_PARAMS}) ../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
