@@ -245,7 +245,6 @@ int main()
 
         // Bob's ID
         rand_str(bob_id,255,&RNG);
-        OCT_jstring(&IdB,bob_id);
         printf("BOB ID: %s\n", bob_id);
 
         // TA: Generate Bob's receiver key
