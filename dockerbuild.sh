@@ -32,7 +32,8 @@ RUN mkdir -p /root/.ssh && \
     mkdir -p ${PRJPATH}
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
-RUN make qa || true
+RUN go get github.com/stretchr/testify/assert && \
+    make qa || true
 EOM
 
 # docker image name
