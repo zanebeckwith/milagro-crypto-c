@@ -66,9 +66,10 @@ add_library(rsa ${LIB_TYPE} rsa.c)
 target_link_libraries (rsa amcl) 
 
 # Build libx509
-message(STATUS "Build x.509")
-add_library(x509 ${LIB_TYPE} x509.c)
-target_link_libraries (x509 rsa ecdh) 
+if(BUILD_X509)
+  add_library(x509 ${LIB_TYPE} x509.c)
+  target_link_libraries (x509 rsa ecdh) 
+endif(BUILD_X509)
 
 # Copy built libs to test which allows testing without
 # having to install the libs.
@@ -89,10 +90,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/librsa.dll" "${PROJECT_BINARY_DIR}/test/")
 
-    add_custom_command(
-                TARGET x509
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libx509.dll" "${PROJECT_BINARY_DIR}/test/")
+    if(BUILD_X509)
+      add_custom_command(
+                  TARGET x509
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libx509.dll" "${PROJECT_BINARY_DIR}/test/")
+    endif(BUILD_X509)
 
     if(BUILD_MPIN)
       message(STATUS "Copy libmpin.dll to test for testing")
@@ -320,21 +323,22 @@ install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
         GROUP_WRITE GROUP_READ
         WORLD_WRITE WORLD_READ WORLD_EXECUTE)
 
-install (TARGETS amcl rsa ecdh x509 DESTINATION lib PERMISSIONS
+set(INSTAll_LIBS amcl rsa ecdh)
+
+if(BUILD_X509)
+  set(INSTALL_LIBS ${INSTALL_LIBS} x509)
+endif(BUILD_X509)
+
+if(BUILD_MPIN)
+  set(INSTALL_LIBS ${INSTALL_LIBS} mpin)
+endif(BUILD_MPIN)
+
+if(BUILD_WCC)
+  set(INSTALL_LIBS ${INSTALL_LIBS} wcc)
+endif(BUILD_WCC)
+
+install (TARGETS ${INSTALL_LIBS} DESTINATION lib PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
 
-if(BUILD_MPIN)
-  install (TARGETS mpin DESTINATION lib PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
-endif(BUILD_MPIN)
-
-if(BUILD_WCC)
-  install (TARGETS wcc DESTINATION lib PERMISSIONS
-          OWNER_WRITE OWNER_READ OWNER_EXECUTE
-          GROUP_READ GROUP_EXECUTE
-          WORLD_READ WORLD_EXECUTE)
-endif(BUILD_WCC)
