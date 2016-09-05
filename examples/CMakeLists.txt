@@ -12,6 +12,11 @@ target_link_libraries (testecdh ecdh)
 add_executable (testrsa testrsa.c)
 target_link_libraries (testrsa rsa) 
 
+if(BUILD_X509)
+  add_executable (testx509 testx509.c)
+  target_link_libraries (testx509 x509) 
+endif(BUILD_X509)
+
 if(BUILD_MPIN)
   add_executable (testmpin testmpin.c)
   target_link_libraries (testmpin mpin) 
