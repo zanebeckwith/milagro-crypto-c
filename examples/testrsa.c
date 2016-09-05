@@ -18,7 +18,7 @@ under the License.
 */
 
 /* test driver and function exerciser for RSA API Functions */
-/* gcc -std=c99 -O3 testrsa.c rsa.c amcl.a -o testrsa.exe */
+/*   gcc -std=c99 -g ./testrsa.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lrsa -o testrsat */
 
 
 #include <stdio.h>

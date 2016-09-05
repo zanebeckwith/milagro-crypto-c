@@ -32,7 +32,7 @@ under the License.
 typedef enum { false, true } bool;
 
 #define LINE_LEN 300
-#define DEBUG
+//#define DEBUG
 
 int main(int argc, char** argv)
 {
