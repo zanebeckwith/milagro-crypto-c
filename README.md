@@ -19,7 +19,7 @@
 
 *AMCL - Apache Milagro Crypto Library*
 
-AMCL is a standards compliant C crypto library with no external dependencies, specifically designed to support the Internet of Things.
+AMCL is a standards compliant C cryptographic library with no external dependencies, specifically designed to support the Internet of Things (IoT).  
 For a detailed explanation about this library please read: [doc/AMCL.pdf](doc/AMCL.pdf)
 
 NOTE: This product includes software developed at [The Apache Software Foundation](http://www.apache.org/).
@@ -95,8 +95,8 @@ Now you can set the path to where libs and python package are installed:
 
 NOTE: The build can be configured by setting flags on the command line, for example:
 
-* cmake -DWORD_LENGTH=64 ../..
-* cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D WORD_LENGTH=64 -D BUILD_WCC=on ../..
+* cmake -DAMCL_CHUNK=64 ../..
+* cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..
 
 To list other available CMake options, use:
 
@@ -148,11 +148,28 @@ After having built the libraries you can build a Windows installer using this co
 In order for this to work NSSI has to have been installed
 
 
-## Docker Build
+## Automation
 
-The script dockerbuild.sh build, test and package this library inside a Docker container.
+This project includes a Makefile that allows you to test and build the project in a Linux machine with simple commands.  
+All the artifacts and reports produced using this Makefile are stored in the *target* folder.  
 
-## Code Coverage
+To see all available options:
 
-The default build in Docker and TravisCI generates a test coverage report in HTML format:
-* target/build/coverage/index.html
+    make help
+
+To build the project inside a Docker container (requires Docker):
+
+    make dbuild
+
+The base Docker building environment is defined in the following Dockerfile:
+
+    resources/DockerDev/Dockerfile
+
+To execute all the default test builds and generate reports in the current environment:
+
+    make qa
+
+To format the code (please use this command before submitting any new code):
+
+    make format
+

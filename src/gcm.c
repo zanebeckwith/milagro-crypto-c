@@ -17,8 +17,6 @@ specific language governing permissions and limitations
 under the License.
 */
 
-
-
 /*
  * Implementation of the AES-GCM Encryption/Authentication
  *
@@ -41,6 +39,7 @@ under the License.
 
 #include <stdlib.h>
 #include <string.h>
+#include "arch.h"
 #include "amcl.h"
 
 #define NB 4
@@ -89,15 +88,16 @@ static void gf2mul(gcm *g)
     /* gf2m mul - Z=H*X mod 2^128 */
     int i,j,m,k;
     unsign32 P[4];
-    uchar b;
+    unsign32 b;
 
     P[0]=P[1]=P[2]=P[3]=0;
     j=8;
     m=0;
     for (i=0; i<128; i++)
     {
-        b=(g->stateX[m]>>(--j))&1;
-        if (b) for (k=0; k<NB; k++) P[k]^=g->table[i][k];
+        b=(unsign32)(g->stateX[m]>>(--j))&1;
+        b=~b+1;
+        for (k=0; k<NB; k++) P[k]^=(g->table[i][k]&b);
         if (j==0)
         {
             j=8;
@@ -149,9 +149,9 @@ static int GCM_ghash(gcm *g,char *plain,int len)
 
 /* SU= 48 */
 /* Initialize GCM mode */
-void GCM_init(gcm* g,char *key,int niv,char *iv)
+void GCM_init(gcm* g,int nk,char *key,int niv,char *iv)
 {
-    /* iv size niv is usually 12 bytes (96 bits). AES key is 16 bytes */
+    /* iv size niv is usually 12 bytes (96 bits). AES key size nk can be 16,24 or 32 bytes */
     int i;
     uchar H[16];
     for (i=0; i<16; i++)
@@ -160,7 +160,7 @@ void GCM_init(gcm* g,char *key,int niv,char *iv)
         g->stateX[i]=0;
     }
 
-    AES_init(&(g->a),ECB,key,iv);
+    AES_init(&(g->a),ECB,nk,key,iv);
     AES_ecb_encrypt(&(g->a),H);     /* E(K,0) */
     precompute(g,H);
 
@@ -248,6 +248,7 @@ int GCM_add_cipher(gcm *g,char *plain,char *cipher,int len)
     /* Add ciphertext to extract plaintext, len is length of ciphertext. */
     int i,j=0;
     unsign32 counter;
+    char oc;
     uchar B[16];
     if (g->status==GCM_ACCEPTING_HEADER) g->status=GCM_ACCEPTING_CIPHER;
     if (g->status!=GCM_ACCEPTING_CIPHER) return 0;
@@ -261,8 +262,10 @@ int GCM_add_cipher(gcm *g,char *plain,char *cipher,int len)
         AES_ecb_encrypt(&(g->a),B);        /* encrypt it  */
         for (i=0; i<16 && j<len; i++)
         {
+            oc=cipher[j];
             plain[j]=cipher[j]^B[i];
-            g->stateX[i]^=cipher[j++];
+            g->stateX[i]^=oc;
+            j++;
             g->lenC[1]++;
             if (g->lenC[1]==0) g->lenC[0]++;
         }
@@ -298,53 +301,58 @@ void GCM_finish(gcm *g,char *tag)
 
 
 // Compile with
-// gcc -O2 amcl_gcm.c amcl_aes.c -o amcl_gcm.exe
+// gcc -O2 gcm.c aes.c -o gcm.exe
 /* SU= 16
 */
-/*
-static void hex2bytes(char *hex,char *bin)
-{
-	int i;
-	char v;
-	int len=strlen(hex);
-	for (i = 0; i < len/2; i++) {
-        char c = hex[2*i];
-        if (c >= '0' && c <= '9') {
-            v = c - '0';
-        } else if (c >= 'A' && c <= 'F') {
-            v = c - 'A' + 10;
-        } else if (c >= 'a' && c <= 'f') {
-            v = c - 'a' + 10;
-        } else {
-            v = 0;
-        }
-        v <<= 4;
-        c = hex[2*i + 1];
-        if (c >= '0' && c <= '9') {
-            v += c - '0';
-        } else if (c >= 'A' && c <= 'F') {
-            v += c - 'A' + 10;
-        } else if (c >= 'a' && c <= 'f') {
-            v += c - 'a' + 10;
-        } else {
-            v = 0;
-        }
-        bin[i] = v;
-    }
-}
-*/
+
+/* static void hex2bytes(char *hex,char *bin) */
+/* { */
+/* 	int i; */
+/* 	char v; */
+/* 	int len=strlen(hex); */
+/* 	for (i = 0; i < len/2; i++) { */
+/*         char c = hex[2*i]; */
+/*         if (c >= '0' && c <= '9') { */
+/*             v = c - '0'; */
+/*         } else if (c >= 'A' && c <= 'F') { */
+/*             v = c - 'A' + 10; */
+/*         } else if (c >= 'a' && c <= 'f') { */
+/*             v = c - 'a' + 10; */
+/*         } else { */
+/*             v = 0; */
+/*         } */
+/*         v <<= 4; */
+/*         c = hex[2*i + 1]; */
+/*         if (c >= '0' && c <= '9') { */
+/*             v += c - '0'; */
+/*         } else if (c >= 'A' && c <= 'F') { */
+/*             v += c - 'A' + 10; */
+/*         } else if (c >= 'a' && c <= 'f') { */
+/*             v += c - 'a' + 10; */
+/*         } else { */
+/*             v = 0; */
+/*         } */
+/*         bin[i] = v; */
+/*     } */
+/* } */
+
 /*
 int main()
 {
 	int i;
 
-	char* KT="feffe9928665731c6d6a8f9467308308";
-	char* MT="d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b39";
-	char* HT="feedfacedeadbeeffeedfacedeadbeefabaddad2";
+//	char* KT="feffe9928665731c6d6a8f9467308308";
+//	char* MT="d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b39";
+//	char* HT="feedfacedeadbeeffeedfacedeadbeefabaddad2";
 //	char* NT="cafebabefacedbaddecaf888";
 // Tag should be 5bc94fbc3221a5db94fae95ae7121a47
-	char* NT="9313225df88406e555909c5aff5269aa6a7a9538534f7da1e4c303d2a318a728c3c0c95156809539fcf0e2429a6b525416aedbf5a0de6a57a637b39b";
+//	char* NT="9313225df88406e555909c5aff5269aa6a7a9538534f7da1e4c303d2a318a728c3c0c95156809539fcf0e2429a6b525416aedbf5a0de6a57a637b39b";
 // Tag should be 619cc5aefffe0bfa462af43c1699d050
+
+  char* KT="6dfb5dc68af6ae2f3242e9184f100918";
+  char* MT="47809d16c2c6ec685962c90e53fe1bba";
+  char* HT="dd0fa6e494031139d71ee45f00d56fa4";
+  char* NT="37d36f5c54d53479d4745dd1";
 
 
 	int len=strlen(MT)/2;
@@ -367,11 +375,13 @@ int main()
     hex2bytes(NT, N);
 	hex2bytes(KT, K);
 
+	printf("lenK= %d\n",lenK);
+
  	printf("Plaintext=\n");
 	for (i=0;i<len;i++) printf("%02x",(unsigned char)M[i]);
 	printf("\n");
 
-	GCM_init(&g,K,lenIV,N);
+	GCM_init(&g,16,K,lenIV,N);
 	GCM_add_header(&g,H,lenH);
 	GCM_add_plain(&g,C,M,len);
 	GCM_finish(&g,T);
@@ -384,7 +394,7 @@ int main()
 	for (i=0;i<16;i++) printf("%02x",(unsigned char)T[i]);
 	printf("\n");
 
-	GCM_init(&g,K,lenIV,N);
+	GCM_init(&g,16,K,lenIV,N);
 	GCM_add_header(&g,H,lenH);
 	GCM_add_cipher(&g,P,C,len);
 	GCM_finish(&g,T);

@@ -17,63 +17,23 @@
 # build the environment
 docker build --tag=miracl/cdev ./resources/DockerDev/
 
+# go path
+GOPATH=/root
+
+# project root path
+PRJPATH=/root/src/milagro-crypto-c
+
 # generate a docker file on the fly
 cat > Dockerfile <<- EOM
 FROM miracl/cdev
 MAINTAINER nicola.asuni@miracl.com
-RUN mkdir -p /root/.ssh
-RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
-RUN mkdir -p /root/C/milagro-crypto-c
-ADD ./ /root/C/milagro-crypto-c
-WORKDIR /root/C/milagro-crypto-c
-
-RUN echo -e "\n\n*** BUILD FOR COVERAGE ***\n" && \
-    rm -rf /root/C/milagro-crypto-c/target/build_test && \
-    mkdir -p /root/C/milagro-crypto-c/target/build_test/coverage && \
-    cd /root/C/milagro-crypto-c/target/build_test && \
-    cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../.. && \
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
-    make && \
-    lcov --zerocounters --directory . && \
-    lcov --capture --initial --directory . --output-file coverage/amcl && \
-    make test && \
-    lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
-    genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info && \
-    make doc
-
-RUN echo -e "\n\n*** BUILD LINUX 64 ***\n\n" && \
-    rm -rf /root/C/milagro-crypto-c/target/build_linux64 && \
-    mkdir -p /root/C/milagro-crypto-c/target/build_linux64 && \
-    cd /root/C/milagro-crypto-c/target/build_linux64 && \
-    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../.. && \
-    make && \
-    make test && \
-    make package
-
-RUN echo -e "\n\n*** BUILD LINUX 32 ***\n\n" && \
-    rm -rf /root/C/milagro-crypto-c/target/build_linux32 && \
-    mkdir -p /root/C/milagro-crypto-c/target/build_linux32 && \
-    cd /root/C/milagro-crypto-c/target/build_linux32 && \
-    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../.. && \
-    make && \
-    make test && \
-    make package
-
-RUN echo -e "\n\n*** BUILD WIN 64 ***\n\n" && \
-    rm -rf /root/C/milagro-crypto-c/target/build_win64 && \
-    mkdir -p /root/C/milagro-crypto-c/target/build_win64 && \
-    cd /root/C/milagro-crypto-c/target/build_win64 && \
-    cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../.. && \
-    make && \
-    make test
-
-RUN echo -e "\n\n*** BUILD WIN 32 ***\n\n" && \
-    rm -rf /root/C/milagro-crypto-c/target/build_win32 && \
-    mkdir -p /root/C/milagro-crypto-c/target/build_win32 && \
-    cd /root/C/milagro-crypto-c/target/build_win32 && \
-    cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../.. && \
-    make && \
-    make test
+RUN mkdir -p /root/.ssh && \
+    echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config && \
+    mkdir -p ${PRJPATH}
+ADD ./ ${PRJPATH}
+WORKDIR ${PRJPATH}
+RUN go get github.com/stretchr/testify/assert && \
+    make qa || true
 EOM
 
 # docker image name
@@ -86,7 +46,7 @@ docker build --no-cache --tag=${DOCKER_IMAGE_NAME} .
 CONTAINER_ID=$(docker run -d ${DOCKER_IMAGE_NAME})
 
 # copy the artifact back to the host
-docker cp ${CONTAINER_ID}:"/root/C/milagro-crypto-c/target" ./
+docker cp ${CONTAINER_ID}:"${PRJPATH}/target" ./
 
 # remove the container and image
 docker rm -f ${CONTAINER_ID} || true

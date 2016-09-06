@@ -34,14 +34,22 @@ under the License.
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
-void FP_nres(BIG a) {}
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
-void FP_redc(BIG a) {}
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
 {
-    BIG t,b,m;
+    BIG t,b;
     chunk v,tw;
     BIG_split(t,b,d,MODBITS);
 
@@ -71,6 +79,54 @@ void FP_mod(BIG r,DBIG d)
     BIG_add(r,t,b);
     BIG_norm(r);
 }
+#endif
+
+/* This only applies to Curve C448, so specialised (for now) */
+#if MODTYPE == GENERALISED_MERSENNE
+
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
+
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
+
+/* reduce a DBIG to a BIG exploiting the special form of the modulus */
+void FP_mod(BIG r,DBIG d)
+{
+    BIG t,b;
+    chunk carry;
+    BIG_split(t,b,d,MBITS);
+
+    BIG_add(r,t,b);
+
+    BIG_dscopy(d,t);
+    BIG_dshl(d,MBITS/2);
+
+    BIG_split(t,b,d,MBITS);
+
+    BIG_add(r,r,t);
+    BIG_add(r,r,b);
+    BIG_norm(r);
+    BIG_shl(t,MBITS/2);
+
+    BIG_add(r,r,t);
+
+    carry=r[NLEN-1]>>TBITS;
+
+    r[NLEN-1]&=TMASK;
+    r[0]+=carry;
+
+    r[224/BASEBITS]+=carry<<(224%BASEBITS); /* need to check that this falls mid-word */
+    BIG_norm(r);
+
+}
+
 #endif
 
 #if MODTYPE == MONTGOMERY_FRIENDLY
@@ -139,59 +195,147 @@ void FP_redc(BIG a)
 /* SU= 112 */
 void FP_mod(BIG a,DBIG d)
 {
-    int i,j;
+    int i,k;
     BIG md;
 
 #ifdef dchunk
-    dchunk sum;
-    chunk sp;
+    dchunk t,c,s;
+    dchunk dd[NLEN];
+    chunk v[NLEN];
 #endif
 
     BIG_rcopy(md,Modulus);
 
 #ifdef COMBA
 
-    /* Faster to Combafy it.. Let the compiler unroll the loops! */
+    t=d[0];
+    v[0]=((chunk)t*MConst)&BMASK;
+    t+=(dchunk)v[0]*md[0];
+    c=(t>>BASEBITS)+d[1];
+    s=0;
 
-    sum=d[0];
-    for (j=0; j<NLEN; j++)
+    for (k=1; k<NLEN; k++)
     {
-        for (i=0; i<j; i++) sum+=(dchunk)d[i]*md[j-i];
-        if (MConst==-1) sp=(-(chunk)sum)&MASK;
-        else
-        {
-            if (MConst==1) sp=((chunk)sum)&MASK;
-            else sp=((chunk)sum*MConst)&MASK;
-        }
-        d[j]=sp;
-        sum+=(dchunk)sp*md[0];  /* no need for &MASK here! */
-        sum=d[j+1]+(sum>>BASEBITS);
+        t=c+s+(dchunk)v[0]*md[k];
+        for (i=k-1; i>k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
+        v[k]=((chunk)t*MConst)&BMASK;
+        t+=(dchunk)v[k]*md[0];
+        c=(t>>BASEBITS)+d[k+1];
+        dd[k]=(dchunk)v[k]*md[k];
+        s+=dd[k];
     }
-
-    for (j=NLEN; j<DNLEN-2; j++)
+    for (k=NLEN; k<2*NLEN-1; k++)
     {
-        for (i=j-NLEN+1; i<NLEN; i++) sum+=(dchunk)d[i]*md[j-i];
-        d[j]=(chunk)sum&MASK;
-        sum=d[j+1]+(sum>>BASEBITS);
+        t=c+s;
+        for (i=NLEN-1; i>=1+k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
+        a[k-NLEN]=(chunk)t&BMASK;
+        c=(t>>BASEBITS)+d[k+1];
+        s-=dd[k-NLEN+1];
     }
+    a[NLEN-1]=(chunk)c&BMASK;
 
-    sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-    d[DNLEN-2]=(chunk)sum&MASK;
-    sum=d[DNLEN-1]+(sum>>BASEBITS);
-    d[DNLEN-1]=(chunk)sum&MASK;
 
-    BIG_sducopy(a,d);
+    /*
+    	t=d[0]; d[0]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[0]*md[0]; c=(t>>BASEBITS)+d[1];
+
+    	for (k=1;k<NLEN;k++)
+    	{
+    		t = c+(dchunk)d[0]*md[k];
+    		for (i=1;i<k;i++) t+=(dchunk)d[i]*md[k-i];
+    		d[k]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[k]*md[0]; c=(t>>BASEBITS)+d[k+1];
+    	}
+    	for (k=NLEN;k<2*NLEN-1;k++)
+    	{
+    		t = c;
+    		for (i=k-NLEN+1;i<NLEN;i++) t+=(dchunk)d[i]*md[k-i];
+    		d[k]=(chunk)t&BMASK; c=(t>>BASEBITS)+d[k+1];
+    	}
+    	d[2*NLEN-1]=(chunk)c&BMASK;
+    */
+    /*
+    	sum=d[0];
+    	if (MConst==-1) sp=(-(chunk)sum)&BMASK;
+    	else
+    	{
+    		if (MConst==1) sp=((chunk)sum)&BMASK;
+    		else sp=((chunk)sum*MConst)&BMASK;
+    	}
+    	d[0]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
+    	sum=d[1]+(sum>>BASEBITS);
+
+    	for (j=1;j<NLEN;j++)
+    	{
+    		sum+=(dchunk)d[0]*md[j];
+    		for (i=1;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
+    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
+    		else
+    		{
+    			if (MConst==1) sp=((chunk)sum)&BMASK;
+    			else sp=((chunk)sum*MConst)&BMASK;
+    		}
+    		d[j]=sp;
+    		dd[j]=(dchunk)sp*md[j];
+    		sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
+
+    	for (j=NLEN;j<DNLEN-2;j++)
+    	{
+    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
+    		d[j]=(chunk)sum&BMASK;
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
+
+    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
+    	d[DNLEN-2]=(chunk)sum&BMASK;
+    	sum=d[DNLEN-1]+(sum>>BASEBITS);
+    	d[DNLEN-1]=(chunk)sum&BMASK;
+    */
+//	BIG_sducopy(a,d);
     BIG_norm(a);
 
+
+    /* Faster to Combafy it.. Let the compiler unroll the loops! */
+    /*
+    	sum=d[0];
+    	for (j=0;j<NLEN;j++)
+    	{
+    		for (i=0;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
+    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
+    		else
+    		{
+    			if (MConst==1) sp=((chunk)sum)&BMASK;
+    			else sp=((chunk)sum*MConst)&BMASK;
+    		}
+    		d[j]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
+
+    	for (j=NLEN;j<DNLEN-2;j++)
+    	{
+    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
+    		d[j]=(chunk)sum&BMASK;
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
+
+    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
+    	d[DNLEN-2]=(chunk)sum&BMASK;
+    	sum=d[DNLEN-1]+(sum>>BASEBITS);
+    	d[DNLEN-1]=(chunk)sum&BMASK;
+
+    	BIG_sducopy(a,d);
+    	BIG_norm(a);
+    */
 #else
-    chunk m, carry;
+    int j;
+    chunk m,carry;
     for (i=0; i<NLEN; i++)
     {
-        if (MConst==-1) m=(-d[i])&MASK;
+        if (MConst==-1) m=(-d[i])&BMASK;
         else
         {
             if (MConst==1) m=d[i];
-            else m=(MConst*d[i])&MASK;
+            else m=(MConst*d[i])&BMASK;
         }
         carry=0;
         for (j=0; j<NLEN; j++)
@@ -245,7 +389,7 @@ void FP_mul(BIG r,BIG a,BIG b)
     DBIG d;
     chunk ea=EXCESS(a);
     chunk eb=EXCESS(b);
-    if ((ea+1)*(eb+1)+1>=FEXCESS)
+    if ((ea+1)>=(FEXCESS-1)/(eb+1))
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d %d\n",ea,eb);
@@ -254,11 +398,20 @@ void FP_mul(BIG r,BIG a,BIG b)
 #ifdef GET_STATS
         rmul++;
     }
+    else
+    {
+        BIG_norm(a);   /* change here */
+    }
     tmul++;
 #else
     }
+    else
+    {
+        BIG_norm(a);   /* change here */
+    }
 #endif
 
+    BIG_norm(b);
     BIG_mul(d,a,b);
     FP_mod(r,d);
 }
@@ -303,7 +456,7 @@ void FP_sqr(BIG r,BIG a)
 {
     DBIG d;
     chunk ea=EXCESS(a);
-    if ((ea+1)*(ea+1)+1>=FEXCESS)
+    if ((ea+1)>=(FEXCESS-1)/(ea+1))
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ea);
@@ -312,10 +465,19 @@ void FP_sqr(BIG r,BIG a)
 #ifdef GET_STATS
         rsqr++;
     }
+    else
+    {
+        BIG_norm(a);   /* change here */
+    }
     tsqr++;
 #else
     }
+    else
+    {
+        BIG_norm(a);   /* change here */
+    }
 #endif
+
     BIG_sqr(d,a);
     FP_mod(r,d);
 }

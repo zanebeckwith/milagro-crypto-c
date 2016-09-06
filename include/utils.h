@@ -17,14 +17,60 @@ specific language governing permissions and limitations
 under the License.
 */
 
+/**
+ * @file utils.h
+ * @author Kealan McCusker
+ * @date 28th July 2016
+ * @brief Support functions for M-Pin servers
+ *
+ * declares functions
+ *
+ */
+
 #ifndef UTILS_H
 #define UTILS_H
 
 #include "amcl.h"
-#include <math.h>
 
-void hex2bytes(char *hex, char *bin);
-void generateRandom(csprng*, octet*);
-int generateOTP(csprng*);
+/** @brief Decode hex value
+ *
+	@param src     Hex encoded string
+	@param dst     Binary string
+	@param src_len length Hex encoded string
+*/
+void amcl_hex2bin(const char *src, char *dst, int src_len);
+
+/** @brief Encode binary string
+ *
+	@param src     Binary string
+	@param dst     Hex encoded string
+	@param src_len length binary string
+*/
+void amcl_bin2hex(char *src, char *dst, int src_len);
+
+/** @brief Print encoded binary string
+ *
+	@param src     Binary string
+	@param src_len length binary string
+*/
+void amcl_print_hex(char *src, int src_len);
+
+/*! \brief Generate a random Octet
+ *
+ *  Generate a random Octet
+ *
+ *  @param  RNG             random number generator
+ *  @param  randomValue     random Octet
+ */
+void generateRandom(csprng* RNG, octet* randomValue);
+
+/*! \brief Generate a random six digit one time password
+ *
+ *  Generates a random six digit one time password
+ *
+ *  @param  RNG             random number generator
+ *  @return OTP             One Time Password
+ */
+int generateOTP(csprng* RNG);
 
 #endif

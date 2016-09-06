@@ -3,5 +3,5 @@ interacts with the c code using CFFI.
 
 To run all MPIN tests
 
-./TestMPINInstall.py -v
+    ./TestMPINInstall.py -v
 

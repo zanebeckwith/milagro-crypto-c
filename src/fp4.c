@@ -218,9 +218,8 @@ void FP4_mul(FP4 *w,FP4 *x,FP4 *y)
 
     FP2_mul(&t4,&t4,&t3); /* (xa+xb)(ya+yb) */
     FP2_sub(&t4,&t4,&t1);
-#if CHUNK<64
     FP2_norm(&t4);
-#endif
+
     FP2_sub(&(w->b),&t4,&t2);
     FP2_mul_ip(&t2);
     FP2_add(&(w->a),&t2,&t1);
@@ -270,9 +269,8 @@ void FP4_times_i(FP4 *w)
 {
     BIG z;
     FP2 s,t;
-#if CHUNK<64
+
     FP4_norm(w);
-#endif
     FP2_copy(&t,&(w->b));
 
     FP2_copy(&s,&t);
@@ -282,9 +280,8 @@ void FP4_times_i(FP4 *w)
     BIG_copy(s.b,z);
 
     FP2_add(&t,&t,&s);
-#if CHUNK<64
     FP2_norm(&t);
-#endif
+
     FP2_copy(&(w->b),&(w->a));
     FP2_copy(&(w->a),&t);
 }

@@ -53,6 +53,7 @@ static void ECP_cswap(ECP *P,ECP *Q,int d)
 #endif
 }
 
+#if CURVETYPE!=MONTGOMERY
 /* Conditional move Q to P dependant on d */
 static void ECP_cmove(ECP *P,ECP *Q,int d)
 {
@@ -66,7 +67,9 @@ static void ECP_cmove(ECP *P,ECP *Q,int d)
     P->inf^=(P->inf^Q->inf)&d;
 #endif
 }
+#endif
 
+#if CURVETYPE!=MONTGOMERY
 /* return 1 if b==c, no branching */
 static int teq(sign32 b,sign32 c)
 {
@@ -74,7 +77,9 @@ static int teq(sign32 b,sign32 c)
     x-=1;  // if x=0, x now -1
     return (int)((x>>31)&1);
 }
+#endif
 
+#if CURVETYPE!=MONTGOMERY
 /* Constant time select from pre-computed table */
 static void ECP_select(ECP *P,ECP W[],sign32 b)
 {
@@ -97,6 +102,7 @@ static void ECP_select(ECP *P,ECP W[],sign32 b)
     ECP_neg(&MP);  // minus P
     ECP_cmove(P,&MP,(int)(m&1));
 }
+#endif
 
 /* Test P == Q */
 /* SU=168 */
@@ -320,9 +326,10 @@ int ECP_set(ECP *P,BIG x,BIG y)
     BIG_copy(y2,y);
 
     FP_nres(y2);
-
     FP_sqr(y2,y2);
     FP_reduce(y2);
+
+
 
     BIG_copy(rhs,x);
     FP_nres(rhs);
@@ -437,7 +444,7 @@ void ECP_affine(ECP *P)
 /* SU=120 */
 void ECP_outputxyz(ECP *P)
 {
-    BIG x,y,z;
+    BIG x,z;
     if (ECP_isinf(P))
     {
         printf("Infinity\n");
@@ -451,6 +458,7 @@ void ECP_outputxyz(ECP *P)
     FP_redc(z);
 
 #if CURVETYPE!=MONTGOMERY
+    BIG y;
     BIG_copy(y,P->y);
     FP_reduce(y);
     FP_redc(y);
@@ -579,9 +587,9 @@ void ECP_dbl(ECP *P)
 
     BIG_imul(w3,w3,4);
     FP_neg(w1,w3);
-#if CHUNK<64
+
     BIG_norm(w1);
-#endif
+
     FP_sqr(P->x,w8);
     FP_add(P->x,P->x,w1);
     FP_add(P->x,P->x,w1);
@@ -599,9 +607,7 @@ void ECP_dbl(ECP *P)
     FP_add(w2,w2,w2);
     FP_sub(w3,w3,P->x);
     FP_mul(P->y,w8,w3);
-//#if CHUNK<64
-//	BIG_norm(w2);
-//#endif
+
     FP_sub(P->y,P->y,w2);
 
     BIG_norm(P->y);
@@ -620,9 +626,9 @@ void ECP_dbl(ECP *P)
     if (CURVE_A==1) BIG_copy(E,C);
     if (CURVE_A==-1) FP_neg(E,C);
     FP_add(F,E,D);
-#if CHUNK<64
+
     BIG_norm(F);
-#endif
+
     FP_sqr(H,P->z);
     FP_add(H,H,H);
     FP_sub(J,F,H);
@@ -638,7 +644,7 @@ void ECP_dbl(ECP *P)
 #endif
 
 #if CURVETYPE==MONTGOMERY
-    BIG t,A,B,AA,BB,C;
+    BIG A,B,AA,BB,C;
     if (ECP_isinf(P)) return;
 
     FP_add(A,P->x,P->z);
@@ -646,9 +652,6 @@ void ECP_dbl(ECP *P)
     FP_sub(B,P->x,P->z);
     FP_sqr(BB,B);
     FP_sub(C,AA,BB);
-//#if CHUNK<64
-//	BIG_norm(C);
-//#endif
 
     FP_mul(P->x,AA,BB);
     FP_imul(A,C,(CURVE_A+2)/4);
@@ -775,7 +778,7 @@ void ECP_add(ECP *P,ECP *Q)
     BIG_norm(P->z);
 
 #else
-    BIG b,A,B,C,D,E,F,G,H,I;
+    BIG b,A,B,C,D,E,F,G;
 
     BIG_rcopy(b,CURVE_B);
     FP_nres(b);
@@ -790,9 +793,8 @@ void ECP_add(ECP *P,ECP *Q)
     FP_sub(F,B,E);
     FP_add(G,B,E);
 
-    FP_add(C,C,D);
-
     if (CURVE_A==1) FP_sub(E,D,C);
+    FP_add(C,C,D);
 
     FP_add(B,P->x,P->y);
     FP_add(D,Q->x,Q->y);
@@ -953,6 +955,9 @@ void ECP_mul(ECP *P,BIG e)
 
     ECP_copy(&Q,P);
     ECP_dbl(&Q);
+
+//printf("Q= ");ECP_output(&Q); printf("\n");
+
     ECP_copy(&W[0],P);
 
     for (i=1; i<8; i++)
@@ -960,6 +965,8 @@ void ECP_mul(ECP *P,BIG e)
         ECP_copy(&W[i],&W[i-1]);
         ECP_add(&W[i],&Q);
     }
+
+//printf("W[1]= ");ECP_output(&W[1]); printf("\n");
 
     /* convert the table to affine */
 #if CURVETYPE==WEIERSTRASS

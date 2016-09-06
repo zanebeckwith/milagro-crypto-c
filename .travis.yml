@@ -43,49 +43,21 @@ addons:
     - mingw-w64-tools
     - mingw-w64-i686-dev
     - mingw-w64-x86-64-dev
+    - golang
 
 install:
   - pip install --user --upgrade pip
   - pip install --user cffi
-  - export PATH=$PATH:$HOME/.local/bin
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/bin
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/pkg
+  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/src
+  - export GOPATH=/home/travis/build/miracl/milagro-crypto-c/target/go
+  - export PATH=$GOPATH/bin:$PATH:$HOME/.local/bin
   - gem install coveralls-lcov
+  - go get github.com/stretchr/testify/assert
 
 script:
-  - echo -e "\n\n*** BUILD FOR COVERAGE ***\n"
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_test/coverage
-  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_test
-  - cmake -D CMAKE_BUILD_TYPE=Coverage -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 -D USE_ANONYMOUS=on -D BUILD_WCC=on ../..
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
-  - make
-  - lcov --zerocounters --directory .
-  - lcov --capture --initial --directory . --output-file coverage/amcl
-  - make test
-  - lcov --no-checksum --directory . --capture --output-file coverage/amcl.info
-  - genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info
-  - make doc
-  - echo -e "\n\n*** BUILD LINUX 64 ***\n\n"
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
-  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux64
-  - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=64 ../..
-  - make
-  - make test
-  - echo -e "\n\n*** BUILD LINUX 32 ***\n\n"
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
-  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_linux32
-  - cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../..
-  - make
-  - make test
-  - echo -e "\n\n*** BUILD WIN 64 ***\n\n"
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win64
-  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win64
-  - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw64-cross.cmake -D WORD_LENGTH=64 ../..
-  - make
-  - make test
-  - echo -e "\n\n*** BUILD WIN 32 ***\n\n"
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/build_win32
-  - cd /home/travis/build/miracl/milagro-crypto-c/target/build_win32
-  - cmake -D CMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake -D WORD_LENGTH=32 ../..
-  - make
-  - make test
+  - make qa
+
 after_success:
-  - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/build_test/coverage/amcl.info
+  - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/COVERAGE/coverage/amcl.info

@@ -35,14 +35,20 @@ import platform
 PGS = 32
 # WCC Field Size
 PFS = 32
-G1 = 2*PFS + 1
-G2 = 4*PFS
+G1 = 2 * PFS + 1
+G2 = 4 * PFS
 # Length of hash
 HASH_BYTES = 32
 # AES-GCM IV length
 IVL = 12
 # AES Key length
 PAS = 16
+
+# Hash function choice
+SHA256 = 32
+SHA384 = 48
+SHA512 = 64
+HASH_TYPE_WCC = SHA256
 
 ffi = cffi.FFI()
 ffi.cdef("""
@@ -62,24 +68,24 @@ typedef struct
 } octet;
 
 extern int WCC_RANDOM_GENERATE(csprng *RNG,octet* S);
-extern void  WCC_Hq(octet *A,octet *B,octet *C,octet *D,octet *h);
-extern int WCC_GET_G2_MULTIPLE(int hashDone,octet *S,octet *ID,octet *VG2);
-extern int WCC_GET_G1_MULTIPLE(int hashDone,octet *S,octet *ID,octet *VG1);
-extern int WCC_GET_G1_TPMULT(int date, octet *S,octet *ID,octet *VG1);
-extern int WCC_GET_G2_TPMULT(int date, octet *S,octet *ID,octet *VG2);
-extern int WCC_GET_G1_PERMIT(int date,octet *S,octet *HID,octet *G1TP);
-extern int WCC_GET_G2_PERMIT(int date,octet *S,octet *HID,octet *G2TP);
-extern int WCC_SENDER_KEY(int date, octet *xOct, octet *piaOct, octet *pibOct, octet *PbG2Oct, octet *PgG1Oct, octet *AKeyG1Oct, octet *ATPG1Oct, octet *IdBOct, octet *AESKeyOct);
-extern int WCC_RECEIVER_KEY(int date, octet *yOct, octet *wOct,  octet *piaOct, octet *pibOct,  octet *PaG1Oct, octet *PgG1Oct, octet *BKeyG2Oct,octet *BTPG2Oct,  octet *IdAOct, octet *AESKeyOct);
+extern void WCC_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h);
+extern int WCC_GET_G2_MULTIPLE(int sha, int hashDone,octet *S,octet *ID,octet *VG2);
+extern int WCC_GET_G1_MULTIPLE(int sha, int hashDone,octet *S,octet *ID,octet *VG1);
+extern int WCC_GET_G1_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG1);
+extern int WCC_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2);
+extern int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *G1TP);
+extern int WCC_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *G2TP);
+extern int WCC_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pibOct, octet *PbG2Oct, octet *PgG1Oct, octet *AKeyG1Oct, octet *ATPG1Oct, octet *IdBOct, octet *AESKeyOct);
+extern int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct, octet *pibOct,  octet *PaG1Oct, octet *PgG1Oct, octet *BKeyG2Oct,octet *BTPG2Oct,  octet *IdAOct, octet *AESKeyOct);
 extern void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T);
 extern void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
-extern void WCC_HASH_ID(octet *,octet *);
+extern void WCC_HASH_ID(int sha, octet *,octet *);
 extern int WCC_RECOMBINE_G1(octet *,octet *,octet *);
 extern int WCC_RECOMBINE_G2(octet *,octet *,octet *);
 extern unsigned int WCC_today(void);
 extern void WCC_CREATE_CSPRNG(csprng *,octet *);
-extern void WCC_KILL_CSPRNG(csprng *RNG);
 extern void version(char* info);
+extern void WCC_KILL_CSPRNG(csprng *RNG);
 
 """)
 
@@ -112,7 +118,7 @@ def toHex(octetValue):
     val = []
     while i < octetValue[0].len:
         val.append(octetValue[0].val[i])
-        i = i+1
+        i = i + 1
     return ''.join(val).encode("hex")
 
 
@@ -151,7 +157,7 @@ if __name__ == "__main__":
 
     # Hash value of IdA
     AHV = ffi.new("octet*")
-    AHVval = ffi.new("char []",  HASH_BYTES)
+    AHVval = ffi.new("char []", HASH_BYTES)
     AHV[0].val = AHVval
     AHV[0].max = HASH_BYTES
     AHV[0].len = HASH_BYTES
@@ -166,7 +172,7 @@ if __name__ == "__main__":
 
     # Hash value of IdB
     BHV = ffi.new("octet*")
-    BHVval = ffi.new("char []",  HASH_BYTES)
+    BHVval = ffi.new("char []", HASH_BYTES)
     BHV[0].val = BHVval
     BHV[0].max = HASH_BYTES
     BHV[0].len = HASH_BYTES
@@ -327,13 +333,13 @@ if __name__ == "__main__":
         print "Date %s" % date
 
     # Hash IdA
-    libwcc.WCC_HASH_ID(IdA, AHV)
+    libwcc.WCC_HASH_ID(HASH_TYPE_WCC, IdA, AHV)
     if DEBUG:
         print "IdA: %s" % toHex(IdA)
         print "AHV: %s" % toHex(AHV)
 
     # Hash IdB
-    libwcc.WCC_HASH_ID(IdB, BHV)
+    libwcc.WCC_HASH_ID(HASH_TYPE_WCC, IdB, BHV)
     if DEBUG:
         print "IdB: %s" % toHex(IdB)
         print "BHV: %s" % toHex(BHV)
@@ -350,12 +356,12 @@ if __name__ == "__main__":
         print "MS2: %s" % toHex(MS2)
 
     # Generate Alice's sender key shares
-    rtn = libwcc.WCC_GET_G1_MULTIPLE(1,MS1, AHV, A1KeyG1)
+    rtn = libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1, AHV, A1KeyG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_MULTIPLE(MS1,AHV,A1KeyG1) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G1_MULTIPLE(1,MS2, AHV, A2KeyG1)
+        print "libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1,AHV,A1KeyG1) Error %s" % rtn
+    rtn = libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2, AHV, A2KeyG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_MULTIPLE(MS2,AHV,A2KeyG1) Error %s" % rtn
+        print "libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2,AHV,A2KeyG1) Error %s" % rtn
     if DEBUG:
         print "A1KeyG1: %s" % toHex(A1KeyG1)
         print "A2KeyG1: %s" % toHex(A2KeyG1)
@@ -367,12 +373,12 @@ if __name__ == "__main__":
     print "AKeyG1: %s" % toHex(AKeyG1)
 
     # Generate Alice's sender time permit shares
-    rtn = libwcc.WCC_GET_G1_PERMIT(date, MS1, AHV, A1TPG1)
+    rtn = libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS1, AHV, A1TPG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_PERMIT(date,MS1,AHV,A1TPG1) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G1_PERMIT(date, MS2, AHV, A2TPG1)
+        print "libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS1,AHV,A1TPG1) Error %s" % rtn
+    rtn = libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS2, AHV, A2TPG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_PERMIT(date,MS2,AHV,A2TPG1) Error %s" % rtn
+        print "libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS2,AHV,A2TPG1) Error %s" % rtn
     if DEBUG:
         print "A1TPG1: %s" % toHex(A1TPG1)
         print "A2TPG1: %s" % toHex(A2TPG1)
@@ -384,12 +390,12 @@ if __name__ == "__main__":
     print "ATPG1: %s" % toHex(ATPG1)
 
     # Generate Bob's receiver secret key shares
-    rtn = libwcc.WCC_GET_G2_MULTIPLE(1,MS1, BHV, B1KeyG2)
+    rtn = libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS1, BHV, B1KeyG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G2_MULTIPLE(MS1,BHV,B1KeyG2) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G2_MULTIPLE(1,MS2, BHV, B2KeyG2)
+        print "libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS1,BHV,B1KeyG2) Error %s" % rtn
+    rtn = libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS2, BHV, B2KeyG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G2_MULTIPLE(MS2,BHV,B2KeyG2) Error %s" % rtn
+        print "libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS2,BHV,B2KeyG2) Error %s" % rtn
     if DEBUG:
         print "B1KeyG2: %s" % toHex(B1KeyG2)
         print "B2KeyG2: %s" % toHex(B2KeyG2)
@@ -401,10 +407,10 @@ if __name__ == "__main__":
     print "BKeyG2: %s" % toHex(BKeyG2)
 
     # Generate Bob's receiver time permit shares
-    rtn = libwcc.WCC_GET_G2_PERMIT(date, MS1, BHV, B1TPG2)
+    rtn = libwcc.WCC_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS1, BHV, B1TPG2)
     if rtn != 0:
         print "libwcc.WCC_GET_G2_PERMIT(date,MS1,BHV,B1TPG2) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G2_PERMIT(date, MS2, BHV, B2TPG2)
+    rtn = libwcc.WCC_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS2, BHV, B2TPG2)
     if rtn != 0:
         print "libwcc.WCC_GET_G2_PERMIT(date,MS2,BHV,B2TPG2) Error %s" % rtn
     if DEBUG:
@@ -423,9 +429,9 @@ if __name__ == "__main__":
     if DEBUG:
         print "X: %s" % toHex(X)
 
-    rtn = libwcc.WCC_GET_G1_TPMULT(date,X,IdA,PaG1);
+    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, X, IdA, PaG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_TPMULT(date,X,IdA,PaG1) Error %s", rtn
+        print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,X,IdA,PaG1) Error %s", rtn
     if DEBUG:
         print "PaG1: %s" % toHex(PaG1)
 
@@ -435,9 +441,9 @@ if __name__ == "__main__":
     if DEBUG:
         print "W: %s" % toHex(W)
 
-    rtn = libwcc.WCC_GET_G1_TPMULT(date,W,IdA,PgG1);
+    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, W, IdA, PgG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_TPMULT(date,W,IdA,PgG1) Error %s", rtn
+        print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,W,IdA,PgG1) Error %s", rtn
     if DEBUG:
         print "PgG1: %s" % toHex(PgG1)
 
@@ -447,32 +453,55 @@ if __name__ == "__main__":
     if DEBUG:
         print "Y: %s" % toHex(Y)
 
-    rtn = libwcc.WCC_GET_G2_TPMULT(date,Y,IdB,PbG2);
+    rtn = libwcc.WCC_GET_G2_TPMULT(HASH_TYPE_WCC, date, Y, IdB, PbG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_TPMULT(date,Y,IdB,PbG2) Error %s", rtn
+        print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,Y,IdB,PbG2) Error %s", rtn
     if DEBUG:
         print "PbG2: %s" % toHex(PbG2)
 
     # PIA = Hq(PaG1,PbG2,PgG1,IdB)
-    libwcc.WCC_Hq(PaG1,PbG2,PgG1,IdB,PIA);
+    libwcc.WCC_Hq(HASH_TYPE_WCC, PaG1, PbG2, PgG1, IdB, PIA)
     if DEBUG:
         print "PIA: %s" % toHex(PIA)
 
     # PIB = Hq(PbG2,PaG1,PgG1,IdA)
-    libwcc.WCC_Hq(PbG2,PaG1,PgG1,IdA,PIB);
+    libwcc.WCC_Hq(HASH_TYPE_WCC, PbG2, PaG1, PgG1, IdA, PIB)
     if DEBUG:
         print "PIB: %s" % toHex(PIB)
-        
-    # Alice calculates AES Key 
-    rtn = libwcc.WCC_SENDER_KEY(date, X, PIA, PIB, PbG2, PgG1, AKeyG1, ATPG1, IdB, KEY1)
+
+    # Alice calculates AES Key
+    rtn = libwcc.WCC_SENDER_KEY(
+        HASH_TYPE_WCC,
+        date,
+        X,
+        PIA,
+        PIB,
+        PbG2,
+        PgG1,
+        AKeyG1,
+        ATPG1,
+        IdB,
+        KEY1)
     if rtn != 0:
-        print "libwcc.WCC_SENDER_KEY(date, X, PIA, PIB, PbG2, PgG1, AKeyG1, ATPG1, IdB, KEY1) Error %s" % rtn
+        print "libwcc.WCC_SENDER_KEY(HASH_TYPE_WCC,date, X, PIA, PIB, PbG2, PgG1, AKeyG1, ATPG1, IdB, KEY1) Error %s" % rtn
     print "{0}'s AES Key: {1}".format(alice_id, toHex(KEY1))
 
     # Bob calculates AES Key
-    rtn = libwcc.WCC_RECEIVER_KEY(date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2)
+    rtn = libwcc.WCC_RECEIVER_KEY(
+        HASH_TYPE_WCC,
+        date,
+        Y,
+        W,
+        PIA,
+        PIB,
+        PaG1,
+        PgG1,
+        BKeyG2,
+        BTPG2,
+        IdA,
+        KEY2)
     if rtn != 0:
-        print "libwcc.WCC_RECEIVER_KEY(date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2) Error %s" % rtn
+        print "libwcc.WCC_RECEIVER_KEY(HASH_TYPE_WCC,date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2) Error %s" % rtn
     print "{0}'s AES Key: {1}".format(bob_id, toHex(KEY2))
 
     libwcc.WCC_KILL_CSPRNG(RNG)

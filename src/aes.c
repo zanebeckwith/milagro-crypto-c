@@ -25,11 +25,11 @@ under the License.
  */
 
 #include <stdlib.h>
+#include "arch.h"
 #include "amcl.h"
 
 /* this is fixed */
 #define NB 4
-#define ROUNDS 10
 
 /* Rotates 32-bit word left by 1, 2 or 3 byte  */
 
@@ -282,7 +282,7 @@ static unsign32 InvMixCol(unsign32 x)
 
 /* SU= 8 */
 /* reset cipher */
-void AES_reset(amcl_aes *a,int mode,char *iv)
+void AES_reset(aes *a,int mode,char *iv)
 {
     /* reset mode, or reset iv */
     int i;
@@ -296,7 +296,7 @@ void AES_reset(amcl_aes *a,int mode,char *iv)
     }
 }
 
-void AES_getreg(amcl_aes *a,char *ir)
+void AES_getreg(aes *a,char *ir)
 {
     int i;
     for (i=0; i<4*NB; i++) ir[i]=a->f[i];
@@ -304,18 +304,25 @@ void AES_getreg(amcl_aes *a,char *ir)
 
 /* SU= 72 */
 /* Initialise cipher */
-void AES_init(amcl_aes *a,int mode,char *key,char *iv)
+int AES_init(aes* a,int mode,int nk,char *key,char *iv)
 {
-    /* Key=16 bytes */
+    /* Key length Nk=16, 24 or 32 bytes */
     /* Key Scheduler. Create expanded encryption key */
-    int i,j,k,N,nk;
-    unsign32 CipherKey[4];
+    int i,j,k,N,nr;
+    unsign32 CipherKey[8];
 
-    nk=4;
+    nk/=4;
+
+    if (nk!=4 && nk!=6 && nk!=8) return 0;
+
+    nr=6+nk;
+
+    a->Nk=nk;
+    a->Nr=nr;
 
     AES_reset(a,mode,iv);
 
-    N=NB*(ROUNDS+1);
+    N=NB*(nr+1);
 
     for (i=j=0; i<nk; i++,j+=4)
     {
@@ -325,9 +332,19 @@ void AES_init(amcl_aes *a,int mode,char *key,char *iv)
     for (j=nk,k=0; j<N; j+=nk,k++)
     {
         a->fkey[j]=a->fkey[j-nk]^SubByte(ROTL24(a->fkey[j-1]))^rco[k];
-
-        for (i=1; i<nk && (i+j)<N; i++)
-            a->fkey[i+j]=a->fkey[i+j-nk]^a->fkey[i+j-1];
+        if (nk<=6)
+        {
+            for (i=1; i<nk && (i+j)<N; i++)
+                a->fkey[i+j]=a->fkey[i+j-nk]^a->fkey[i+j-1];
+        }
+        else
+        {
+            for (i=1; i<4 && (i+j)<N; i++)
+                a->fkey[i+j]=a->fkey[i+j-nk]^a->fkey[i+j-1];
+            if ((j+4)<N) a->fkey[j+4]=a->fkey[j+4-nk]^SubByte(a->fkey[j+3]);
+            for (i=5; i<nk && (i+j)<N; i++)
+                a->fkey[i+j]=a->fkey[i+j-nk]^a->fkey[i+j-1];
+        }
 
     }
     /* now for the expanded decrypt key in reverse order */
@@ -339,12 +356,12 @@ void AES_init(amcl_aes *a,int mode,char *key,char *iv)
         for (j=0; j<NB; j++) a->rkey[k+j]=InvMixCol(a->fkey[i+j]);
     }
     for (j=N-NB; j<N; j++) a->rkey[j-N+NB]=a->fkey[j];
-
+    return 1;
 }
 
 /* SU= 80 */
 /* Encrypt a single block */
-void AES_ecb_encrypt(amcl_aes *a,uchar *buff)
+void AES_ecb_encrypt(aes *a,uchar *buff)
 {
     int i,j,k;
     unsign32 p[4],q[4],*x,*y,*t;
@@ -360,7 +377,7 @@ void AES_ecb_encrypt(amcl_aes *a,uchar *buff)
     y=q;
 
     /* State alternates between x and y */
-    for (i=1; i<ROUNDS; i++)
+    for (i=1; i<a->Nr; i++)
     {
 
         y[0]=a->fkey[k]^ftable[MR_TOBYTE(x[0])]^
@@ -414,7 +431,7 @@ void AES_ecb_encrypt(amcl_aes *a,uchar *buff)
 
 /* SU= 80 */
 /* Decrypt a single block */
-void AES_ecb_decrypt(amcl_aes *a,uchar *buff)
+void AES_ecb_decrypt(aes *a,uchar *buff)
 {
     int i,j,k;
     unsign32 p[4],q[4],*x,*y,*t;
@@ -430,7 +447,7 @@ void AES_ecb_decrypt(amcl_aes *a,uchar *buff)
     y=q;
 
     /* State alternates between x and y */
-    for (i=1; i<ROUNDS; i++)
+    for (i=1; i<a->Nr; i++)
     {
         /* Nr is number of rounds. May be odd. */
 
@@ -484,9 +501,20 @@ void AES_ecb_decrypt(amcl_aes *a,uchar *buff)
 
 }
 
+/* simple default increment function */
+static void increment(char *f)
+{
+    int i;
+    for (i=0; i<16; i++)
+    {
+        f[i]++;
+        if (f[i]!=0) break;
+    }
+}
+
 /* SU= 40 */
 /* Encrypt using selected mode of operation */
-unsign32 AES_encrypt(amcl_aes *a,char *buff)
+unsign32 AES_encrypt(aes* a,char *buff)
 {
     int j,bytes;
     char st[16];
@@ -532,6 +560,18 @@ unsign32 AES_encrypt(amcl_aes *a,char *buff)
         for (j=0; j<bytes; j++) buff[j]^=a->f[j];
         return 0;
 
+    case CTR1:
+    case CTR2:
+    case CTR4:
+    case CTR8:
+    case CTR16:
+
+        bytes=a->mode-CTR1+1;
+        for (j=0; j<4*NB; j++) st[j]=a->f[j];
+        AES_ecb_encrypt(a,(uchar *)st);
+        for (j=0; j<bytes; j++) buff[j]^=st[j];
+        increment(a->f);
+
     default:
         return 0;
     }
@@ -539,7 +579,7 @@ unsign32 AES_encrypt(amcl_aes *a,char *buff)
 
 /* SU= 40 */
 /* Decrypt using selected mode of operation */
-unsign32 AES_decrypt(amcl_aes *a,char *buff)
+unsign32 AES_decrypt(aes *a,char *buff)
 {
     int j,bytes;
     char st[16];
@@ -589,6 +629,17 @@ unsign32 AES_decrypt(amcl_aes *a,char *buff)
         for (j=0; j<bytes; j++) buff[j]^=a->f[j];
         return 0;
 
+    case CTR1:
+    case CTR2:
+    case CTR4:
+    case CTR8:
+    case CTR16:
+
+        bytes=a->mode-CTR1+1;
+        for (j=0; j<4*NB; j++) st[j]=a->f[j];
+        AES_ecb_encrypt(a,(uchar *)st);
+        for (j=0; j<bytes; j++) buff[j]^=st[j];
+        increment(a->f);
 
     default:
         return 0;
@@ -596,33 +647,38 @@ unsign32 AES_decrypt(amcl_aes *a,char *buff)
 }
 
 /* Clean up and delete left-overs */
-void AES_end(amcl_aes *a)
+void AES_end(aes *a)
 {
     /* clean up */
     int i;
-    for (i=0; i<NB*(ROUNDS+1); i++)
+    for (i=0; i<NB*(a->Nr+1); i++)
         a->fkey[i]=a->rkey[i]=0;
     for (i=0; i<4*NB; i++)
         a->f[i]=0;
 }
 
+
 /*
+#include <stdio.h>
+
+#define KK 32
+
 int main()
 {
     int i;
-    amcl_aes a;
+    aes a;
 	unsign32 t;
 	uchar x,y;
 
-    char key[16];
+    char key[KK];
     char block[16];
     char iv[16];
-    for (i=0;i<16;i++) key[i]=0;
+    for (i=0;i<KK;i++) key[i]=5;
     key[0]=1;
     for (i=0;i<16;i++) iv[i]=i;
     for (i=0;i<16;i++) block[i]=i;
 
-    AES_init(&a,CBC,key,iv);
+    AES_init(&a,CTR16,KK,key,iv);
 
     printf("Plain=   ");
     for (i=0;i<16;i++) printf("%02x",block[i]);
@@ -631,7 +687,7 @@ int main()
     printf("Encrypt= ");
     for (i=0;i<16;i++) printf("%02x",(uchar)block[i]);
     printf("\n");
-    AES_reset(&a,CBC,iv);
+    AES_reset(&a,CTR16,iv);
     AES_decrypt(&a,block);
     printf("Decrypt= ");
     for (i=0;i<16;i++) printf("%02x",(uchar)block[i]);

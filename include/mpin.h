@@ -36,19 +36,23 @@ under the License.
 
 /* Field size is assumed to be greater than or equal to group size */
 
-#define PGS 32  /**< MPIN Group Size */
-#define PFS 32  /**< MPIN Field Size */
-#define PAS 16  /**< MPIN Symmetric Key Size */
+#define PGS MODBYTES  /**< MPIN Group Size */
+#define PFS MODBYTES  /**< MPIN Field Size */
+#define PAS 16        /**< MPIN Symmetric Key Size */
 
-#define MPIN_OK                     0  /**< Function completed without error */
-/*#define MPIN_DOMAIN_ERROR          -11
+#define MPIN_OK                     0   /**< Function completed without error */
+/*
+#define MPIN_DOMAIN_ERROR          -11
 #define MPIN_INVALID_PUBLIC_KEY    -12
-#define MPIN_ERROR                 -13*/
-#define MPIN_INVALID_POINT         -14	/**< Point is NOT on the curve */
-/*#define MPIN_DOMAIN_NOT_FOUND      -15
+#define MPIN_ERROR                 -13
+*/
+#define MPIN_INVALID_POINT         -14  /**< Point is NOT on the curve */
+/*
+#define MPIN_DOMAIN_NOT_FOUND      -15
 #define MPIN_OUT_OF_MEMORY         -16
 #define MPIN_DIV_BY_ZERO           -17
-#define MPIN_WRONG_ORDER           -18*/
+#define MPIN_WRONG_ORDER           -18
+*/
 #define MPIN_BAD_PIN               -19  /**< Bad PIN number entered */
 
 
@@ -58,7 +62,7 @@ under the License.
 #define PBLEN 14   /**< max length of PIN in bits */
 
 #define TIME_SLOT_MINUTES 1440 /**< Time Slot = 1 day */
-#define HASH_BYTES 32 /**< Number of bytes output by Hash function */
+#define HASH_TYPE_MPIN SHA256 /**< Choose Hash function */
 
 /* MPIN support functions */
 
@@ -66,35 +70,39 @@ under the License.
 
 /**	@brief Hash an M-Pin Identity to an octet string
  *
+ 	@param h is the hash type
 	@param ID an octet containing the identity
 	@param HID an octet containing the hashed identity
  */
-void MPIN_HASH_ID(octet *ID,octet *HID);
+void MPIN_HASH_ID(int h,octet *ID,octet *HID);
 /**	@brief Get epoch time as unsigned integer
  *
 	@return current epoch time in seconds
  */
 unsign32 MPIN_GET_TIME(void);
-/**	@brief Generate Y=H(t,O), where t is epoch time, O is an octet, and H(.) is a hash function
+/**	@brief Generate Y=H(s,O), where s is epoch time, O is an octet, and H(.) is a hash function
  *
+  	@param h is the hash type
 	@param t is epoch time in seconds
 	@param O is an input octet
 	@param Y is the output octet
  */
-void MPIN_GET_Y(int t,octet *O,octet *Y);
+void MPIN_GET_Y(int h,int t,octet *O,octet *Y);
 /**	@brief Extract a PIN number from a client secret
  *
+  	@param h is the hash type
 	@param ID is the input client identity
 	@param pin is an input PIN number
 	@param CS is the client secret from which the PIN is to be extracted
 	@return 0 or an error code
  */
-int MPIN_EXTRACT_PIN(octet *ID,int pin,octet *CS);
+int MPIN_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
 /**	@brief Perform client side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
 	If Time Permits are enabled, and PIN error detection is OFF, U is not generated and can be set to NULL.
 	If Time Permits are enabled, and PIN error detection is ON, U and UT are both generated.
+ 	@param h is the hash type
 	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
 	@param ID is the input client identity
 	@param R is a pointer to a cryptographically secure random number generator
@@ -110,12 +118,13 @@ int MPIN_EXTRACT_PIN(octet *ID,int pin,octet *CS);
 	@param y is output H(t|U) or H(t|UT) if Time Permits enabled
 	@return 0 or an error code
  */
-int MPIN_CLIENT(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
+int MPIN_CLIENT(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
 /**	@brief Perform first pass of the client side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
 	If Time Permits are enabled, and PIN error detection is OFF, U is not generated and can be set to NULL.
 	If Time Permits are enabled, and PIN error detection is ON, U and UT are both generated.
+ 	@param h is the hash type
 	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
 	@param ID is the input client identity
 	@param R is a pointer to a cryptographically secure random number generator
@@ -128,7 +137,7 @@ int MPIN_CLIENT(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,oct
 	@param TP is the input time permit
 	@return 0 or an error code
  */
-int MPIN_CLIENT_1(int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
+int MPIN_CLIENT_1(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
 /**	@brief Generate a random group element
  *
 	@param R is a pointer to a cryptographically secure random number generator
@@ -149,6 +158,7 @@ int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 	If Time Permits are disabled, set d = 0, and UT and HTID are not generated and can be set to NULL.
 	If Time Permits are enabled, and PIN error detection is OFF, U and HID are not needed and can be set to NULL.
 	If Time Permits are enabled, and PIN error detection is ON, U, UT, HID and HTID are all required.
+ 	@param h is the hash type
 	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
 	@param HID is output H(ID), a hash of the client ID
 	@param HTID is output H(ID)+H(d|H(ID))
@@ -164,16 +174,16 @@ int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 	@param t is input epoch time in seconds - a timestamp
 	@return 0 or an error code
  */
-int MPIN_SERVER(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
+int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
 /**	@brief Perform first pass of the server side of the 3-pass version of the M-Pin protocol
  *
+ 	@param h is the hash type
 	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
 	@param ID is the input claimed client identity
 	@param HID is output H(ID), a hash of the client ID
 	@param HTID is output H(ID)+H(d|H(ID))
-	@return 0 or an error code
  */
-void	MPIN_SERVER_1(int d,octet *ID,octet *HID,octet *HTID);
+void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
 /**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not needed and can be set to NULL.
@@ -255,6 +265,28 @@ void MPIN_KILL_CSPRNG(csprng *R);
 	@return 0 or an error code
  */
 int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
+/**	@brief Find a random multiple of a point in G1
+ *
+	@param R is a pointer to a cryptographically secure random number generator
+	@param type determines type of action to betaken
+	@param x an output internally randomly generated if R!=NULL, otherwise must be provided as an input
+	@param G a point in G2
+	@param W the output =x.G or (1/x).G
+	@return 0 or an error code
+ */
+int MPIN_GET_G2_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
+/** @brief Hash the session transcript
+ 	@param h is the hash type
+	@param I is the hashed input client ID = H(ID)
+	@param U is the client output = x.H(ID)
+	@param CU is the client output = x.(H(ID)+H(T|H(ID)))
+	@param Y is the server challenge
+	@param V is the client part response
+	@param R is the client part response
+	@param W is the server part response
+	@param H the output is the hash of all of the above that apply
+*/
+void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,octet *W,octet *H);
 /**	@brief Create a client secret in G1 from a master secret and the client ID
  *
 	@param S is an input master secret
@@ -265,13 +297,14 @@ int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
 int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
 /**	@brief Create a Time Permit in G1 from a master secret and the client ID
  *
+  	@param h is the hash type
 	@param d is input date, in days since the epoch.
 	@param S is an input master secret
 	@param ID is the input client identity
 	@param TP is a Time Permit for the given date = s.H(d|H(ID))
 	@return 0 or an error code
  */
-int MPIN_GET_CLIENT_PERMIT(int d,octet *S,octet *ID,octet *TP);
+int MPIN_GET_CLIENT_PERMIT(int h,int d,octet *S,octet *ID,octet *TP);
 /**	@brief Create a server secret in G2 from a master secret
  *
 	@param S is an input master secret
@@ -286,14 +319,16 @@ int MPIN_GET_SERVER_SECRET(octet *S,octet *SS);
  *
 	@param T is the input M-Pin token (the client secret with PIN portion removed)
 	@param ID is the input client identity
+	@param CP is Public Key (or NULL)
 	@param g1 precomputed output
 	@param g2 precomputed output
 	@return 0 or an error code
  */
-int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *g1,octet *g2);
+int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *CP,octet *g1,octet *g2);
 /**	@brief Calculate Key on Server side for M-Pin Full
  *
 	Uses UT internally for the key calculation, unless not available in which case U is used
+ 	@param h is the hash type
 	@param Z is the input Client-side Diffie-Hellman component
 	@param SS is the input server secret
 	@param w is an input random number generated by the server
@@ -304,9 +339,10 @@ int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *g1,octet *g2);
 	@param K is the output calculated shared key
 	@return 0 or an error code
  */
-int MPIN_SERVER_KEY(octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U,octet *UT,octet *K);
+int MPIN_SERVER_KEY(int h,octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U,octet *UT,octet *K);
 /**	@brief Calculate Key on Client side for M-Pin Full
  *
+  	@param h is the hash type
 	@param g1 precomputed input
 	@param g2 precomputed input
 	@param pin is the input PIN number
@@ -317,7 +353,7 @@ int MPIN_SERVER_KEY(octet *Z,octet *SS,octet *w,octet *p,octet *I,octet *U,octet
 	@param K is the output calculated shared key
 	@return 0 or an error code
  */
-int MPIN_CLIENT_KEY(octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p,octet *T,octet *K);
+int MPIN_CLIENT_KEY(int h,octet *g1,octet *g2,int pin,octet *r,octet *x,octet *p,octet *T,octet *K);
 
 /**	@brief AES-GCM Encryption
  *
@@ -350,7 +386,7 @@ void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T
 	@param tag is the output HMAC
 	@return 0 for bad parameters, else 1
  */
-int MPIN_HMAC(octet *M,octet *K,int len,octet *tag);
+//int HMAC(octet *M,octet *K,int len,octet *tag);
 
 /**	@brief Password Based Key Derivation Function - generates key K from password, salt and repeat counter
  *
@@ -361,19 +397,6 @@ int MPIN_HMAC(octet *M,octet *K,int len,octet *tag);
 	@param len is output desired length of key
 	@param K is the derived key
  */
-void MPIN_PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
-
-/** @brief Hash the session transcript
-	@param I is the hashed input client ID = H(ID)
-	@param U is the client output = x.H(ID)
-	@param CU is the client output = x.(H(ID)+H(T|H(ID)))
-	@param Y is the server challenge
-	@param V is the client part response
-	@param R is the client part response
-	@param W is the server part response
-	@param H the output is the hash of all of the above that apply
-*/
-void MPIN_HASH_ALL(octet *I,octet *U,octet *CU,octet *V,octet *Y,octet *R,octet *W,octet *H);
+//void PBKDF2(octet *P,octet *S,int rep,int len,octet *K);
 
 #endif
-

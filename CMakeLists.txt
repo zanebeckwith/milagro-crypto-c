@@ -17,11 +17,12 @@ message(STATUS "Generator - ${CMAKE_GENERATOR}")
 # Add options for build
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 option (BUILD_PYTHON "Build Python" OFF)
+option (BUILD_GO "Build Golang" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
-option (BUILD_WCC "Build WCC" OFF)
+option (BUILD_WCC "Build WCC" ON)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
-option (USE_PATENTS "Use alleged patents" OFF)
-option (USE_ANONYMOUS "Anonymous authenticaion for M-Pin Full" OFF)
+option (USE_PATENTS "Use patents for G1 and G2 multiplication" OFF)
+option (USE_ANONYMOUS "Anonymous authentication for M-Pin Full" OFF)
 
 # Allow the developer to select if Dynamic or Static libraries are built
 # Set the default LIB_TYPE variable to STATIC
@@ -32,22 +33,26 @@ IF (BUILD_SHARED_LIBS)
 ENDIF (BUILD_SHARED_LIBS)
 
 set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}
-    CACHE STRING "Choose the type of build: None Debug Release Coverage ASan ASanDbg Check CheckFull"
+    CACHE STRING "Choose the type of build: Debug Release Coverage ASan Check CheckFull"
     FORCE)
 
 if(CMAKE_COMPILER_IS_GNUCC)
+    message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
                     OUTPUT_VARIABLE GCC_VERSION)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wextra -Wno-strict-prototypes -Wunused-value -Wcast-align -Wunused-variable -Wundef")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wextra -Wno-strict-prototypes -Wunused-value -Wcast-align -Wunused-variable -Wundef -Wformat-security")
+
     if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
-    endif()
+        set(CMAKE_C_FLAGS_ASAN    "-O0 -g3 -fsanitize=address")
+    else (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+        message(STATUS "GCC 4.8 required to run address sanitizer - please upgrade your installation")
+    endif(GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+
     set(CMAKE_C_FLAGS_RELEASE     "-O2")
     set(CMAKE_C_FLAGS_DEBUG       "-O0 -g3")
     set(CMAKE_C_FLAGS_COVERAGE    "-O0 -g3 --coverage")
-    set(CMAKE_C_FLAGS_ASAN        "-Werror -fsanitize=address -fno-common -O3")
-    set(CMAKE_C_FLAGS_ASANDBG     "-fsanitize=address -fno-common -O1 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls ")
-    set(CMAKE_C_FLAGS_CHECK       "-Werror -Os")
+    set(CMAKE_C_FLAGS_CHECK       "-O2 -Werror")
     set(CMAKE_C_FLAGS_CHECKFULL   "${CMAKE_C_FLAGS_CHECK} -Wcast-qual")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
@@ -64,6 +69,8 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    # Linux specific code
+   # Default install path on Linux
+   SET(CMAKE_INSTALL_PREFIX /opt/amcl)
    set(OS "Linux")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
@@ -73,22 +80,35 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Select word length
-set(WORD_LENGTH "32" CACHE STRING "Word length. See amcl.h.in for explanation")
+set(AMCL_CHUNK "32" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
 set(Word_Length_Values "16;32;64")
-set_property(CACHE WORD_LENGTH PROPERTY STRINGS ${Word_Length_Values})
-message(STATUS "WORD_LENGTH='${WORD_LENGTH}'")
+set_property(CACHE AMCL_CHUNK PROPERTY STRINGS ${Word_Length_Values})
+message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
-set(FIELD_CHOICE "BNCX" CACHE STRING "Choice of Field. See amcl.h.in for explanation")
-set(Field_Values "BN;BNCX;BNT;BNT2;NIST;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256")
-set_property(CACHE FIELD_CHOICE PROPERTY STRINGS ${Field_Values})
-message(STATUS "FIELD_CHOICE='${FIELD_CHOICE}'")
+set(AMCL_CHOICE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h.in for explanation")
+set(Field_Values "NIST256;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN_CURVES;BN454;BN646;BN254;BN254_CX;BN254_T;BN254_T2;BLS_CURVES;BLS455")
+set_property(CACHE AMCL_CHOICE PROPERTY STRINGS ${Field_Values})
+message(STATUS "AMCL_CHOICE='${AMCL_CHOICE}'")
 
 # Select Curve type
-set(CURVE_TYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See amcl.h.in for explanation")
+set(AMCL_CURVETYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See ./include/amcl.h.in for explanation")
 set(Curve_Values "WEIERSTRASS;EDWARDS;MONTGOMERY")
-set_property(CACHE CURVE_TYPE PROPERTY STRINGS ${Curve_Values})
-message(STATUS "CURVE_TYPE='${CURVE_TYPE}'")
+set_property(CACHE AMCL_CURVETYPE PROPERTY STRINGS ${Curve_Values})
+message(STATUS "AMCL_CURVETYPE='${AMCL_CURVETYPE}'")
+
+# Select Finite field support
+set(AMCL_FFLEN "8" CACHE STRING "Finite field support. See ./include/amcl.h.in for explanation")
+set(ff_len_values "4;8;16")
+set_property(CACHE AMCL_FFLEN PROPERTY STRINGS ${ff_Len_values})
+message(STATUS "AMCL_FFLEN='${AMCL_FFLEN}'")
+
+# configure arch header file to pass CMake settings
+# to the source code
+configure_file (
+  "${PROJECT_SOURCE_DIR}/include/arch.h.in"
+  "${PROJECT_BINARY_DIR}/include/arch.h"
+  )
 
 # configure amcl header file to pass CMake settings
 # to the source code
@@ -97,11 +117,21 @@ configure_file (
   "${PROJECT_BINARY_DIR}/include/amcl.h"
   )
 
-if(NOT(FIELD_CHOICE MATCHES "BN"))
-  message(STATUS "Field choice prevents MPIN being built")
+# Build libx509
+if( ((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8")) OR 
+    ((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16")) OR
+    ((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8")) )
+  message(STATUS "Build x.509")
+  set(BUILD_X509 ON)
+endif( ((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8")) OR 
+    ((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16")) OR
+    ((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8")) )
+
+if(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
+  message(STATUS "Curve choice prevents MPIN being built")
   set(BUILD_MPIN OFF)
-  set(BUILD_WSS OFF)
-endif(NOT(FIELD_CHOICE MATCHES "BN"))
+  set(BUILD_WCC OFF)
+endif(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
 
 # test configuration
 if(BUILD_MPIN OR BUILD_WCC)
@@ -115,14 +145,6 @@ if(BUILD_MPIN OR BUILD_WCC)
     "${PROJECT_BINARY_DIR}/include/config.h"
   )
 endif(BUILD_MPIN OR BUILD_WCC)
-
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified.")
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
 
 # Add subdirectories
 add_subdirectory(include)
@@ -140,12 +162,18 @@ if (BUILD_PYTHON)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND python -c "from distutils.sysconfig import get_python_lib; from os.path import dirname; print dirname(get_python_lib())" OUTPUT_VARIABLE PYTHON_SITE_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  if((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
-    file(COPY "${PROJECT_SOURCE_DIR}/testVectors/mpin/BNCX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
-    file(RENAME "${PROJECT_BINARY_DIR}/wrappers/python/BNCX.json" "${PROJECT_BINARY_DIR}/wrappers/python/MPINTestVectors.json")
-  endif((FIELD_CHOICE STREQUAL "BNCX") AND BUILD_MPIN)
+  if((AMCL_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
+    file(COPY "${PROJECT_SOURCE_DIR}/testVectors/mpin/BN254_CX.json" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python")
+    file(RENAME "${PROJECT_BINARY_DIR}/wrappers/python/BN254_CX.json" "${PROJECT_BINARY_DIR}/wrappers/python/MPINTestVectors.json")
+  endif((AMCL_CHOICE STREQUAL "BN254_CX") AND BUILD_MPIN)
   add_subdirectory (wrappers/python)
 endif (BUILD_PYTHON)
+
+if (BUILD_GO)
+  set(GO_PATH "$ENV{GOPATH}" CACHE STRING "GOPATH")
+  message(STATUS "Build Golang: GOPATH='${GO_PATH}'")
+  add_subdirectory (wrappers/go)
+endif (BUILD_GO)
 
 # Build Documentation
 if (BUILD_DOXYGEN)

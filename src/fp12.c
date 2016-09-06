@@ -107,10 +107,7 @@ void FP12_usqr(FP12 *w,FP12 *x)
     FP4_add(&D,&(w->a),&(w->a));
     FP4_add(&(w->a),&D,&(w->a));
 
-#if CHUNK<64
     FP4_norm(&(w->a));
-#endif
-
     FP4_nconj(&A,&A);
 
     FP4_add(&A,&A,&A);
@@ -120,17 +117,14 @@ void FP12_usqr(FP12 *w,FP12 *x)
 
     FP4_add(&D,&B,&B);
     FP4_add(&B,&B,&D);
-#if CHUNK<64
     FP4_norm(&B);
-#endif
+
     FP4_sqr(&C,&(x->b));
 
     FP4_add(&D,&C,&C);
     FP4_add(&C,&C,&D);
 
-#if CHUNK<64
     FP4_norm(&C);
-#endif
     FP4_conj(&(w->b),&(x->b));
     FP4_add(&(w->b),&(w->b),&(w->b));
     FP4_nconj(&(w->c),&(x->c));
@@ -164,14 +158,14 @@ void FP12_sqr(FP12 *w,FP12 *x)
     FP4_copy(&(w->a),&A);
 
     FP4_add(&A,&A,&B);
-#if CHUNK<64
+
     FP4_norm(&A);
-#endif
+
     FP4_add(&A,&A,&C);
     FP4_add(&A,&A,&D);
-#if CHUNK<64
+
     FP4_norm(&A);
-#endif
+
     FP4_neg(&A,&A);
     FP4_times_i(&B);
     FP4_times_i(&C);
@@ -207,9 +201,9 @@ void FP12_mul(FP12 *w,FP12 *y)
     FP4_neg(&t1,&z2);
 
     FP4_add(&z1,&z1,&t0);   // z1=z1-z0
-#if CHUNK<64
+
     FP4_norm(&z1);
-#endif
+
     FP4_add(&(w->b),&z1,&t1);
 // z1=z1-z2
     FP4_add(&z3,&z3,&t1);        // z3=z3-z2
@@ -223,11 +217,11 @@ void FP12_mul(FP12 *w,FP12 *y)
 
     FP4_mul(&t0,&(w->c),&(y->c));
     FP4_neg(&t1,&t0);
-#if CHUNK<64
+
     FP4_norm(&z2);
     FP4_norm(&z3);
     FP4_norm(&(w->b));
-#endif
+
     FP4_add(&(w->c),&z2,&t1);
     FP4_add(&z3,&z3,&t1);
     FP4_times_i(&t0);
@@ -260,9 +254,9 @@ void FP12_smul(FP12 *w,FP12 *y)
     FP4_neg(&t1,&z2);
 
     FP4_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
-#if CHUNK<64
+
     FP4_norm(&(w->b));
-#endif
+
     FP4_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
 
     FP4_add(&z3,&z3,&t1);        // z3=z3-z2
@@ -526,7 +520,6 @@ void FP12_toOctet(octet *W,FP12 *g)
     BIG_copy(a,(*g).a.b.b);
     FP_redc(a);
     BIG_toBytes(&(W->val[3*MODBYTES]),a);
-
     BIG_copy(a,(*g).b.a.a);
     FP_redc(a);
     BIG_toBytes(&(W->val[4*MODBYTES]),a);
@@ -539,7 +532,6 @@ void FP12_toOctet(octet *W,FP12 *g)
     BIG_copy(a,(*g).b.b.b);
     FP_redc(a);
     BIG_toBytes(&(W->val[7*MODBYTES]),a);
-
     BIG_copy(a,(*g).c.a.a);
     FP_redc(a);
     BIG_toBytes(&(W->val[8*MODBYTES]),a);

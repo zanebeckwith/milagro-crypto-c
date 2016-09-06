@@ -23,14 +23,13 @@ under the License.
 #include "amcl.h"
 #include "utils.h"
 
-void hex2bytes(char *hex, char *bin)
+void amcl_hex2bin(const char *src, char *dst, int src_len)
 {
     int i;
     char v;
-    int len=strlen(hex);
-    for (i = 0; i < len/2; i++)
+    for (i = 0; i < src_len/2; i++)
     {
-        char c = hex[2*i];
+        char c = src[2*i];
         if (c >= '0' && c <= '9')
         {
             v = c - '0';
@@ -48,7 +47,7 @@ void hex2bytes(char *hex, char *bin)
             v = 0;
         }
         v <<= 4;
-        c = hex[2*i + 1];
+        c = src[2*i + 1];
         if (c >= '0' && c <= '9')
         {
             v += c - '0';
@@ -65,17 +64,30 @@ void hex2bytes(char *hex, char *bin)
         {
             v = 0;
         }
-        bin[i] = v;
+        dst[i] = v;
     }
 }
 
-/*! \brief Generate a random six digit one time password
- *
- *  Generates a random six digit one time password
- *
- *  @param  RNG             random number generator
- *  @return OTP             One Time Password
- */
+void amcl_bin2hex(char *src, char *dst, int src_len)
+{
+    int i;
+    for (i = 0; i < src_len; i++)
+    {
+        sprintf(&dst[i*2],"%02x", (unsigned char) src[i]);
+    }
+}
+
+
+void amcl_print_hex(char *src, int src_len)
+{
+    int i;
+    for (i = 0; i < src_len; i++)
+    {
+        printf("%02x", (unsigned char) src[i]);
+    }
+    printf("\n");
+}
+
 int generateOTP(csprng* RNG)
 {
     int OTP=0;
@@ -83,30 +95,23 @@ int generateOTP(csprng* RNG)
     int i = 0;
     int val = 0;
     char byte[6] = {0};
+    int mult=1;
 
     /* Generate random 6 digit random value */
     for (i=0; i<6; i++)
     {
         byte[i]=RAND_byte(RNG);
         val = byte[i];
-        OTP = ((abs(val) % 10) * pow(10.0,i)) + OTP;
+        OTP = ((abs(val) % 10) * mult) + OTP;
+        mult = mult * 10;
     }
 
     return OTP;
 }
 
-/*! \brief Generate a random Octet
- *
- *  Generate a random Octet
- *
- *  @param  RNG            random number generator
- *  @param randomValue     random Octet
- */
 void generateRandom(csprng *RNG,octet *randomValue)
 {
     int i;
     for (i=0; i<randomValue->len; i++)
         randomValue->val[i]=RAND_byte(RNG);
 }
-
-
