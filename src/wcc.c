@@ -38,13 +38,16 @@ under the License.
 /* map octet string to point on curve */
 static void mapit(octet *h,ECP *P)
 {
-    BIG q,px;
-    BIG_fromBytes(px,h->val);
+    BIG q,x,c;
+    BIG_fromBytes(x,h->val);
     BIG_rcopy(q,Modulus);
-    BIG_mod(px,q);
+    BIG_mod(x,q);
 
-    while (!ECP_setx(P,px,0))
-        BIG_inc(px,1);
+    while (!ECP_setx(P,x,0))
+        BIG_inc(x,1);
+
+    BIG_rcopy(c,CURVE_Cof);
+    ECP_mul(P,c);
 }
 
 /* maps to hash value to point on G2 */
@@ -201,7 +204,7 @@ void WCC_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
     // hv has to store two points in G1, One in G2 and the Id length
     char hv[2000];
     octet HV= {0,sizeof(hv),hv};
-    char ht[HASH_BYTES];
+    char ht[PFS];
     octet HT= {0,sizeof(ht),ht};
 
     BIG_rcopy(q,CURVE_Order);
@@ -253,7 +256,7 @@ int WCC_GET_G1_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG1)
 {
     BIG s;
     ECP P;
-    char h[HASH_BYTES];
+    char h[PFS];
     octet H= {0,sizeof(h),h};
 
     if (hashDone)
@@ -292,9 +295,9 @@ int WCC_GET_G1_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG1)
 {
     BIG s;
     ECP P,Q;
-    char h1[HASH_BYTES];
+    char h1[PFS];
     octet H1= {0,sizeof(h1),h1};
-    char h2[HASH_BYTES];
+    char h2[PFS];
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
@@ -335,9 +338,9 @@ int WCC_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2)
 {
     BIG s;
     ECP2 P,Q;
-    char h1[HASH_BYTES];
+    char h1[PFS];
     octet H1= {0,sizeof(h1),h1};
-    char h2[HASH_BYTES];
+    char h2[PFS];
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
@@ -378,7 +381,7 @@ int WCC_GET_G2_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG2)
 {
     BIG s;
     ECP2 P;
-    char h[HASH_BYTES];
+    char h[PFS];
     octet H= {0,sizeof(h),h};
 
     if (hashDone)
@@ -417,7 +420,7 @@ int WCC_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2)
 {
     BIG s;
     ECP2 P;
-    char h[HASH_BYTES];
+    char h[PFS];
     octet H= {0,sizeof(h),h};
 
     hashit(sha,date,HID,&H);
@@ -455,7 +458,7 @@ int WCC_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pibOct,
 {
     ECP sAG1,ATPG1,PgG1;
     ECP2 BG2,dateBG2,PbG2;
-    char hv1[HASH_BYTES],hv2[HASH_BYTES];
+    char hv1[PFS],hv2[PFS];
     octet HV1= {0,sizeof(hv1),hv1};
     octet HV2= {0,sizeof(hv2),hv2};
 
@@ -470,7 +473,7 @@ int WCC_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pibOct,
 
     char hv[6*PFS+1];
     octet HV= {0,sizeof(hv),hv};
-    char ht[HASH_BYTES];
+    char ht[PFS];
     octet HT= {0,sizeof(ht),ht};
 
     BIG_fromBytes(x,xOct->val);
@@ -611,7 +614,7 @@ int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct
 {
     ECP AG1,dateAG1,PgG1,PaG1;
     ECP2 sBG2,BTPG2;
-    char hv1[HASH_BYTES],hv2[HASH_BYTES];
+    char hv1[PFS],hv2[PFS];
     octet HV1= {0,sizeof(hv1),hv1};
     octet HV2= {0,sizeof(hv2),hv2};
 
@@ -626,7 +629,7 @@ int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct
 
     char hv[6*PFS+1];
     octet HV= {0,sizeof(hv),hv};
-    char ht[HASH_BYTES];
+    char ht[PFS];
     octet HT= {0,sizeof(ht),ht};
 
     BIG_fromBytes(y,yOct->val);
@@ -840,7 +843,7 @@ int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG1)
 {
     BIG s;
     ECP P;
-    char h[HASH_BYTES];
+    char h[PFS];
     octet H= {0,sizeof(h),h};
 
     hashit(sha,date,HID,&H);

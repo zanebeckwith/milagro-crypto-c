@@ -49,51 +49,51 @@ int main()
     int PIN1,PIN2,rtn,err,iter;
 
     char x[PGS],y[PGS];
-    octet X= {sizeof(x), sizeof(x),x};
-    octet Y= {sizeof(y),sizeof(y),y};
+    octet X= {0, sizeof(x),x};
+    octet Y= {0,sizeof(y),y};
 
     /* Master secret shares */
     char ms1[PGS], ms2[PGS];
-    octet MS1= {sizeof(ms1),sizeof(ms1),ms1};
-    octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
+    octet MS1= {0,sizeof(ms1),ms1};
+    octet MS2= {0,sizeof(ms2),ms2};
 
     /* Hash values of ID */
-    char hcid[32];
-    octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
+    char hcid[PFS];
+    octet HCID= {0,sizeof(hcid), hcid};
 
     /* Client secret and shares */
     char cs1[2*PFS+1], cs2[2*PFS+1], sec[2*PFS+1];
-    octet SEC= {sizeof(sec),sizeof(sec),sec};
-    octet CS1= {sizeof(cs1),sizeof(cs1), cs1};
-    octet CS2= {sizeof(cs2),sizeof(cs2), cs2};
+    octet SEC= {0,sizeof(sec),sec};
+    octet CS1= {0,sizeof(cs1), cs1};
+    octet CS2= {0,sizeof(cs2), cs2};
 
     /* Server secret and shares */
     char ss1[4*PFS], ss2[4*PFS], serverSecret[4*PFS];
-    octet ServerSecret= {sizeof(serverSecret),sizeof(serverSecret),serverSecret};
-    octet SS1= {sizeof(ss1),sizeof(ss1),ss1};
-    octet SS2= {sizeof(ss2),sizeof(ss2),ss2};
+    octet ServerSecret= {0,sizeof(serverSecret),serverSecret};
+    octet SS1= {0,sizeof(ss1),ss1};
+    octet SS2= {0,sizeof(ss2),ss2};
 
     /* Time Permit and shares */
     char tp1[2*PFS+1], tp2[2*PFS+1], tp[2*PFS+1];
-    octet TP= {sizeof(tp),sizeof(tp),tp};
-    octet TP1= {sizeof(tp1),sizeof(tp1),tp1};
-    octet TP2= {sizeof(tp2),sizeof(tp2),tp2};
+    octet TP= {0,sizeof(tp),tp};
+    octet TP1= {0,sizeof(tp1),tp1};
+    octet TP2= {0,sizeof(tp2),tp2};
 
     /* Token stored on computer */
     char token[2*PFS+1];
-    octet TOKEN= {sizeof(token),sizeof(token),token};
+    octet TOKEN= {0,sizeof(token),token};
 
     char ut[2*PFS+1],u[2*PFS+1];
-    octet UT= {sizeof(ut),sizeof(ut),ut};
-    octet U= {sizeof(u),sizeof(u),u};
+    octet UT= {0,sizeof(ut),ut};
+    octet U= {0,sizeof(u),u};
 
     char hid[2*PFS+1],htid[2*PFS+1];
     octet HID= {0,sizeof(hid),hid};
     octet HTID= {0,sizeof(htid),htid};
 
     char e[12*PFS], f[12*PFS];
-    octet E= {sizeof(e),sizeof(e),e};
-    octet F= {sizeof(f),sizeof(f),f};
+    octet E= {0,sizeof(e),e};
+    octet F= {0,sizeof(f),f};
 
     octet *pID;
 
@@ -316,5 +316,6 @@ int main()
             printf("Iteration %d SUCCESS Error Code %d\n\n", iter, rtn);
         }
     }
+    MPIN_KILL_CSPRNG(&RNG);
     return 0;
 }

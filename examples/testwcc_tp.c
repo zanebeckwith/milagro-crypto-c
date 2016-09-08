@@ -56,7 +56,7 @@ int main()
     char bTPG2[4*PFS];
     octet BTPG2= {sizeof(bTPG2),sizeof(bTPG2), bTPG2};
 
-    char ahv[HASH_BYTES],alice_id[256],bhv[HASH_BYTES],bob_id[256];
+    char ahv[PFS],alice_id[256],bhv[PFS],bob_id[256];
     octet AHV= {0,sizeof(ahv),ahv};
     octet BHV= {0,sizeof(bhv),bhv};
 
@@ -92,13 +92,13 @@ int main()
     octet MESSAGE1 = {0, sizeof(message1), message1};
     octet MESSAGE2 = {0, sizeof(message2), message2};
 
-    char t1[16];  // Tag
-    char t2[16];  // Tag
-    char k1[16];  // AES Key
-    char k2[16];  // AES Key
-    char iv[12]; // IV - Initialisation vector
-    char c[100];  // Ciphertext
-    char p[100];  // Recovered Plaintext
+    char t1[PTAG]; // Tag
+    char t2[PTAG]; // Tag
+    char k1[PAS];  // AES Key
+    char k2[PAS];  // AES Key
+    char iv[PIV];  // IV - Initialisation vector
+    char c[100];   // Ciphertext
+    char p[100];   // Recovered Plaintext
     octet T1= {sizeof(t1),sizeof(t1),t1};
     octet T2= {sizeof(t2),sizeof(t2),t2};
     octet K1= {0,sizeof(k1),k1};

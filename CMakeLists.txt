@@ -130,8 +130,12 @@ endif( ((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8")) OR
 if(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
   message(STATUS "Curve choice prevents MPIN being built")
   set(BUILD_MPIN OFF)
-  set(BUILD_WCC OFF)
 endif(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
+
+if(NOT(AMCL_CHOICE MATCHES "BN"))
+  message(STATUS "Curve choice prevents WCC being built")
+  set(BUILD_WCC OFF)
+endif(NOT(AMCL_CHOICE MATCHES "BN"))
 
 # test configuration
 if(BUILD_MPIN OR BUILD_WCC)
