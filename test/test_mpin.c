@@ -84,6 +84,9 @@ int main()
     PIN1 = 1234;
     PIN2 = 1234;
 
+    printf("MPIN_FS %d\n", MPIN_FS());
+    printf("MPIN_GS %d\n", MPIN_GS());
+
     /* Assign the End-User an ID */
     char* user = "testuser@miracl.com";
     OCT_jstring(&ID,user);

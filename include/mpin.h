@@ -377,6 +377,18 @@ void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T
  */
 void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T);
 
+/**	@brief Return the field size
+ *
+	@return Field size
+ */
+int MPIN_FS();
+
+/**	@brief Return the group size
+ *
+	@return Group size
+ */
+int MPIN_GS();
+
 /**	@brief HMAC of message M using key K to create tag of length len in octet tag
  *
 	IEEE-1363 MAC1 function. Uses SHA256 internally.

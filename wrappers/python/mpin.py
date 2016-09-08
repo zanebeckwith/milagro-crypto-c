@@ -32,24 +32,6 @@ import cffi
 import platform
 import os
 
-# MPIN Group Size
-PGS = 32
-# MPIN Field Size
-PFS = 32
-G1 = 2 * PFS + 1
-G2 = 4 * PFS
-GT = 12 * PFS
-# Hash Size
-HASH_BYTES = 32
-# AES-GCM IV length
-IVL = 12
-# MPIN Symmetric Key Size
-PAS = 16
-
-# Hash function choice
-SHA256 = 32
-SHA384 = 48
-SHA512 = 64
 
 ffi = cffi.FFI()
 ffi.cdef("""
@@ -69,6 +51,8 @@ typedef struct
 } octet;
 
 
+extern unsigned int MPIN_FS(void);
+extern unsigned int MPIN_GS(void);
 extern void MPIN_HASH_ID(int h,octet *ID,octet *HID);
 extern unsigned int MPIN_GET_TIME(void);
 extern void MPIN_GET_Y(int h,int t,octet *O,octet *Y);
@@ -113,6 +97,22 @@ elif (platform.system() == 'Darwin'):
 else:
     libmpin = ffi.dlopen("libmpin.so")
 
+# MPIN Group Size
+PGS = libmpin.MPIN_GS()
+# MPIN Field Size
+PFS = libmpin.MPIN_FS()
+G1 = 2 * PFS + 1
+G2 = 4 * PFS
+GT = 12 * PFS
+# AES-GCM IV length
+IVL = 12
+# MPIN Symmetric Key Size
+PAS = 16
+
+# Hash function choice
+SHA256 = 32
+SHA384 = 48
+SHA512 = 64
 
 def to_hex(octet_value):
     """Converts an octet type into a string
@@ -248,7 +248,7 @@ def hash_id(hash_type, mpin_id):
     """
     # Hash value of mpin_id
     mpin_id1, mpin_id1_val = make_octet(None, mpin_id)
-    hash_mpin_id1, hash_mpin_id1_val = make_octet(HASH_BYTES)
+    hash_mpin_id1, hash_mpin_id1_val = make_octet(PFS)
     libmpin.MPIN_HASH_ID(hash_type, mpin_id1, hash_mpin_id1)
 
     hash_mpin_id_hex = to_hex(hash_mpin_id1)
@@ -908,7 +908,7 @@ def hash_all(hash_type, hash_mpin_id, u, ut, v, y, r, w):
     r1, r1_val = make_octet(None, r)
     w1, w1_val = make_octet(None, w)
 
-    hm1, hm1_val = make_octet(HASH_BYTES)
+    hm1, hm1_val = make_octet(PFS)
     libmpin.MPIN_HASH_ALL(hash_type, hash_mpin_id1,
                           u1, ut1, v1, y1, r1, w1, hm1)
 
