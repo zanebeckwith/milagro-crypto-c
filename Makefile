@@ -93,7 +93,7 @@ BUILDS=ASAN:-DCMAKE_BUILD_TYPE=ASan,-DBUILD_WCC=on \
 	LINUX_32BIT_NIST384_RSA3072:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DAMCL_CHOICE=NIST384,-DAMCL_CURVETYPE=WEIERSTRASS,-DAMCL_FFLEN=8,-DAMCL_CHUNK=32 \
 	LINUX_32BIT_C41417:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DAMCL_CHOICE=C41417,-DAMCL_CURVETYPE=EDWARDS,-DAMCL_FFLEN=8,-DAMCL_CHUNK=32 \
 	LINUX_32BIT_NIST521:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DAMCL_CHOICE=NIST521,-DAMCL_CURVETYPE=WEIERSTRASS,-DAMCL_FFLEN=4,-DAMCL_CHUNK=32 \
-	LINUX_324BIT_BN254_CX_ANONYMOUS:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DUSE_ANONYMOUS=on,-DAMCL_CHUNK=32 \
+	LINUX_32BIT_BN254_CX_ANONYMOUS:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DUSE_ANONYMOUS=on,-DAMCL_CHUNK=32 \
 	LINUX_32BIT_BN254_CX:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DAMCL_CHUNK=32 \
 	LINUX_32BIT_BN454:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DAMCL_CHOICE=BN454,-DFFLEN=2,-DAMCL_CHUNK=32 \
 	LINUX_32BIT_BN646:-DCMAKE_C_FLAGS=-m32,-DCMAKE_INSTALL_PREFIX=/opt/amcl,-DAMCL_CHOICE=BN646,-DFFLEN=2,-DAMCL_CHUNK=32 \
@@ -152,15 +152,18 @@ qa:
 	@mkdir -p target/
 	@echo 0 > target/make_qa.exit
 	@echo '' > target/make_qa_errors.log
-	@parallel --verbose make build_item ITEM={} ::: ${BUILDS}
+	@parallel --verbose make build_qa_item ITEM={} ::: ${BUILDS}
 	@cat target/make_qa_errors.log
 	@exit `cat target/make_qa.exit`
 
 # Build the project using one of the pre-defined targets (example: "make build TYPE=COVERAGE")
 build:
-	make build_item ITEM=$(filter ${TYPE}:%,$(BUILDS)) \
-	|| (echo $$? > target/make_qa.exit && echo ${ITEM} >> target/make_qa_errors.log)
+	make build_item ITEM=$(filter ${TYPE}:%,$(BUILDS))
 
+# Same as build_item but stores the exit code and faling items
+build_qa_item:
+	make build_item ITEM=${ITEM} || (echo $$? > target/make_qa.exit && echo ${ITEM} >> target/make_qa_errors.log);
+ 
 # Build the specified item entry from the BUILDS list
 build_item:
 	make buildx BUILD_NAME=$(word 1,$(subst :, ,${ITEM})) BUILD_PARAMS=$(word 2,$(subst :, ,${ITEM}))
