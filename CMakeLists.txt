@@ -79,14 +79,14 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Select word length
-set(AMCL_CHUNK "32" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
+set(AMCL_CHUNK "64" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
 set(Word_Length_Values "16;32;64")
 set_property(CACHE AMCL_CHUNK PROPERTY STRINGS ${Word_Length_Values})
 message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
 set(AMCL_CHOICE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h.in for explanation")
-set(Field_Values "NIST256;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN_CURVES;BN454;BN646;BN254;BN254_CX;BN254_T;BN254_T2;BLS_CURVES;BLS455")
+set(Field_Values "NIST256;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN454;BN646;BN254;BN254_CX;BN254_T;BN254_T2;BLS455")
 set_property(CACHE AMCL_CHOICE PROPERTY STRINGS ${Field_Values})
 message(STATUS "AMCL_CHOICE='${AMCL_CHOICE}'")
 
@@ -129,8 +129,12 @@ endif( ((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8")) OR
 if(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
   message(STATUS "Curve choice prevents MPIN being built")
   set(BUILD_MPIN OFF)
-  set(BUILD_WCC OFF)
 endif(NOT(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
+
+if(NOT(AMCL_CHOICE MATCHES "BN"))
+  message(STATUS "Curve choice prevents WCC being built")
+  set(BUILD_WCC OFF)
+endif(NOT(AMCL_CHOICE MATCHES "BN"))
 
 # test configuration
 if(BUILD_MPIN OR BUILD_WCC)

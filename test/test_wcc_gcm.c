@@ -37,9 +37,9 @@ int main()
     int lenK=strlen(KT)/2;
     int lenIV=strlen(NT)/2;
 
-    char t1[16];  // Tag
-    char t2[16];  // Tag
-    char k[16];   // AES Key
+    char t1[PTAG];  // Tag
+    char t2[PTAG];  // Tag
+    char k[PAS];   // AES Key
     char h[64];   // Header - to be included in Authentication, but not encrypted
     char iv[100]; // IV - Initialisation vector
     char m[100];  // Plaintext to be encrypted/authenticated

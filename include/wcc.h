@@ -35,15 +35,16 @@ under the License.
 
 /* Field size is assumed to be greater than or equal to group size */
 
-#define PGS MODBYTES  /**< MPIN Group Size */
-#define PFS MODBYTES  /**< MPIN Field Size */
-#define PAS 16  /**< MPIN Symmetric Key Size */
+#define PGS MODBYTES  /**< WCC Group Size */
+#define PFS MODBYTES  /**< WCC Field Size */
+#define PAS 16  /**< AES-GCM Symmetric Key Size */
+#define PIV 12  /**< AES-GCM Initialization Vector Size */
+#define PTAG 16  /**< AES-GCM MAC Size */
 
 #define WCC_OK                     0    /**< Function completed without error */
 #define WCC_INVALID_POINT         -51	/**< Point is NOT on the curve */
 
 #define TIME_SLOT_MINUTES 1440 /**< Time Slot = 1 day */
-#define HASH_BYTES MODBYTES  /**< Size of hashed output */
 
 #define HASH_TYPE_WCC SHA256 /**< Choose Hash function */
 
