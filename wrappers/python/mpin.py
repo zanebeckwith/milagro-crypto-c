@@ -114,6 +114,7 @@ SHA256 = 32
 SHA384 = 48
 SHA512 = 64
 
+
 def to_hex(octet_value):
     """Converts an octet type into a string
 

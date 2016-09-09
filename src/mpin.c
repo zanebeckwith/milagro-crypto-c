@@ -1153,13 +1153,15 @@ void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T
 }
 
 /* Return the Field size */
-int MPIN_FS(){
-  return PFS;
+int MPIN_FS()
+{
+    return PFS;
 }
 
 /* Return the Group size */
-int MPIN_GS(){
-  return PGS;
+int MPIN_GS()
+{
+    return PGS;
 }
 
 /*

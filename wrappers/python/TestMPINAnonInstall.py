@@ -26,6 +26,7 @@ import mpin
 
 HASH_TYPE_MPIN = mpin.SHA256
 
+
 class TestMPIN(unittest.TestCase):
     """Tests M-Pin crypto code when Anonymous build is selected"""
 
