@@ -80,7 +80,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Select word length
-set(AMCL_CHUNK "32" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
+set(AMCL_CHUNK "64" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
 set(Word_Length_Values "16;32;64")
 set_property(CACHE AMCL_CHUNK PROPERTY STRINGS ${Word_Length_Values})
 message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")

@@ -70,7 +70,7 @@ The above packages can be installed in different ways, depending on the Operatin
 
 ## Build Instructions
 
-NOTE: The default build is for 32 bit machines
+NOTE: The default build is for 64 bit machines
 
 
 ### Linux and Mac
