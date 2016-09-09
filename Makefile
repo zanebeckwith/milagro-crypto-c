@@ -8,6 +8,7 @@
 # the current environment, or Docker to build everything inside a Docker 
 # container via the command "make dbuild".
 #
+# Requires GNU parallel: https://www.gnu.org/software/parallel/
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
@@ -151,16 +152,14 @@ qa:
 	@mkdir -p target/
 	@echo 0 > target/make_qa.exit
 	@echo '' > target/make_qa_errors.log
-	@$(foreach ITEM,$(BUILDS), \
-		make build_item ITEM=${ITEM} \
-		|| (echo $$? > target/make_qa.exit && echo ${ITEM} >> target/make_qa_errors.log); \
-	)
+	@parallel --verbose make build_item ITEM={} ::: ${BUILDS}
 	@cat target/make_qa_errors.log
 	@exit `cat target/make_qa.exit`
 
 # Build the project using one of the pre-defined targets (example: "make build TYPE=COVERAGE")
 build:
-	make build_item ITEM=$(filter ${TYPE}:%,$(BUILDS))
+	make build_item ITEM=$(filter ${TYPE}:%,$(BUILDS)) \
+	|| (echo $$? > target/make_qa.exit && echo ${ITEM} >> target/make_qa_errors.log)
 
 # Build the specified item entry from the BUILDS list
 build_item:

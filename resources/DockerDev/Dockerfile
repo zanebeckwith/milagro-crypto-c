@@ -69,6 +69,9 @@ RUN apt-get install -y dos2unix mingw-w64 binutils-mingw-w64 mingw-w64-tools min
 # Cross compile for 32 bit Linux
 RUN apt-get install -y g++-multilib libc6-dev-i386
 
+# Execute commands in parallel
+RUN apt-get install -y parallel
+
 RUN pip install --upgrade pip && \
     pip install cffi && \
     pip install --upgrade autopep8
