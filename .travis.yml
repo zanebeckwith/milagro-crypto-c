@@ -44,6 +44,8 @@ addons:
     - mingw-w64-i686-dev
     - mingw-w64-x86-64-dev
     - golang
+    - g++-multilib
+    - libc6-dev-i386
 
 install:
   - pip install --user --upgrade pip
