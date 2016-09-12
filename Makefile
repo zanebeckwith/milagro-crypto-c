@@ -161,9 +161,7 @@ qa:
 	@mkdir -p target/
 	@echo 0 > target/make_qa.exit
 	@echo '' > target/make_qa_errors.log
-	make build_group BUILD_GROUP=BUILDS_QA
-	make build_group BUILD_GROUP=BUILDS_64
-	make build_group BUILD_GROUP=BUILDS_32
+	make build_group BUILD_GROUP=BUILDS
 	@cat target/make_qa_errors.log
 	@exit `cat target/make_qa.exit`
 

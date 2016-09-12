@@ -60,14 +60,7 @@ install:
   - go get github.com/stretchr/testify/assert
 
 script:
-  - mkdir -p target/
-  - echo 0 > target/make_qa.exit
-  - echo '' > target/make_qa_errors.log
-  - make build_group BUILD_GROUP=BUILDS_QA
-  - make build_group BUILD_GROUP=BUILDS_64
-  - make build_group BUILD_GROUP=BUILDS_32
-  - cat target/make_qa_errors.log
-  - grep "^0$" target/make_qa.exit
+  - make qa
 
 after_success:
   - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/COVERAGE/coverage/amcl.info
