@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all format clean qa build build_item buildx dbuild
+.PHONY: help all format clean qa build_group build build_qa_item build_item buildx dbuild
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -160,11 +160,15 @@ qa:
 	@mkdir -p target/
 	@echo 0 > target/make_qa.exit
 	@echo '' > target/make_qa_errors.log
-	@parallel --verbose make build_qa_item ITEM={} ::: ${BUILDS_QA}
-	@parallel --verbose make build_qa_item ITEM={} ::: ${BUILDS_64}
-	@parallel --verbose make build_qa_item ITEM={} ::: ${BUILDS_32}
+	make build_group BUILD_GROUP=BUILDS_QA
+	make build_group BUILD_GROUP=BUILDS_64
+	make build_group BUILD_GROUP=BUILDS_32
 	@cat target/make_qa_errors.log
 	@exit `cat target/make_qa.exit`
+
+# Build the specified group of options
+build_group:
+	@parallel --verbose make build_qa_item ITEM={} ::: ${${BUILD_GROUP}}
 
 # Build the project using one of the pre-defined targets (example: "make build TYPE=COVERAGE")
 build:

@@ -63,9 +63,9 @@ script:
   - mkdir -p target/
   - echo 0 > target/make_qa.exit
   - echo '' > target/make_qa_errors.log
-  - parallel --verbose make build_qa_item ITEM={} ::: ${BUILDS_QA}
-  - parallel --verbose make build_qa_item ITEM={} ::: ${BUILDS_64}
-  - parallel --verbose make build_qa_item ITEM={} ::: ${BUILDS_32}
+  - make build_group BUILD_GROUP=BUILDS_QA
+  - make build_group BUILD_GROUP=BUILDS_64
+  - make build_group BUILD_GROUP=BUILDS_32
   - cat target/make_qa_errors.log
   - grep "^0$" target/make_qa.exit
 
