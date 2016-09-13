@@ -187,7 +187,7 @@ int main(int argc, char** argv)
             octet PLAINTEXT1Oct= {CIPHERTEXTLen,CIPHERTEXTLen,PLAINTEXT1};
             amcl_hex2bin(linePtr, PLAINTEXT1, l1);
 
-            aes a;
+            amcl_aes a;
 
 #ifdef DEBUG
             printf("KEY = ");
