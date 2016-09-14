@@ -58,7 +58,7 @@ static void mapit2(octet *h,ECP2 *Q)
 #if CHOICE < BLS_CURVES
     ECP2 T,K;
 #else
-    ECP2 xQ, 2xQ, 3xQ, FQ, nFQ;
+    ECP2 xQ, x2Q, x3Q, FQ, nFQ;
 #endif
 
     BIG_fromBytes(hv,h->val);
@@ -105,12 +105,12 @@ static void mapit2(octet *h,ECP2 *Q)
     /* Hashing to G2 - Scott */
     ECP2_copy(&xQ,Q);
     ECP2_mul(&xQ,x);      /* compute xQ            */
-    ECP2_copy(&2xQ,&xQ);
-    ECP2_mul(&2xQ,x);     /* compute 2xQ=x*xQ      */
-    ECP2_copy(&3xQ,&2xQ);
-    ECP2_mul(&3xQ,x);     /* compute 3xQ           */
+    ECP2_copy(&x2Q,&xQ);
+    ECP2_mul(&x2Q,x);     /* compute x2Q=x*xQ      */
+    ECP2_copy(&x3Q,&x2Q);
+    ECP2_mul(&x3Q,x);     /* compute x3Q           */
     ECP2_neg(&xQ);        /* our x is negative     */
-    ECP2_neg(&3xQ);       /* our x is negative     */
+    ECP2_neg(&x3Q);       /* our x is negative     */
 
     ECP2_copy(&FQ,Q);
     ECP2_dbl(&Q);         /* compute 2Q            */
@@ -132,20 +132,20 @@ static void mapit2(octet *h,ECP2 *Q)
     ECP2_dbl(&FQ);        /* compute 2*F(F(xQ))    */
     ECP2_add(Q,&FQ);      /* add 2*F(F(xQ)) to Q   */
 
-    ECP2_copy(&FQ,&2xQ);
-    ECP2_neg(&2xQ);       /* compute -2xQ          */
-    ECP2_add(Q,&2xQ)      /* add -2xQ to Q         */
-    ECP2_frob(&FQ,&X);    /* compute F(2xQ)        */
+    ECP2_copy(&FQ,&x2Q);
+    ECP2_neg(&x2Q);       /* compute -x2Q          */
+    ECP2_add(Q,&x2Q);     /* add -x2Q to Q         */
+    ECP2_frob(&FQ,&X);    /* compute F(x2Q)        */
     ECP2_copy(&nFQ,&FQ);
-    ECP2_neg(&nFQ);       /* compute -F(2xQ)       */
-    ECP2_add(Q,&nFQ);     /* add -F(2xQ) to Q      */
-    ECP2_frob(&FQ,&X);    /* compute F(F(2xQ))     */
-    ECP2_neg(&FQ);        /* compute -F(F(2xQ))    */
-    ECP2_add(Q,&FQ);      /* add -F(F(2xQ)) to Q   */
+    ECP2_neg(&nFQ);       /* compute -F(x2Q)       */
+    ECP2_add(Q,&nFQ);     /* add -F(x2Q) to Q      */
+    ECP2_frob(&FQ,&X);    /* compute F(F(x2Q))     */
+    ECP2_neg(&FQ);        /* compute -F(F(x2Q))    */
+    ECP2_add(Q,&FQ);      /* add -F(F(x2Q)) to Q   */
 
-    ECP2_add(Q,&3XQ);     /* add 3xQ to Q          */
-    ECP2_frob(&3XQ,&X);   /* compute F(3xQ)        */
-    ECP_add(Q,&3XQ);      /* add F(3xQ) to Q       */
+    ECP2_add(Q,&x3Q);     /* add x3Q to Q          */
+    ECP2_frob(&x3Q,&X);   /* compute F(x3Q)        */
+    ECP_add(Q,&x3Q);      /* add F(x3Q) to Q       */
     ECP_affine(Q);
 
 #endif
