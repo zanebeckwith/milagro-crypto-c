@@ -54,8 +54,13 @@ static void mapit(octet *h,ECP *P)
 static void mapit2(octet *h,ECP2 *Q)
 {
     BIG q,one,Fx,Fy,x,hv;
-    FP2 X;
+    FP2 X;   
+#if CHOICE < BLS_CURVES
     ECP2 T,K;
+#else
+    ECP2 xQ, 2xQ, 3xQ, FQ, nFQ;
+#endif
+
     BIG_fromBytes(hv,h->val);
     BIG_rcopy(q,Modulus);
     BIG_one(one);
@@ -68,12 +73,14 @@ static void mapit2(octet *h,ECP2 *Q)
         BIG_inc(hv,1);
     }
 
-    /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
     BIG_rcopy(Fx,CURVE_Fra);
     BIG_rcopy(Fy,CURVE_Frb);
     FP2_from_BIGs(&X,Fx,Fy);
     BIG_rcopy(x,CURVE_Bnx);
 
+#if CHOICE < BLS_CURVES
+
+    /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
     ECP2_copy(&T,Q);
     ECP2_mul(&T,x);
     ECP2_neg(&T);  /* our x is negative */
@@ -92,6 +99,56 @@ static void mapit2(octet *h,ECP2 *Q)
     ECP2_frob(&T,&X);
     ECP2_add(Q,&T);
     ECP2_affine(Q);
+
+#else
+
+    /* Hashing to G2 - Scott */
+    ECP2_copy(&xQ,Q);
+    ECP2_mul(&xQ,x);      /* compute xQ            */
+    ECP2_copy(&2xQ,&xQ);
+    ECP2_mul(&2xQ,x);     /* compute 2xQ=x*xQ      */
+    ECP2_copy(&3xQ,&2xQ);
+    ECP2_mul(&3xQ,x);     /* compute 3xQ           */
+    ECP2_neg(&xQ);        /* our x is negative     */
+    ECP2_neg(&3xQ);       /* our x is negative     */
+
+    ECP2_copy(&FQ,Q);
+    ECP2_dbl(&Q);         /* compute 2Q            */
+    ECP2_dbl(&Q);         /* compute 4Q            */
+    ECP2_frob(&FQ,&X);    /* compute F(Q)          */
+    ECP2_add(Q,&FQ);      /* add F(Q) to Q         */
+    ECP2_frob(&FQ,&X);    /* compute F(F(Q))       */
+    ECP2_neg(&FQ);        /* compute -F(F(Q))      */
+    ECP2_add(Q,&FQ);      /* add -F(F(Q)) to Q     */
+
+    ECP2_copy(&FQ,&xQ);
+    ECP2_neg(&xQ);        /* compute -xQ           */
+    ECP2_add(Q,&xQ)       /* add -xQ to Q          */
+    ECP2_frob(&FQ,&X);    /* compute F(xQ)         */
+    ECP2_copy(&nFQ,&FQ);
+    ECP2_neg(&nFQ);       /* compute -F(xQ)        */
+    ECP2_add(Q,&nFQ);     /* add -F(xQ) to Q       */
+    ECP2_frob(&FQ,&X);    /* compute F(F(xQ))      */
+    ECP2_dbl(&FQ);        /* compute 2*F(F(xQ))    */
+    ECP2_add(Q,&FQ);      /* add 2*F(F(xQ)) to Q   */
+
+    ECP2_copy(&FQ,&2xQ);
+    ECP2_neg(&2xQ);       /* compute -2xQ          */
+    ECP2_add(Q,&2xQ)      /* add -2xQ to Q         */
+    ECP2_frob(&FQ,&X);    /* compute F(2xQ)        */
+    ECP2_copy(&nFQ,&FQ);
+    ECP2_neg(&nFQ);       /* compute -F(2xQ)       */
+    ECP2_add(Q,&nFQ);     /* add -F(2xQ) to Q      */
+    ECP2_frob(&FQ,&X);    /* compute F(F(2xQ))     */
+    ECP2_neg(&FQ);        /* compute -F(F(2xQ))    */
+    ECP2_add(Q,&FQ);      /* add -F(F(2xQ)) to Q   */
+
+    ECP2_add(Q,&3XQ);     /* add 3xQ to Q          */
+    ECP2_frob(&3XQ,&X);   /* compute F(3xQ)        */
+    ECP_add(Q,&3XQ);      /* add F(3xQ) to Q       */
+    ECP_affine(Q);
+
+#endif
 }
 
 /* Hash number (optional) and octet to octet */
