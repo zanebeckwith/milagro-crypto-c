@@ -113,8 +113,8 @@ static void mapit2(octet *h,ECP2 *Q)
     ECP2_neg(&x3Q);       /* our x is negative     */
 
     ECP2_copy(&FQ,Q);
-    ECP2_dbl(Q);         /* compute 2Q            */
-    ECP2_dbl(Q);         /* compute 4Q            */
+    ECP2_dbl(Q);          /* compute 2Q            */
+    ECP2_dbl(Q);          /* compute 4Q            */
     ECP2_frob(&FQ,&X);    /* compute F(Q)          */
     ECP2_add(Q,&FQ);      /* add F(Q) to Q         */
     ECP2_frob(&FQ,&X);    /* compute F(F(Q))       */
@@ -145,7 +145,7 @@ static void mapit2(octet *h,ECP2 *Q)
 
     ECP2_add(Q,&x3Q);     /* add x3Q to Q          */
     ECP2_frob(&x3Q,&X);   /* compute F(x3Q)        */
-    ECP2_add(Q,&x3Q);      /* add F(x3Q) to Q       */
+    ECP2_add(Q,&x3Q);     /* add F(x3Q) to Q       */
     ECP2_affine(Q);
 
 #endif
