@@ -262,7 +262,7 @@ unsign32 MPIN_today(void)
 {
     /* return time in slots since epoch */
     unsign32 ti=(unsign32)time(NULL);
-    return (long)(ti/(60*TIME_SLOT_MINUTES));
+    return (uint32_t)(ti/(60*TIME_SLOT_MINUTES));
 }
 
 /* Hash the M-Pin transcript - new */

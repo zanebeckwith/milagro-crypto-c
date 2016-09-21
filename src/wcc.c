@@ -55,7 +55,12 @@ static void mapit2(octet *h,ECP2 *Q)
 {
     BIG q,one,Fx,Fy,x,hv;
     FP2 X;
+#if CHOICE < BLS_CURVES
     ECP2 T,K;
+#else
+    ECP2 xQ, x2Q, x3Q, FQ, nFQ;
+#endif
+
     BIG_fromBytes(hv,h->val);
     BIG_rcopy(q,Modulus);
     BIG_one(one);
@@ -68,12 +73,15 @@ static void mapit2(octet *h,ECP2 *Q)
         BIG_inc(hv,1);
     }
 
-    /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
     BIG_rcopy(Fx,CURVE_Fra);
     BIG_rcopy(Fy,CURVE_Frb);
     FP2_from_BIGs(&X,Fx,Fy);
     BIG_rcopy(x,CURVE_Bnx);
 
+#if CHOICE < BLS_CURVES
+
+    /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
+    /* Q -> xQ + F(3xQ) + F(F(xQ)) + F(F(F(Q))). */
     ECP2_copy(&T,Q);
     ECP2_mul(&T,x);
     ECP2_neg(&T);  /* our x is negative */
@@ -92,6 +100,55 @@ static void mapit2(octet *h,ECP2 *Q)
     ECP2_frob(&T,&X);
     ECP2_add(Q,&T);
     ECP2_affine(Q);
+
+#else
+
+    /* Hashing to G2 - Scott, Benger, Charlemagne, Perez, Kachisa */
+    /* Q -> 4Q+F(Q)-F(F(Q)) -xQ-F(xQ)+2F(F(xQ)) -x2Q-F(x2Q)-F(F(x2Q)) +x3Q+F(x3Q) */
+    ECP2_copy(&xQ,Q);
+    ECP2_mul(&xQ,x);      /* compute xQ            */
+    ECP2_copy(&x2Q,&xQ);
+    ECP2_mul(&x2Q,x);     /* compute x2Q=x*xQ      */
+    ECP2_copy(&x3Q,&x2Q);
+    ECP2_mul(&x3Q,x);     /* compute x3Q           */
+
+    ECP2_copy(&FQ,Q);
+    ECP2_dbl(Q);          /* compute 2Q            */
+    ECP2_dbl(Q);          /* compute 4Q            */
+    ECP2_frob(&FQ,&X);    /* compute F(Q)          */
+    ECP2_add(Q,&FQ);      /* add F(Q) to Q         */
+    ECP2_frob(&FQ,&X);    /* compute F(F(Q))       */
+    ECP2_neg(&FQ);        /* compute -F(F(Q))      */
+    ECP2_add(Q,&FQ);      /* add -F(F(Q)) to Q     */
+
+    ECP2_copy(&FQ,&xQ);
+    ECP2_neg(&xQ);        /* compute -xQ           */
+    ECP2_add(Q,&xQ);      /* add -xQ to Q          */
+    ECP2_frob(&FQ,&X);    /* compute F(xQ)         */
+    ECP2_copy(&nFQ,&FQ);
+    ECP2_neg(&nFQ);       /* compute -F(xQ)        */
+    ECP2_add(Q,&nFQ);     /* add -F(xQ) to Q       */
+    ECP2_frob(&FQ,&X);    /* compute F(F(xQ))      */
+    ECP2_dbl(&FQ);        /* compute 2*F(F(xQ))    */
+    ECP2_add(Q,&FQ);      /* add 2*F(F(xQ)) to Q   */
+
+    ECP2_copy(&FQ,&x2Q);
+    ECP2_neg(&x2Q);       /* compute -x2Q          */
+    ECP2_add(Q,&x2Q);     /* add -x2Q to Q         */
+    ECP2_frob(&FQ,&X);    /* compute F(x2Q)        */
+    ECP2_copy(&nFQ,&FQ);
+    ECP2_neg(&nFQ);       /* compute -F(x2Q)       */
+    ECP2_add(Q,&nFQ);     /* add -F(x2Q) to Q      */
+    ECP2_frob(&FQ,&X);    /* compute F(F(x2Q))     */
+    ECP2_neg(&FQ);        /* compute -F(F(x2Q))    */
+    ECP2_add(Q,&FQ);      /* add -F(F(x2Q)) to Q   */
+
+    ECP2_add(Q,&x3Q);     /* add x3Q to Q          */
+    ECP2_frob(&x3Q,&X);   /* compute F(x3Q)        */
+    ECP2_add(Q,&x3Q);     /* add F(x3Q) to Q       */
+    ECP2_affine(Q);
+
+#endif
 }
 
 /* Hash number (optional) and octet to octet */
@@ -769,7 +826,7 @@ void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 unsign32 WCC_today(void)
 {
     unsign32 ti=(unsign32)time(NULL);
-    return (long)(ti/(60*TIME_SLOT_MINUTES));
+    return (uint32_t)(ti/(60*TIME_SLOT_MINUTES));
 }
 
 /*!  \brief Initialise a random number generator
