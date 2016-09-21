@@ -54,7 +54,7 @@ static void mapit(octet *h,ECP *P)
 static void mapit2(octet *h,ECP2 *Q)
 {
     BIG q,one,Fx,Fy,x,hv;
-    FP2 X;   
+    FP2 X;
 #if CHOICE < BLS_CURVES
     ECP2 T,K;
 #else
