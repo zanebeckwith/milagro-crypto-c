@@ -109,8 +109,6 @@ static void mapit2(octet *h,ECP2 *Q)
     ECP2_mul(&x2Q,x);     /* compute x2Q=x*xQ      */
     ECP2_copy(&x3Q,&x2Q);
     ECP2_mul(&x3Q,x);     /* compute x3Q           */
-    ECP2_neg(&xQ);        /* our x is negative     */
-    ECP2_neg(&x3Q);       /* our x is negative     */
 
     ECP2_copy(&FQ,Q);
     ECP2_dbl(Q);          /* compute 2Q            */
@@ -826,7 +824,7 @@ void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 unsign32 WCC_today(void)
 {
     unsign32 ti=(unsign32)time(NULL);
-    return (long)(ti/(60*TIME_SLOT_MINUTES));
+    return (uint32_t)(ti/(60*TIME_SLOT_MINUTES));
 }
 
 /*!  \brief Initialise a random number generator
