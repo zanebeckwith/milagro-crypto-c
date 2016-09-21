@@ -81,6 +81,7 @@ static void mapit2(octet *h,ECP2 *Q)
 #if CHOICE < BLS_CURVES
 
     /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
+    /* Q -> xQ + F(3xQ) + F(F(xQ)) + F(F(F(Q))). */
     ECP2_copy(&T,Q);
     ECP2_mul(&T,x);
     ECP2_neg(&T);  /* our x is negative */
@@ -102,7 +103,8 @@ static void mapit2(octet *h,ECP2 *Q)
 
 #else
 
-    /* Hashing to G2 - Scott */
+    /* Hashing to G2 - Scott, Benger, Charlemagne, Perez, Kachisa */
+    /* Q -> 4Q+F(Q)-F(F(Q)) -xQ-F(xQ)+2F(F(xQ)) -x2Q-F(x2Q)-F(F(x2Q)) +x3Q+F(x3Q) */
     ECP2_copy(&xQ,Q);
     ECP2_mul(&xQ,x);      /* compute xQ            */
     ECP2_copy(&x2Q,&xQ);
