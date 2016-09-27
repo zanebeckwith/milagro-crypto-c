@@ -54,8 +54,10 @@ extern void RSA_KILL_CSPRNG(csprng *R);
 	@param e the encryption exponent
 	@param PRIV the output RSA private key
 	@param PUB the output RSA public key
+        @param P Input prime number. Used when R is equal to NULL for testing
+        @param Q Inpuy prime number. Used when R is equal to NULL for testing
  */
-extern void RSA_KEY_PAIR(csprng *R,sign32 e,rsa_private_key* PRIV,rsa_public_key* PUB);
+extern void RSA_KEY_PAIR(csprng *R,sign32 e,rsa_private_key* PRIV,rsa_public_key* PUB,octet *P, octet* Q);
 /**	@brief PKCS V1.5 padding of a message prior to RSA signature
  *
 	@param h is the hash type
