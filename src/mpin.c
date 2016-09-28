@@ -1057,9 +1057,6 @@ void MPIN_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
     BIG_fromBytes(y,H.val);
     BIG_rcopy(q,CURVE_Order);
     BIG_mod(y,q);
-#ifdef AES_S
-    BIG_mod2m(y,2*AES_S);
-#endif
     BIG_toBytes(Y->val,y);
     Y->len=PGS;
 }
