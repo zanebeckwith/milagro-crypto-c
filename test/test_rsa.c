@@ -51,7 +51,7 @@ int main()
     RSA_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
     printf("Generating public/private key pair\n");
-    RSA_KEY_PAIR(&RNG,65537,&priv,&pub);
+    RSA_KEY_PAIR(&RNG,65537,&priv,&pub,NULL,NULL);
 
     printf("Encrypting test string\n");
     OCT_jstring(&M,(char *)"Hello World\n");

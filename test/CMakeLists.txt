@@ -280,3 +280,44 @@ if(AMCL_CHOICE STREQUAL "GOLDILOCKS")
   set_tests_properties (test_ecdsa_verify_GOLDILOCKS_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif(AMCL_CHOICE STREQUAL "GOLDILOCKS")
 
+if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA2048 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
+
+if((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA3072 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/3072/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
+
+
+if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA4096 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/4096/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
+
+if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA2048 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
+

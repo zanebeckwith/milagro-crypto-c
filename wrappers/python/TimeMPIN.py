@@ -59,7 +59,7 @@ if __name__ == "__main__":
     mpin_id = "user@miracl.com"
 
     # Hash mpin_id
-    hash_mpin_id = mpin.hash_id(mpin_id)
+    hash_mpin_id = mpin.hash_id(32, mpin_id)
 
     if USE_ANONYMOUS:
         pID = hash_mpin_id

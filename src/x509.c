@@ -167,7 +167,7 @@ static int bround(int len)
 pktype X509_extract_cert_sig(octet *sc,octet *sig)
 {
     int i,j,k,fin,len,rlen,sj,ex;
-    char soid[8];
+    char soid[9];
     octet SOID= {0,sizeof(soid),soid};
     pktype ret;
 
