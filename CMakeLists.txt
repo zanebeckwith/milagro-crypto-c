@@ -36,6 +36,12 @@ set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}
     CACHE STRING "Choose the type of build: Debug Release Coverage ASan Check CheckFull"
     FORCE)
 
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_BUILD_TYPE)
+
 if(CMAKE_COMPILER_IS_GNUCC)
     message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion

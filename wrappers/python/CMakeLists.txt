@@ -32,6 +32,7 @@ if(BUILD_MPIN)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
   file(COPY mpin.py DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python/")
+  file(COPY TimeMPIN.py DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python/")
   if (USE_ANONYMOUS)
       file(COPY TestMPINAnonInstall.py DESTINATION "${PROJECT_BINARY_DIR}/wrappers/python/")
       add_test (test_python_mpin_anon_install python TestMPINAnonInstall.py) 

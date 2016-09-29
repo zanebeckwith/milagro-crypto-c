@@ -1160,7 +1160,7 @@ if __name__ == "__main__":
         date = 0
 
     # Seed
-    seedHex = "3ade3d4a5c698e8910bf92f25d97ceeb7c25ed838901a5cb5db2cf25434c1fe76c7f79b7af2e5e1e4988e4294dbd9bd9fa3960197fb7aec373609fb890d74b16a4b14b2ae7e23b75f15d36c21791272372863c4f8af39980283ae69a79cf4e48e908f9e0"
+    seedHex = "b75e7857fa17498c333d3c8d42e10f8c3cb8a66f7a84d85f86cd5acb537fa211"
     seed = seedHex.decode("hex")
 
     # random number generator
