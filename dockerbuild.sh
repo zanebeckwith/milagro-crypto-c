@@ -15,7 +15,7 @@
 # ./dockerbuild.sh
 
 # build the environment
-docker build --tag=miracl/cdev ./resources/DockerDev/
+docker build --tag=miracl/amcldev ./resources/DockerDev/
 
 # go path
 GOPATH=/root
@@ -25,11 +25,9 @@ PRJPATH=/root/src/milagro-crypto-c
 
 # generate a docker file on the fly
 cat > Dockerfile <<- EOM
-FROM miracl/cdev
+FROM miracl/amcldev
 MAINTAINER nicola.asuni@miracl.com
-RUN mkdir -p /root/.ssh && \
-    echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config && \
-    mkdir -p ${PRJPATH}
+RUN mkdir -p ${PRJPATH}
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
 RUN make qa || true

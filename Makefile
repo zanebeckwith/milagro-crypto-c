@@ -120,14 +120,26 @@ help:
 	@echo "$(PROJECT) Makefile."
 	@echo "The following commands are available:"
 	@echo ""
-	@echo "    make format   : Format the source code"
-	@echo "    make clean    : Remove any build artifact"
-	@echo "    make qa       : build all versions and generate reports"
-	@echo "    make dbuild   : build everything inside a Docker container"
+	@echo "    make format  :  Format the source code"
+	@echo "    make clean   :  Remove any build artifact"
+	@echo "    make qa      :  build all versions and generate reports"
+	@echo "    make dbuild  :  build everything inside a Docker container"
 	@echo ""
-	@echo "    You can also build the following predefined types:"
+	@echo "    You can also build individual types or groups:"
 	@echo ""
-	@$(foreach PARAMS,$(BUILDS), \
+	@echo "    make build_group BUILD_GROUP=BUILDS_QA"
+	@echo "    make build_group BUILD_GROUP=BUILDS_64"
+	@echo "    make build_group BUILD_GROUP=BUILDS_32"
+	@echo ""
+	@$(foreach PARAMS,$(BUILDS_QA), \
+		echo "    make build TYPE=$(word 1,$(subst :, ,${PARAMS}))" ; \
+	)
+	@echo ""
+	@$(foreach PARAMS,$(BUILDS_64), \
+		echo "    make build TYPE=$(word 1,$(subst :, ,${PARAMS}))" ; \
+	)
+	@echo ""
+	@$(foreach PARAMS,$(BUILDS_32), \
 		echo "    make build TYPE=$(word 1,$(subst :, ,${PARAMS}))" ; \
 	)
 	@echo ""
