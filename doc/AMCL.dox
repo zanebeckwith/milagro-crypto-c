@@ -1,16 +1,15 @@
 /*
-  This file contains NO source code, just some documentation for doxygen to
-  parse.
+  This file contains NO source code, just some documentation for Doxygen to parse.
 */
 
 /*!
   \mainpage Apache Milagro Crypto Library (AMCL)
 
- AMCL is a standards compliant C crypto library with no external dependencies, specifically designed to support the Internet of Things.
+ AMCL is a standards compliant C cryptographic library with no external dependencies, specifically designed to support the Internet of Things (IoT).
 
  For a detailed explanation about this library please read: <a href="AMCL.pdf">AMCL.pdf</a>
 
- AMCL is provided in C language and there is also a Python wrapper provided that requires <a href="https://cffi.readthedocs.org/en/release-0.8/">CFFI</a>
+ AMCL is provided in *C* language but includes a <a href="https://www.python.org">Python</a> and <a href="https://golang.org">GO</a> wrapper.
 
   \section homepage Project page
   The official project page is hosted at 
@@ -37,7 +36,7 @@ under the License.
 
   \section platforms Platforms
 
-  The software can be compiled and installed for these operating systems;
+  The software can be compiled and installed for the following operating systems:
 
 <ul type="disc">
   <li>Linux</li>
@@ -54,26 +53,80 @@ under the License.
   git mirror https://github.com/apache/incubator-milagro
 
 
-  \section dependencies Software Dependencies
-  
+
+  \section quickstart Quick Start
+
+<p>This project includes a Makefile that allows you to test and build the project in a Linux-compatible system with simple commands.<br>
+All the artifacts and reports produced using this Makefile are stored in the <em>target</em> folder.</p>
+<p>All the packages listed in the <em>resources/DockerDev/Dockerfile</em> file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a <a href="https://www.docker.com" data-original-href="https://www.docker.com">Docker</a> container using the command "make dbuild".</p>
+<p>To see all available options:</p>
+<pre><code>make help
+</code></pre>
+<p>To build the project inside a Docker container (requires Docker):</p>
+<pre><code>make dbuild
+</code></pre>
+<p>The base Docker building environment is defined in the following Dockerfile:</p>
+<pre><code>resources/DockerDev/Dockerfile
+</code></pre>
+<p>To execute all the default test builds and generate reports in the current environment:</p>
+<pre><code>make qa
+</code></pre>
+<p>To format the code (please use this command before submitting any pull request):</p>
+<pre><code>make format
+</code></pre>
+
+
+
+  \section dockercommands Useful Docker commands
+
+<p>To manually create the container you can execute:</p>
+<pre><code><span class="hljs-symbol">docker</span> <span class="hljs-keyword">build </span>--tag=<span class="hljs-string">"miracl/amcldev"</span> .
+</code></pre>
+<p>To log into the newly created container:</p>
+<pre><code>docker run -t -<span class="hljs-selector-tag">i</span> miracl/amcldev /bin/bash
+</code></pre>
+<p>To get the container ID:</p>
+<pre><code>CONTAINER_ID=`docker ps -<span class="hljs-literal">a</span> | grep miracl/amcldev | cut -c1-<span class="hljs-number">12</span>`
+</code></pre>
+<p>To delete the newly created docker container:</p>
+<pre><code>docker rm -f $CONTAINER_ID
+</code></pre>
+<p>To delete the docker image:</p>
+<pre><code>docker rmi <span class="hljs-_">-f</span> miracl/amcldev
+</code></pre>
+<p>To delete all containers</p>
+<pre><code>docker rm $<span class="hljs-comment">(docker ps -a -q)</span>
+</code></pre>
+<p>To delete all images</p>
+<pre><code>    docker rmi $(docker images -<span class="hljs-keyword">q</span>)
+</code></pre>
+
+
+
+  \section manualbuilds Manual Builds
+
+  \subsection dependencies Software Dependencies
+
 <p>In order to build this library, the following packages are required:</p>
 <ul>
-<li><a href="https://cmake.org/" data-original-href="https://cmake.org/">CMake</a> is required to build the source code.;</li>
-<li><a href="https://cffi.readthedocs.org/en/release-0.8/" data-original-href="https://cffi.readthedocs.org/en/release-0.8/">CFFI</a>, the C Foreign Function Interface for Python is required in order to execute tests;</li>
+<li><a href="https://cmake.org/" data-original-href="https://cmake.org/">CMake</a> is required to build the source code.</li>
+<li><a href="https://cffi.readthedocs.org/en/release-0.8/" data-original-href="https://cffi.readthedocs.org/en/release-0.8/">CFFI</a>, the C Foreign Function Interface for Python is required in order to execute tests.</li>
 <li><a href="http://doxygen.org" data-original-href="http://doxygen.org">Doxygen</a> is required to build the source code documentation.</li>
+<li><a href="https://golang.org/dl/" data-original-href="https://golang.org/dl/">GO</a> and <a href="https://www.python.org/" data-original-href="https://www.python.org/">Python</a> languages are required to build the language wrappers.</li>
+<li>Please refer to the <em>resources/DockerDev/Dockerfile</em> file for any additional dependency.</li>
 </ul>
 <p>The above packages can be installed in different ways, depending on the Operating System used:</p>
 <ul>
 <li><strong>Debian/Ubuntu Linux</strong></li>
 </ul>
-<pre><code>sudo apt-get install -y git cmake build-essential python python-dev python-pip libffi-dev doxygen doxygen-latex
+<pre><code>sudo apt-get install -y git cmake build-essential python python-dev python-pip libffi-dev doxygen doxygen-latex parallel
 sudo pip install cffi
 </code></pre>
 <ul>
 <li><strong>RedHat/CentOS/Fedora Linux</strong></li>
 </ul>
 <pre><code>sudo yum groupinstall "Development Tools" "Development Libraries"
-sudo yum install -y git cmake python libpython-devel python-pip libffi-devel doxygen doxygen-latex
+sudo yum install -y git cmake python libpython-devel python-pip libffi-devel doxygen doxygen-latex parallel
 sudo pip install cffi
 </code></pre>
 <ul>
@@ -84,6 +137,7 @@ brew install cmake
 brew install pkg-config libffi
 sudo pip install cffi
 brew install doxygen
+brew install parallel
 </code></pre>
 <ul>
 <li><strong>Windows</strong>
@@ -100,10 +154,12 @@ brew install doxygen
 </ul>
 
 
-  \section build Build Instructions
-  
-<p>NOTE: The default build is for 32 bit machines</p>
-<h3>Linux and Mac</h3>
+  \subsection build Build Instructions
+
+<p>NOTE: The default build is for 64 bit machines</p>
+
+<h4>Linux and Mac</h4>
+
 <pre><code>git clone https://github.com/miracl/milagro-crypto-c
 cd milagro-crypto-c
 mkdir -p target/build
@@ -121,26 +177,31 @@ sudo make install
 export PYTHONPATH=/usr/lib/python2.7/dist-packages
 </code></pre>
 <p>NOTE: The build can be configured by setting flags on the command line, for example:</p>
-<ul>
-<li>cmake -DAMCL_CHUNK=64 ../..</li>
-<li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..</li>
-</ul>
+<pre><code>
+cmake -DAMCL_CHUNK=64 ../..
+cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..
+</code></pre>
 <p>To list other available CMake options, use:</p>
-<ul>
-<li>cmake -LH</li>
-</ul>
-<h4>Uninstall software</h4>
+<pre><code>cmake -LH
+</code></pre>
+
+<h5>Uninstall software</h5>
+
 <pre><code>sudo make uninstall
 </code></pre>
-<h4>Building an installer (only for Linux)</h4>
+
+<h5>Building an installer</h5>
+
 <p>After having built the libraries you can build a binary installer and a source distribution by running this command</p>
 <pre><code>make package
 </code></pre>
-<h3>Windows</h3>
+
+<h4>Windows</h4>
+
 <p>Start a command prompt as an administrator</p>
 <pre><code>git clone https://github.com/miracl/milagro-crypto-c
 cd milagro-crypto-c
-mkdir -p target\\build
+mkdir target\\build
 cd target\\build
 cmake -G "MinGW Makefiles" ..\\..
 mingw32-make
@@ -151,41 +212,17 @@ mingw32-make install
 <p>Post install append the PATH system variable to point to the install ./lib:</p>
 <p><em>My Computer -&gt; Properties -&gt; Advanced &gt; Environment Variables</em></p>
 <p>The build can be configured using by setting flags on the command line i.e.</p>
-<pre><code>cmake -G "MinGW Makefiles" -DAMCL_CHUNK=64 ..
+<pre><code>cmake -G "MinGW Makefiles" -D BUILD_PYTHON=on ..
 </code></pre>
-<h4>Uninstall software</h4>
+
+<h5>Uninstall software</h5>
+
 <pre><code>mingw32-make uninstall
 </code></pre>
-<h4>Building an installer</h4>
+<h5>Building an installer</h5>
 <p>After having built the libraries you can build a Windows installer using this command</p>
 <pre><code>sudo mingw32-make package
 </code></pre>
 <p>In order for this to work NSSI has to have been installed</p>
-
-
-  \section automation Automation
-
-<p>This project includes a Makefile that allows you to test and build the project in a Linux machine with simple commands.<br />
-All the artifacts and reports produced using this Makefile are stored in the <em>target</em> folder.<br />
-<br />
-To see all available options:</p>
-
-<code><pre>make help</pre></code>
-
-<p>To build the project inside a Docker container (requires Docker):</p>
-
-<code><pre>make dbuild</pre></code>
-
-<p>The base Docker building environment is defined in the following Dockerfile:</p>
-
-<code><pre>resources/DockerDev/Dockerfile</pre></code>
-
-<p>To execute all the default test builds and generate reports in the current environment:</p>
-
-<code><pre>make qa</pre></code>
-
-<p>To format the code (please use this command before submitting any new code):</p>
-
-<code><pre>make format</pre></code>
 
 */
