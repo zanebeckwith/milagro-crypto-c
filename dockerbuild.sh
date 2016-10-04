@@ -17,9 +17,6 @@
 # build the environment
 docker build --tag=miracl/amcldev ./resources/DockerDev/
 
-# go path
-GOPATH=/root
-
 # project root path
 PRJPATH=/root/src/milagro-crypto-c
 
@@ -34,7 +31,7 @@ RUN make qa || true
 EOM
 
 # docker image name
-DOCKER_IMAGE_NAME="local/build"
+DOCKER_IMAGE_NAME="localbuild/amcldev"
 
 # build the docker container and build the project
 docker build --no-cache --tag=${DOCKER_IMAGE_NAME} .
