@@ -1,42 +1,8 @@
 # Dockerfile
 #
-# Development environment for milagro-crypto-c
+# Linux development environment
 #
 # @author      Nicola Asuni <nicola.asuni@miracl.com>
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# NOTES:
-#
-# This script requires Docker (https://www.docker.com/)
-#
-#     sudo apt-get install docker docker.io
-#
-# Add your user to the "docker" group:
-#     sudo groupadd docker
-#     sudo gpasswd -a <YOURUSER> docker
-#     sudo service docker restart
-#
-# To create the container execute:
-#     docker build --tag="miracl/amcldev" .
-#
-# To log into the newly created container:
-#     docker run -t -i miracl/amcldev /bin/bash
-#
-# To get the container ID:
-#     CONTAINER_ID=`docker ps -a | grep miracl/amcldev | cut -c1-12`
-#
-# To delete the newly created docker container:
-#     docker rm -f $CONTAINER_ID
-#
-# To delete the docker image:
-#     docker rmi -f miracl/amcldev
-#
-# To delete all containers
-#     docker rm $(docker ps -a -q)
-#
-# To delete all images
-#     docker rmi $(docker images -q)
 # ------------------------------------------------------------------------------
 
 FROM phusion/baseimage
