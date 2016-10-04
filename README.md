@@ -38,25 +38,29 @@ All the artifacts and reports produced using this Makefile are stored in the *ta
 All the packages listed in the *resources/DockerDev/Dockerfile* file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a [Docker](https://www.docker.com) container using the command "make dbuild".
 
 To see all available options:
-
-    make help
+```
+make help
+```
 
 To build the project inside a Docker container (requires Docker):
-
-    make dbuild
+```
+make dbuild
+```
 
 The base Docker building environment is defined in the following Dockerfile:
-
-    resources/DockerDev/Dockerfile
+```
+resources/DockerDev/Dockerfile
+```
 
 To execute all the default test builds and generate reports in the current environment:
-
-    make qa
+```
+make qa
+```
 
 To format the code (please use this command before submitting any pull request):
-
-    make format
-
+```
+make format
+```
 
 ## Useful Docker commands
 
@@ -92,7 +96,7 @@ docker rm $(docker ps -a -q)
 
 To delete all images
 ```
-    docker rmi $(docker images -q)
+docker rmi $(docker images -q)
 ```
 
 ## Manual Builds
