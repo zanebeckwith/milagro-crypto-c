@@ -16,12 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 
-AMCL X.509 Functions 
+    AMCL X.509 Functions
 */
 
 /**
  * @file x509.c
- * @author Mike Scott 
+ * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
  * @brief X509 function source file
@@ -562,10 +562,10 @@ int X509_find_subject(octet *c)
 }
 
 /*
-    NOTE: When extracting cert information, we actually return just an 
+    NOTE: When extracting cert information, we actually return just an
     index to the data inside the cert, and maybe its length. So no memory
-    is assigned to store cert info. It is the callers responsibility to 
-    allocate such memory if required, and copy cert information into it. 
+    is assigned to store cert info. It is the callers responsibility to
+    allocate such memory if required, and copy cert information into it.
 */
 
 int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
