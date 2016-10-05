@@ -35,8 +35,8 @@ under the License.
 #define X509_H
 
 /**
-	@brief Public key type
-*/
+ *	@brief Public key type
+ */
 typedef struct
 {
     int type;  /**< signature type (ECC or RSA) */
@@ -48,73 +48,91 @@ typedef struct
 
 /** @brief Extract certificate signature
  *
-	@param c an X.509 certificate
-	@param s the extracted signature
-	@return 0 on failure, or indicator of signature type (ECC or RSA)
-*/
+ *  Extract certificate signature from an x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@param s the extracted signature
+ *	@return 0 on failure, or indicator of signature type (ECC or RSA)
+ */
 extern pktype X509_extract_cert_sig(octet *c,octet *s);
 
-/** @brief Extract certificate from signed certificate.
+/** @brief Extract certificate from signed certificate
  *
-	@param sc a signed certificate
-	@param c the extracted certificate
-	@return 0 on failure
-*/
+ *  Extract certificate from a signed x509 certificate.
+ *
+ *	@param sc a signed certificate
+ *	@param c the extracted certificate
+ *	@return 0 on failure
+ */
 extern int X509_extract_cert(octet *sc,octet *c);
 
-/** @brief Extract public key from certificate.
+/** @brief Extract public key from certificate
  *
-	@param c an X.509 certificate
-	@param k the extracted key
-	@return 0 on failure, or indicator of public key type (ECC or RSA)
-*/
+ *  Extract public key from an x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@param k the extracted key
+ *	@return 0 on failure, or indicator of public key type (ECC or RSA)
+ */
 extern pktype X509_extract_public_key(octet *c,octet *k);
 
-/** @brief Find index to issuer field in a certificate.
+/** @brief Find index to issuer field in a certificate
  *
-	@param c an X.509 certificate
-	@return 0 on failure, or pointer to issuer field in cert
-*/
+ *  Find index to issuer field in a x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@return 0 on failure, or pointer to issuer field in cert
+ */
 extern int X509_find_issuer(octet *c);
 
-/** @brief Find index to validity period field in a certificate.
+/** @brief Find index to validity period field in a certificate
  *
-	@param c an X.509 certificate
-	@return 0 on failure, or pointer to validity field in cert
-*/
+ *  Find index to validity period field in a x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@return 0 on failure, or pointer to validity field in cert
+ */
 extern int X509_find_validity(octet *c);
 
 /** @brief Get index to subject field in a certificate
  *
-	@param c an X.509 certificate
-	@return 0 on failure, or pointer to subject field in cert
-*/
+ *  Get index to subject field in a x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@return 0 on failure, or pointer to subject field in cert
+ */
 extern int X509_find_subject(octet *c);
 
-/** @brief Find entity property indicated by SOID.
+/** @brief Find entity property indicated by SOID
  *
-	@param c an X.509 certificate
-	@param S is OID of property we are looking for
-	@param s is a pointer to the section of interest in the cert
-	@param f is pointer to the length of the property
-	@return 0 on failure, or pointer to the property
-*/
+ *  Find entity property indicated by SOID from an x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@param S is OID of property we are looking for
+ *	@param s is a pointer to the section of interest in the cert
+ *	@param f is pointer to the length of the property
+ *	@return 0 on failure, or pointer to the property
+ */
 extern int X509_find_entity_property(octet *c,octet *S,int s,int *f);
 
-/** @brief Find start date of certificate validity period.
+/** @brief Find start date of certificate validity period
  *
-	@param c an X.509 certificate
-	@param s is a pointer to the start of the validity field
-	@return 0 on failure, or pointer to the start date
-*/
+ *  Find start date of certificate validity period from an x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@param s is a pointer to the start of the validity field
+ *	@return 0 on failure, or pointer to the start date
+ */
 extern int X509_find_start_date(octet *c,int s);
 
-/** @brief Find expiry date of certificate validity period.
+/** @brief Find expiry date of certificate validity period
  *
-	@param c an X.509 certificate
-	@param s is a pointer to the start of the validity field
-	@return 0 on failure, or pointer to the expiry date
-*/
+ *  Find expiry date of certificate validity period from a x509 certificate.
+ *
+ *	@param c an X.509 certificate
+ *	@param s is a pointer to the start of the validity field
+ *	@return 0 on failure, or pointer to the expiry date
+ */
 extern int X509_find_expiry_date(octet *c,int s);
 
 #endif
