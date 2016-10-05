@@ -1,4 +1,4 @@
-/*
+/**
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
 distributed with this work for additional information
@@ -17,12 +17,14 @@ specific language governing permissions and limitations
 under the License.
 */
 
+/* AMCL Wang/Chow-Choo Functions */
+
 /**
  * @file wcc.c
- * @author Mike Scott and Kealan McCusker
+ * @author Mike Scott
+ * @author Kealan McCusker
  * @date 28th April 2016
  * @brief Wang / Chow Choo (WCC) definitions
- *
  *
  */
 
@@ -35,7 +37,7 @@ under the License.
 // #define DEBUG
 
 
-/* map octet string to point on curve */
+/* Map octet string to point on curve */
 static void mapit(octet *h,ECP *P)
 {
     BIG q,x,c;
@@ -50,7 +52,7 @@ static void mapit(octet *h,ECP *P)
     ECP_mul(P,c);
 }
 
-/* maps to hash value to point on G2 */
+/* Map to hash value to point on G2 */
 static void mapit2(octet *h,ECP2 *Q)
 {
     BIG q,one,Fx,Fy,x,hv;
@@ -84,7 +86,7 @@ static void mapit2(octet *h,ECP2 *Q)
     /* Q -> xQ + F(3xQ) + F(F(xQ)) + F(F(F(Q))). */
     ECP2_copy(&T,Q);
     ECP2_mul(&T,x);
-    ECP2_neg(&T);  /* our x is negative */
+    ECP2_neg(&T);   // our x is negative
     ECP2_copy(&K,&T);
     ECP2_dbl(&K);
     ECP2_add(&K,&T);
@@ -106,46 +108,46 @@ static void mapit2(octet *h,ECP2 *Q)
     /* Hashing to G2 - Scott, Benger, Charlemagne, Perez, Kachisa */
     /* Q -> 4Q+F(Q)-F(F(Q)) -xQ-F(xQ)+2F(F(xQ)) -x2Q-F(x2Q)-F(F(x2Q)) +x3Q+F(x3Q) */
     ECP2_copy(&xQ,Q);
-    ECP2_mul(&xQ,x);      /* compute xQ            */
+    ECP2_mul(&xQ,x);      // compute xQ
     ECP2_copy(&x2Q,&xQ);
-    ECP2_mul(&x2Q,x);     /* compute x2Q=x*xQ      */
+    ECP2_mul(&x2Q,x);     // compute x2Q=x*xQ
     ECP2_copy(&x3Q,&x2Q);
-    ECP2_mul(&x3Q,x);     /* compute x3Q           */
+    ECP2_mul(&x3Q,x);     // compute x3Q
 
     ECP2_copy(&FQ,Q);
-    ECP2_dbl(Q);          /* compute 2Q            */
-    ECP2_dbl(Q);          /* compute 4Q            */
-    ECP2_frob(&FQ,&X);    /* compute F(Q)          */
-    ECP2_add(Q,&FQ);      /* add F(Q) to Q         */
-    ECP2_frob(&FQ,&X);    /* compute F(F(Q))       */
-    ECP2_neg(&FQ);        /* compute -F(F(Q))      */
-    ECP2_add(Q,&FQ);      /* add -F(F(Q)) to Q     */
+    ECP2_dbl(Q);          // compute 2Q
+    ECP2_dbl(Q);          // compute 4Q
+    ECP2_frob(&FQ,&X);    // compute F(Q)
+    ECP2_add(Q,&FQ);      // add F(Q) to Q
+    ECP2_frob(&FQ,&X);    // compute F(F(Q))
+    ECP2_neg(&FQ);        // compute -F(F(Q))
+    ECP2_add(Q,&FQ);      // add -F(F(Q)) to Q
 
     ECP2_copy(&FQ,&xQ);
-    ECP2_neg(&xQ);        /* compute -xQ           */
-    ECP2_add(Q,&xQ);      /* add -xQ to Q          */
-    ECP2_frob(&FQ,&X);    /* compute F(xQ)         */
+    ECP2_neg(&xQ);        // compute -xQ
+    ECP2_add(Q,&xQ);      // add -xQ to Q
+    ECP2_frob(&FQ,&X);    // compute F(xQ)
     ECP2_copy(&nFQ,&FQ);
-    ECP2_neg(&nFQ);       /* compute -F(xQ)        */
-    ECP2_add(Q,&nFQ);     /* add -F(xQ) to Q       */
-    ECP2_frob(&FQ,&X);    /* compute F(F(xQ))      */
-    ECP2_dbl(&FQ);        /* compute 2*F(F(xQ))    */
-    ECP2_add(Q,&FQ);      /* add 2*F(F(xQ)) to Q   */
+    ECP2_neg(&nFQ);       // compute -F(xQ)
+    ECP2_add(Q,&nFQ);     // add -F(xQ) to Q
+    ECP2_frob(&FQ,&X);    // compute F(F(xQ))
+    ECP2_dbl(&FQ);        // compute 2*F(F(xQ))
+    ECP2_add(Q,&FQ);      // add 2*F(F(xQ)) to Q
 
     ECP2_copy(&FQ,&x2Q);
-    ECP2_neg(&x2Q);       /* compute -x2Q          */
-    ECP2_add(Q,&x2Q);     /* add -x2Q to Q         */
-    ECP2_frob(&FQ,&X);    /* compute F(x2Q)        */
+    ECP2_neg(&x2Q);       // compute -x2Q
+    ECP2_add(Q,&x2Q);     // add -x2Q to Q
+    ECP2_frob(&FQ,&X);    // compute F(x2Q)
     ECP2_copy(&nFQ,&FQ);
-    ECP2_neg(&nFQ);       /* compute -F(x2Q)       */
-    ECP2_add(Q,&nFQ);     /* add -F(x2Q) to Q      */
-    ECP2_frob(&FQ,&X);    /* compute F(F(x2Q))     */
-    ECP2_neg(&FQ);        /* compute -F(F(x2Q))    */
-    ECP2_add(Q,&FQ);      /* add -F(F(x2Q)) to Q   */
+    ECP2_neg(&nFQ);       // compute -F(x2Q)
+    ECP2_add(Q,&nFQ);     // add -F(x2Q) to Q
+    ECP2_frob(&FQ,&X);    // compute F(F(x2Q))
+    ECP2_neg(&FQ);        // compute -F(F(x2Q))
+    ECP2_add(Q,&FQ);      // add -F(F(x2Q)) to Q
 
-    ECP2_add(Q,&x3Q);     /* add x3Q to Q          */
-    ECP2_frob(&x3Q,&X);   /* compute F(x3Q)        */
-    ECP2_add(Q,&x3Q);     /* add F(x3Q) to Q       */
+    ECP2_add(Q,&x3Q);     // add x3Q to Q
+    ECP2_frob(&x3Q,&X);   // compute F(x3Q)
+    ECP2_add(Q,&x3Q);     // add F(x3Q) to Q
     ECP2_affine(Q);
 
 #endif
@@ -237,27 +239,10 @@ static void hashit(int sha,int n,octet *x,octet *w)
     }
 }
 
-/*! \brief Hash EC Points and Id to an integer
- *
- *  Perform sha256 of EC Points and Id. Map to an integer modulo the
- *  curve order
- *
- *  <ol>
- *  <li> x = toInteger(sha256(A,B,C,D))
- *  <li> h = x % q where q is the curve order
- *  </ol>
- *
- *  @param  sha      Hash type
- *  @param  A        EC Point
- *  @param  B        EC Point
- *  @param  C        EC Point
- *  @param  D        Identity
- *  @param  h        Integer result
- */
+/* Perform sha256 of EC Points and Id. Map to an integer modulo the curve order.  */
 void WCC_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
 {
     BIG q,hs;
-
     // hv has to store two points in G1, One in G2 and the Id length
     char hv[2000];
     octet HV= {0,sizeof(hv),hv};
@@ -294,21 +279,7 @@ void WCC_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
     h->len=PGS;
 }
 
-/*! \brief Calculate value in G1 multiplied by an integer
- *
- *  Calculate a value in G1. VG1 = s*H1(ID) where ID is the identity.
- *
- *  <ol>
- *  <li> VG1 = s*H1(ID)
- *  </ol>
- *
- *  @param  sha         Hash type
- *  @param  hashDone    ID value is already hashed if set to 1
- *  @param  S           integer modulus curve order
- *  @param  ID          ID value or sha256(ID)
- *  @param  VG1         EC point VG1 = s*H1(ID)
- *  @return rtn         Returns 0 if successful or else an error code
- */
+/*  Calculate a value in G1. VG1 = s*H1(ID) where ID is the identity */
 int WCC_GET_G1_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG1)
 {
     BIG s;
@@ -333,21 +304,7 @@ int WCC_GET_G1_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG1)
     return 0;
 }
 
-/*! \brief Calculate a value in G1 used for when time permits are enabled
- *
- *  Calculate a value in G1 used for when time permits are enabled
- *
- *  <ol>
- *  <li> VG1 = s*H1(ID) + s*H1(date|sha256(ID))
- *  </ol>
- *
- *  @param  sha         Hash type
- *  @param  date        Epoch days
- *  @param  S           integer modulus curve order
- *  @param  ID          ID value or sha256(ID)
- *  @param  VG1         EC point in G1
- *  @return rtn         Returns 0 if successful or else an error code
- */
+/* Calculate a value in G1 used for when time permits are enabled */
 int WCC_GET_G1_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG1)
 {
     BIG s;
@@ -376,21 +333,7 @@ int WCC_GET_G1_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG1)
     return 0;
 }
 
-/*! \brief Calculate a value in G2 used for when time permits are enabled
- *
- *  Calculate a value in G2 used for when time permits are enabled
- *
- *  <ol>
- *  <li> VG2 = s*H1(ID) + s*H1(date|sha256(ID))
- *  </ol>
- *
- *  @param  sha         Hash type
- *  @param  date        Epoch days
- *  @param  S           integer modulus curve order
- *  @param  ID          ID value or sha256(ID)
- *  @param  VG2         EC point in G2
- *  @return rtn         Returns 0 if successful or else an error code
- */
+/* Calculate a value in G2 used for when time permits are enabled */
 int WCC_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2)
 {
     BIG s;
@@ -419,21 +362,7 @@ int WCC_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2)
     return 0;
 }
 
-/*! \brief Calculate value in G2 multiplied by an integer
- *
- *  Calculate a value in G2. VG2 = s*H2(ID) where ID is the identity.
- *
- *  <ol>
- *  <li> VG2 = s*H2(ID)
- *  </ol>
- *
- *  @param  sha       Hash type
- *  @param  hashDone  ID is value is already hashed if set to 1
- *  @param  S         integer modulus curve order
- *  @param  ID        ID Value or sha256(ID)
- *  @param  VG2       EC Point VG2 = s*H2(ID)
- *  @return rtn       Returns 0 if successful or else an error code
- */
+/* Calculate a value in G2. VG2 = s*H2(ID) where ID is the identity */
 int WCC_GET_G2_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG2)
 {
     BIG s;
@@ -458,21 +387,7 @@ int WCC_GET_G2_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG2)
     return 0;
 }
 
-/*! \brief Calculate time permit in G2
- *
- *  Calculate time permit in G2.
- *
- *  <ol>
- *  <li> TPG2=s*H2(date|sha256(ID))
- *  </ol>
- *
- *  @param  sha       Hash type
- *  @param  date      Epoch days
- *  @param  S         Master secret
- *  @param  HID       sha256(ID)
- *  @param  TPG2      Time Permit in G2
- *  @return rtn       Returns 0 if successful or else an error code
- */
+/* Calculate time permit in G2 */
 int WCC_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2)
 {
     BIG s;
@@ -489,28 +404,7 @@ int WCC_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2)
     return 0;
 }
 
-/*! \brief Calculate the sender AES key
- *
- *  Calculate the sender AES Key
- *
- *  <ol>
- *  <li> j=e((x+pia).AKeyG1,pib.BG2+PbG2)
- *  <li> K=H(j,x.PgG1)
- *  </ol>
- *
- *  @param  sha         Hash type
- *  @param  date        Epoch days
- *  @param  xOct        Random x < q where q is the curve order
- *  @param  piaOct      Hq(PaG1,PbG2,PgG1)
- *  @param  pibOct      Hq(PbG2,PaG1,PgG1)
- *  @param  PbG2Oct     y.BG2 where y < q
- *  @param  PgG1Oct     w.AG1 where w < q
- *  @param  AKeyG1Oct   Sender key
- *  @param  ATPG1Oct    Sender time permit
- *  @param  IdBOct      Receiver identity
- *  @param  AESKeyOct   Returned AES key
- *  @return rtn         Returns 0 if successful or else an error code
- */
+/* Calculate the sender AES Key */
 int WCC_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pibOct, octet *PbG2Oct, octet *PgG1Oct, octet *AKeyG1Oct, octet *ATPG1Oct, octet *IdBOct, octet *AESKeyOct)
 {
     ECP sAG1,ATPG1,PgG1;
@@ -644,29 +538,7 @@ int WCC_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pibOct,
     return 0;
 }
 
-/*! \brief Calculate the receiver AES key
- *
- *  Calculate the receiver AES key
- *
- *  <ol>
- *  <li> j=e(pia.AG1+PaG1,(y+pib).BKeyG2)
- *  <li> K=H(j,w.PaG1)
- *  </ol>
- *
- *  @param  sha         Hash type
- *  @param  date        Epoch days
- *  @param  yOct        Random y < q where q is the curve order
- *  @param  wOct        Random w < q where q is the curve order
- *  @param  piaOct      Hq(PaG1,PbG2,PgG1)
- *  @param  pibOct      Hq(PbG2,PaG1,PgG1)
- *  @param  PaG1Oct     x.AG1 where x < q
- *  @param  PgG1Oct     w.AG1 where w < q
- *  @param  BKeyG2Oct   Receiver key
- *  @param  BTPG2Oct    Receiver time permit
- *  @param  IdAOct      Sender identity
- *  @param  AESKeyOct   AES key returned
- *  @return rtn         Returns 0 if successful or else an error code
- */
+/* Calculate the receiver AES key */
 int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct, octet *pibOct,  octet *PaG1Oct, octet *PgG1Oct, octet *BKeyG2Oct,octet *BTPG2Oct,  octet *IdAOct, octet *AESKeyOct)
 {
     ECP AG1,dateAG1,PgG1,PaG1;
@@ -773,18 +645,8 @@ int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct
 
 }
 
-/*! \brief Encrypt data using AES GCM
- *
- *  AES is run as a block cypher in the GCM  mode of operation. The key size is 128 bits.
- *  This function will encrypt any data length.
- *
- *  @param  K             128 bit secret key
- *  @param  IV            96 bit initialization vector
- *  @param  H             Additional authenticated data (AAD). This data is authenticated, but not encrypted.
- *  @param  P             Plaintext
- *  @param  C             Ciphertext output. It is the same length as the plaintext.
- *  @param  T             128-bit authentication tag output.
- */
+/* AES is run as a block cypher in the GCM  mode of operation. The key 
+   size is 128 bits. This function will encrypt any data length */
 void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
     gcm g;
@@ -796,18 +658,8 @@ void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
     T->len=16;
 }
 
-/*! \brief Decrypt data using AES GCM
- *
- *  AES is run as a block cypher in the GCM  mode of operation. The key size is 128 bits.
- *  This function will decrypt any data length.
- *
- *  @param  K             128 bit secret key
- *  @param  IV            96 bit initialization vector
- *  @param  H             Additional authenticated data (AAD). This data is authenticated, but not encrypted.
- *  @param  C             Ciphertext.
- *  @param  P             Decrypted data. It is the same length as the ciphertext.Plaintext
- *  @param  T             128-bit authentication tag.
- */
+/* AES is run as a block cypher in the GCM  mode of operation. The key 
+   size is 128 bits. This function will decrypt any data length */
 void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 {
     gcm g;
@@ -819,57 +671,32 @@ void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
     T->len=16;
 }
 
-/*!  \brief Get today's date as days from the epoch
- *
- *   @return today's date, as number of days elapsed since the epoch
- */
+/* Get today's date as days from the epoch */
 unsign32 WCC_today(void)
 {
     unsign32 ti=(unsign32)time(NULL);
     return (uint32_t)(ti/(60*TIME_SLOT_MINUTES));
 }
 
-/*!  \brief Initialise a random number generator
- *
- *   @param RNG     cryptographically secure random number generator
- *   @param SEED    random seed value
- */
+/* Initialise a random number generator */
 void WCC_CREATE_CSPRNG(csprng *RNG,octet *SEED)
 {
     RAND_seed(RNG,SEED->len,SEED->val);
 }
 
-/*!  \brief Kill a random number generator
- *
- *   Deletes all internal state
- *
- *   @param RNG    cryptographically secure random number generator
- */
+/* Deletes all internal state */
 void WCC_KILL_CSPRNG(csprng *RNG)
 {
     RAND_clean(RNG);
 }
 
-/*!  \brief Perform sha256
- *
- *   Hash ID
- *
- *   @param  sha    Hash type
- *   @param  ID     Value to hash
- *   @param  HID    sha256 hashed value
- */
+/* Performe the hash ID using sha256 */
 void WCC_HASH_ID(int sha,octet *ID,octet *HID)
 {
     hashit(sha,0,ID,HID);
 }
 
-/*!  \brief Generate a random integer
- *
- *   Generate a random number modulus the group order
- *
- *   @param  RNG    cryptographically secure random number generator
- *   @param  S      Returned random integer modulus the group order
- */
+/* Generate a random number modulus the group order */
 int WCC_RANDOM_GENERATE(csprng *RNG,octet* S)
 {
     BIG r,s;
@@ -880,22 +707,7 @@ int WCC_RANDOM_GENERATE(csprng *RNG,octet* S)
     return 0;
 }
 
-
-/*! \brief Calculate time permit in G2
- *
- *  Calculate time permit in G2.
- *
- *  <ol>
- *  <li> TPG1=s*H1(date|sha256(ID))
- *  </ol>
- *
- *  @param  sha       Hash type
- *  @param  date      Epoch days
- *  @param  S         Master secret
- *  @param  HID       sha256(ID)
- *  @param  TPG1      Time Permit in G1
- *  @return rtn       Returns 0 if successful or else an error code
- */
+/* Calculate time permit in G2 */
 int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG1)
 {
     BIG s;
@@ -912,13 +724,7 @@ int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG1)
     return 0;
 }
 
-/*! \brief Add two members from the group G1
- *
- *   @param  R1      member of G1
- *   @param  R2      member of G1
- *   @param  R       returns member of G1 = R1+R2
- *   @return         Returns 0 if successful or else an error code
- */
+/* Add two members from the group G1 */
 int WCC_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
 {
     ECP P,T;
@@ -933,13 +739,7 @@ int WCC_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
     return res;
 }
 
-/*! \brief Add two members from the group G2
- *
- *   @param  W1      member of G2
- *   @param  W2      member of G2
- *   @param  W       returns member of G2 = W1+W2
- *   @return         Returns 0 if successful or else an error code
- */
+/* Add two members from the group G2 */
 int WCC_RECOMBINE_G2(octet *W1,octet *W2,octet *W)
 {
     ECP2 Q,T;

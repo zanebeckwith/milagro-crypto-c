@@ -1,29 +1,7 @@
-/*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
-*/
-
-/* AMCL header file */
-/* Designed for AES-128/192/256 security, 254-521 bit elliptic curves and BN curves for pairings */
-/* Each "limb" of a big number occupies at most (n-3) bits of an n-bit computer word. The most significant word must have at least 4 extra unused bits */
-
 /**
- * @file AMCL.h
- * @author Mike Scott and Kealan McCusker
+ * @file amcl.h
+ * @author Mike Scott
+ * @author Kealan McCusker
  * @date 19th May 2015
  * @brief Main Header File
  *
@@ -31,7 +9,34 @@
  * defines structures
  * declares functions
  *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
+/* AMCL header file */
+
+/*
+   Designed for AES-128/192/256 security, 254-521 bit elliptic 
+   curves and BN curves for pairings Each "limb" of a big number 
+   occupies at most (n-3) bits of an n-bit computer word. The most 
+   significant word must have at least 4 extra unused bits 
+*/
 
 /* NOTE: There is only one user configurable section in this header - see below */
 
@@ -2174,68 +2179,81 @@ extern void FP12_fromOctet(FP12 *x,octet *S);
  */
 extern void FP12_trace(FP4 *t,FP12 *x);
 
-
-
 /* Pairing function prototypes */
+
 /**	@brief Calculate Miller loop for Optimal ATE pairing e(P,Q)
  *
-	@param r FP12 result of the pairing calculation e(P,Q)
-	@param P ECP2 instance, an element of G2
-	@param Q ECP instance, an element of G1
-
+ *  Calculate Miller loop for Optimal ATE pairing e(P,Q).
+ *
+ *	@param r FP12 result of the pairing calculation e(P,Q)
+ *	@param P ECP2 instance, an element of G2
+ *	@param Q ECP instance, an element of G1
+ *
  */
 extern void PAIR_ate(FP12 *r,ECP2 *P,ECP *Q);
+
 /**	@brief Calculate Miller loop for Optimal ATE double-pairing e(P,Q).e(R,S)
  *
-	Faster than calculating two separate pairings
-	@param r FP12 result of the pairing calculation e(P,Q).e(R,S), an element of GT
-	@param P ECP2 instance, an element of G2
-	@param Q ECP instance, an element of G1
-	@param R ECP2 instance, an element of G2
-	@param S ECP instance, an element of G1
+ *  Calculate Miller loop for Optimal ATE double-pairing e(P,Q).e(R,S).
+ *
+ *	Faster than calculating two separate pairings
+ *	@param r FP12 result of the pairing calculation e(P,Q).e(R,S), an element of GT
+ *	@param P ECP2 instance, an element of G2
+ *	@param Q ECP instance, an element of G1
+ *	@param R ECP2 instance, an element of G2
+ *	@param S ECP instance, an element of G1
  */
 extern void PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S);
+
 /**	@brief Final exponentiation of pairing, converts output of Miller loop to element in GT
  *
-	Here p is the internal modulus, and r is the group order
-	@param x FP12, on exit = x^((p^12-1)/r)
+ *  Final exponentiation of pairing, converts output of Miller loop to element in GT.
+ *
+ *	@param x FP12, on exit = x^((p^12-1)/r)
+ *  @note Here p is the internal modulus, and r is the group order.
  */
 extern void PAIR_fexp(FP12 *x);
+
 /**	@brief Fast point multiplication of a member of the group G1 by a BIG number
  *
-	May exploit endomorphism for speed.
-	@param Q ECP member of G1.
-	@param b BIG multiplier
-
+ *  Fast point multiplication of a member of the group G1 by a BIG number.
+ *
+ *	@param Q ECP member of G1.
+ *	@param b BIG multiplier
+ *  @note This method is patented.
+ *  @note May exploit endomorphism for speed.
  */
 extern void PAIR_G1mul(ECP *Q,BIG b);
+
 /**	@brief Fast point multiplication of a member of the group G2 by a BIG number
  *
-	May exploit endomorphism for speed.
-	@param P ECP2 member of G1.
-	@param b BIG multiplier
-
+ *  Fast point multiplication of a member of the group G2 by a BIG number.
+ *
+ *	@param P ECP2 member of G1.
+ *	@param b BIG multiplier
+ *  @note May exploit endomorphism for speed.
  */
 extern void PAIR_G2mul(ECP2 *P,BIG b);
+
 /**	@brief Fast raising of a member of GT to a BIG power
  *
-	May exploit endomorphism for speed.
-	@param x FP12 member of GT.
-	@param b BIG exponent
-
+ *  Fast raising of a member of GT to a BIG power
+ *	
+ *	@param f FP12 member of GT. In exit f=f^e
+ *	@param b BIG exponent
+ *  @note May exploit endomorphism for speed.
  */
-extern void PAIR_GTpow(FP12 *x,BIG b);
+extern void PAIR_GTpow(FP12 *f,BIG b);
+
 /**	@brief Tests FP12 for membership of GT
  *
-	@param x FP12 instance
-	@return 1 if x is in GT, else return 0
-
+ *	@param x FP12 instance
+ *	@return 1 if x is in GT, else return 0
  */
 extern int PAIR_GTmember(FP12 *x);
 
-
-
 /* Finite Field Prototypes */
+
 /**	@brief Copy one FF element of given length to another
  *
 	@param x FF instance to be copied to, on exit = y
@@ -2487,111 +2505,160 @@ extern void FF_pow2(BIG *r,BIG *x,BIG e,BIG *y,BIG f,BIG *m,int n);
 
 
 /* Octet string handlers */
+
 /**	@brief Formats and outputs an octet to the console in hex
  *
-	@param O Octet to be output
+ *  Formats and outputs an octet to the console in hex.
+ *
+ *	@param O Octet to be output
+ *  @note There is a backspace at the end.
  */
 extern void OCT_output(octet *O);
+
 /**	@brief Formats and outputs an octet to the console as a character string
  *
-	@param O Octet to be output
+ *  Formats and outputs an octet to the console as a character string.
+ *
+ *	@param O Octet to be output
+ *  @note There isn't a backspace at the end.
  */
 extern void OCT_output_string(octet *O);
+
 /**	@brief Wipe clean an octet
  *
-	@param O Octet to be cleaned
+ *  Wipe clean an octet.
+ *
+ *	@param O Octet to be cleaned
  */
 extern void OCT_clear(octet *O);
-/**	@brief Compare two octets
+
+/**	@brief Compare two octets strings
  *
-	@param O first Octet to be compared
-	@param P second Octet to be compared
-	@return 1 if equal, else 0
+ *  Compare two octets strings.
+ *
+ *	@param O first Octet to be compared
+ *	@param P second Octet to be compared
+ *	@return 1 if equal, else 0
  */
 extern int  OCT_comp(octet *O,octet *P);
+
 /**	@brief Compare first n bytes of two octets
  *
-	@param O first Octet to be compared
-	@param P second Octet to be compared
-	@param n number of bytes to compare
-	@return 1 if equal, else 0
+ *  Compare first n bytes of two octets,
+ *  check are first n bytes the same.
+ *
+ *	@param O first Octet to be compared
+ *	@param P second Octet to be compared
+ *	@param n number of bytes to compare
+ *	@return 1 if equal, else 0
  */
 extern int  OCT_ncomp(octet *O,octet *P,int n);
-/**	@brief Join from a C string to end of an octet
+
+/**	@brief Convert C string to octet format.
  *
-	Truncates if there is no room
-	@param O Octet to be written to
-	@param s zero terminated string to be joined to octet
+ *  Convert C string to octet format.
+ *
+ *	@param O Octet to be written to
+ *	@param s zero terminated string to be joined to octet
+ *  @note Truncates if no room.
  */
 extern void OCT_jstring(octet *O,char *s);
+
 /**	@brief Join bytes to end of an octet
  *
-	Truncates if there is no room
-	@param O Octet to be written to
-	@param s bytes to be joined to end of octet
-	@param n number of bytes to join
+ *  Join bytes to end of an octet.
+ *
+ *	@param O Octet to be written to
+ *	@param s bytes to be joined to end of octet
+ *	@param n number of bytes to join
+ *  @note Truncates if there is no room.
  */
 extern void OCT_jbytes(octet *O,char *s,int n);
+
 /**	@brief Join single byte to end of an octet, repeated n times
  *
-	Truncates if there is no room
-	@param O Octet to be written to
-	@param b byte to be joined to end of octet
-	@param n number of times b is to be joined
+ *	Join single byte to end of an octet, repeated n times.
+ *
+ *	@param O Octet to be written to
+ *	@param b byte to be joined to end of octet
+ *	@param n number of times b is to be joined
+ *  @note Truncates if there is no room.
  */
 extern void OCT_jbyte(octet *O,int b,int n);
-/**	@brief Join one octet to the end of another
+
+/**	@brief Concatenates two octet strings
  *
-	Truncates if there is no room
-	@param O Octet to be written to
-	@param P Octet to be joined to the end of O
+ *	Concatenates two octet strings
+ *
+ *	@param O Octet to be written to
+ *	@param P Octet to be joined to the end of O
+ *  @note Truncates if there is no room.
  */
 extern void OCT_joctet(octet *O,octet *P);
+
 /**	@brief XOR common bytes of a pair of Octets
  *
-	@param O Octet - on exit = O xor P
-	@param P Octet to be xored into O
+ *  XOR common bytes of a pair of Octets.
+ *
+ *	@param O Octet - on exit = O xor P
+ *	@param P Octet to be xored into O
  */
 extern void OCT_xor(octet *O,octet *P);
+
 /**	@brief reset Octet to zero length
+ *  
+ *  Reset Octet to zero length.
  *
-	@param O Octet to be emptied
+ *	@param O Octet to be emptied
  */
 extern void OCT_empty(octet *O);
+
 /**	@brief Pad out an Octet to the given length
  *
-	Padding is done by inserting leading zeros, so abcd becomes 00abcd
-	@param O Octet to be padded
-	@param n new length of Octet
+ *  Pad out an Octet to the given length.
+ *
+ *	@param O Octet to be padded
+ *	@param n new length of Octet
+ *  @note Padding is done by inserting leading zeros, so abcd becomes 00abcd.
  */
 extern int OCT_pad(octet *O,int n);
-/**	@brief Convert an Octet to printable base64 number
+
+/**	@brief Convert an Octet to printable base64 string
  *
-	@param b zero terminated byte array to take base64 conversion
-	@param O Octet to be converted
+ *  Convert an Octet to printable base64 string.
+ *
+ *	@param b zero terminated byte array to take base64 conversion
+ *	@param O Octet to be converted
  */
 extern void OCT_tobase64(char *b,octet *O);
+
 /**	@brief Populate an Octet from base64 number
  *
- 	@param O Octet to be populated
-	@param b zero terminated base64 string
-
+ *  Populate an Octet from base64 number.
+ *
+ *	@param O Octet to be populated
+ *	@param b zero terminated base64 string
  */
 extern void OCT_frombase64(octet *O,char *b);
+
 /**	@brief Copy one Octet into another
  *
- 	@param O Octet to be copied to
-	@param P Octet to be copied from
-
+ *  Copy one Octet into another.
+ *
+ *	@param O Octet to be copied to
+ *	@param P Octet to be copied from
  */
 extern void OCT_copy(octet *O,octet *P);
+
 /**	@brief XOR every byte of an octet with input m
  *
- 	@param O Octet
-	@param m byte to be XORed with every byte of O
-
+ *  XOR every byte of an octet with input m.
+ *
+ * 	@param O Octet
+ *	@param m byte to be XORed with every byte of O
  */
 extern void OCT_xorbyte(octet *O,int m);
+
 /**	@brief Chops Octet into two, leaving first n bytes in O, moving the rest to P
  *
  	@param O Octet to be chopped
@@ -2600,52 +2667,67 @@ extern void OCT_xorbyte(octet *O,int m);
 
  */
 extern void OCT_chop(octet *O,octet *P,int n);
-/**	@brief Join n bytes of integer m to end of Octet O (big endian)
- *
-	Typically n is 4 for a 32-bit integer
- 	@param O Octet to be appended to
-	@param m integer to be appended to O
-	@param n number of bytes in m
 
+/**	@brief Appends n bytes of integer m to end of Octet O (big endian)
+ *
+ *  Join n bytes of integer m to end of Octet O (big endian).
+ *	
+ *	@param O Octet to be appended to
+ *	@param m integer to be appended to O
+ *	@param n number of bytes in m
+ *	@note Typically n is 4 for a 32-bit integer
  */
 extern void OCT_jint(octet *O,int m,int n);
+
 /**	@brief Create an Octet from bytes taken from a random number generator
  *
-	Truncates if there is no room
- 	@param O Octet to be populated
-	@param R an instance of a Cryptographically Secure Random Number Generator
-	@param n number of bytes to extracted from R
-
+ *  Create an Octet from bytes taken from a random number generator.
+ *
+ *	Truncates if there is no room
+ *	@param O Octet to be populated
+ *	@param R an instance of a Cryptographically Secure Random Number Generator
+ *	@param n number of bytes to extracted from R
+ *  @note Truncates if there is no room.
  */
 extern void OCT_rand(octet *O,csprng *R,int n);
+
 /**	@brief Shifts Octet left by n bytes
  *
-	Leftmost bytes disappear
- 	@param O Octet to be shifted
-	@param n number of bytes to shift
-
+ *  Shifts Octet left by n bytes.  
+ *
+ *	Leftmost bytes disappear
+ *	@param O Octet to be shifted
+ *	@param n number of bytes to shift
+ *  @note Leftmost bytes disappear.
  */
 extern void OCT_shl(octet *O,int n);
+
 /**	@brief Convert a hex number to an Octet
  *
-	@param dst Octet
-	@param src Hex string to be converted
+ *  Convert a hex number to an Octet.
+ *
+ *	@param dst Octet
+ *	@param src Hex string to be converted
  */
 extern void OCT_fromHex(octet *dst,char *src);
-/**	@brief Convert an Octet to printable hex number
+
+/**	@brief Convert an Octet to a hex string
  *
-	@param dst hex value
-	@param src Octet to be converted
+ *  Convert an Octet to a hex string.
+ *
+ *	@param dst hex value
+ *	@param src Octet to be converted
  */
 extern void OCT_toHex(octet *src,char *dst);
+
 /**	@brief Convert an Octet to string
  *
-	@param dst string value
-	@param src Octet to be converted
+ *  Convert an Octet to string.
+ *
+ *	@param dst string value
+ *	@param src Octet to be converted
  */
 extern void OCT_toStr(octet *src,char *dst);
-
-
 
 /* Hash function */
 /**	@brief Initialise an instance of SHA256
@@ -2805,27 +2887,33 @@ extern int GCM_add_cipher(gcm *G,char *p,char *c,int n);
  */
 extern void GCM_finish(gcm *G,char *t);
 
-
-
 /* random numbers */
+
 /**	@brief Seed a random number generator from an array of bytes
  *
-	The provided seed should be truly random
-	@param R an instance of a Cryptographically Secure Random Number Generator
-	@param n the number of seed bytes provided
-	@param b an array of seed bytes
-
+ *  Seed a random number generator from an array of bytes.
+ *
+ *	The provided seed should be truly random
+ *	@param R an instance of a Cryptographically Secure Random Number Generator
+ *	@param n the number of seed bytes provided
+ *	@param b an array of seed bytes
  */
 extern void RAND_seed(csprng *R,int n,char *b);
+
 /**	@brief Delete all internal state of a random number generator
  *
-	@param R an instance of a Cryptographically Secure Random Number Generator
+ *  Delete all internal state of a random number generator.
+ *
+ *	@param R an instance of a Cryptographically Secure Random Number Generator
  */
 extern void RAND_clean(csprng *R);
-/**	@brief Return a random byte from a random number generator
+
+/**	@brief Get a random byte from a random number generator
  *
-	@param R an instance of a Cryptographically Secure Random Number Generator
-	@return a random byte
+ *  Get a random byte from a random number generator.
+ *
+ *	@param R an instance of a Cryptographically Secure Random Number Generator
+ *	@return a random byte
  */
 extern int RAND_byte(csprng *R);
 

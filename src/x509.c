@@ -16,12 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 
-    AMCL X.509 Functions
+AMCL X.509 Functions 
 */
 
 /**
  * @file x509.c
- * @author Mike Scott
+ * @author Mike Scott 
  * @author Kealan McCusker
  * @date 19th May 2015
  * @brief X509 function source file
@@ -165,11 +165,7 @@ static int bround(int len)
 
 }
 
-//	Input signed cert as octet, and extract signature
-//	Return 0 for failure, ECC for Elliptic Curve signature, RSA for RSA signature
-//  Note that signature type is not provided here - its the type of the public key that
-//  is used to verify it that matters, and which determines for example the curve to be used!
-
+/* Extract certificate signature */
 pktype X509_extract_cert_sig(octet *sc,octet *sig)
 {
     int i,j,k,fin,len,rlen,sj,ex;
@@ -341,6 +337,7 @@ pktype X509_extract_cert_sig(octet *sc,octet *sig)
     return ret;
 }
 
+/* Extract certificate from signed certificate */
 int X509_extract_cert(octet *sc,octet *cert)
 {
     int i,j,fin,len,k;
@@ -364,7 +361,7 @@ int X509_extract_cert(octet *sc,octet *cert)
     return 1;
 }
 
-// Extract Public Key from inside Certificate
+/* Extract public key from certificate */
 pktype X509_extract_public_key(octet *c,octet *key)
 {
     int i,j,fin,len,sj;
@@ -415,7 +412,7 @@ pktype X509_extract_public_key(octet *c,octet *key)
     if (len<0) return ret;
     j+=skip(len);
 
-// ** Maybe dive in and check Public Key OIDs here?
+// Maybe dive in and check Public Key OIDs here?
 // ecpublicKey & prime256v1, secp384r1 or secp521r1 for ECC
 // rsapublicKey for RSA
 
@@ -512,6 +509,7 @@ pktype X509_extract_public_key(octet *c,octet *key)
     return ret;
 }
 
+/* Find index to issuer field in a certificate */
 int X509_find_issuer(octet *c)
 {
     int j,len;
@@ -537,6 +535,7 @@ int X509_find_issuer(octet *c)
     return j;
 }
 
+/* Find index to validity period field in a certificate */
 int X509_find_validity(octet *c)
 {
     int j,len;
@@ -549,6 +548,7 @@ int X509_find_validity(octet *c)
     return j;
 }
 
+/* Get index to subject field in a certificate */
 int X509_find_subject(octet *c)
 {
     int j,len;
@@ -562,12 +562,13 @@ int X509_find_subject(octet *c)
 }
 
 /*
-    NOTE: When extracting cert information, we actually return just an
+    NOTE: When extracting cert information, we actually return just an 
     index to the data inside the cert, and maybe its length. So no memory
-    is assigned to store cert info. It is the callers responsibility to
-    allocate such memory if required, and copy cert information into it.
+    is assigned to store cert info. It is the callers responsibility to 
+    allocate such memory if required, and copy cert information into it. 
 */
 
+/* Find entity property indicated by SOID */
 int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
 {
     int i,j,k,fin,len,tlen;
@@ -612,6 +613,7 @@ int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
     return 0;
 }
 
+/* Find start date of certificate validity period */
 int X509_find_start_date(octet *c,int start)
 {
     int j,len;
@@ -627,6 +629,7 @@ int X509_find_start_date(octet *c,int start)
     return j;
 }
 
+/* Find expiry date of certificate validity period */
 int X509_find_expiry_date(octet *c,int start)
 {
     int j,len;

@@ -1,23 +1,32 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+ * @file oct.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief Basic Octet string maintainance routines
+ *
+ * Basic Octet string maintainance routines
+ *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-/*** Basic Octet string maintainance routines  ***/
 /* SU=m, m is Stack Usage */
 
 #include <string.h>
@@ -25,8 +34,7 @@ under the License.
 
 /* Output an octet string (Debug Only) */
 
-/* SU= 16 */
-/* output octet */
+/* SU= 16, formats and outputs an octet to the console in hex */
 void OCT_output(octet *w)
 {
     int i;
@@ -39,7 +47,7 @@ void OCT_output(octet *w)
     printf("\n");
 }
 
-/* SU= 16 */
+/* SU= 16, formats and outputs an octet to the console as a character string */
 void OCT_output_string(octet *w)
 {
     int i;
@@ -49,7 +57,6 @@ void OCT_output_string(octet *w)
         ch=w->val[i];
         printf("%c",ch);
     }
-    /*  printf("\n"); */
 }
 
 /* Convert C string to octet format - truncates if no room  */
@@ -67,9 +74,7 @@ void OCT_jstring(octet *y,char *s)
     }
 }
 
-/* compare 2 octet strings.
- * If x==y return TRUE, else return FALSE */
-/* SU= 8 */
+/* SU= 8, compare 2 octet strings. */ 
 int OCT_comp(octet *x,octet *y)
 {
     int i;
@@ -83,7 +88,6 @@ int OCT_comp(octet *x,octet *y)
 }
 
 /* check are first n bytes the same */
-
 int OCT_ncomp(octet *x,octet *y,int n)
 {
     int i;
@@ -109,8 +113,7 @@ void OCT_shl(octet *x,int n)
         x->val[i]=x->val[i+n];
 }
 
-/* Append binary string to octet - truncates if no room */
-/* SU= 12 */
+/* SU= 12, append binary string to octet, truncates if no room */
 void OCT_jbytes(octet *y,char *b,int len)
 {
     int i,j;
@@ -123,8 +126,7 @@ void OCT_jbytes(octet *y,char *b,int len)
     }
 }
 
-/* Concatenates two octet strings */
-/* SU= 8 */
+/* SU= 8, concatenates two octet strings */
 void OCT_joctet(octet *y,octet *x)
 {
     /* y=y || x */
@@ -144,8 +146,7 @@ void OCT_joctet(octet *y,octet *x)
     y->len+=x->len;
 }
 
-/* Append byte to octet rep times */
-/* SU= 8 */
+/* SU= 8, append byte to octet rep times */
 void OCT_jbyte(octet *y,int ch,int rep)
 {
     int i,j;
@@ -158,8 +159,7 @@ void OCT_jbyte(octet *y,int ch,int rep)
     }
 }
 
-/* XOR common bytes of x with y */
-/* SU= 8 */
+/* SU= 8, XOR common bytes of a pair of Octets */
 void OCT_xor(octet *y,octet *x)
 {
     /* xor first x->len bytes of y */
@@ -185,8 +185,7 @@ void OCT_clear(octet *w)
     w->len=0;
 }
 
-/* appends int x of length len bytes to OCTET string */
-/* SU= 8 */
+/* SU= 8, appends n bytes of integer m to end of Octet O (big endian) */
 void OCT_jint(octet *y,int x,int len)
 {
     int i,n;
@@ -204,8 +203,8 @@ void OCT_jint(octet *y,int x,int len)
     }
 }
 
-/* Pad an octet to a given length */
-/* SU= 8 */
+
+/* SU= 8, Pad an octet to a given length */
 int OCT_pad(octet *w,int n)
 {
     int i,d;
@@ -220,9 +219,7 @@ int OCT_pad(octet *w,int n)
     return 1;
 }
 
-
-/* Convert an octet string to base64 string */
-/* SU= 56 */
+/* SU= 56, Convert an octet string to base64 string */
 void OCT_tobase64(char *b,octet *w)
 {
     int i,j,k,rem,last;
@@ -261,7 +258,7 @@ void OCT_tobase64(char *b,octet *w)
     b[k]='\0';  /* dangerous! */
 }
 
-/* SU= 56 */
+/* SU= 56, populate an Octet from base64 number */
 void OCT_frombase64(octet *w,char *b)
 {
     int i,j,k,pads,len=(int)strlen(b);
@@ -302,8 +299,7 @@ void OCT_frombase64(octet *w,char *b)
     w->len=k;
 }
 
-/* copy an octet string - truncates if no room */
-/* SU= 16 */
+/* SU= 16, copy an octet string - truncates if no room */
 void OCT_copy(octet *y,octet *x)
 {
     int i;
@@ -322,8 +318,7 @@ void OCT_xorbyte(octet *x,int m)
     for (i=0; i<x->len; i++) x->val[i]^=m;
 }
 
-/* truncates x to n bytes and places the rest in y (if y is not NULL) */
-/* SU= 8 */
+/* SU= 8, truncates x to n bytes and places the rest in y (if y is not NULL) */
 void OCT_chop(octet *x,octet *y,int n)
 {
     int i;
@@ -341,7 +336,7 @@ void OCT_chop(octet *x,octet *y,int n)
     }
 }
 
-/* set x to len random bytes */
+/* Create an Octet from bytes taken from a random number generator */
 void OCT_rand(octet *x,csprng *RNG,int len)
 {
     int i;
@@ -351,7 +346,7 @@ void OCT_rand(octet *x,csprng *RNG,int len)
     for (i=0; i<len; i++) x->val[i]=RAND_byte(RNG);
 }
 
-/* Convert an octet to a hex string */
+/* Convert an Octet to a hex string */
 void OCT_toHex(octet *src,char *dst)
 {
     int i;
@@ -363,6 +358,7 @@ void OCT_toHex(octet *src,char *dst)
     }
 }
 
+/* Internal function */
 static int char2int(char input)
 {
     if(input >= '0' && input <= '9')
@@ -374,7 +370,7 @@ static int char2int(char input)
     return 0;
 }
 
-/* Convert from a hex string */
+/* Convert a hex number to an Octet */
 void OCT_fromHex(octet *dst,char *src)
 {
     int i=0;
@@ -390,7 +386,7 @@ void OCT_fromHex(octet *dst,char *src)
 }
 
 
-/* Convert an octet to a string */
+/* Convert an Octet to string */
 void OCT_toStr(octet *src,char *dst)
 {
     int i;
