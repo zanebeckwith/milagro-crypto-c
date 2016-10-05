@@ -1,27 +1,28 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+		http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+
+	AMCL x509 header file 
 */
-
-/* AMCL x509 header file */
 
 /**
  * @file x509.h
- * @author Mike Scott and Kealan McCusker
+ * @author Mike Scott 
+ * @author Kealan McCusker
  * @date 19th May 2015
  * @brief X509 function Header File
  *
@@ -39,52 +40,58 @@ under the License.
 typedef struct
 {
     int type;  /**< signature type (ECC or RSA) */
-    int hash; /**< hash type */
+    int hash;  /**< hash type */
     int curve; /**< elliptic curve used  */
 } pktype;
 
 /* X.509 functions */
+
 /** @brief Extract certificate signature
  *
 	@param c an X.509 certificate
 	@param s the extracted signature
 	@return 0 on failure, or indicator of signature type (ECC or RSA)
-
 */
 extern pktype X509_extract_cert_sig(octet *c,octet *s);
-/** @brief
+
+/** @brief Extract certificate from signed certificate.
  *
 	@param sc a signed certificate
 	@param c the extracted certificate
 	@return 0 on failure
 */
 extern int X509_extract_cert(octet *sc,octet *c);
-/** @brief
+
+/** @brief Extract public key from certificate.
  *
 	@param c an X.509 certificate
 	@param k the extracted key
 	@return 0 on failure, or indicator of public key type (ECC or RSA)
 */
 extern pktype X509_extract_public_key(octet *c,octet *k);
-/** @brief
+
+/** @brief Find index to issuer field in a certificate.
  *
 	@param c an X.509 certificate
 	@return 0 on failure, or pointer to issuer field in cert
 */
 extern int X509_find_issuer(octet *c);
-/** @brief
+
+/** @brief Find index to validity period field in a certificate.
  *
 	@param c an X.509 certificate
 	@return 0 on failure, or pointer to validity field in cert
 */
 extern int X509_find_validity(octet *c);
-/** @brief
+
+/** @brief Get index to subject field in a certificate
  *
 	@param c an X.509 certificate
 	@return 0 on failure, or pointer to subject field in cert
 */
 extern int X509_find_subject(octet *c);
-/** @brief
+
+/** @brief Find entity property indicated by SOID.
  *
 	@param c an X.509 certificate
 	@param S is OID of property we are looking for
@@ -93,20 +100,21 @@ extern int X509_find_subject(octet *c);
 	@return 0 on failure, or pointer to the property
 */
 extern int X509_find_entity_property(octet *c,octet *S,int s,int *f);
-/** @brief
+
+/** @brief Find start date of certificate validity period.
  *
 	@param c an X.509 certificate
 	@param s is a pointer to the start of the validity field
 	@return 0 on failure, or pointer to the start date
 */
 extern int X509_find_start_date(octet *c,int s);
-/** @brief
+
+/** @brief Find expiry date of certificate validity period.
  *
 	@param c an X.509 certificate
 	@param s is a pointer to the start of the validity field
 	@return 0 on failure, or pointer to the expiry date
 */
 extern int X509_find_expiry_date(octet *c,int s);
-
 
 #endif

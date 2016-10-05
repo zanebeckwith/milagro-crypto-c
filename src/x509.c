@@ -1,4 +1,4 @@
-/*
+/**
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
 distributed with this work for additional information
@@ -15,12 +15,18 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
+
+AMCL X.509 Functions 
 */
 
-/* AMCL X.509 Functions */
-
-// To run test program, define HAS_MAIN
-// gcc x509.c ecdh.c rsa.c amcl.a -o x509.exe
+/**
+ * @file x509.c
+ * @author Mike Scott 
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief X509 function source file
+ *
+ */
 
 #define HAS_MAIN
 
@@ -58,7 +64,7 @@ under the License.
 #define RSA_H512 23
 
 // return xxxxxxxxxxxxxxxx | xxxx | xxxx
-//        2048 | 2 | 3  -> 2048-bit RSA with SHA512
+// 2048 | 2 | 3  -> 2048-bit RSA with SHA512
 
 #define H256 2
 #define H384 3
@@ -335,7 +341,6 @@ pktype X509_extract_cert_sig(octet *sc,octet *sig)
     return ret;
 }
 
-// Extract certificate from signed cert
 int X509_extract_cert(octet *sc,octet *cert)
 {
     int i,j,fin,len,k;
@@ -465,7 +470,7 @@ pktype X509_extract_public_key(octet *c,octet *key)
     j++;
     len--; // skip bit shift (hopefully 0!)
 
-// extract key
+    // extract key
     if (ret.type==ECC)
     {
         key->len=len;
@@ -507,8 +512,6 @@ pktype X509_extract_public_key(octet *c,octet *key)
     return ret;
 }
 
-// Find pointer to main sections of cert, before extracting individual field
-// Find index to issuer in cert
 int X509_find_issuer(octet *c)
 {
     int j,len;
@@ -534,7 +537,6 @@ int X509_find_issuer(octet *c)
     return j;
 }
 
-// Find index to validity period
 int X509_find_validity(octet *c)
 {
     int j,len;
@@ -547,7 +549,6 @@ int X509_find_validity(octet *c)
     return j;
 }
 
-// Find index to subject in cert
 int X509_find_subject(octet *c)
 {
     int j,len;
@@ -560,11 +561,12 @@ int X509_find_subject(octet *c)
     return j;
 }
 
-// NOTE: When extracting cert information, we actually return just an index to the data inside the cert, and maybe its length
-// So no memory is assigned to store cert info. It is the callers responsibility to allocate such memory if required, and copy
-// cert information into it.
-
-// Find entity property indicated by SOID, given start of issuer or subject field. Return index in cert, flen=length of field
+/*
+    NOTE: When extracting cert information, we actually return just an 
+    index to the data inside the cert, and maybe its length. So no memory
+    is assigned to store cert info. It is the callers responsibility to 
+    allocate such memory if required, and copy cert information into it. 
+*/
 
 int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
 {
@@ -606,11 +608,10 @@ int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
         }
         j+=len;  // skip over it
     }
-    *flen=0; /*****/
+    *flen=0;
     return 0;
 }
 
-// Find start date of certificate validity period
 int X509_find_start_date(octet *c,int start)
 {
     int j,len;
@@ -626,7 +627,6 @@ int X509_find_start_date(octet *c,int start)
     return j;
 }
 
-// Find expiry date of certificate validity period
 int X509_find_expiry_date(octet *c,int start)
 {
     int j,len;
