@@ -1,21 +1,32 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file fp4.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief Main Header File
+ *
+ * AMCL Fp^4 functions 
+ * FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1)) 
+ *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /* AMCL Fp^4 functions */
 /* SU=m, m is Stack Usage (no lazy )*/
@@ -24,30 +35,27 @@ under the License.
 
 #include "amcl.h"
 
-/* test x==0 ? */
-/* SU= 8 */
+/* SU= 8, Tests for FP4 equal to zero */
 int FP4_iszilch(FP4 *x)
 {
     if (FP2_iszilch(&(x->a)) && FP2_iszilch(&(x->b))) return 1;
     return 0;
 }
 
-/* test x==1 ? */
-/* SU= 8 */
+/* SU= 8, Tests for FP4 equal to unity */
 int FP4_isunity(FP4 *x)
 {
     if (FP2_isunity(&(x->a)) && FP2_iszilch(&(x->b))) return 1;
     return 0;
 }
 
-/* test is w real? That is in a+ib test b is zero */
+/* Tests for FP4 having only a real part and no imaginary part */
 int FP4_isreal(FP4 *w)
 {
     return FP2_iszilch(&(w->b));
 }
 
-/* return 1 if x==y, else 0 */
-/* SU= 16 */
+/* SU= 16, Tests for equality of two FP4s */
 int FP4_equals(FP4 *x,FP4 *y)
 {
     if (FP2_equals(&(x->a),&(y->a)) && FP2_equals(&(x->b),&(y->b)))
@@ -55,24 +63,21 @@ int FP4_equals(FP4 *x,FP4 *y)
     return 0;
 }
 
-/* set FP4 from two FP2s */
-/* SU= 16 */
+/* SU= 16, Initialise FP4 from two FP2s */
 void FP4_from_FP2s(FP4 *w,FP2 * x,FP2* y)
 {
     FP2_copy(&(w->a), x);
     FP2_copy(&(w->b), y);
 }
 
-/* set FP4 from FP2 */
-/* SU= 8 */
+/* SU= 8, Initialise FP4 from single FP2 */
 void FP4_from_FP2(FP4 *w,FP2 *x)
 {
     FP2_copy(&(w->a), x);
     FP2_zero(&(w->b));
 }
 
-/* FP4 copy w=x */
-/* SU= 16 */
+/* SU= 16, Copy FP4 to another FP4 */
 void FP4_copy(FP4 *w,FP4 *x)
 {
     if (w==x) return;
@@ -80,27 +85,23 @@ void FP4_copy(FP4 *w,FP4 *x)
     FP2_copy(&(w->b), &(x->b));
 }
 
-/* FP4 w=0 */
-/* SU= 8 */
+/* SU= 8, Set FP4 to zero */
 void FP4_zero(FP4 *w)
 {
     FP2_zero(&(w->a));
     FP2_zero(&(w->b));
 }
 
-/* FP4 w=1 */
-/* SU= 8 */
+/* SU= 8, Set FP4 to unity */
 void FP4_one(FP4 *w)
 {
     FP2_one(&(w->a));
     FP2_zero(&(w->b));
 }
 
-/* Set w=-x */
-/* SU= 160 */
+/* SU= 160, Negation of FP4 */
 void FP4_neg(FP4 *w,FP4 *x)
 {
-    /* Just one field neg */
     FP2 m,t;
     FP2_add(&m,&(x->a),&(x->b));
     FP2_neg(&m,&m);
@@ -110,8 +111,7 @@ void FP4_neg(FP4 *w,FP4 *x)
     FP2_copy(&(w->a),&t);
 }
 
-/* Set w=conj(x) */
-/* SU= 16 */
+/* SU= 16, Conjugation of FP4 */
 void FP4_conj(FP4 *w,FP4 *x)
 {
     FP2_copy(&(w->a), &(x->a));
@@ -119,8 +119,7 @@ void FP4_conj(FP4 *w,FP4 *x)
     FP2_norm(&(w->b));
 }
 
-/* Set w=-conj(x) */
-/* SU= 16 */
+/* SU= 16, Negative conjugation of FP4 */
 void FP4_nconj(FP4 *w,FP4 *x)
 {
     FP2_copy(&(w->b),&(x->b));
@@ -128,16 +127,14 @@ void FP4_nconj(FP4 *w,FP4 *x)
     FP2_norm(&(w->a));
 }
 
-/* Set w=x+y */
-/* SU= 16 */
+/* SU= 16, Addition of two FP4s */
 void FP4_add(FP4 *w,FP4 *x,FP4 *y)
 {
     FP2_add(&(w->a), &(x->a), &(y->a));
     FP2_add(&(w->b), &(x->b), &(y->b));
 }
 
-/* Set w=x-y */
-/* SU= 160 */
+/* SU= 160, Subtraction of two FP4s */
 void FP4_sub(FP4 *w,FP4 *x,FP4 *y)
 {
     FP4 my;
@@ -145,40 +142,35 @@ void FP4_sub(FP4 *w,FP4 *x,FP4 *y)
     FP4_add(w, x, &my);
 
 }
-/* SU= 8 */
-/* reduce all components of w mod Modulus */
+/* SU= 8, Reduces all components of possibly unreduced FP4 mod Modulus */
 void FP4_reduce(FP4 *w)
 {
     FP2_reduce(&(w->a));
     FP2_reduce(&(w->b));
 }
 
-/* SU= 8 */
-/* normalise all elements of w */
+/* SU= 8, Normalises the components of an FP4 */
 void FP4_norm(FP4 *w)
 {
     FP2_norm(&(w->a));
     FP2_norm(&(w->b));
 }
 
-/* Set w=s*x, where s is FP2 */
-/* SU= 16 */
+/* SU= 16, Multiplication of an FP4 by an FP2 */
 void FP4_pmul(FP4 *w,FP4 *x,FP2 *s)
 {
     FP2_mul(&(w->a),&(x->a),s);
     FP2_mul(&(w->b),&(x->b),s);
 }
 
-/* SU= 16 */
-/* Set w=s*x, where s is int */
+/* SU= 16, Multiplication of an FP4 by a small integer */
 void FP4_imul(FP4 *w,FP4 *x,int s)
 {
     FP2_imul(&(w->a),&(x->a),s);
     FP2_imul(&(w->b),&(x->b),s);
 }
 
-/* Set w=x^2 */
-/* SU= 232 */
+/* SU= 232, Squaring an FP4 */
 void FP4_sqr(FP4 *w,FP4 *x)
 {
     FP2 t1,t2,t3;
@@ -204,8 +196,7 @@ void FP4_sqr(FP4 *w,FP4 *x)
     FP4_norm(w);
 }
 
-/* Set w=x*y */
-/* SU= 312 */
+/* SU= 312, Multiplication of two FP4s */
 void FP4_mul(FP4 *w,FP4 *x,FP4 *y)
 {
 
@@ -227,8 +218,7 @@ void FP4_mul(FP4 *w,FP4 *x,FP4 *y)
     FP4_norm(w);
 }
 
-/* output FP4 in format [a,b] */
-/* SU= 8 */
+/* SU= 8, Formats as [a,b] and outputs an FP4 to the console */
 void FP4_output(FP4 *w)
 {
     printf("[");
@@ -238,7 +228,7 @@ void FP4_output(FP4 *w)
     printf("]");
 }
 
-/* SU= 8 */
+/* SU= 8, Formats and outputs an FP4 to the console in raw form (for debugging) */
 void FP4_rawoutput(FP4 *w)
 {
     printf("[");
@@ -248,8 +238,7 @@ void FP4_rawoutput(FP4 *w)
     printf("]");
 }
 
-/* Set w=1/x */
-/* SU= 160 */
+/* SU= 160, Inverting an FP4 */
 void FP4_inv(FP4 *w,FP4 *x)
 {
     FP2 t1,t2;
@@ -263,8 +252,7 @@ void FP4_inv(FP4 *w,FP4 *x)
     FP2_mul(&(w->b),&t1,&(x->b));
 }
 
-/* w*=i where i = sqrt(-1+sqrt(-1)) */
-/* SU= 200 */
+/* SU= 200, Multiplies an FP4 instance by irreducible polynomial sqrt(1+sqrt(-1)) */
 void FP4_times_i(FP4 *w)
 {
     BIG z;
@@ -286,8 +274,7 @@ void FP4_times_i(FP4 *w)
     FP2_copy(&(w->a),&t);
 }
 
-/* Set w=w^p using Frobenius */
-/* SU= 16 */
+/* SU= 16, Raises an FP4 to the power of the internal modulus p, using the Frobenius */
 void FP4_frob(FP4 *w,FP2 *f)
 {
     FP2_conj(&(w->a),&(w->a));
@@ -295,8 +282,7 @@ void FP4_frob(FP4 *w,FP2 *f)
     FP2_mul( &(w->b),f,&(w->b));
 }
 
-/* Set r=a^b mod m */
-/* SU= 240 */
+/* SU= 240, Raises an FP4 to the power of a BIG */
 void FP4_pow(FP4 *r,FP4* a,BIG b)
 {
     FP4 w;
@@ -320,8 +306,7 @@ void FP4_pow(FP4 *r,FP4* a,BIG b)
     FP4_reduce(r);
 }
 
-/* SU= 304 */
-/* XTR xtr_a function */
+/* SU= 304, Calculates the XTR addition function r=w*x-conj(x)*y+z */
 void FP4_xtr_A(FP4 *r,FP4 *w,FP4 *x,FP4 *y,FP4 *z)
 {
     FP4 t1,t2;
@@ -341,8 +326,7 @@ void FP4_xtr_A(FP4 *r,FP4 *w,FP4 *x,FP4 *y,FP4 *z)
     FP4_norm(r);
 }
 
-/* SU= 152 */
-/* XTR xtr_d function */
+/* SU= 152, Calculates the XTR doubling function r=x^2-2*conj(x) */
 void FP4_xtr_D(FP4 *r,FP4 *x)
 {
     FP4 w;
@@ -354,8 +338,7 @@ void FP4_xtr_D(FP4 *r,FP4 *x)
     FP4_reduce(r);    /* reduce here as multiple calls trigger automatic reductions */
 }
 
-/* SU= 728 */
-/* r=x^n using XTR method on traces of FP12s */
+/* SU= 728, Calculates FP4 trace of an FP12 raised to the power of a BIG number */
 void FP4_xtr_pow(FP4 *r,FP4 *x,BIG n)
 {
     int i,par,nb;
@@ -407,8 +390,7 @@ void FP4_xtr_pow(FP4 *r,FP4 *x,BIG n)
     FP4_reduce(r);
 }
 
-/* SU= 872 */
-/* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
+/* SU= 872, Calculates FP4 trace of c^a.d^b, where c and d are derived from FP4 traces of FP12s. See Stam thesis. */
 void FP4_xtr_pow2(FP4 *r,FP4 *ck,FP4 *cl,FP4 *ckml,FP4 *ckm2l,BIG a,BIG b)
 {
     int i,f2;

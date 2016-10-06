@@ -1,31 +1,39 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file fp2.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief Main Header File
+ *
+ * AMCL Fp^2 functions
+ * FP2 elements are of the form a+ib, where i is sqrt(-1)
+ *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /* AMCL Fp^2 functions */
 /* SU=m, m is Stack Usage (no lazy )*/
 
-/* FP2 elements are of the form a+ib, where i is sqrt(-1) */
-
 #include "amcl.h"
 
-/* test x==0 ? */
-/* SU= 8 */
+/* SU= 8, Tests for FP2 equal to zero */
 int FP2_iszilch(FP2 *x)
 {
     FP2_reduce(x);
@@ -33,15 +41,14 @@ int FP2_iszilch(FP2 *x)
     return 0;
 }
 
-/* Move b to a if d=1 */
+/* Conditionally copies second FP2 parameter to the first (without branching) */
 void FP2_cmove(FP2 *f,FP2 *g,int d)
 {
     BIG_cmove(f->a,g->a,d);
     BIG_cmove(f->b,g->b,d);
 }
 
-/* test x==1 ? */
-/* SU= 48 */
+/* SU= 48, Tests for FP2 equal to one */
 int FP2_isunity(FP2 *x)
 {
     BIG one;
@@ -51,16 +58,14 @@ int FP2_isunity(FP2 *x)
     return 0;
 }
 
-/* SU= 8 */
-/* Fully reduce a and b mod Modulus */
+/* SU= 8, Reduces all components of possibly unreduced FP2 mod Modulus */
 void FP2_reduce(FP2 *w)
 {
     FP_reduce(w->a);
     FP_reduce(w->b);
 }
 
-/* return 1 if x==y, else 0 */
-/* SU= 16 */
+/* SU= 16, Tests for equality of two FP2s */
 int FP2_equals(FP2 *x,FP2 *y)
 {
     FP2_reduce(x);
@@ -70,16 +75,14 @@ int FP2_equals(FP2 *x,FP2 *y)
     return 0;
 }
 
-/* Create FP2 from two FPs */
-/* SU= 16 */
+/* SU= 16, Initialise FP2 from two BIGs in n-residue form */
 void FP2_from_FPs(FP2 *w,BIG x,BIG y)
 {
     BIG_copy(w->a,x);
     BIG_copy(w->b,y);
 }
 
-/* Create FP2 from two BIGS */
-/* SU= 16 */
+/* SU= 16, Initialise FP2 from two BIG integers */
 void FP2_from_BIGs(FP2 *w,BIG x,BIG y)
 {
     BIG_copy(w->a,x);
@@ -88,16 +91,14 @@ void FP2_from_BIGs(FP2 *w,BIG x,BIG y)
     FP_nres(w->b);
 }
 
-/* Create FP2 from FP */
-/* SU= 8 */
+/* SU= 8, Initialise FP2 from single BIG in n-residue form */
 void FP2_from_FP(FP2 *w,BIG x)
 {
     BIG_copy(w->a,x);
     BIG_zero(w->b);
 }
 
-/* Create FP2 from BIG */
-/* SU= 8 */
+/* SU= 8, Initialise FP2 from single BIG */
 void FP2_from_BIG(FP2 *w,BIG x)
 {
     BIG_copy(w->a,x);
@@ -105,8 +106,7 @@ void FP2_from_BIG(FP2 *w,BIG x)
     BIG_zero(w->b);
 }
 
-/* FP2 copy w=x */
-/* SU= 16 */
+/* SU= 16, Copy FP2 to another FP2 */
 void FP2_copy(FP2 *w,FP2 *x)
 {
     if (w==x) return;
@@ -114,16 +114,14 @@ void FP2_copy(FP2 *w,FP2 *x)
     BIG_copy(w->b,x->b);
 }
 
-/* FP2 set w=0 */
-/* SU= 8 */
+/* SU= 8, Set FP2 to zero */
 void FP2_zero(FP2 *w)
 {
     BIG_zero(w->a);
     BIG_zero(w->b);
 }
 
-/* FP2 set w=1 */
-/* SU= 48 */
+/* SU= 48, Set FP2 to unity */
 void FP2_one(FP2 *w)
 {
     BIG one;
@@ -131,8 +129,7 @@ void FP2_one(FP2 *w)
     FP2_from_FP(w,one);
 }
 
-/* Set w=-x */
-/* SU= 88 */
+/* SU= 88, Negation of FP2 */
 void FP2_neg(FP2 *w,FP2 *x)
 {
     /* Just one neg! */
@@ -146,24 +143,21 @@ void FP2_neg(FP2 *w,FP2 *x)
     BIG_copy(w->a,t);
 }
 
-/* Set w=conj(x) */
-/* SU= 16 */
+/* SU= 16, Conjugation of FP2 */
 void FP2_conj(FP2 *w,FP2 *x)
 {
     BIG_copy(w->a,x->a);
     FP_neg(w->b,x->b);
 }
 
-/* Set w=x+y */
-/* SU= 16 */
+/* SU= 16, Addition of two FP2s */
 void FP2_add(FP2 *w,FP2 *x,FP2 *y)
 {
     FP_add(w->a,x->a,y->a);
     FP_add(w->b,x->b,y->b);
 }
 
-/* Set w=x-y */
-/* SU= 16 */
+/* SU= 16, Subtraction of two FP2s */
 void FP2_sub(FP2 *w,FP2 *x,FP2 *y)
 {
     FP2 m;
@@ -171,24 +165,21 @@ void FP2_sub(FP2 *w,FP2 *x,FP2 *y)
     FP2_add(w,x,&m);
 }
 
-/* Set w=s*x, where s is FP */
-/* SU= 16 */
+/* SU= 16, Multiplication of an FP2 by an n-residue */
 void FP2_pmul(FP2 *w,FP2 *x,BIG s)
 {
     FP_mul(w->a,x->a,s);
     FP_mul(w->b,x->b,s);
 }
 
-/* SU= 16 */
-/* Set w=s*x, where s is int */
+/* SU= 16, Multiplication of an FP2 by a small integer */
 void FP2_imul(FP2 *w,FP2 *x,int s)
 {
     FP_imul(w->a,x->a,s);
     FP_imul(w->b,x->b,s);
 }
 
-/* Set w=x^2 */
-/* SU= 128 */
+/* SU= 128, Squaring an FP2 */
 void FP2_sqr(FP2 *w,FP2 *x)
 {
     BIG w1,w3,mb;
@@ -205,9 +196,7 @@ void FP2_sqr(FP2 *w,FP2 *x)
 
 }
 
-
-/* Set w=x*y */
-/* SU= 168 */
+/* SU= 168, Multiplication of two FP2s */
 void FP2_mul(FP2 *w,FP2 *x,FP2 *y)
 {
     BIG w1,w2,w5,mw;
@@ -231,8 +220,7 @@ void FP2_mul(FP2 *w,FP2 *x,FP2 *y)
 
 }
 
-/* output FP2 in hex format [a,b] */
-/* SU= 16 */
+/* SU= 16, Formats and outputs as [a,b] an FP2 to the console */
 void FP2_output(FP2 *w)
 {
     FP2_reduce(w);
@@ -247,7 +235,7 @@ void FP2_output(FP2 *w)
     FP_nres(w->b);
 }
 
-/* SU= 8 */
+/* SU= 8, Formats and outputs as [a,b] an FP2 to the console in raw form (for debugging) */
 void FP2_rawoutput(FP2 *w)
 {
     printf("[");
@@ -257,9 +245,7 @@ void FP2_rawoutput(FP2 *w)
     printf("]");
 }
 
-
-/* Set w=1/x */
-/* SU= 128 */
+/* SU= 128, Inverting an FP2 */
 void FP2_inv(FP2 *w,FP2 *x)
 {
     BIG m,w1,w2;
@@ -278,19 +264,14 @@ void FP2_inv(FP2 *w,FP2 *x)
 //	FP2_norm(w);
 }
 
-
-/* Set w=x/2 */
-/* SU= 16 */
+/* SU= 16, Divide an FP2 by 2 */
 void FP2_div2(FP2 *w,FP2 *x)
 {
     FP_div2(w->a,x->a);
     FP_div2(w->b,x->b);
 }
 
-/* Set w*=(1+sqrt(-1)) */
-/* where X^2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
-
-/* SU= 128 */
+/* SU= 128, Multiply an FP2 by (1+sqrt(-1)) */
 void FP2_mul_ip(FP2 *w)
 {
     FP2 t;
@@ -307,8 +288,7 @@ void FP2_mul_ip(FP2 *w)
     FP2_norm(w);
 }
 
-/* Set w/=(1+sqrt(-1)) */
-/* SU= 88 */
+/* SU= 88, Divide an FP2 by (1+sqrt(-1)) */
 void FP2_div_ip(FP2 *w)
 {
     FP2 t;
@@ -318,16 +298,14 @@ void FP2_div_ip(FP2 *w)
     FP2_div2(w,&t);
 }
 
-/* SU= 8 */
-/* normalise a and b components of w */
+/* SU= 8, Normalises the components of an FP2 */
 void FP2_norm(FP2 *w)
 {
     BIG_norm(w->a);
     BIG_norm(w->b);
 }
 
-/* Set w=a^b mod m */
-/* SU= 208 */
+/* SU= 208, Raises an FP2 to the power of a BIG */
 void FP2_pow(FP2 *r,FP2* a,BIG b)
 {
     FP2 w;
@@ -352,8 +330,7 @@ void FP2_pow(FP2 *r,FP2* a,BIG b)
 }
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
-/* returns true if u is QR */
-
+/* Square root of an FP2 */
 int FP2_sqrt(FP2 *w,FP2 *u)
 {
     BIG w1,w2,q;
