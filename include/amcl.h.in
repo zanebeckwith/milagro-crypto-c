@@ -2700,6 +2700,15 @@ extern void FF_shr(BIG *x,int n);
  */
 extern void FF_output(BIG *x,int n);
 
+/**	@brief Formats and outputs an FF to the console, in raw form
+ *
+ *  Formats and outputs an FF to the console, in raw form
+ *
+ *	@param x FF instance to be printed
+ *	@param n size of FF in BIGs
+ */
+extern void FF_rawoutput(BIG *x,int n);
+
 /**	@brief Formats and outputs an FF instance to an octet string
  *
  *  Formats and outputs an FF instance to an octet string.
