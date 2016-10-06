@@ -1,34 +1,43 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+ * @file ecp2.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief Main Header File
+ *
+ * AMCL Weierstrass elliptic curve functions over FP2
+ *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-/* AMCL Weierstrass elliptic curve functions over FP2 */
 /* SU=m, m is Stack Usage */
 
 #include "amcl.h"
 
+/* Tests for ECP2 point equal to infinity */
 int ECP2_isinf(ECP2 *P)
 {
     return P->inf;
 }
 
-/* Set P=Q */
-/* SU= 16 */
+/* SU= 16, Copy ECP2 point to another ECP2 point */
 void ECP2_copy(ECP2 *P,ECP2 *Q)
 {
     P->inf=Q->inf;
@@ -37,8 +46,7 @@ void ECP2_copy(ECP2 *P,ECP2 *Q)
     FP2_copy(&(P->z),&(Q->z));
 }
 
-/* set P to Infinity */
-/* SU= 8 */
+/* SU= 8, Set ECP2 to point-at-infinity */
 void ECP2_inf(ECP2 *P)
 {
     P->inf=1;
@@ -88,8 +96,7 @@ static void ECP2_select(ECP2 *P,ECP2 W[],sign32 b)
     ECP2_cmove(P,&MP,(int)(m&1));
 }
 
-/* return 1 if P==Q, else 0 */
-/* SU= 312 */
+/* SU= 312, Tests for equality of two ECP2s */
 int ECP2_equals(ECP2 *P,ECP2 *Q)
 {
     FP2 pz2,qz2,a,b;
@@ -111,8 +118,7 @@ int ECP2_equals(ECP2 *P,ECP2 *Q)
     return 1;
 }
 
-/* Make P affine (so z=1) */
-/* SU= 232 */
+/* SU= 232, Converts an ECP2 point from Projective (x,y,z) coordinates to affine (x,y) coordinates */
 void ECP2_affine(ECP2 *P)
 {
     FP2 one,iz,izn;
@@ -137,8 +143,7 @@ void ECP2_affine(ECP2 *P)
     FP2_copy(&(P->z),&one);
 }
 
-/* extract x, y from point P */
-/* SU= 16 */
+/* SU= 16, Extract x and y coordinates of an ECP2 point P */
 int ECP2_get(FP2 *x,FP2 *y,ECP2 *P)
 {
     if (P->inf) return -1;
@@ -148,8 +153,7 @@ int ECP2_get(FP2 *x,FP2 *y,ECP2 *P)
     return 0;
 }
 
-/* SU= 152 */
-/* Output point P */
+/* SU= 152, Formats and outputs an ECP2 point to the console, converted to affine coordinates */
 void ECP2_output(ECP2 *P)
 {
     FP2 x,y;
@@ -166,7 +170,7 @@ void ECP2_output(ECP2 *P)
     printf(")\n");
 }
 
-/* SU= 232 */
+/* SU= 232, Formats and outputs an ECP2 point to the console, in projective coordinates */
 void ECP2_outputxyz(ECP2 *P)
 {
     ECP2 Q;
@@ -185,8 +189,7 @@ void ECP2_outputxyz(ECP2 *P)
     printf(")\n");
 }
 
-/* SU= 168 */
-/* Convert Q to octet string */
+/* SU= 168, Formats and outputs an ECP2 point to an octet string */
 void ECP2_toOctet(octet *W,ECP2 *Q)
 {
     FP2 qx,qy;
@@ -203,8 +206,7 @@ void ECP2_toOctet(octet *W,ECP2 *Q)
     BIG_toBytes(&(W->val[3*MODBYTES]),qy.b);
 }
 
-/* SU= 176 */
-/* restore Q from octet string */
+/* SU= 176, Creates an ECP2 point from an octet string */
 int ECP2_fromOctet(ECP2 *Q,octet *W)
 {
     FP2 qx,qy;
@@ -221,8 +223,7 @@ int ECP2_fromOctet(ECP2 *Q,octet *W)
     return 0;
 }
 
-/* SU= 128 */
-/* Calculate RHS of twisted curve equation x^3+B/i */
+/* SU= 128, Calculate Right Hand Side of curve equation y^2=f(x) */
 void ECP2_rhs(FP2 *rhs,FP2 *x)
 {
     /* calculate RHS of elliptic curve equation */
@@ -244,9 +245,7 @@ void ECP2_rhs(FP2 *rhs,FP2 *x)
     FP2_reduce(rhs);
 }
 
-
-/* Set P=(x,y). Return 1 if (x,y) is on the curve, else return 0*/
-/* SU= 232 */
+/* SU= 232, Set ECP2 to point(x,y) given x and y */
 int ECP2_set(ECP2 *P,FP2 *x,FP2 *y)
 {
     FP2 one,rhs,y2;
@@ -271,8 +270,7 @@ int ECP2_set(ECP2 *P,FP2 *x,FP2 *y)
     return 1;
 }
 
-/* Set P=(x,y). Return 1 if (x,.) is on the curve, else return 0 */
-/* SU= 232 */
+/* SU= 232, Set ECP to point(x,[y]) given x */
 int ECP2_setx(ECP2 *P,FP2 *x)
 {
     FP2 y;
@@ -291,17 +289,14 @@ int ECP2_setx(ECP2 *P,FP2 *x)
     return 1;
 }
 
-/* Set P=-P */
-/* SU= 8 */
+/* SU= 8, Negation of an ECP2 point */
 void ECP2_neg(ECP2 *P)
 {
     FP2_neg(&(P->y),&(P->y));
     FP2_norm(&(P->y));
 }
 
-/* R+=R */
-/* return -1 for Infinity, 0 for addition, 1 for doubling */
-/* SU= 448 */
+/* SU= 448, Doubles an ECP2 instance P */
 int ECP2_dbl(ECP2 *P)
 {
     FP2 w1,w7,w8,w2,w3;
@@ -352,8 +347,7 @@ int ECP2_dbl(ECP2 *P)
     return 1;
 }
 
-/* Set P+=Q */
-/* SU= 400 */
+/* SU= 400, Adds ECP2 instance Q to ECP2 instance P */
 int ECP2_add(ECP2 *P,ECP2 *Q)
 {
     int aff;
@@ -431,8 +425,7 @@ int ECP2_add(ECP2 *P,ECP2 *Q)
     return 0;
 }
 
-/* Set P-=Q */
-/* SU= 16 */
+/* SU= 16, Subtracts ECP instance Q from ECP2 instance P */
 void ECP2_sub(ECP2 *P,ECP2 *Q)
 {
     ECP2_neg(Q);
@@ -481,8 +474,7 @@ static void ECP2_multiaffine(int m,ECP2 *P,FP2 *work)
     }
 }
 
-/* P*=e */
-/* SU= 280 */
+/* SU= 280, Multiplies an ECP2 instance P by a BIG, side-channel resistant */
 void ECP2_mul(ECP2 *P,BIG e)
 {
     /* fixed size windows */
@@ -551,8 +543,7 @@ void ECP2_mul(ECP2 *P,BIG e)
     ECP2_affine(P);
 }
 
-/* Calculates q.P using Frobenius constant X */
-/* SU= 96 */
+/* SU= 96, Multiplies an ECP2 instance P by the internal modulus p, using precalculated Frobenius constant f */
 void ECP2_frob(ECP2 *P,FP2 *X)
 {
     FP2 X2;
@@ -568,6 +559,7 @@ void ECP2_frob(ECP2 *P,FP2 *X)
     FP2_mul(&(P->y),X,&(P->y));
 }
 
+/* Calculates P=b[0]*Q[0]+b[1]*Q[1]+b[2]*Q[2]+b[3]*Q[3] */
 void ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
 {
     int i,j,a[4],nb;
