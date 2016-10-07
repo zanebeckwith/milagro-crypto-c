@@ -218,6 +218,6 @@ endif
 dbuild:
 	@mkdir -p target
 	@rm -rf target/*
-	@echo 0 > target/buildall.exit
+	@echo 0 > target/make_qa.exit
 	VENDOR=$(VENDOR) PROJECT=$(PROJECT) ./dockerbuild.sh
 	@exit `cat target/make_qa.exit`
