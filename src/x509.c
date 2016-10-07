@@ -508,6 +508,8 @@ pktype X509_extract_public_key(octet *c,octet *key)
     return ret;
 }
 
+/* Find pointer to main sections of cert, before extracting individual field */
+
 /* Find index to issuer field in a certificate */
 int X509_find_issuer(octet *c)
 {

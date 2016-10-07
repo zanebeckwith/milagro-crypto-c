@@ -216,5 +216,8 @@ endif
 
 # Build everything inside a Docker container
 dbuild:
-	./dockerbuild.sh
+	@mkdir -p target
+	@rm -rf target/*
+	@echo 0 > target/make_qa.exit
+	VENDOR=$(VENDOR) PROJECT=$(PROJECT) ./dockerbuild.sh
 	@exit `cat target/make_qa.exit`

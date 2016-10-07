@@ -403,7 +403,7 @@ int MPIN_RECOMBINE_G2(octet *W1,octet *W2,octet *W)
     return res;
 }
 
-/* Generate a random group element, a random secret S */
+/* Generate a random group element */
 int MPIN_RANDOM_GENERATE(csprng *RNG,octet* S)
 {
     BIG r,s;
@@ -529,7 +529,7 @@ int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     return res;
 }
 
-/* Create a client secret in G1 from a master secret and the client ID */
+/* Create a client secret CST=S*H(CID) in G1 where CID is client ID and S is master secret  */
 int MPIN_GET_CLIENT_SECRET(octet *S,octet *CID,octet *CST)
 {
     return MPIN_GET_G1_MULTIPLE(NULL,1,S,CID,CST);
@@ -1033,7 +1033,9 @@ unsign32 MPIN_GET_TIME(void)
     return (unsign32)time(NULL);
 }
 
-/* Generate Y=H(TimeValue,O), where TimeValue is epoch time, O is an octet, and H(.) is a hash function */
+/* Generate Y = H(TimeValue, xCID) when time permits disabled or else 
+   Y = H(TimeValue, xCID) where xCID = x.H(Id) or xCID = x.(H(Id)+H(TimeValue|H(Id))),
+   where TimeValue is epoch time, and H(.) is a hash function */
 void MPIN_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
 {
     BIG q,y;
@@ -1110,7 +1112,7 @@ int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet
     return 0;
 }
 
-/* AES-GCM Encryption of octets */
+/* AES-GCM Encryption */
 void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
     gcm g;
