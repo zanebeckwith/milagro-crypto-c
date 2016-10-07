@@ -1,23 +1,31 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+ * @file ecdh.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 2nd June 2015
+ * @brief ECDH/ECIES/ECDSA function source file for implementation of standard EC protocols
+ *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-/* ECDH/ECIES/ECDSA Functions - see main program below */
+/* ECDH/ECIES/ECDSA function source file for implementation of standard EC protocols */
 
 #include <stdio.h>
 #include <string.h>
@@ -134,7 +142,7 @@ static void hashit(int sha,octet *p,int n,octet *x,octet *w,int pad)
     return;
 }
 
-/* Hash octet p to octet w */
+/* Hash an octet into another octet*/
 void HASH(int sha,octet *p,octet *w)
 {
     hashit(sha,p,-1,NULL,w,0);
@@ -147,12 +155,13 @@ void ECC_CREATE_CSPRNG(csprng *RNG,octet *RAW)
     RAND_seed(RNG,RAW->len,RAW->val);
 }
 
+/* Kill a random number generator */
 void ECC_KILL_CSPRNG(csprng *RNG)
 {
     RAND_clean(RNG);
 }
 
-/* Calculate HMAC of m using key k. HMAC is tag of length olen */
+/* Calculate HMAC of message M using key K to create tag of length len in octet tag */
 int HMAC(int sha,octet *m,octet *k,int olen,octet *tag)
 {
     /* Input is from an octet m        *
@@ -211,6 +220,8 @@ void KDF1(octet *z,int olen,octet *key)
     }
 }
 */
+
+/* Key Derivation Function - generates key K from inputs Z and P */
 void KDF2(int sha,octet *z,octet *p,int olen,octet *key)
 {
     /* NOTE: the parameter olen is the length of the output k in bytes */
@@ -232,9 +243,7 @@ void KDF2(int sha,octet *z,octet *p,int olen,octet *key)
 
 }
 
-/* Password based Key Derivation Function */
-/* Input password p, salt s, and repeat count */
-/* Output key of length olen */
+/* Password Based Key Derivation Function - generates key K from password, salt and repeat counter */
 void PBKDF2(int sha,octet *p,octet *s,int rep,int olen,octet *key)
 {
     int i,j,len,d=ROUNDUP(olen,sha);
@@ -310,7 +319,7 @@ void AES_CBC_IV0_ENCRYPT(octet *k,octet *m,octet *c)
     c->len=opt;
 }
 
-/* decrypts and returns TRUE if all consistent, else returns FALSE */
+/* AES encrypts a plaintext to a ciphtertext */
 int AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
 {
     /* padding is removed */
@@ -360,11 +369,7 @@ int AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
     return 1;
 }
 
-/* Calculate a public/private EC GF(p) key pair. W=S.G mod EC(p),
- * where S is the secret key and W is the public key
- * and G is fixed generator.
- * If RNG is NULL then the private key is provided externally in S
- * otherwise it is generated randomly internally */
+/* Generate a public/private EC GF(p) key pair. W=S.G mod EC(p) */
 int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 {
     BIG r,gx,s;
@@ -460,7 +465,7 @@ int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
     return res;
 }
 
-/* validate public key. Set full=true for fuller check */
+/* Validate an ECC public key */
 int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
 {
     BIG q,r,wx;
@@ -498,7 +503,7 @@ int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
     return res;
 }
 
-/* IEEE-1363 Diffie-Hellman online calculation Z=S.WD */
+/* Generate Diffie-Hellman online calculation shared key Z=S.WD,IEEE-1363 */
 int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 {
     BIG r,s,wx;

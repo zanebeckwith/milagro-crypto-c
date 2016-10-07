@@ -1,21 +1,29 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file epc.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief AMCL Elliptic Curve Functions
+ *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /* AMCL Elliptic Curve Functions */
 /* SU=m, SU is Stack Usage (Weierstrass Curves) */
@@ -24,7 +32,7 @@ under the License.
 
 #include "amcl.h"
 
-/* test for P=O point-at-infinity */
+/* Tests for ECP point equal to infinity */
 int ECP_isinf(ECP *P)
 {
 #if CURVETYPE==EDWARDS
@@ -104,8 +112,7 @@ static void ECP_select(ECP *P,ECP W[],sign32 b)
 }
 #endif
 
-/* Test P == Q */
-/* SU=168 */
+/* SU=168, Tests for equality of two ECPs */
 int ECP_equals(ECP *P,ECP *Q)
 {
 #if CURVETYPE==WEIERSTRASS
@@ -153,8 +160,7 @@ int ECP_equals(ECP *P,ECP *Q)
 #endif
 }
 
-/* Set P=Q */
-/* SU=16 */
+/* SU=16, Copy ECP point to another ECP point */
 void ECP_copy(ECP *P,ECP *Q)
 {
 #if CURVETYPE!=EDWARDS
@@ -169,7 +175,8 @@ void ECP_copy(ECP *P,ECP *Q)
 
 /* Set P=-Q */
 #if CURVETYPE!=MONTGOMERY
-/* SU=8 */
+
+/* SU=8, Negation of an ECP point */
 void ECP_neg(ECP *P)
 {
     if (ECP_isinf(P)) return;
@@ -184,7 +191,7 @@ void ECP_neg(ECP *P)
 }
 #endif
 
-/* Set P=O */
+/* Set P=O, Set ECP to point-at-infinity */
 void ECP_inf(ECP *P)
 {
 #if CURVETYPE==EDWARDS
@@ -196,8 +203,7 @@ void ECP_inf(ECP *P)
 #endif
 }
 
-/* Calculate right Hand Side of curve equation y^2=RHS */
-/* SU=56 */
+/* SU=56, Calculate Right Hand Side of curve equation y^2=f(x) */
 void ECP_rhs(BIG v,BIG x)
 {
 #if CURVETYPE==WEIERSTRASS
@@ -262,8 +268,7 @@ void ECP_rhs(BIG v,BIG x)
 
 #if CURVETYPE==MONTGOMERY
 
-/* Set P=(x,{y}) */
-
+/* Set ECP to point(x,[y]) given x */
 int ECP_set(ECP *P,BIG x)
 {
     BIG m,rhs;
@@ -285,7 +290,7 @@ int ECP_set(ECP *P,BIG x)
     return 1;
 }
 
-/* Extract x coordinate as BIG */
+/* Extract x coordinate of an ECP point P */
 int ECP_get(BIG x,ECP *P)
 {
     if (ECP_isinf(P)) return -1;
@@ -295,10 +300,9 @@ int ECP_get(BIG x,ECP *P)
     return 0;
 }
 
-
 #else
-/* Extract (x,y) and return sign of y. If x and y are the same return only x */
-/* SU=16 */
+
+/* SU=16, Extract x and y coordinates of an ECP point P */
 int ECP_get(BIG x,BIG y,ECP *P)
 {
     int s;
@@ -318,8 +322,7 @@ int ECP_get(BIG x,BIG y,ECP *P)
     return s;
 }
 
-/* Set P=(x,{y}) */
-/* SU=96 */
+/* SU=96, Set ECP to point(x,y) given x and y */
 int ECP_set(ECP *P,BIG x,BIG y)
 {
     BIG rhs,y2;
@@ -352,8 +355,7 @@ int ECP_set(ECP *P,BIG x,BIG y)
     return 1;
 }
 
-/* Set P=(x,y), where y is calculated from x with sign s */
-/* SU=136 */
+/* SU=136, Set P=(x,y), where y is calculated from x with sign s */
 int ECP_setx(ECP *P,BIG x,int s)
 {
     BIG t,rhs,m;
@@ -387,8 +389,7 @@ int ECP_setx(ECP *P,BIG x,int s)
 
 #endif
 
-/* Convert P to Affine, from (x,y,z) to (x,y) */
-/* SU=160 */
+/* SU=160, Converts an ECP point from Projective (x,y,z) coordinates to affine (x,y) coordinates */
 void ECP_affine(ECP *P)
 {
     BIG one,iz,m;
@@ -441,7 +442,7 @@ void ECP_affine(ECP *P)
     BIG_copy(P->z,one);
 }
 
-/* SU=120 */
+/* SU=120, Formats and outputs an ECP point to the console, in projective coordinates */
 void ECP_outputxyz(ECP *P)
 {
     BIG x,z;
@@ -479,8 +480,7 @@ void ECP_outputxyz(ECP *P)
 #endif
 }
 
-/* SU=16 */
-/* Output point P */
+/* SU=16, Formats and outputs an ECP point to the console, converted to affine coordinates */
 void ECP_output(ECP *P)
 {
     if (ECP_isinf(P))
@@ -509,8 +509,7 @@ void ECP_output(ECP *P)
 }
 
 
-/* SU=88 */
-/* Convert P to octet string */
+/* SU=88, Formats and outputs an ECP point to an octet string */
 void ECP_toOctet(octet *W,ECP *P)
 {
 #if CURVETYPE==MONTGOMERY
@@ -529,8 +528,7 @@ void ECP_toOctet(octet *W,ECP *P)
 #endif
 }
 
-/* SU=88 */
-/* Restore P from octet string */
+/* SU=88, Creates an ECP point from an octet string */
 int ECP_fromOctet(ECP *P,octet *W)
 {
 #if CURVETYPE==MONTGOMERY
@@ -547,9 +545,7 @@ int ECP_fromOctet(ECP *P,octet *W)
 #endif
 }
 
-
-/* Set P=2P */
-/* SU=272 */
+/* SU=272, Doubles an ECP instance P */
 void ECP_dbl(ECP *P)
 {
 #if CURVETYPE==WEIERSTRASS
@@ -665,7 +661,7 @@ void ECP_dbl(ECP *P)
 
 #if CURVETYPE==MONTGOMERY
 
-/* Set P+=Q. W is difference between P and Q and is affine */
+/* Adds ECP instance Q to ECP instance P, given difference D=P-Q */
 void ECP_add(ECP *P,ECP *Q,ECP *W)
 {
     BIG A,B,C,D,DA,CB;
@@ -697,8 +693,7 @@ void ECP_add(ECP *P,ECP *Q,ECP *W)
 
 #else
 
-/* Set P+=Q */
-/* SU=248 */
+/* SU=248, Adds ECP instance Q to ECP instance P */
 void ECP_add(ECP *P,ECP *Q)
 {
 #if CURVETYPE==WEIERSTRASS
@@ -817,8 +812,7 @@ void ECP_add(ECP *P,ECP *Q)
 #endif
 }
 
-/* Set P-=Q */
-/* SU=16 */
+/* SU=16m Subtracts ECP instance Q from ECP instance P */
 void  ECP_sub(ECP *P,ECP *Q)
 {
     ECP_neg(Q);
@@ -830,8 +824,8 @@ void  ECP_sub(ECP *P,ECP *Q)
 
 
 #if CURVETYPE==WEIERSTRASS
-/* normalises array of points. Assumes P[0] is normalised already */
 
+/* normalises array of points. Assumes P[0] is normalised already */
 static void ECP_multiaffine(int m,ECP P[],BIG work[])
 {
     int i;
@@ -874,7 +868,7 @@ static void ECP_multiaffine(int m,ECP P[],BIG work[])
 #endif
 
 #if CURVETYPE!=MONTGOMERY
-/* constant time multiply by small integer of length bts - use ladder */
+/* Multiplies an ECP instance P by a small integer, side-channel resistant */
 void ECP_pinmul(ECP *P,int e,int bts)
 {
     int i,b;
@@ -899,8 +893,7 @@ void ECP_pinmul(ECP *P,int e,int bts)
 }
 #endif
 
-/* Set P=r*P */
-/* SU=424 */
+/* SU=424, Multiplies an ECP instance P by a BIG, side-channel resistant */
 void ECP_mul(ECP *P,BIG e)
 {
 #if CURVETYPE==MONTGOMERY
@@ -1014,10 +1007,8 @@ void ECP_mul(ECP *P,BIG e)
 }
 
 #if CURVETYPE!=MONTGOMERY
-/* Set P=eP+fQ double multiplication */
-/* constant time - as useful for GLV method in pairings */
-/* SU=456 */
 
+/* SU=456, Calculates double multiplication P=e*P+f*Q, side-channel resistant */
 void ECP_mul2(ECP *P,ECP *Q,BIG e,BIG f)
 {
     BIG te,tf,mt;

@@ -1,26 +1,31 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file x509.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief AMCL X509 function source file
+ *
+ * @section LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /* AMCL X.509 Functions */
-
-// To run test program, define HAS_MAIN
-// gcc x509.c ecdh.c rsa.c amcl.a -o x509.exe
 
 #define HAS_MAIN
 
@@ -58,7 +63,7 @@ under the License.
 #define RSA_H512 23
 
 // return xxxxxxxxxxxxxxxx | xxxx | xxxx
-//        2048 | 2 | 3  -> 2048-bit RSA with SHA512
+// 2048 | 2 | 3  -> 2048-bit RSA with SHA512
 
 #define H256 2
 #define H384 3
@@ -159,11 +164,7 @@ static int bround(int len)
 
 }
 
-//	Input signed cert as octet, and extract signature
-//	Return 0 for failure, ECC for Elliptic Curve signature, RSA for RSA signature
-//  Note that signature type is not provided here - its the type of the public key that
-//  is used to verify it that matters, and which determines for example the curve to be used!
-
+/* Extract certificate signature */
 pktype X509_extract_cert_sig(octet *sc,octet *sig)
 {
     int i,j,k,fin,len,rlen,sj,ex;
@@ -335,7 +336,7 @@ pktype X509_extract_cert_sig(octet *sc,octet *sig)
     return ret;
 }
 
-// Extract certificate from signed cert
+/* Extract certificate from signed certificate */
 int X509_extract_cert(octet *sc,octet *cert)
 {
     int i,j,fin,len,k;
@@ -359,7 +360,7 @@ int X509_extract_cert(octet *sc,octet *cert)
     return 1;
 }
 
-// Extract Public Key from inside Certificate
+/* Extract public key from certificate */
 pktype X509_extract_public_key(octet *c,octet *key)
 {
     int i,j,fin,len,sj;
@@ -410,7 +411,7 @@ pktype X509_extract_public_key(octet *c,octet *key)
     if (len<0) return ret;
     j+=skip(len);
 
-// ** Maybe dive in and check Public Key OIDs here?
+// Maybe dive in and check Public Key OIDs here?
 // ecpublicKey & prime256v1, secp384r1 or secp521r1 for ECC
 // rsapublicKey for RSA
 
@@ -465,7 +466,7 @@ pktype X509_extract_public_key(octet *c,octet *key)
     j++;
     len--; // skip bit shift (hopefully 0!)
 
-// extract key
+    // extract key
     if (ret.type==ECC)
     {
         key->len=len;
@@ -507,8 +508,9 @@ pktype X509_extract_public_key(octet *c,octet *key)
     return ret;
 }
 
-// Find pointer to main sections of cert, before extracting individual field
-// Find index to issuer in cert
+/* Find pointer to main sections of cert, before extracting individual field */
+
+/* Find index to issuer field in a certificate */
 int X509_find_issuer(octet *c)
 {
     int j,len;
@@ -534,7 +536,7 @@ int X509_find_issuer(octet *c)
     return j;
 }
 
-// Find index to validity period
+/* Find index to validity period field in a certificate */
 int X509_find_validity(octet *c)
 {
     int j,len;
@@ -547,7 +549,7 @@ int X509_find_validity(octet *c)
     return j;
 }
 
-// Find index to subject in cert
+/* Get index to subject field in a certificate */
 int X509_find_subject(octet *c)
 {
     int j,len;
@@ -560,12 +562,14 @@ int X509_find_subject(octet *c)
     return j;
 }
 
-// NOTE: When extracting cert information, we actually return just an index to the data inside the cert, and maybe its length
-// So no memory is assigned to store cert info. It is the callers responsibility to allocate such memory if required, and copy
-// cert information into it.
+/*
+    NOTE: When extracting cert information, we actually return just an
+    index to the data inside the cert, and maybe its length. So no memory
+    is assigned to store cert info. It is the callers responsibility to
+    allocate such memory if required, and copy cert information into it.
+*/
 
-// Find entity property indicated by SOID, given start of issuer or subject field. Return index in cert, flen=length of field
-
+/* Find entity property indicated by SOID */
 int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
 {
     int i,j,k,fin,len,tlen;
@@ -606,11 +610,11 @@ int X509_find_entity_property(octet *c,octet *SOID,int start,int *flen)
         }
         j+=len;  // skip over it
     }
-    *flen=0; /*****/
+    *flen=0;
     return 0;
 }
 
-// Find start date of certificate validity period
+/* Find start date of certificate validity period */
 int X509_find_start_date(octet *c,int start)
 {
     int j,len;
@@ -626,7 +630,7 @@ int X509_find_start_date(octet *c,int start)
     return j;
 }
 
-// Find expiry date of certificate validity period
+/* Find expiry date of certificate validity period */
 int X509_find_expiry_date(octet *c,int start)
 {
     int j,len;
