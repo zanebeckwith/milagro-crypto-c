@@ -14,9 +14,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -642,7 +642,7 @@ int WCC_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *piaOct
 
 }
 
-/* AES is run as a block cypher in the GCM  mode of operation. The key 
+/* AES is run as a block cypher in the GCM  mode of operation. The key
    size is 128 bits. This function will encrypt any data length */
 void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
@@ -655,7 +655,7 @@ void WCC_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
     T->len=16;
 }
 
-/* AES is run as a block cypher in the GCM  mode of operation. The key 
+/* AES is run as a block cypher in the GCM  mode of operation. The key
    size is 128 bits. This function will decrypt any data length */
 void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 {

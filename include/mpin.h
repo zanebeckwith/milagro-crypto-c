@@ -14,9 +14,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -180,7 +180,7 @@ int MPIN_CLIENT_2(octet *X,octet *Y,octet *SEC);
 /**	@brief Perform server side of the one-pass version of the M-Pin protocol
  *
  *	Perform server side of the one-pass version of the M-Pin protocol.
- *	
+ *
  *	@param h is the hash type
  *	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
  *	@param HID is output H(ID), a hash of the client ID
@@ -216,8 +216,8 @@ void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
 
 /**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
  *
- *  Perform third pass on the server side of the 3-pass version of the M-Pin protocol.	
- *	
+ *  Perform third pass on the server side of the 3-pass version of the M-Pin protocol.
+ *
  *	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
  *	@param HID is input H(ID), a hash of the client ID
  *	@param HTID is input H(ID)+H(d|H(ID))
@@ -322,7 +322,7 @@ void MPIN_KILL_CSPRNG(csprng *R);
  *	@param G if type=0 a point in G1, else an octet to be mapped to G1
  *	@param W the output =x.G or x.M(G), where M(.) is a mapping
  *	@return 0 or an error code
- *  @note 
+ *  @note
  */
 int MPIN_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W);
 

@@ -17,9 +17,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,10 +31,10 @@
 /* AMCL Main header file */
 
 /*
-   Designed for AES-128/192/256 security, 254-521 bit elliptic 
-   curves and BN curves for pairings Each "limb" of a big number 
-   occupies at most (n-3) bits of an n-bit computer word. The most 
-   significant word must have at least 4 extra unused bits 
+   Designed for AES-128/192/256 security, 254-521 bit elliptic
+   curves and BN curves for pairings Each "limb" of a big number
+   occupies at most (n-3) bits of an n-bit computer word. The most
+   significant word must have at least 4 extra unused bits
 */
 
 /* NOTE: There is only one user configurable section in this header - see below */
@@ -869,7 +869,7 @@ extern void BIG_fromBytes(BIG x,char *a);
  */
 extern void BIG_fromBytesLen(BIG x,char *a,int s);
 
-/**	@brief Outputs a DBIG number to the console 
+/**	@brief Outputs a DBIG number to the console
  *
  *  Outputs a DBIG number to the console.
  *
@@ -1033,7 +1033,7 @@ extern void BIG_imul(BIG x,BIG y,int i);
 
 /**	@brief Multiply BIG by not-so-small small integer - output normalised
  *
- *  Multiply BIG by not-so-small small integer - output normalised  
+ *  Multiply BIG by not-so-small small integer - output normalised
  *
  *	@param x BIG number, product of other two
  *	@param y BIG number
@@ -1327,7 +1327,7 @@ extern void BIG_randomnum(BIG x,BIG n,csprng *r);
  */
 extern void BIG_modmul(BIG x,BIG y,BIG z,BIG n);
 
-/**	@brief  Calculate x=y/z mod n 
+/**	@brief  Calculate x=y/z mod n
  *
  *  Calculate x=y/z mod n.
  *
@@ -1382,7 +1382,7 @@ extern int BIG_jacobi(BIG x,BIG y);
  */
 extern void BIG_invmodp(BIG x,BIG y,BIG n);
 
-/** @brief Calculate x=x mod 2^m 
+/** @brief Calculate x=x mod 2^m
  *
  *  Calculate x=x mod 2^m.
  *
@@ -1578,7 +1578,7 @@ extern int FP2_iszilch(FP2 *x);
 /**	@brief Conditionally copies second FP2 parameter to the first (without branching)
  *
  *	Conditionally copies second FP2 parameter to the first (without branching)
- * 
+ *
  *	@param x FP2 instance, set to y if s!=0
  *	@param y another FP2 instance
  *	@param s copy only takes place if not equal to 0
@@ -1852,7 +1852,7 @@ extern int ECP_equals(ECP *P,ECP *Q);
 
 /**	@brief Copy ECP point to another ECP point
  *
- *  Copy ECP point to another ECP point  
+ *  Copy ECP point to another ECP point
  *
  *	@param P ECP instance, on exit = Q
  *	@param Q ECP instance to be copied
@@ -2363,7 +2363,7 @@ extern void FP4_conj(FP4 *x,FP4 *y);
 /**	@brief Negative conjugation of FP4
  *
  *  Negative conjugation of FP4.
- * 
+ *
  *	If y=(a,b) on exit x=(-a,b)
  *	@param x FP4 instance, on exit = -conj(y)
  *	@param y FP4 instance
@@ -2447,7 +2447,7 @@ extern void FP4_inv(FP4 *x,FP4 *y);
 extern void FP4_output(FP4 *x);
 
 /**	@brief Formats and outputs an FP4 to the console in raw form (for debugging)
- * 
+ *
  *  Formats and outputs an FP4 to the console in raw form (for debugging).
  *
  *	@param x FP4 instance to be printed
@@ -2456,7 +2456,7 @@ extern void FP4_rawoutput(FP4 *x);
 
 /**	@brief Multiplies an FP4 instance by irreducible polynomial sqrt(1+sqrt(-1))
  *
- *  Multiplies an FP4 instance by irreducible polynomial sqrt(1+sqrt(-1)).  
+ *  Multiplies an FP4 instance by irreducible polynomial sqrt(1+sqrt(-1)).
  *
  *	@param x FP4 instance, on exit = sqrt(1+sqrt(-1)*x
  */
@@ -2820,7 +2820,7 @@ extern void PAIR_G2mul(ECP2 *P,BIG b);
 /**	@brief Fast raising of a member of GT to a BIG power
  *
  *  Fast raising of a member of GT to a BIG power
- *	
+ *
  *	@param f FP12 member of GT. In exit f=f^e
  *	@param b BIG exponent
  *  @note May exploit endomorphism for speed.
@@ -2907,7 +2907,7 @@ extern void FF_one(BIG *x,int n);
 /**	@brief Compares two FF numbers. Inputs must be normalised externally
  *
  *  Compares two FF numbers. Inputs must be normalised externally.
- * 
+ *
  *	@param x first FF number to be compared
  *	@param y second FF number to be compared
  *	@param n size of FF in BIGs
@@ -3292,7 +3292,7 @@ extern void OCT_joctet(octet *O,octet *P);
 extern void OCT_xor(octet *O,octet *P);
 
 /**	@brief reset Octet to zero length
- *  
+ *
  *  Reset Octet to zero length.
  *
  *	@param O Octet to be emptied
@@ -3357,7 +3357,7 @@ extern void OCT_chop(octet *O,octet *P,int n);
 /**	@brief Appends n bytes of integer m to end of Octet O (big endian)
  *
  *  Join n bytes of integer m to end of Octet O (big endian).
- *	
+ *
  *	@param O Octet to be appended to
  *	@param m integer to be appended to O
  *	@param n number of bytes in m
@@ -3379,7 +3379,7 @@ extern void OCT_rand(octet *O,csprng *R,int n);
 
 /**	@brief Shifts Octet left by n bytes
  *
- *  Shifts Octet left by n bytes.  
+ *  Shifts Octet left by n bytes.
  *
  *	Leftmost bytes disappear
  *	@param O Octet to be shifted

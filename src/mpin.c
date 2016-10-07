@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 2nd June 2015
- * @brief MPIN Functions - Version 3.0 - supports Time Permits 
+ * @brief MPIN Functions - Version 3.0 - supports Time Permits
  *
  * @section LICENSE
  *
@@ -14,9 +14,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -289,7 +289,7 @@ void MPIN_HASH_ALL(int sha,octet *HID,octet *xID,octet *xCID,octet *SEC,octet *Y
     hashit(sha,0,&T,H);
 }
 
-/* Initialise a Cryptographically Strong Random Number Generator 
+/* Initialise a Cryptographically Strong Random Number Generator
    from an octet of raw random data */
 void MPIN_CREATE_CSPRNG(csprng *RNG,octet *RAW)
 {

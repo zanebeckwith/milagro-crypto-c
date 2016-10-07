@@ -14,9 +14,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -53,7 +53,7 @@ void amcl_hex2bin(const char *src, char *dst, int src_len);
 void amcl_bin2hex(char *src, char *dst, int src_len);
 
 /** @brief Print encoded binary string in hex
- * 
+ *
  *  Print encoded binary string in hex.
  *
  *	@param src     Binary string

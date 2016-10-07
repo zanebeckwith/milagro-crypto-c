@@ -14,9 +14,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -561,10 +561,10 @@ int X509_find_subject(octet *c)
 }
 
 /*
-    NOTE: When extracting cert information, we actually return just an 
+    NOTE: When extracting cert information, we actually return just an
     index to the data inside the cert, and maybe its length. So no memory
-    is assigned to store cert info. It is the callers responsibility to 
-    allocate such memory if required, and copy cert information into it. 
+    is assigned to store cert info. It is the callers responsibility to
+    allocate such memory if required, and copy cert information into it.
 */
 
 /* Find entity property indicated by SOID */

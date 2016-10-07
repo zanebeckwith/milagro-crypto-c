@@ -14,9 +14,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -65,7 +65,7 @@ static unsign32 sbrand(csprng *rng)
 /* SU= 20, initialise random number system */
 static void sirand(csprng* rng,unsign32 seed)
 {
-    /* modified so that a subsequent call "stirs" in another seed 
+    /* modified so that a subsequent call "stirs" in another seed
        value in this way as many seed bits as desired may be used */
     int i,in;
     unsign32 t,m=1;
@@ -104,7 +104,7 @@ static unsign32 pack(const uchar *b)
 /* SU= 360, initialize RNG with some real entropy from some external source */
 void RAND_seed(csprng *rng,int rawlen,char *raw)
 {
-    /* initialise from at least 128 byte string 
+    /* initialise from at least 128 byte string
        of raw random input, and 32-bit time-of-day */
     int i;
     char digest[32];

@@ -3,8 +3,8 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief AMCL Fp^4 functions 
- * @note FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1)) 
+ * @brief AMCL Fp^4 functions
+ * @note FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1))
  *
  * @section LICENSE
  *
@@ -15,9 +15,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
