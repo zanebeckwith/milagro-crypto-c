@@ -8,40 +8,47 @@
 # ------------------------------------------------------------------------------
 
 # NOTES:
-#
-# This script requires docker
+# This script requires Docker
 
 # EXAMPLE USAGE:
-# ./dockerbuild.sh
+# VENDOR=vendorname PROJECT=projectname ./dockerbuild.sh
 
-# build the environment
-docker build --tag=miracl/amcldev ./resources/DockerDev/
+# Get vendor and project name
+: ${VENDOR:=vendor}
+: ${PROJECT:=project}
 
-# project root path
-PRJPATH=/root/src/milagro-crypto-c
+# Name of the base development Docker image
+DOCKERDEV=${VENDOR}/dev_${PROJECT}
 
-# generate a docker file on the fly
+# Build the base environment and keep it cached locally
+docker build -t ${DOCKERDEV} ./resources/DockerDev/
+
+# Define the project root path
+PRJPATH=/root/src/${PROJECT}
+
+# Generate a temporary Dockerfile to build and test the project
+# NOTE: The exit status of the RUN command is stored to be returned later,
+#       so in case of error we can continue without interrupting this script.
 cat > Dockerfile <<- EOM
-FROM miracl/amcldev
-MAINTAINER nicola.asuni@miracl.com
+FROM ${DOCKERDEV}
 RUN mkdir -p ${PRJPATH}
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
-RUN make qa || true
+RUN make qa || (echo \$? > target/make_qa.exit)
 EOM
 
-# docker image name
-DOCKER_IMAGE_NAME="localbuild/amcldev"
+# Define the temporary Docker image name
+DOCKER_IMAGE_NAME=${VENDOR}/build_${PROJECT}
 
-# build the docker container and build the project
-docker build --no-cache --tag=${DOCKER_IMAGE_NAME} .
+# Build the Docker image
+docker build --no-cache -t ${DOCKER_IMAGE_NAME} .
 
-# start a container using the newly created docker image
+# Start a container using the newly created Docker image
 CONTAINER_ID=$(docker run -d ${DOCKER_IMAGE_NAME})
 
-# copy the artifact back to the host
+# Copy all build/test artifacts back to the host
 docker cp ${CONTAINER_ID}:"${PRJPATH}/target" ./
 
-# remove the container and image
+# Remove the temporary container and image
 docker rm -f ${CONTAINER_ID} || true
 docker rmi -f ${DOCKER_IMAGE_NAME} || true
