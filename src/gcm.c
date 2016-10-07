@@ -3,9 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief Main Header File
- *
- * Implementation of the AES-GCM Encryption/Authentication
+ * @brief Implementation of the AES-GCM Encryption/Authentication
  *
  * @section LICENSE
  *

@@ -5,8 +5,6 @@
  * @date 19th May 2015
  * @brief AMCL BN Curve pairing functions
  *
- * AMCL BN Curve pairing functions
- *
  * @section LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -26,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL BN Curve pairing functions */
 
 //#define HAS_MAIN
 

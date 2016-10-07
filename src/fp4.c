@@ -3,10 +3,8 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief Main Header File
- *
- * AMCL Fp^4 functions 
- * FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1)) 
+ * @brief AMCL Fp^4 functions 
+ * @note FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1)) 
  *
  * @section LICENSE
  *
@@ -30,8 +28,6 @@
 
 /* AMCL Fp^4 functions */
 /* SU=m, m is Stack Usage (no lazy )*/
-
-/* FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1)) */
 
 #include "amcl.h"
 

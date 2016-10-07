@@ -3,9 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief Main Header File
- *
- * Implementation of the Secure Hashing Algorithm (SHA-256/384/512)
+ * @brief Implementation of the Secure Hashing Algorithm (SHA-256/384/512)
  *
  * @section LICENSE
  *

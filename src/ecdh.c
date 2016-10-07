@@ -3,9 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 2nd June 2015
- * @brief ECDH source file for implementation of standard EC protocols
- *
- * Declares functions
+ * @brief ECDH/ECIES/ECDSA function source file for implementation of standard EC protocols
  *
  * @section LICENSE
  *
@@ -27,7 +25,7 @@
  * under the License.
  */
 
-/* ECDH/ECIES/ECDSA Functions - see main program below */
+/* ECDH/ECIES/ECDSA function source file for implementation of standard EC protocols */
 
 #include <stdio.h>
 #include <string.h>

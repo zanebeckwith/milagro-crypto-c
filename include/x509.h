@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief X509 function Header File
+ * @brief AMCL X509 function Header File
  *
  * @section LICENSE
  *
@@ -24,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL X509 function Header File */
 
 #ifndef X509_H
 #define X509_H

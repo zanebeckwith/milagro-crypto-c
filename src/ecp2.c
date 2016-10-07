@@ -3,9 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief Main Header File
- *
- * AMCL Weierstrass elliptic curve functions over FP2
+ * @brief AMCL Weierstrass elliptic curve functions over FP2
  *
  * @section LICENSE
  *
@@ -27,6 +25,7 @@
  * under the License.
  */
 
+/* AMCL Weierstrass elliptic curve functions over FP2 */
 /* SU=m, m is Stack Usage */
 
 #include "amcl.h"

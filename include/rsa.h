@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 2nd June 2015
- * @brief RSA header file for implementation of RSA protocol
+ * @brief AMCL RSA header file for implementation of RSA protocol
  *
  * @section LICENSE
  *
@@ -24,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL RSA header file for implementation of RSA protocol */
 
 #ifndef RSA_H
 #define RSA_H

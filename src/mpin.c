@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 2nd June 2015
- * @brief MPIN Functions
+ * @brief MPIN Functions - Version 3.0 - supports Time Permits 
  *
  * @section LICENSE
  *
@@ -25,7 +25,7 @@
  * under the License.
  */
 
-/* Version 3.0 - supports Time Permits */
+/* MPIN Functions - Version 3.0 - supports Time Permits */
 
 #include <stdio.h>
 #include <stdlib.h>

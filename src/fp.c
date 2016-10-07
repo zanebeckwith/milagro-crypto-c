@@ -3,9 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief AMCL mod p functions
- *
- * Small Finite Field arithmetic
+ * @brief AMCL mod p functions, small Finite Field arithmetic
  *
  * @section LICENSE
  *
@@ -27,7 +25,7 @@
  * under the License.
  */
 
-/* AMCL mod p functions */
+/* AMCL mod p functions, small Finite Field arithmetic */
 /* SU=m, SU is Stack Usage (NOT_SPECIAL Modulus) */
 
 #include "amcl.h"

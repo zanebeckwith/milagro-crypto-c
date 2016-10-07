@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th July 2016
- * @brief Support functions for M-Pin servers
+ * @brief AMCL Support functions for M-Pin servers
  *
  * @section LICENSE
  *
@@ -24,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL Support functions for M-Pin servers */
 
 #include <stdio.h>
 #include <stdlib.h>

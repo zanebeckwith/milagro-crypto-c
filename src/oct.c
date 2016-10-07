@@ -3,9 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief Basic Octet string maintainance routines
- *
- * Basic Octet string maintainance routines
+ * @brief AMCL Basic Octet string maintainance routines
  *
  * @section LICENSE
  *
@@ -26,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL Basic Octet string maintainance routines */
 
 /* SU=m, m is Stack Usage */
 

@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th April 2016
- * @brief Wang / Chow Choo (WCC) definitions
+ * @brief AMCL Wang / Chow Choo (WCC) definitions
  *
  * @section LICENSE
  *
@@ -24,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL Wang / Chow Choo (WCC) definitions */
 
 #ifndef WCC_H
 #define WCC_H

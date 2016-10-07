@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 2nd June 2015
- * @brief ECDH Header file for implementation of standard EC protocols
+ * @brief AMCL ECDH Header file for implementation of standard EC protocols
  *
  * Declares functions
  *
@@ -26,6 +26,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL ECDH Header file for implementation of standard EC protocols */
 
 
 #ifndef ECDH_H

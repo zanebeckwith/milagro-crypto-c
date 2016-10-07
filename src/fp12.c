@@ -4,8 +4,7 @@
  * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Fp^12 functions
- *
- * FP12 elements are of the form a+i.b+i^2.c
+ * @note FP12 elements are of the form a+i.b+i^2.c
  *
  * @section LICENSE
  *
@@ -26,7 +25,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 
 /* AMCL Fp^12 functions */
 /* SU=m, m is Stack Usage (no lazy )*/

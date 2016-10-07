@@ -1,9 +1,9 @@
 /**
- * @file utils.c
+ * @file rsa.c
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 2nd June 2015
- * @brief RSA source code file for implementation of RSA protocol
+ * @brief AMCL RSA source code file for implementation of RSA protocol
  *
  * @section LICENSE
  *
@@ -25,7 +25,7 @@
  * under the License.
  */
 
- /* RSA Functions - see main program below */
+ /* AMCL RSA source code file for implementation of RSA protocol */
 
 #include <stdio.h>
 #include <string.h>

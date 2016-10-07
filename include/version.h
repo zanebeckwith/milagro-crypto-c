@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th April 2016
- * @brief 
+ * @brief AMCL header support version function
  *
  * @section LICENSE
  *
@@ -24,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL header support version function */
 
 #ifndef VERSION_H
 #define VERSION_H

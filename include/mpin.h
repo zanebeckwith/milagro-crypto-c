@@ -3,10 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 2nd June 2015
- * @brief MPIN Functions
- *
- * defines structures
- * declares functions
+ * @brief AMCL MPIN header functions
  *
  * @section LICENSE
  *
@@ -27,6 +24,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* AMCL MPIN header functions - Definition structures and functions */
 
 #ifndef MPIN_H
 #define MPIN_H

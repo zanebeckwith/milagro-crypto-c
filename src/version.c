@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th April 2016
- * @brief 
+ * @brief AMCL version support function
  *
  * @section LICENSE
  *
@@ -26,6 +26,8 @@
  */
 
 #include "version.h"
+
+/* AMCL version support function */
 
 /* Print version number and information about the build */
 void amcl_version(void)

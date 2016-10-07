@@ -3,7 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- * @brief ROM file with the parameters of the curves.
+ * @brief AMCL ROM file with the parameters of the curves
  *
  * @section LICENSE
  *
@@ -25,7 +25,7 @@
  * under the License.
  */
 
-/* AMCL - ROM file */
+/* AMCL ROM file with the parameters of the curves */
 
 #include "amcl.h"
 
