@@ -1792,3 +1792,7 @@ GENERATE_LEGEND        = YES
 # the various graphs.
 
 DOT_CLEANUP            = YES
+
+# is set to YES then doxygen will immediately stop when a warning is encountered.
+
+WARN_AS_ERROR          = YES
