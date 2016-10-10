@@ -1793,6 +1793,6 @@ GENERATE_LEGEND        = YES
 
 DOT_CLEANUP            = YES
 
-# is set to YES then doxygen will immediately stop when a warning is encountered.
+# If set to YES then doxygen will immediately stop when a warning is encountered.
 
 WARN_AS_ERROR          = YES
