@@ -1,7 +1,7 @@
 /**
  * @file test_rsa_sign.c
  * @author Kealan McCusker
- * @brief Test RSA signature 
+ * @brief Test RSA signature
  *
  * @section LICENSE
  *

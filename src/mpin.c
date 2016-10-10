@@ -1033,7 +1033,7 @@ unsign32 MPIN_GET_TIME(void)
     return (unsign32)time(NULL);
 }
 
-/* Generate Y = H(TimeValue, xCID) when time permits disabled or else 
+/* Generate Y = H(TimeValue, xCID) when time permits disabled or else
    Y = H(TimeValue, xCID) where xCID = x.H(Id) or xCID = x.(H(Id)+H(TimeValue|H(Id))),
    where TimeValue is epoch time, and H(.) is a hash function */
 void MPIN_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)

@@ -1,7 +1,7 @@
 /**
  * @file test_mpinfull_onepass.c
  * @author Kealan McCusker
- * @brief Test M-Pin Full Single pass 
+ * @brief Test M-Pin Full Single pass
  *
  * @section LICENSE
  *
