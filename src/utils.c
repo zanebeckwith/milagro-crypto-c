@@ -5,7 +5,7 @@
  * @date 28th July 2016
  * @brief AMCL Support functions for M-Pin servers
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

@@ -3,7 +3,7 @@
  * @author Kealan McCusker
  * @brief Test WCC with and without time permits
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

@@ -5,7 +5,7 @@
  * @date 19th May 2015
  * @brief AMCL mod p functions, small Finite Field arithmetic
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

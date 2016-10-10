@@ -5,7 +5,7 @@
  * @date 19th May 2015
  * @brief Implementation of the AES-GCM Encryption/Authentication
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

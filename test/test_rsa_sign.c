@@ -3,7 +3,7 @@
  * @author Kealan McCusker
  * @brief Test RSA signature
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

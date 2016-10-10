@@ -5,7 +5,7 @@
  * @date 28th April 2016
  * @brief AMCL version support function
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

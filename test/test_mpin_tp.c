@@ -3,7 +3,7 @@
  * @author Kealan McCusker
  * @brief Test good token and correct PIN with D-TA for nTimePermitTests days in the future
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
