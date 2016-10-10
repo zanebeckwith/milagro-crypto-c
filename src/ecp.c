@@ -1,11 +1,11 @@
 /**
- * @file epc.c
+ * @file ecp.c
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Elliptic Curve Functions
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

@@ -6,7 +6,7 @@
  * @brief AMCL Fp^4 functions
  * @note FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1))
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

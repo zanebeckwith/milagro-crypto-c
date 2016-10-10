@@ -6,7 +6,7 @@
  * @brief AMCL Fp^12 functions
  * @note FP12 elements are of the form a+i.b+i^2.c
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

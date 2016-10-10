@@ -5,7 +5,7 @@
  * @date 19th May 2015
  * @brief Implementation of the Secure Hashing Algorithm (SHA-256/384/512)
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

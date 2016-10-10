@@ -5,7 +5,7 @@
  * @date 2nd June 2015
  * @brief MPIN Functions - Version 3.0 - supports Time Permits
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

@@ -5,7 +5,7 @@
  * @date 19th May 2015
  * @brief AMCL Basic Octet string maintainance routines
  *
- * @section LICENSE
+ * LICENSE
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
