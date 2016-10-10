@@ -205,14 +205,14 @@ ifneq ($(strip $(filter %COVERAGE,${BUILD_NAME})),)
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
 	genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info && \
-	make doc
+	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0
 else 
 	cd target/${BUILD_NAME} && \
 	cmake $(subst $(comma),$(space),${BUILD_PARAMS}) ../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
 	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
-	make doc
+	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0
 endif
 
 # Build everything inside a Docker container
