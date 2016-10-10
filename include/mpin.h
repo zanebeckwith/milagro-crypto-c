@@ -423,7 +423,7 @@ int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *CP,octet *g1,octet *g2);
  *	@param K is the output calculated shared key
  *	@return 0 or an error code
  * */
- int MPIN_SERVER_KEY(int h,octet *Z,octet *SS,octet *w,octet *HT,octet *I,octet *U,octet *UT,octet *K);
+int MPIN_SERVER_KEY(int h,octet *Z,octet *SS,octet *w,octet *HT,octet *I,octet *U,octet *UT,octet *K);
 
 /**	@brief Calculate Key on Client side for M-Pin Full
  *
