@@ -1,5 +1,5 @@
 /**
- * @file epc.c
+ * @file ecp.c
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
