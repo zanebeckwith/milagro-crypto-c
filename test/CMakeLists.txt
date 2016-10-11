@@ -91,7 +91,7 @@ if(BUILD_MPIN)
   add_executable (test_mpin_tp test_mpin_tp.c)
   add_executable (test_mpin_random test_mpin_random.c)
   add_executable (test_mpinfull test_mpinfull.c)
-  add_executable (test_mpinfullSingle test_mpinfullSingle.c)
+  add_executable (test_mpinfull_onepass test_mpinfull_onepass.c)
   add_executable (test_mpinfull_random test_mpinfull_random.c)
   add_executable (test_utils test_utils.c)
   # Link the executable to the libraries
@@ -104,7 +104,7 @@ if(BUILD_MPIN)
   target_link_libraries (test_mpin_tp mpin) 
   target_link_libraries (test_mpin_random mpin) 
   target_link_libraries (test_mpinfull mpin) 
-  target_link_libraries (test_mpinfullSingle mpin) 
+  target_link_libraries (test_mpinfull_onepass mpin) 
   target_link_libraries (test_mpinfull_random mpin) 
   target_link_libraries (test_utils mpin) 
   # tests
@@ -117,7 +117,7 @@ if(BUILD_MPIN)
   do_test (test_mpin_tp "Iteration ${MPIN_TIME_PERMIT_TESTS} SUCCESS Error Code 0")
   do_test (test_mpin_random "Iteration ${MPIN_RANDOM_TESTS} SUCCESS Error Code 0")
   do_test (test_mpinfull "SUCCESS")
-  do_test (test_mpinfullSingle "SUCCESS")
+  do_test (test_mpinfull_onepass "SUCCESS")
   do_test (test_mpinfull_random "Iteration ${MPIN_RANDOM_TESTS} SUCCESS")
   do_test (test_utils "SUCCESS")
 endif(BUILD_MPIN)
@@ -279,4 +279,45 @@ if(AMCL_CHOICE STREQUAL "GOLDILOCKS")
   add_test(NAME test_ecdsa_verify_GOLDILOCKS_SHA512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/GOLDILOCKS/amcl_ecdsa_sha512.txt sha512)
   set_tests_properties (test_ecdsa_verify_GOLDILOCKS_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif(AMCL_CHOICE STREQUAL "GOLDILOCKS")
+
+if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA2048 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
+
+if((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA3072 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/3072/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
+
+
+if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA4096 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/4096/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
+
+if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
+  message(STATUS "Run ${AMCL_CHOICE} RSA2048 Tests")
+  add_executable (test_rsa_sign test_rsa_sign.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_rsa_sign x509) 
+  # test
+  add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
+  set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
 

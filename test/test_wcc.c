@@ -1,21 +1,28 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+ * @file test_wcc.c
+ * @author Kealan McCusker
+ * @brief Test WCC with and without time permits
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 
 /* Test WCC with and without time permits */
 
@@ -49,15 +56,15 @@ int main()
     octet IdB= {0,sizeof(bob_id),bob_id};
 
     char x[PGS];
-    octet X= {sizeof(x),sizeof(x),x};
+    octet X= {0,sizeof(x),x};
     char y[PGS];
-    octet Y= {sizeof(y),sizeof(y),y};
+    octet Y= {0,sizeof(y),y};
     char w[PGS];
-    octet W= {sizeof(w),sizeof(w),w};
+    octet W= {0,sizeof(w),w};
     char pia[PGS];
-    octet PIA= {sizeof(pia),sizeof(pia),pia};
+    octet PIA= {0,sizeof(pia),pia};
     char pib[PGS];
-    octet PIB= {sizeof(pib),sizeof(pib),pib};
+    octet PIB= {0,sizeof(pib),pib};
 
     char pgg1[2*PFS+1];
     octet PgG1= {0,sizeof(pgg1), pgg1};
@@ -76,8 +83,8 @@ int main()
     octet MESSAGE1 = {0, sizeof(message1), message1};
     OCT_jstring(&MESSAGE1,"Hello Bob");
 
-    char k1[16];  // AES Key
-    char k2[16];  // AES Key
+    char k1[PAS];  // AES Key
+    char k2[PAS];  // AES Key
     octet K1= {0,sizeof(k1),k1};
     octet K2= {0,sizeof(k2),k2};
 

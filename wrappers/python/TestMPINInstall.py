@@ -268,16 +268,7 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(rtn, -19)
 
     def test_4(self):
-        """test_4 Test hash function"""
-        for i in range(1, 10000):
-            bytesStr = os.urandom(128)
-            hash_object2 = hashlib.sha256(bytesStr)
-            digest = hash_object2.hexdigest()
-            hash_mpin_id = mpin.hash_id(HASH_TYPE_MPIN, bytesStr)
-            self.assertEqual(digest, hash_mpin_id.encode("hex"))
-
-    def test_5(self):
-        """test_5 Make sure all client secret are unique"""
+        """test_4 Make sure all client secret are unique"""
         # random number generator
         rng = mpin.create_csprng(self.seed)
 
@@ -300,8 +291,8 @@ class TestMPIN(unittest.TestCase):
             self.assertEqual(match, 0)
             s.add(cs1Hex)
 
-    def test_6(self):
-        """test_6 Make sure all one time passwords are random i.e. they should collide"""
+    def test_5(self):
+        """test_5 Make sure all one time passwords are random i.e. they should collide"""
         # random number generator
         rng = mpin.create_csprng(self.seed)
 
@@ -315,8 +306,8 @@ class TestMPIN(unittest.TestCase):
             s.add(OTP)
         self.assertEqual(match, 1)
 
-    def test_7(self):
-        """test_7 Make sure all random values are random i.e. they should collide"""
+    def test_6(self):
+        """test_6 Make sure all random values are random i.e. they should collide"""
         # random number generator
         rng = mpin.create_csprng(self.seed)
 
@@ -332,8 +323,8 @@ class TestMPIN(unittest.TestCase):
             s.add(random)
         self.assertEqual(match, 1)
 
-    def test_8(self):
-        """test_8 AES-GCM: Successful encryption and decryption"""
+    def test_7(self):
+        """test_7 AES-GCM: Successful encryption and decryption"""
 
         # Generate 16 byte key
         key = os.urandom(mpin.PAS)
@@ -354,8 +345,8 @@ class TestMPIN(unittest.TestCase):
         self.assertEqual(tag1, tag2)
         self.assertEqual(plaintext1, plaintext2)
 
-    def test_9(self):
-        """test_9 AES-GCM: Failed encryption and decryption by changing a ciphertext byte"""
+    def test_8(self):
+        """test_8 AES-GCM: Failed encryption and decryption by changing a ciphertext byte"""
 
         # Generate 16 byte key
         key = os.urandom(mpin.PAS)
@@ -381,8 +372,8 @@ class TestMPIN(unittest.TestCase):
         self.assertNotEqual(tag1, tag2)
         self.assertNotEqual(plaintext1, plaintext2)
 
-    def test_9_1(self):
-        """test_10 AES-GCM: Failed encryption and decryption by changing a header byte"""
+    def test_9(self):
+        """test_9 AES-GCM: Failed encryption and decryption by changing a header byte"""
 
         # Generate 16 byte key
         key = os.urandom(mpin.PAS)

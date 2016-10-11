@@ -1,28 +1,31 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-
-/*
- * Implementation of the NIST Advanced Ecryption Standard
+/**
+ * @file aes.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief AMCL Implementation of the NIST Advanced Ecryption Standard (AES)
  *
- * SU=m, SU is Stack Usage
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
+/* AMCL Implementation of the NIST Advanced Ecryption Standard (AES) */
 
 #include <stdlib.h>
 #include "arch.h"
@@ -218,25 +221,24 @@ static const unsign32 rtable[]=
 
 #define MR_TOBYTE(x) ((uchar)((x)))
 
+/* pack bytes into a 32-bit Word */
 static unsign32 pack(const uchar *b)
 {
-    /* pack bytes into a 32-bit Word */
     return ((unsign32)b[3]<<24)|((unsign32)b[2]<<16)|((unsign32)b[1]<<8)|(unsign32)b[0];
 }
 
+/* unpack bytes from a word */
 static void unpack(unsign32 a,uchar *b)
 {
-    /* unpack bytes from a word */
     b[0]=MR_TOBYTE(a);
     b[1]=MR_TOBYTE(a>>8);
     b[2]=MR_TOBYTE(a>>16);
     b[3]=MR_TOBYTE(a>>24);
 }
 
-/* SU= 8 */
+/* SU= 8, x.y= AntiLog(Log(x) + Log(y)) */
 static uchar bmul(uchar x,uchar y)
 {
-    /* x.y= AntiLog(Log(x) + Log(y)) */
     if (x && y) return ptab[(ltab[x]+ltab[y])%255];
     else return 0;
 }
@@ -252,19 +254,18 @@ static unsign32 SubByte(unsign32 a)
     return pack(b);
 }
 
-/* SU= 16 */
+/* SU= 16, dot product of two 4-byte arrays */
 static uchar product(unsign32 x,unsign32 y)
 {
-    /* dot product of two 4-byte arrays */
     uchar xb[4],yb[4];
     unpack(x,xb);
     unpack(y,yb);
     return bmul(xb[0],yb[0])^bmul(xb[1],yb[1])^bmul(xb[2],yb[2])^bmul(xb[3],yb[3]);
 }
 
+/* matrix Multiplication */
 static unsign32 InvMixCol(unsign32 x)
 {
-    /* matrix Multiplication */
     unsign32 y,m;
     uchar b[4];
 
@@ -280,11 +281,9 @@ static unsign32 InvMixCol(unsign32 x)
     return y;
 }
 
-/* SU= 8 */
-/* reset cipher */
-void AES_reset(aes *a,int mode,char *iv)
+/* SU= 8, Reset AES mode or IV */
+void AES_reset(amcl_aes *a,int mode,char *iv)
 {
-    /* reset mode, or reset iv */
     int i;
     a->mode=mode;
     for (i=0; i<4*NB; i++)
@@ -296,15 +295,15 @@ void AES_reset(aes *a,int mode,char *iv)
     }
 }
 
-void AES_getreg(aes *a,char *ir)
+/* Extract chaining vector from AMCL_AES instance */
+void AES_getreg(amcl_aes *a,char *ir)
 {
     int i;
     for (i=0; i<4*NB; i++) ir[i]=a->f[i];
 }
 
-/* SU= 72 */
-/* Initialise cipher */
-int AES_init(aes* a,int mode,int nk,char *key,char *iv)
+/* SU= 72, Initialise an instance of AMCL_AES and its mode of operation */
+int AES_init(amcl_aes* a,int mode,int nk,char *key,char *iv)
 {
     /* Key length Nk=16, 24 or 32 bytes */
     /* Key Scheduler. Create expanded encryption key */
@@ -359,9 +358,8 @@ int AES_init(aes* a,int mode,int nk,char *key,char *iv)
     return 1;
 }
 
-/* SU= 80 */
-/* Encrypt a single block */
-void AES_ecb_encrypt(aes *a,uchar *buff)
+/* SU= 80, Encrypt a single 16 byte block in ECB mode */
+void AES_ecb_encrypt(amcl_aes *a,uchar *buff)
 {
     int i,j,k;
     unsign32 p[4],q[4],*x,*y,*t;
@@ -429,9 +427,8 @@ void AES_ecb_encrypt(aes *a,uchar *buff)
     }
 }
 
-/* SU= 80 */
-/* Decrypt a single block */
-void AES_ecb_decrypt(aes *a,uchar *buff)
+/* SU= 80, Decrypt a single 16 byte block in ECB mode */
+void AES_ecb_decrypt(amcl_aes *a,uchar *buff)
 {
     int i,j,k;
     unsign32 p[4],q[4],*x,*y,*t;
@@ -501,7 +498,7 @@ void AES_ecb_decrypt(aes *a,uchar *buff)
 
 }
 
-/* simple default increment function */
+/* Simple default increment function */
 static void increment(char *f)
 {
     int i;
@@ -512,9 +509,8 @@ static void increment(char *f)
     }
 }
 
-/* SU= 40 */
-/* Encrypt using selected mode of operation */
-unsign32 AES_encrypt(aes* a,char *buff)
+/* SU= 40, Encrypt a single 16 byte block in active mode */
+unsign32 AES_encrypt(amcl_aes* a,char *buff)
 {
     int j,bytes;
     char st[16];
@@ -577,9 +573,8 @@ unsign32 AES_encrypt(aes* a,char *buff)
     }
 }
 
-/* SU= 40 */
-/* Decrypt using selected mode of operation */
-unsign32 AES_decrypt(aes *a,char *buff)
+/* SU= 40, Decrypt a single 16 byte block in active mode */
+unsign32 AES_decrypt(amcl_aes *a,char *buff)
 {
     int j,bytes;
     char st[16];
@@ -646,8 +641,8 @@ unsign32 AES_decrypt(aes *a,char *buff)
     }
 }
 
-/* Clean up and delete left-overs */
-void AES_end(aes *a)
+/* Clean up after application of AES */
+void AES_end(amcl_aes *a)
 {
     /* clean up */
     int i;
@@ -666,7 +661,7 @@ void AES_end(aes *a)
 int main()
 {
     int i;
-    aes a;
+    amcl_aes a;
 	unsign32 t;
 	uchar x,y;
 

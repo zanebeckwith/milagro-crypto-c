@@ -1,24 +1,31 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+ * @file fp.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief AMCL mod p functions, small Finite Field arithmetic
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-/* AMCL mod p functions */
-/* Small Finite Field arithmetic */
+/* AMCL mod p functions, small Finite Field arithmetic */
 /* SU=m, SU is Stack Usage (NOT_SPECIAL Modulus) */
 
 #include "amcl.h"
@@ -34,19 +41,21 @@ under the License.
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
+/* Converts from BIG integer to n-residue form mod Modulus */
 void FP_nres(BIG a)
 {
     BIG tmp;
     BIG_rcopy(tmp,a);
 }
 
+/* Converts from n-residue form back to BIG integer form */
 void FP_redc(BIG a)
 {
     BIG tmp;
     BIG_rcopy(tmp,a);
 }
 
-/* reduce a DBIG to a BIG exploiting the special form of the modulus */
+/* Reduces a DBIG to BIG exploiting special form of the modulus */
 void FP_mod(BIG r,DBIG d)
 {
     BIG t,b;
@@ -84,12 +93,14 @@ void FP_mod(BIG r,DBIG d)
 /* This only applies to Curve C448, so specialised (for now) */
 #if MODTYPE == GENERALISED_MERSENNE
 
+/* Converts from n-residue form back to BIG integer form */
 void FP_nres(BIG a)
 {
     BIG tmp;
     BIG_rcopy(tmp,a);
 }
 
+/* Converts from n-residue form back to BIG integer form */
 void FP_redc(BIG a)
 {
     BIG tmp;
@@ -131,7 +142,7 @@ void FP_mod(BIG r,DBIG d)
 
 #if MODTYPE == MONTGOMERY_FRIENDLY
 
-/* convert to Montgomery n-residue form */
+/* Converts from BIG integer to n-residue form mod Modulus */
 void FP_nres(BIG a)
 {
     DBIG d;
@@ -142,7 +153,7 @@ void FP_nres(BIG a)
     BIG_dmod(a,d,m);
 }
 
-/* convert back to regular form */
+/* Converts from n-residue form back to BIG integer form */
 void FP_redc(BIG a)
 {
     DBIG d;
@@ -151,11 +162,10 @@ void FP_redc(BIG a)
     FP_mod(a,d);
 }
 
-/* fast modular reduction from DBIG to BIG exploiting special form of the modulus */
+/* Fast modular reduction from DBIG to BIG exploiting special form of the modulus */
 void FP_mod(BIG a,DBIG d)
 {
     int i;
-    chunk k;
 
     for (i=0; i<NLEN; i++)
         d[NLEN+i]+=muladd(d[i],MConst-1,d[i],&d[NLEN+i-1]);
@@ -168,8 +178,7 @@ void FP_mod(BIG a,DBIG d)
 
 #if MODTYPE == NOT_SPECIAL
 
-/* convert BIG a to Montgomery n-residue form */
-/* SU= 120 */
+/* SU= 120, Converts from BIG integer to n-residue form mod Modulus */
 void FP_nres(BIG a)
 {
     DBIG d;
@@ -180,8 +189,7 @@ void FP_nres(BIG a)
     BIG_dmod(a,d,m);
 }
 
-/* SU= 80 */
-/* convert back to regular form */
+/* SU= 80, Converts from n-residue form back to BIG integer form */
 void FP_redc(BIG a)
 {
     DBIG d;
@@ -190,9 +198,7 @@ void FP_redc(BIG a)
     FP_mod(a,d);
 }
 
-/* reduce a DBIG to a BIG using Montgomery's no trial division method */
-/* d is expected to be dnormed before entry */
-/* SU= 112 */
+/* SU= 112, Fast modular reduction from DBIG to BIG exploiting special form of the modulus */
 void FP_mod(BIG a,DBIG d)
 {
     int i,k;
@@ -350,8 +356,7 @@ void FP_mod(BIG a,DBIG d)
 
 #endif
 
-/* test x==0 ? */
-/* SU= 48 */
+/* SU= 48, Tests for BIG equal to zero mod Modulus */
 int FP_iszilch(BIG x)
 {
     BIG m;
@@ -360,8 +365,7 @@ int FP_iszilch(BIG x)
     return BIG_iszilch(x);
 }
 
-/* output FP */
-/* SU= 48 */
+/* SU= 48, Outputs a BIG number that is in n-residue form to the console */
 void FP_output(BIG r)
 {
     BIG c;
@@ -370,6 +374,7 @@ void FP_output(BIG r)
     BIG_output(c);
 }
 
+/* Outputs a BIG number that is in n-residue form to the console, in raw form */
 void FP_rawoutput(BIG r)
 {
     BIG_rawoutput(r);
@@ -381,9 +386,7 @@ int tadd=0,radd=0,tneg=0,rneg=0;
 int tdadd=0,rdadd=0,tdneg=0,rdneg=0;
 #endif
 
-/* r=a*b mod Modulus */
-/* product must be less that p.R - and we need to know this in advance! */
-/* SU= 88 */
+/* SU= 88, Fast Modular multiplication of two BIGs in n-residue form, mod Modulus */
 void FP_mul(BIG r,BIG a,BIG b)
 {
     DBIG d;
@@ -416,8 +419,7 @@ void FP_mul(BIG r,BIG a,BIG b)
     FP_mod(r,d);
 }
 
-/* multiplication by an integer, r=a*c */
-/* SU= 136 */
+/* SU= 136, Fast Modular multiplication of a BIG in n-residue form, by a small integer, mod Modulus */
 void FP_imul(BIG r,BIG a,int c)
 {
     DBIG d;
@@ -450,8 +452,7 @@ void FP_imul(BIG r,BIG a,int c)
     BIG_norm(r);
 }
 
-/* Set r=a^2 mod m */
-/* SU= 88 */
+/* SU= 88, Fast Modular squaring of a BIG in n-residue form, mod Modulus */
 void FP_sqr(BIG r,BIG a)
 {
     DBIG d;
@@ -482,8 +483,7 @@ void FP_sqr(BIG r,BIG a)
     FP_mod(r,d);
 }
 
-/* SU= 16 */
-/* Set r=a+b */
+/* SU= 16, Modular addition of two BIGs in n-residue form, mod Modulus */
 void FP_add(BIG r,BIG a,BIG b)
 {
     BIG_add(r,a,b);
@@ -502,8 +502,7 @@ void FP_add(BIG r,BIG a,BIG b)
 #endif
 }
 
-/* Set r=a-b mod m */
-/* SU= 56 */
+/* SU= 56, Modular subtraction of two BIGs in n-residue form, mod Modulus */
 void FP_sub(BIG r,BIG a,BIG b)
 {
     BIG n;
@@ -511,8 +510,7 @@ void FP_sub(BIG r,BIG a,BIG b)
     FP_add(r,a,n);
 }
 
-/* SU= 48 */
-/* Fully reduce a mod Modulus */
+/* SU= 48, Reduces possibly unreduced BIG mod Modulus */
 void FP_reduce(BIG a)
 {
     BIG m;
@@ -520,8 +518,7 @@ void FP_reduce(BIG a)
     BIG_mod(a,m);
 }
 
-/* Set r=-a mod Modulus */
-/* SU= 64 */
+/* SU= 64, Modular negation of a BIG in n-residue form, mod Modulus */
 void FP_neg(BIG r,BIG a)
 {
     int sb;
@@ -558,8 +555,7 @@ void FP_neg(BIG r,BIG a)
 
 }
 
-/* Set r=a/2. */
-/* SU= 56 */
+/* SU= 56, Modular division by 2 of a BIG in n-residue form, mod Modulus */
 void FP_div2(BIG r,BIG a)
 {
     BIG m;
@@ -578,7 +574,7 @@ void FP_div2(BIG r,BIG a)
     }
 }
 
-/* set w=1/x */
+/* Modular inverse of a BIG in n-residue form, mod Modulus */
 void FP_inv(BIG w,BIG x)
 {
     BIG m;
@@ -598,8 +594,7 @@ void FP_one(BIG n)
     FP_nres(n);
 }
 
-/* Set r=a^b mod Modulus */
-/* SU= 136 */
+/* SU= 136, Fast Modular exponentiation of a BIG in n-residue form, to the power of a BIG, mod Modulus */
 void FP_pow(BIG r,BIG a,BIG b)
 {
     BIG w,z,zilch;
@@ -621,7 +616,7 @@ void FP_pow(BIG r,BIG a,BIG b)
     FP_reduce(r);
 }
 
-/* is r a QR? */
+/* Tests for BIG a quadratic residue mod Modulus */
 int FP_qr(BIG r)
 {
     int j;
@@ -635,8 +630,7 @@ int FP_qr(BIG r)
 
 }
 
-/* Set a=sqrt(b) mod Modulus */
-/* SU= 160 */
+/* SU= 160, Fast Modular square root of a BIG in n-residue form, mod Modulus */
 void FP_sqrt(BIG r,BIG a)
 {
     BIG v,i,b;

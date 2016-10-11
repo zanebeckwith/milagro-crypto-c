@@ -1,25 +1,31 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+ * @file mpin.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 2nd June 2015
+ * @brief MPIN Functions - Version 3.0 - supports Time Permits
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-/* MPIN Functions */
-
-/* Version 3.0 - supports Time Permits */
+/* MPIN Functions - Version 3.0 - supports Time Permits */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,8 +85,8 @@ static void mpin_hash(int sha,FP4 *f, ECP *P,octet *w)
     for (i=0; i<hlen; i++) h[i]=0;
 }
 
-/* these next two functions help to implement elligator squared - http://eprint.iacr.org/2014/043 */
-/* maps a random u to a point on the curve */
+/* These next two functions help to implement elligator squared - http://eprint.iacr.org/2014/043 */
+/* Maps a random u to a point on the curve */
 static void map(ECP *P,BIG u,int cb)
 {
     BIG x,q;
@@ -93,7 +99,7 @@ static void map(ECP *P,BIG u,int cb)
         BIG_inc(x,1);
 }
 
-/* returns u derived from P. Random value in range 1 to return value should then be added to u */
+/* Returns u derived from P. Random value in range 1 to return value should then be added to u */
 static int unmap(BIG u,int *cb,ECP *P)
 {
     int s,r=0;
@@ -114,7 +120,7 @@ static int unmap(BIG u,int *cb,ECP *P)
     return r;
 }
 
-/* map octet string containing hash to point on curve of correct order */
+/* Map octet string containing hash to point on curve of correct order */
 static void mapit(octet *h,ECP *P)
 {
     BIG q,x,c;
@@ -172,7 +178,7 @@ static void mapit(octet *h,ECP *P)
 
 
 
-/* general purpose hash function w=hash(p|n|x|y) */
+/* General purpose hash function w=hash(p|n|x|y) */
 static void hashit(int sha,int n,octet *x,octet *w)
 {
     int i,c[4],hlen;
@@ -258,15 +264,15 @@ static void hashit(int sha,int n,octet *x,octet *w)
     }
 }
 
+/* Supply today's date as days from the epoch */
 unsign32 MPIN_today(void)
 {
     /* return time in slots since epoch */
     unsign32 ti=(unsign32)time(NULL);
-    return (long)(ti/(60*TIME_SLOT_MINUTES));
+    return (uint32_t)(ti/(60*TIME_SLOT_MINUTES));
 }
 
-/* Hash the M-Pin transcript - new */
-
+/* Hash the session transcript */
 void MPIN_HASH_ALL(int sha,octet *HID,octet *xID,octet *xCID,octet *SEC,octet *Y,octet *R,octet *W,octet *H)
 {
     char t[10*MODBYTES+4];
@@ -283,9 +289,8 @@ void MPIN_HASH_ALL(int sha,octet *HID,octet *xID,octet *xCID,octet *SEC,octet *Y
     hashit(sha,0,&T,H);
 }
 
-/* Initialise a Cryptographically Strong Random Number Generator from
-   an octet of raw random data */
-
+/* Initialise a Cryptographically Strong Random Number Generator
+   from an octet of raw random data */
 void MPIN_CREATE_CSPRNG(csprng *RNG,octet *RAW)
 {
     RAND_seed(RNG,RAW->len,RAW->val);
@@ -301,9 +306,9 @@ void MPIN_HASH_ID(int sha,octet *ID,octet *HID)
     hashit(sha,0,ID,HID);
 }
 
-/* these next two functions implement elligator squared - http://eprint.iacr.org/2014/043 */
-/* Elliptic curve point E in format (0x04,x,y} is converted to form {0x0-,u,v} */
-/* Note that u and v are indistinguisible from random strings */
+/* The following two functions implement elligator squared - http://eprint.iacr.org/2014/043 */
+
+/* Encoding of a Time Permit to make it indistinguishable from a random string */
 int MPIN_ENCODING(csprng *RNG,octet *E)
 {
     int rn,m,su,sv,res=0;
@@ -338,6 +343,7 @@ int MPIN_ENCODING(csprng *RNG,octet *E)
     return res;
 }
 
+/* Encoding of an obfuscated Time Permit */
 int MPIN_DECODING(octet *D)
 {
     int su,sv;
@@ -364,7 +370,7 @@ int MPIN_DECODING(octet *D)
     return res;
 }
 
-/* R=R1+R2 in group G1 */
+/* Add two members from the group G1 */
 int MPIN_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
 {
     ECP P,T;
@@ -397,7 +403,7 @@ int MPIN_RECOMBINE_G2(octet *W1,octet *W2,octet *W)
     return res;
 }
 
-/* create random secret S */
+/* Generate a random group element */
 int MPIN_RANDOM_GENERATE(csprng *RNG,octet* S)
 {
     BIG r,s;
@@ -436,7 +442,7 @@ int MPIN_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
     return res;
 }
 
-/* Implement step 2 on client side of MPin protocol - SEC=-(x+y)*SEC */
+/* Perform second pass of the client side of the 3-pass version of the M-Pin protocol */
 int MPIN_CLIENT_2(octet *X,octet *Y,octet *SEC)
 {
     BIG px,py,r;
@@ -458,13 +464,7 @@ int MPIN_CLIENT_2(octet *X,octet *Y,octet *SEC)
     return res;
 }
 
-/*
- W=x*H(G);
- if RNG == NULL then X is passed in
- if RNG != NULL the X is passed out
- if type=0 W=x*G where G is point on the curve, else W=x*M(G), where M(G) is mapping of octet G to point on the curve
-*/
-
+/* Find a random multiple of a point in G1 */
 int MPIN_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
 {
     ECP P;
@@ -497,13 +497,7 @@ int MPIN_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     return res;
 }
 
-/*
- if RNG == NULL then X is passed in
- if RNG != NULL the X is passed out
- W=x*G where G is point on the curve
- if type==1 W=(x^-1)G
-*/
-
+/* Find a random multiple of a point in G2 */
 int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
 {
     ECP2 P;
@@ -535,16 +529,13 @@ int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     return res;
 }
 
-
-
-/* Client secret CST=s*H(CID) where CID is client ID and s is master secret */
-/* CID is hashed externally */
+/* Create a client secret CST=S*H(CID) in G1 where CID is client ID and S is master secret  */
 int MPIN_GET_CLIENT_SECRET(octet *S,octet *CID,octet *CST)
 {
     return MPIN_GET_G1_MULTIPLE(NULL,1,S,CID,CST);
 }
 
-/* Implement step 1 on client side of MPin protocol */
+/* Perform first pass of the client side of the 3-pass version of the M-Pin protocol */
 int MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *SEC,octet *xID,octet *xCID,octet *PERMIT)
 {
     BIG r,x;
@@ -618,7 +609,7 @@ int MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int pin
     return res;
 }
 
-/* Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret */
+/* Create a server secret in G2 from a master secret */
 int MPIN_GET_SERVER_SECRET(octet *S,octet *SST)
 {
     BIG r,s;
@@ -648,7 +639,7 @@ int MPIN_GET_SERVER_SECRET(octet *S,octet *SST)
 }
 
 
-/* Time Permit CTT=s*H(date|H(CID)) where s is master secret */
+/* Create a Time Permit in G1 from a master secret and the client ID */
 int MPIN_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
 {
     BIG s;
@@ -666,10 +657,7 @@ int MPIN_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
     return 0;
 }
 
-// if date=0 only use HID, set HCID=NULL
-// if date and PE, use HID and HCID
-
-/* Outputs H(CID) and H(CID)+H(T|H(CID)) for time permits. If no time permits set HTID=NULL */
+/* Perform first pass of the server side of the 3-pass version of the M-Pin protocol */
 void MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 {
     char h[MODBYTES];
@@ -701,7 +689,7 @@ void MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 
 }
 
-/* Implement M-Pin on server side */
+/* Perform third pass on the server side of the 3-pass version of the M-Pin protocol */
 int MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
 {
     BIG px,py,y;
@@ -885,6 +873,7 @@ int MPIN_KANGAROO(octet *E,octet *F)
 
 /* Functions to support M-Pin Full */
 
+/* Precompute values for use by the client side of M-Pin Full */
 int MPIN_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
 {
     ECP P,T;
@@ -931,8 +920,7 @@ int MPIN_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
     return res;
 }
 
-/* calculate common key on client side */
-/* wCID = w.(A+AT) */
+/* Calculate Key on Client side for M-Pin Full */
 int MPIN_CLIENT_KEY(int sha,octet *G1,octet *G2,int pin,octet *R,octet *X,octet *H,octet *wCID,octet *CK)
 {
     FP12 g1,g2;
@@ -994,9 +982,7 @@ int MPIN_CLIENT_KEY(int sha,octet *G1,octet *G2,int pin,octet *R,octet *X,octet 
     return res;
 }
 
-/* calculate common key on server side */
-/* Z=r.A - no time permits involved */
-
+/* Calculate Key on Client side for M-Pin Full */
 int MPIN_SERVER_KEY(int sha,octet *Z,octet *SST,octet *W,octet *H,octet *HID,octet *xID,octet *xCID,octet *SK)
 {
     int res=0;
@@ -1041,12 +1027,15 @@ int MPIN_SERVER_KEY(int sha,octet *Z,octet *SST,octet *W,octet *H,octet *HID,oct
     return res;
 }
 
+/* Get epoch time as unsigned integer */
 unsign32 MPIN_GET_TIME(void)
 {
     return (unsign32)time(NULL);
 }
 
-/* Generate Y = H(epoch, xCID/xID) */
+/* Generate Y = H(TimeValue, xCID) when time permits disabled or else
+   Y = H(TimeValue, xCID) where xCID = x.H(Id) or xCID = x.(H(Id)+H(TimeValue|H(Id))),
+   where TimeValue is epoch time, and H(.) is a hash function */
 void MPIN_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
 {
     BIG q,y;
@@ -1057,14 +1046,11 @@ void MPIN_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
     BIG_fromBytes(y,H.val);
     BIG_rcopy(q,CURVE_Order);
     BIG_mod(y,q);
-#ifdef AES_S
-    BIG_mod2m(y,2*AES_S);
-#endif
     BIG_toBytes(Y->val,y);
     Y->len=PGS;
 }
 
-/* One pass MPIN Client */
+/* Perform client side of the one-pass version of the M-Pin protocol */
 int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,octet *MESSAGE,int TimeValue,octet *Y)
 {
     int rtn=0;
@@ -1096,7 +1082,7 @@ int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *T
     return 0;
 }
 
-/* One pass MPIN Server */
+/* Perform server side of the one-pass version of the M-Pin protocol */
 int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue)
 {
     int rtn=0;
@@ -1126,8 +1112,7 @@ int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet
     return 0;
 }
 
-/* AES-GCM Encryption of octets, K is key, H is header,
-   P is plaintext, C is ciphertext, T is authentication tag */
+/* AES-GCM Encryption */
 void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
     gcm g;
@@ -1139,8 +1124,7 @@ void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T
     T->len=16;
 }
 
-/* AES-GCM Decryption of octets, K is key, H is header,
-   P is plaintext, C is ciphertext, T is authentication tag */
+/* AES-GCM Decryption of octets */
 void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 {
     gcm g;
@@ -1150,6 +1134,18 @@ void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T
     P->len=C->len;
     GCM_finish(&g,T->val);
     T->len=16;
+}
+
+/* Return the Field size */
+int MPIN_FS()
+{
+    return PFS;
+}
+
+/* Return the Group size */
+int MPIN_GS()
+{
+    return PGS;
 }
 
 /*

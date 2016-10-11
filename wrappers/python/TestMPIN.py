@@ -32,7 +32,7 @@ class TestMPIN(unittest.TestCase):
         pass
 
     def test_1(self):
-        """test_1 Good PIN and good token"""
+        """test_1 Test Vector test"""
         vectors = json.load(open("./MPINTestVectors.json", "r"))
         for vector in vectors:
             print "Test vector {}".format(vector['test_no'])

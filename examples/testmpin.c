@@ -94,6 +94,8 @@ int main()
     RAW.val[3]=ran>>24;
     for (i=0; i<100; i++) RAW.val[i]=i+1;
 
+    printf("MPIN_FS %d\n", MPIN_FS());
+    printf("MPIN_GS %d\n", MPIN_GS());
     /* initialise strong RNG */
     MPIN_CREATE_CSPRNG(&RNG,&RAW);
 

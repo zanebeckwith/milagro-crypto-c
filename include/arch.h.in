@@ -1,49 +1,42 @@
-/*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
-*/
-
-/* Architecture definition header file */
-
 /**
  * @file arch.h
  * @author Mike Scott
+ * @author Kealan McCusker
  * @date 23rd February 2016
- * @brief Architecture Header File
+ * @brief Specify Processor Architecture
  *
- * Specify Processor Architecture
+ * LICENSE
  *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
+/* Architecture definition header file */
 
 /* NOTE: There is only one user configurable section in this header - see below */
 
 #ifndef ARCH_H
 #define ARCH_H
 
-
-
-
 /*** START OF USER CONFIGURABLE SECTION - set architecture ***/
 
 #define CHUNK @AMCL_CHUNK@		/**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
 
 /*** END OF USER CONFIGURABLE SECTION ***/
-
-
 
 /* Create Integer types */
 /* Support for C99?  Note for GCC need to explicitly include -std=c99 in command line */

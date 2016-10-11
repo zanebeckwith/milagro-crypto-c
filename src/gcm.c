@@ -1,21 +1,29 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file gcm.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 19th May 2015
+ * @brief Implementation of the AES-GCM Encryption/Authentication
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /*
  * Implementation of the AES-GCM Encryption/Authentication
@@ -35,6 +43,7 @@ under the License.
  *
  * See http://www.mindspring.com/~dmcgrew/gcm-nist-6.pdf
  */
+
 /* SU=m, m is Stack Usage */
 
 #include <stdlib.h>
@@ -45,24 +54,24 @@ under the License.
 #define NB 4
 #define MR_TOBYTE(x) ((uchar)((x)))
 
+/* pack bytes into a 32-bit Word */
 static unsign32 pack(const uchar *b)
 {
-    /* pack bytes into a 32-bit Word */
     return ((unsign32)b[0]<<24)|((unsign32)b[1]<<16)|((unsign32)b[2]<<8)|(unsign32)b[3];
 }
 
+/* unpack bytes from a word */
 static void unpack(unsign32 a,uchar *b)
 {
-    /* unpack bytes from a word */
     b[3]=MR_TOBYTE(a);
     b[2]=MR_TOBYTE(a>>8);
     b[1]=MR_TOBYTE(a>>16);
     b[0]=MR_TOBYTE(a>>24);
 }
 
+/* precompute small 2k bytes gf2m table of x^n.H */
 static void precompute(gcm *g,uchar *H)
 {
-    /* precompute small 2k bytes gf2m table of x^n.H */
     int i,j;
     unsign32 *last,*next,b;
 
@@ -82,10 +91,9 @@ static void precompute(gcm *g,uchar *H)
     }
 }
 
-/* SU= 32 */
+/* SU= 32, gf2m mul - Z=H*X mod 2^128 */
 static void gf2mul(gcm *g)
 {
-    /* gf2m mul - Z=H*X mod 2^128 */
     int i,j,m,k;
     unsign32 P[4];
     unsign32 b;
@@ -108,10 +116,9 @@ static void gf2mul(gcm *g)
     for (i=j=0; i<NB; i++,j+=4) unpack(P[i],(uchar *)&g->stateX[j]);
 }
 
-/* SU= 32 */
+/* SU= 32, Finish off GHASH */
 static void GCM_wrap(gcm *g)
 {
-    /* Finish off GHASH */
     int i,j;
     unsign32 F[4];
     uchar L[16];
@@ -147,8 +154,7 @@ static int GCM_ghash(gcm *g,char *plain,int len)
     return 1;
 }
 
-/* SU= 48 */
-/* Initialize GCM mode */
+/* SU= 48, Initialise an instance of AES-GCM mode */
 void GCM_init(gcm* g,int nk,char *key,int niv,char *iv)
 {
     /* iv size niv is usually 12 bytes (96 bits). AES key size nk can be 16,24 or 32 bytes */
@@ -187,8 +193,7 @@ void GCM_init(gcm* g,int nk,char *key,int niv,char *iv)
     g->status=GCM_ACCEPTING_HEADER;
 }
 
-/* SU= 24 */
-/* Add Header data - included but not encrypted */
+/* SU= 24, Add header (material to be authenticated but not encrypted) */
 int GCM_add_header(gcm* g,char *header,int len)
 {
     /* Add some header. Won't be encrypted, but will be authenticated. len is length of header */
@@ -209,8 +214,7 @@ int GCM_add_header(gcm* g,char *header,int len)
     return 1;
 }
 
-/* SU= 48 */
-/* Add Plaintext - included and encrypted */
+/* SU= 48, Add plaintext and extract ciphertext */
 int GCM_add_plain(gcm *g,char *cipher,char *plain,int len)
 {
     /* Add plaintext to extract ciphertext, len is length of plaintext.  */
@@ -241,11 +245,9 @@ int GCM_add_plain(gcm *g,char *cipher,char *plain,int len)
     return 1;
 }
 
-/* SU= 48 */
-/* Add Ciphertext - decrypts to plaintext */
+/* SU= 48, Add ciphertext and extract plaintext */
 int GCM_add_cipher(gcm *g,char *plain,char *cipher,int len)
 {
-    /* Add ciphertext to extract plaintext, len is length of ciphertext. */
     int i,j=0;
     unsign32 counter;
     char oc;
@@ -275,13 +277,10 @@ int GCM_add_cipher(gcm *g,char *plain,char *cipher,int len)
     return 1;
 }
 
-/* SU= 16 */
-/* Finish and extract Tag */
+/* SU= 16, Finish off GHASH and extract authentication tag (HMAC) */
 void GCM_finish(gcm *g,char *tag)
 {
-    /* Finish off GHASH and extract tag (MAC) */
     int i;
-
     GCM_wrap(g);
 
     /* extract tag */

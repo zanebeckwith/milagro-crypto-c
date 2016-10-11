@@ -1,21 +1,27 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file test_mpin.c
+ * @author Kealan McCusker
+ * @brief Test good token and correct PIN with D-TA. Single pass
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /* Test good token and correct PIN with D-TA. Single pass */
 
@@ -33,56 +39,59 @@ int main()
     octet ID = {0,sizeof(id),id};
 
     char x[PGS],y1[PGS],y2[PGS];
-    octet X= {sizeof(x), sizeof(x),x};
-    octet Y1= {sizeof(y1),sizeof(y1),y1};
-    octet Y2= {sizeof(y2),sizeof(y2),y2};
+    octet X= {0, sizeof(x),x};
+    octet Y1= {0,sizeof(y1),y1};
+    octet Y2= {0,sizeof(y2),y2};
 
     /* Master secret shares */
     char ms1[PGS], ms2[PGS];
-    octet MS1= {sizeof(ms1),sizeof(ms1),ms1};
-    octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
+    octet MS1= {0,sizeof(ms1),ms1};
+    octet MS2= {0,sizeof(ms2),ms2};
 
     /* Hash values of Client ID */
     char hcid[PFS];
-    octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
+    octet HCID= {0,sizeof(hcid), hcid};
 
     /* Client secret and shares */
     char cs1[2*PFS+1], cs2[2*PFS+1], sec[2*PFS+1];
-    octet SEC= {sizeof(sec),sizeof(sec),sec};
-    octet CS1= {sizeof(cs1),sizeof(cs1), cs1};
-    octet CS2= {sizeof(cs2),sizeof(cs2), cs2};
+    octet SEC= {0,sizeof(sec),sec};
+    octet CS1= {0,sizeof(cs1), cs1};
+    octet CS2= {0,sizeof(cs2), cs2};
 
     /* Server secret and shares */
     char ss1[4*PFS], ss2[4*PFS], serverSecret[4*PFS];
-    octet ServerSecret= {sizeof(serverSecret),sizeof(serverSecret),serverSecret};
-    octet SS1= {sizeof(ss1),sizeof(ss1),ss1};
-    octet SS2= {sizeof(ss2),sizeof(ss2),ss2};
+    octet ServerSecret= {0,sizeof(serverSecret),serverSecret};
+    octet SS1= {0,sizeof(ss1),ss1};
+    octet SS2= {0,sizeof(ss2),ss2};
 
     /* Time Permit and shares */
     char tp1[2*PFS+1], tp2[2*PFS+1], tp[2*PFS+1];
-    octet TP= {sizeof(tp),sizeof(tp),tp};
-    octet TP1= {sizeof(tp1),sizeof(tp1),tp1};
-    octet TP2= {sizeof(tp2),sizeof(tp2),tp2};
+    octet TP= {0,sizeof(tp),tp};
+    octet TP1= {0,sizeof(tp1),tp1};
+    octet TP2= {0,sizeof(tp2),tp2};
 
     /* Token stored on computer */
     char token[2*PFS+1];
-    octet TOKEN= {sizeof(token),sizeof(token),token};
+    octet TOKEN= {0,sizeof(token),token};
 
     char ut[2*PFS+1];
-    octet UT= {sizeof(ut),sizeof(ut),ut};
+    octet UT= {0,sizeof(ut),ut};
 
     char hid[2*PFS+1],htid[2*PFS+1];
     octet HID= {0,sizeof(hid),hid};
     octet HTID= {0,sizeof(htid),htid};
 
     char e[12*PFS], f[12*PFS];
-    octet E= {sizeof(e),sizeof(e),e};
-    octet F= {sizeof(f),sizeof(f),f};
+    octet E= {0,sizeof(e),e};
+    octet F= {0,sizeof(f),f};
 
     int TimeValue = 0;
 
     PIN1 = 1234;
     PIN2 = 1234;
+
+    printf("MPIN_FS %d\n", MPIN_FS());
+    printf("MPIN_GS %d\n", MPIN_GS());
 
     /* Assign the End-User an ID */
     char* user = "testuser@miracl.com";
@@ -90,13 +99,13 @@ int main()
     printf("CLIENT: ID %s\n", user);
 
     int date = 0;
-    char seed[100] = {0};
+    char seed[32] = {0};
     octet SEED = {0,sizeof(seed),seed};
     csprng RNG;
 
     /* unrandom seed value! */
-    SEED.len=100;
-    for (i=0; i<100; i++) SEED.val[i]=i+1;
+    SEED.len=32;
+    for (i=0; i<32; i++) SEED.val[i]=i+1;
 
     /* initialise random number generator */
     MPIN_CREATE_CSPRNG(&RNG,&SEED);
@@ -254,5 +263,6 @@ int main()
     {
         printf("SUCCESS Error Code %d\n", rtn);
     }
+    MPIN_KILL_CSPRNG(&RNG);
     return 0;
 }

@@ -1,21 +1,27 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file test_mpin_sign.c
+ * @author Kealan McCusker
+ * @brief Test function for M-Pin Signature
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /* Test M-Pin Signature */
 
@@ -29,8 +35,6 @@ int main()
 {
     int i,PIN1,PIN2,rtn;
 
-    int failure = 0;
-
     char id[256];
     octet ID = {0,sizeof(id),id};
 
@@ -39,53 +43,51 @@ int main()
     octet M= {0,sizeof(m),m};
 
     char x[PGS],y1[PGS],y2[PGS];
-    octet X= {sizeof(x), sizeof(x),x};
-    octet Y1= {sizeof(y1),sizeof(y1),y1};
-    octet Y2= {sizeof(y2),sizeof(y2),y2};
+    octet X= {0,sizeof(x),x};
+    octet Y1= {0,sizeof(y1),y1};
+    octet Y2= {0,sizeof(y2),y2};
 
     /* Master secret shares */
     char ms1[PGS], ms2[PGS];
-    octet MS1= {sizeof(ms1),sizeof(ms1),ms1};
-    octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
+    octet MS1= {0,sizeof(ms1),ms1};
+    octet MS2= {0,sizeof(ms2),ms2};
 
     /* Hash values of Client ID */
     char hcid[PFS];
-    octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
+    octet HCID= {0,sizeof(hcid), hcid};
 
     /* Client secret and shares */
     char cs1[2*PFS+1], cs2[2*PFS+1], sec[2*PFS+1];
-    octet SEC= {sizeof(sec),sizeof(sec),sec};
-    octet CS1= {sizeof(cs1),sizeof(cs1), cs1};
-    octet CS2= {sizeof(cs2),sizeof(cs2), cs2};
+    octet SEC= {0,sizeof(sec),sec};
+    octet CS1= {0,sizeof(cs1), cs1};
+    octet CS2= {0,sizeof(cs2), cs2};
 
     /* Server secret and shares */
     char ss1[4*PFS], ss2[4*PFS], serverSecret[4*PFS];
-    octet ServerSecret= {sizeof(serverSecret),sizeof(serverSecret),serverSecret};
-    octet SS1= {sizeof(ss1),sizeof(ss1),ss1};
-    octet SS2= {sizeof(ss2),sizeof(ss2),ss2};
+    octet ServerSecret= {0,sizeof(serverSecret),serverSecret};
+    octet SS1= {0,sizeof(ss1),ss1};
+    octet SS2= {0,sizeof(ss2),ss2};
 
     /* Time Permit and shares */
     char tp1[2*PFS+1], tp2[2*PFS+1], tp[2*PFS+1];
-    octet TP= {sizeof(tp),sizeof(tp),tp};
-    octet TP1= {sizeof(tp1),sizeof(tp1),tp1};
-    octet TP2= {sizeof(tp2),sizeof(tp2),tp2};
+    octet TP= {0,sizeof(tp),tp};
+    octet TP1= {0,sizeof(tp1),tp1};
+    octet TP2= {0,sizeof(tp2),tp2};
 
     /* Token stored on computer */
     char token[2*PFS+1];
-    octet TOKEN= {sizeof(token),sizeof(token),token};
+    octet TOKEN= {0,sizeof(token),token};
 
     char ut[2*PFS+1];
-    octet UT= {sizeof(ut),sizeof(ut),ut};
+    octet UT= {0,sizeof(ut),ut};
 
     char hid[2*PFS+1],htid[2*PFS+1];
     octet HID= {0,sizeof(hid),hid};
     octet HTID= {0,sizeof(htid),htid};
 
     char e[12*PFS], f[12*PFS];
-    octet E= {sizeof(e),sizeof(e),e};
-    octet F= {sizeof(f),sizeof(f),f};
-
-
+    octet E= {0,sizeof(e),e};
+    octet F= {0,sizeof(f),f};
 
     int TimeValue = 0;
 
@@ -195,9 +197,23 @@ int main()
     printf("Client Secret = 0x");
     OCT_output(&TOKEN);
 
-    /* Generate Time Permit shares */
-    date = MPIN_today();
+    /* Client extracts PIN1 from secret to create Token */
+    rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
+    if (rtn != 0)
+    {
+        printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Token = 0x");
+    OCT_output(&TOKEN);
+
+    /*********** Fix values for date and time  ********/
+    printf("Fix values for date and time\n");
+    date = 17072;
     printf("Date %d \n", date);
+    TimeValue = 1475079474;
+    printf("TimeValue %d \n", TimeValue);
+
     rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
     if (rtn != 0)
     {
@@ -225,23 +241,12 @@ int main()
     printf("Time Permit = 0x");
     OCT_output(&TP);
 
-    /* Client extracts PIN1 from secret to create Token */
-    rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
-    if (rtn != 0)
-    {
-        printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
-        return 1;
-    }
-    printf("Token = 0x");
-    OCT_output(&TOKEN);
-
     /* Good signature */
+    printf("***** Fixed good signature *****\n");
 
     /* Client  */
     char* message = "sign this message";
     OCT_jstring(&M,message);
-    TimeValue = MPIN_GET_TIME();
-    printf("TimeValue %d \n", TimeValue);
     rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
@@ -259,8 +264,8 @@ int main()
     OCT_output(&Y2);
     if (rtn != 0)
     {
-        failure = 1;
-        printf("FAILURE valid signature not detected %d\n", rtn);
+        printf("TEST FAILED: valid signature not detected %d\n", rtn);
+        return 1;
     }
     else
     {
@@ -268,6 +273,143 @@ int main()
     }
 
     /* Time stamp expired */
+    printf("***** Fixed time stamp expired *****\n");
+
+    /* Client  */
+    OCT_clear(&M);
+    message = "sign this message";
+    OCT_jstring(&M,message);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
+    if (rtn != 0)
+    {
+        printf("MPIN_CLIENT ERROR %d\n", rtn);
+        return 1;
+    }
+    printf("Y1 = 0x");
+    OCT_output(&Y1);
+    printf("V = 0x");
+    OCT_output(&SEC);
+
+    /* Server  */
+    TimeValue += 10;
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    printf("Y2 = 0x");
+    OCT_output(&Y2);
+    if (rtn != -19)
+    {
+        printf("TEST FAILED: Invalid signature not detected %d\n", rtn);
+        return 1;
+    }
+    else
+    {
+        printf("SUCCESS Error Code %d\n", rtn);
+    }
+
+    /* Invalid data */
+    printf("***** Fixed invalid data *****\n");
+
+    /* Client  */
+    OCT_clear(&M);
+    message = "sign this message";
+    OCT_jstring(&M,message);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
+    if (rtn != 0)
+    {
+        printf("MPIN_CLIENT ERROR %d\n", rtn);
+        return 1;
+    }
+    printf("Y1 = 0x");
+    OCT_output(&Y1);
+    printf("V = 0x");
+    OCT_output(&SEC);
+
+    /* Server  */
+    OCT_clear(&M);
+    message = "bad message";
+    OCT_jstring(&M,message);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    printf("Y2 = 0x");
+    OCT_output(&Y2);
+    if (rtn != -19)
+    {
+        printf("TEST FAILED: Invalid signature not detected %d\n", rtn);
+        return 1;
+    }
+    else
+    {
+        printf("SUCCESS Error Code %d\n", rtn);
+    }
+
+    /*********** Current date and time  ********/
+    printf("Current date and time\n");
+
+    date = MPIN_today();
+    printf("Date %d \n", date);
+    TimeValue = MPIN_GET_TIME();
+    printf("TimeValue %d \n", TimeValue);
+
+    /* Generate Time Permit shares */
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
+        return 1;
+    }
+    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
+        return 1;
+    }
+    printf("TP1 = 0x");
+    OCT_output(&TP1);
+    printf("TP2 = 0x");
+    OCT_output(&TP2);
+
+    /* Combine Time Permit shares */
+    rtn = MPIN_RECOMBINE_G1(&TP1, &TP2, &TP);
+    if (rtn != 0)
+    {
+        printf("MPIN_RECOMBINE_G1(&TP1, &TP2, &TP) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Time Permit = 0x");
+    OCT_output(&TP);
+
+
+    /* Good signature */
+    printf("***** Good signature *****\n");
+    ;
+    /* Client  */
+    message = "sign this message";
+    OCT_jstring(&M,message);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
+    if (rtn != 0)
+    {
+        printf("MPIN_CLIENT ERROR %d\n", rtn);
+        return 1;
+    }
+    printf("Y1 = 0x");
+    OCT_output(&Y1);
+    printf("V = 0x");
+    OCT_output(&SEC);
+
+    /* Server  */
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    printf("Y2 = 0x");
+    OCT_output(&Y2);
+    if (rtn != 0)
+    {
+        printf("TEST FAILED: valid signature not detected %d\n", rtn);
+        return 1;
+    }
+    else
+    {
+        printf("SUCCESS Error Code %d\n", rtn);
+    }
+
+    /* Time stamp expired */
+    printf("***** Time stamp expired *****\n");
 
     /* Client  */
     OCT_clear(&M);
@@ -293,8 +435,8 @@ int main()
     OCT_output(&Y2);
     if (rtn != -19)
     {
-        failure = 1;
-        printf("FAILURE Invalid signature not detected %d\n", rtn);
+        printf("TEST FAILED: Invalid signature not detected %d\n", rtn);
+        return 1;
     }
     else
     {
@@ -302,6 +444,7 @@ int main()
     }
 
     /* Invalid data */
+    printf("***** Invalid data *****\n");
 
     /* Client  */
     OCT_clear(&M);
@@ -329,20 +472,15 @@ int main()
     OCT_output(&Y2);
     if (rtn != -19)
     {
-        failure = 1;
-        printf("FAILURE Invalid signature not detected %d\n", rtn);
+        printf("TEST FAILED: Invalid signature not detected %d\n", rtn);
+        return 1;
     }
     else
     {
         printf("SUCCESS Error Code %d\n", rtn);
     }
 
-    if (failure != 0)
-    {
-        printf("TEST FAILED\n");
-        return 1;
-    }
-
     printf("TEST PASSED\n");
+    MPIN_KILL_CSPRNG(&RNG);
     return 0;
 }

@@ -1,23 +1,31 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+/**
+ * @file rsa.c
+ * @author Mike Scott
+ * @author Kealan McCusker
+ * @date 2nd June 2015
+ * @brief AMCL RSA source code file for implementation of RSA protocol
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-/* RSA Functions - see main program below */
+/* AMCL RSA source code file for implementation of RSA protocol */
 
 #include <stdio.h>
 #include <string.h>
@@ -116,46 +124,63 @@ void RSA_CREATE_CSPRNG(csprng *RNG,octet *RAW)
     RAND_seed(RNG,RAW->len,RAW->val);
 }
 
+/* Kill a random number generator */
 void RSA_KILL_CSPRNG(csprng *RNG)
 {
     RAND_clean(RNG);
 }
 
-/* generate an RSA key pair */
-
-void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB)
+/* Generate an RSA key pair */
+void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB,octet *P, octet* Q)
 {
     /* IEEE1363 A16.11/A16.12 more or less */
     BIG t[HFLEN],p1[HFLEN],q1[HFLEN];
 
-    for (;;)
+    if (RNG!=NULL)
     {
 
-        FF_random(PRIV->p,RNG,HFLEN);
-        while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
-        while (!FF_prime(PRIV->p,RNG,HFLEN))
-            FF_inc(PRIV->p,4,HFLEN);
+        for (;;)
+        {
+
+            FF_random(PRIV->p,RNG,HFLEN);
+            while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
+            while (!FF_prime(PRIV->p,RNG,HFLEN))
+                FF_inc(PRIV->p,4,HFLEN);
+
+            FF_copy(p1,PRIV->p,HFLEN);
+            FF_dec(p1,1,HFLEN);
+
+            if (FF_cfactor(p1,e,HFLEN)) continue;
+            break;
+        }
+
+        for (;;)
+        {
+            FF_random(PRIV->q,RNG,HFLEN);
+            while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
+            while (!FF_prime(PRIV->q,RNG,HFLEN))
+                FF_inc(PRIV->q,4,HFLEN);
+
+            FF_copy(q1,PRIV->q,HFLEN);
+            FF_dec(q1,1,HFLEN);
+            if (FF_cfactor(q1,e,HFLEN)) continue;
+
+            break;
+        }
+
+    }
+    else
+    {
+        FF_fromOctet(PRIV->p,P,HFLEN);
+        FF_fromOctet(PRIV->q,Q,HFLEN);
 
         FF_copy(p1,PRIV->p,HFLEN);
         FF_dec(p1,1,HFLEN);
 
-        if (FF_cfactor(p1,e,HFLEN)) continue;
-        break;
-    }
-
-    for (;;)
-    {
-        FF_random(PRIV->q,RNG,HFLEN);
-        while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
-        while (!FF_prime(PRIV->q,RNG,HFLEN))
-            FF_inc(PRIV->q,4,HFLEN);
-
         FF_copy(q1,PRIV->q,HFLEN);
         FF_dec(q1,1,HFLEN);
-        if (FF_cfactor(q1,e,HFLEN)) continue;
-
-        break;
     }
+
 
     FF_mul(PUB->n,PRIV->p,PRIV->q,HFLEN);
     PUB->e=e;
@@ -180,7 +205,6 @@ void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB
 }
 
 /* Mask Generation Function */
-
 void MGF1(int sha,octet *z,int olen,octet *mask)
 {
     char h[64];
@@ -205,8 +229,7 @@ const char SHA256ID[]= {0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0
 const char SHA384ID[]= {0x30,0x41,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x02,0x05,0x00,0x04,0x30};
 const char SHA512ID[]= {0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x03,0x05,0x00,0x04,0x40};
 
-/* PKCS 1.5 padding of a message to be signed */
-
+/* PKCS V1.5 padding of a message prior to RSA signature */
 int PKCS15(int sha,octet *m,octet *w)
 {
     int olen=FF_BITS/8;
@@ -233,8 +256,7 @@ int PKCS15(int sha,octet *m,octet *w)
     return 1;
 }
 
-/* OAEP Message Encoding for Encryption */
-
+/* OAEP padding of a message prior to RSA encryption */
 int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
 {
     int slen,olen=RFS-1;
@@ -274,8 +296,7 @@ int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
     return 1;
 }
 
-/* OAEP Message Decoding for Decryption */
-
+/* OAEP unpadding of a message after RSA decryption */
 int OAEP_DECODE(int sha,octet *p,octet *f)
 {
     int comp,x,t;
@@ -332,7 +353,7 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     return 1;
 }
 
-/* destroy the Private Key structure */
+/* Destroy an Private Key structure */
 void RSA_PRIVATE_KEY_KILL(rsa_private_key *PRIV)
 {
     FF_zero(PRIV->p,HFLEN);
@@ -342,7 +363,7 @@ void RSA_PRIVATE_KEY_KILL(rsa_private_key *PRIV)
     FF_zero(PRIV->c,HFLEN);
 }
 
-/* RSA encryption with the public key */
+/* RSA encryption of suitably padded plaintext */
 void RSA_ENCRYPT(rsa_public_key *PUB,octet *F,octet *G)
 {
     BIG f[FFLEN];
