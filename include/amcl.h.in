@@ -3042,10 +3042,10 @@ extern void FF_mul(BIG *x,BIG *y,BIG *z,int n);
  *
  *	@param x FF instance to be reduced mod m - on exit = x mod m
  *	@param m FF modulus
- *  @param n size of FF in BIGs
- *	@note This is slow
+ *	@param n size of FF in BIGs
+ *  @note This is slow
  */
-extern void FF_mod(BIG* x,BIG* m,int n);
+extern void FF_mod(BIG *x,BIG *m,int n);
 
 /**	@brief Square an FF
  *
