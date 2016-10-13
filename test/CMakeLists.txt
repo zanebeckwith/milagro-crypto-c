@@ -168,13 +168,11 @@ if(AMCL_CHOICE STREQUAL "NIST521")
   add_executable (test_ecdsa_keypair test_ecdsa_keypair.c)
   add_executable (test_ecdsa_sign test_ecdsa_sign.c)
   add_executable (test_ecdsa_verify test_ecdsa_verify.c)
-  add_executable (test_x509 test_x509.c)
   # Link the executable to the libraries
   target_link_libraries (test_ecdh ecdh) 
   target_link_libraries (test_ecdsa_keypair ecdh) 
   target_link_libraries (test_ecdsa_sign ecdh) 
   target_link_libraries (test_ecdsa_verify ecdh)
-  target_link_libraries (test_x509 x509)
   # test
   add_test(NAME test_ecdh_NIST521 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/P-521/KAS_ECC_CDH_PrimitiveTest.txt)
   set_tests_properties (test_ecdh_NIST521 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
@@ -186,11 +184,16 @@ if(AMCL_CHOICE STREQUAL "NIST521")
   set_tests_properties (test_ecdsa_sign_NIST521_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
   add_test(NAME test_ecdsa_verify_NIST521_SHA256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/P-521/sha256Verify.rsp sha256)
   set_tests_properties (test_ecdsa_verify_NIST521_SHA256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_verify_NIST521_SHA512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/P-521/sha512Verify.rsp sha512)
-  set_tests_properties (test_ecdsa_verify_NIST521_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif(AMCL_CHOICE STREQUAL "NIST521")
+
+if((AMCL_CHOICE STREQUAL "NIST521")  AND (AMCL_FFLEN STREQUAL "8"))
+  add_executable (test_x509 test_x509.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_x509 x509)
+  # test
   add_test(NAME test_x509_NIST521 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/P521/x509-vect.txt)
   set_tests_properties (test_x509_NIST521 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-endif(AMCL_CHOICE STREQUAL "NIST521")
+endif((AMCL_CHOICE STREQUAL "NIST521")  AND (AMCL_FFLEN STREQUAL "8"))
 
 if(AMCL_CHOICE STREQUAL "NIST384")
   message(STATUS "Run ${AMCL_CHOICE} ECC Tests")
@@ -301,22 +304,30 @@ endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
 if((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
   message(STATUS "Run ${AMCL_CHOICE} RSA3072 Tests")
   add_executable (test_rsa_sign test_rsa_sign.c)
+  add_executable (test_x509 test_x509.c)
   # Link the executable to the libraries
-  target_link_libraries (test_rsa_sign x509) 
+  target_link_libraries (test_rsa_sign x509)
+  target_link_libraries (test_x509 x509)
   # test
   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/3072/pkcs-vect.txt)
   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+  add_test(NAME test_x509_NIST256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/4096/x509-vect.txt)
+  set_tests_properties (test_x509_NIST256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
 
 
 if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
   message(STATUS "Run ${AMCL_CHOICE} RSA4096 Tests")
   add_executable (test_rsa_sign test_rsa_sign.c)
+  add_executable (test_x509 test_x509.c)
   # Link the executable to the libraries
-  target_link_libraries (test_rsa_sign x509) 
+  target_link_libraries (test_rsa_sign x509)
+  target_link_libraries (test_x509 x509) 
   # test
   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/4096/pkcs-vect.txt)
   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+  add_test(NAME test_x509_NIST256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/4096/x509-vect.txt)
+  set_tests_properties (test_x509_NIST256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
 
 if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
