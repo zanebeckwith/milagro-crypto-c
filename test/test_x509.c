@@ -975,6 +975,6 @@ int main(int argc, char** argv)
     printf("X509 ERROR Empty test vector file\n");
     exit(EXIT_FAILURE);
   }
-  printf("TEST X509 PASSED\n");
+  printf("SUCCESS TEST X509 PASSED\n");
   exit(EXIT_SUCCESS);
 }
