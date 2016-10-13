@@ -28,5 +28,5 @@
  */
 
 
-const int nTimePermitTests = @MPIN_TIME_PERMIT_TESTS@;
-const int nRandomTests = @MPIN_RANDOM_TESTS@;
+const int nTimePermitTests = @MPIN_TIME_PERMIT_TESTS@;  /**< MPin Time Permit Tests */
+const int nRandomTests = @MPIN_RANDOM_TESTS@;           /**< MPin Random Tests */

@@ -47,12 +47,13 @@
 #include <inttypes.h>
 #include "arch.h"
 
-#define AMCL_VERSION_MAJOR @AMCL_VERSION_MAJOR@
-#define AMCL_VERSION_MINOR @AMCL_VERSION_MINOR@
-#define AMCL_VERSION_PATCH @AMCL_VERSION_PATCH@
-#define OS "@OS@"
+#define AMCL_VERSION_MAJOR @AMCL_VERSION_MAJOR@       /**< Major version of the library */
+#define AMCL_VERSION_MINOR @AMCL_VERSION_MINOR@       /**< Minor version of the library */
+#define AMCL_VERSION_PATCH @AMCL_VERSION_PATCH@       /**< Patch version of the library */
+#define OS "@OS@"      /**< Operative system */
+
 #cmakedefine USE_PATENTS
-#cmakedefine USE_ANONYMOUS
+#cmakedefine USE_ANONYMOUS  /**< Use Anonymous Configuration in MPin */
 
 /* Curve types */
 
@@ -77,8 +78,8 @@
 #define C41417 11 /**< Bernstein et al Curve41417 2^414-17									- EDWARDS only */
 #define NIST521 12 /**< For the NIST 521-bit standard curve									- WEIERSTRASS only */
 
-/* BN Curves */
-#define BN_CURVES 100
+/* BN curves */
+#define BN_CURVES 100  /**< Barreto-Naehrig curves */
 #define BN454 100  /**< New AES-128 security BN curve - Modulus built from -0x10000010000000000000100000001  - WEIERSTRASS only */
 #define BN646 101  /**< AES-192 security BN curve -  Modulus built from t=-0x10000000000000000000004000000000000001001 - WEIERSTRASS only */
 
@@ -91,7 +92,7 @@
 #define BN254_T2 105  /**< G2 and GT-Strong BN curve.  Modulus built from t=-0x4000020100608205 		- WEIERSTRASS only */
 
 /* BLS-12 Curves */
-#define BLS_CURVES 200
+#define BLS_CURVES 200   /**< Barreto-Lynn-Scott curves */
 #define BLS455 200   /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
 
 
@@ -135,7 +136,7 @@
 #define NOT_SPECIAL 0			/**< Modulus of no exploitable form */
 #define PSEUDO_MERSENNE 1		/**< Pseudo-mersenne modulus of form $2^n-c$  */
 #define MONTGOMERY_FRIENDLY 3	/**< Montgomery Friendly modulus of form $2^a(2^b-c)-1$  */
-#define GENERALISED_MERSENNE 2	/**< Generalised-mersenne modulus of form $2^n-2^m-1$  */  /** GOLDILOCKS only */
+#define GENERALISED_MERSENNE 2	/**< Generalised-mersenne modulus of form $2^n-2^m-1$, GOLDILOCKS only */
 
 /* Built-in curves defined here */
 /* MIRACL check.cpp utility used to determine optimal choice for BASEBITS */
@@ -610,10 +611,7 @@ typedef struct
 } ECP2;
 
 
-/**
-	@brief SHA256/384-512 hash function instance
-*/
-
+/** @brief SHA256 hash function instance */
 typedef struct
 {
     unsign32 length[2];  /**< 64-bit input length */
@@ -622,6 +620,7 @@ typedef struct
     int hlen;			/**< Hash length in bytes */
 } hash256;
 
+/** @brief SHA384-512 hash function instance */
 typedef struct
 {
     unsign64 length[2];  /**< 64-bit input length */
@@ -630,6 +629,7 @@ typedef struct
     int hlen;           /**< Hash length in bytes */
 } hash512;
 
+/** @brief SHA384 hash function instance */
 typedef hash512 hash384;
 
 #define SHA256 32 /**< SHA-256 hashing */
@@ -660,10 +660,10 @@ typedef hash512 hash384;
 	@brief AES instance
 */
 
-
 typedef struct
 {
-    int Nk,Nr;
+    int Nk,            /**< AES Key Length */
+    int Nr;            /**< AES Number of rounds */
     int mode;          /**< AES mode of operation */
     unsign32 fkey[60]; /**< subkeys for encrypton */
     unsign32 rkey[60]; /**< subkeys for decrypton */
@@ -1303,16 +1303,16 @@ extern void BIG_random(BIG x,csprng *r);
  */
 extern void BIG_randomnum(BIG x,BIG n,csprng *r);
 
-/**	@brief  return NAF (Non-Adjacent-Form) value as +/- 1, 3 or 5, inputs must be normalised
- *
-	Given x and 3*x extracts NAF value from given bit position, and returns number of bits processed, and number of trailing zeros detected if any
-	@param x BIG number
-	@param x3 BIG number, three times x
-	@param i bit position
-	@param nbs pointer to integer returning number of bits processed
-	@param nzs pointer to integer returning number of trailing 0s
-	@return + or - 1, 3 or 5
- */
+///*@brief  return NAF (Non-Adjacent-Form) value as +/- 1, 3 or 5, inputs must be normalised
+//
+//	Given x and 3*x extracts NAF value from given bit position, and returns number of bits processed, and number of trailing zeros detected if any
+//	@param x BIG number
+//	@param x3 BIG number, three times x
+//	@param i bit position
+//	@param nbs pointer to integer returning number of bits processed
+//	@param nzs pointer to integer returning number of trailing 0s
+//	@return + or - 1, 3 or 5
+//*/
 //extern int BIG_nafbits(BIG x,BIG x3,int i,int *nbs,int *nzs);
 
 /**	@brief  Calculate x=y*z mod n
@@ -3028,11 +3028,11 @@ extern void FF_fromOctet(BIG *x,octet *S,int n);
  *
  *  Multiplication of two FFs.
  *
- *	Uses Karatsuba method internally
  *	@param x FF instance, on exit = y*z
  *	@param y FF instance
  *	@param z FF instance
  * 	@param n size of FF in BIGs
+ *  @note Uses Karatsuba method internally
  */
 extern void FF_mul(BIG *x,BIG *y,BIG *z,int n);
 
@@ -3040,12 +3040,12 @@ extern void FF_mul(BIG *x,BIG *y,BIG *z,int n);
  *
  *  Reduce FF mod a modulus.
  *
- *	@note This is slow
  *	@param x FF instance to be reduced mod m - on exit = x mod m
  *	@param m FF modulus
  *  @param n size of FF in BIGs
+ *	@note This is slow
  */
-extern void FF_mod(BIG *x,BIG *m,int n);
+extern void FF_mod(BIG* x,BIG* m,int n);
 
 /**	@brief Square an FF
  *
