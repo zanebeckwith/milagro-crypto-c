@@ -3,7 +3,8 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th July 2016
- * @brief AMCL Support functions for M-Pin servers
+ *
+ * AMCL Support functions for M-Pin servers
  *
  * LICENSE
  *
@@ -14,8 +15,7 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -32,50 +32,55 @@
 
 #include "amcl.h"
 
-/** @brief Decode hex value
+/**
+ * @brief Decode hex value
  *
- *  Decode hex value.
+ * Decode hex value.
  *
- *	@param src     Hex encoded string
- *	@param dst     Binary string
- *	@param src_len length Hex encoded string
+ * @param src     Hex encoded string
+ * @param dst     Binary string
+ * @param src_len length Hex encoded string
  */
 void amcl_hex2bin(const char *src, char *dst, int src_len);
 
-/** @brief Encode binary string
+/**
+ * @brief Encode binary string
  *
- *  Encode binary string.
+ * Encode binary string.
  *
- *	@param src     Binary string
- *	@param dst     Hex encoded string
- *	@param src_len length binary string
+ * @param src     Binary string
+ * @param dst     Hex encoded string
+ * @param src_len length binary string
  */
 void amcl_bin2hex(char *src, char *dst, int src_len);
 
-/** @brief Print encoded binary string in hex
+/**
+ * @brief Print encoded binary string in hex
  *
- *  Print encoded binary string in hex.
+ * Print encoded binary string in hex.
  *
- *	@param src     Binary string
- *	@param src_len length binary string
+ * @param src     Binary string
+ * @param src_len length binary string
  */
 void amcl_print_hex(char *src, int src_len);
 
-/** @brief Generate a random Octet
+/**
+ * @brief Generate a random Octet
  *
- *  Generate a random Octet.
+ * Generate a random Octet.
  *
- *  @param  RNG             random number generator
- *  @param  randomValue     random Octet
+ * @param  RNG             random number generator
+ * @param  randomValue     random Octet
  */
 void generateRandom(csprng* RNG, octet* randomValue);
 
-/** @brief Generate a random six digit one time password
+/**
+ * @brief Generate a random six digit one time password
  *
- *  Generates a random six digit one time password.
+ * Generates a random six digit one time password.
  *
- *  @param  RNG             random number generator
- *  @return OTP             One Time Password
+ * @param  RNG             random number generator
+ * @return OTP             One Time Password
  */
 int generateOTP(csprng* RNG);
 

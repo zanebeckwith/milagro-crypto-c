@@ -11,56 +11,16 @@ branches:
   only:
     - master
     - develop
-
-before_install:
-    # Enable i386 for wine
-    - sudo dpkg --add-architecture i386
-    - sudo apt-get update || true
-    - sudo apt-get -y install wine
-    - wine --version
-
-addons:
-  apt:
-    packages:
-    - build-essential
-    - cmake
-    - gcc
-    - lcov
-    - devscripts
-    - pbuilder
-    - strace
-    - lsof
-    - gdb
-    - valgrind
-    - python
-    - python-dev
-    - python-pip
-    - libffi-dev
-    - doxygen
-    - doxygen-latex
-    - mingw-w64
-    - binutils-mingw-w64
-    - mingw-w64-tools
-    - mingw-w64-i686-dev
-    - mingw-w64-x86-64-dev
-    - golang
-    - g++-multilib
-    - libc6-dev-i386
-    - parallel
+    - travis
 
 install:
-  - pip install --user --upgrade pip
-  - pip install --user cffi
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/bin
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/pkg
-  - mkdir -p /home/travis/build/miracl/milagro-crypto-c/target/go/src
-  - export GOPATH=/home/travis/build/miracl/milagro-crypto-c/target/go
-  - export PATH=$GOPATH/bin:$PATH:$HOME/.local/bin
   - gem install coveralls-lcov
-  - go get github.com/stretchr/testify/assert
+
+services:
+  - docker
 
 script:
-  - make qa
+  - make dbuild
 
 after_success:
   - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/COVERAGE/coverage/amcl.info
