@@ -662,7 +662,7 @@ typedef hash512 hash384;
 
 typedef struct
 {
-    int Nk,            /**< AES Key Length */
+    int Nk;            /**< AES Key Length */
     int Nr;            /**< AES Number of rounds */
     int mode;          /**< AES mode of operation */
     unsign32 fkey[60]; /**< subkeys for encrypton */
