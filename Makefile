@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all format clean qa build_group build build_qa_item build_item buildx dbuild
+.PHONY: help all format clean qa build_group build build_qa_item build_item buildx dbuild pubdocs
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -222,3 +222,20 @@ dbuild:
 	@echo 0 > target/make.exit
 	VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET='$(MAKETARGET)' ./dockerbuild.sh
 	@exit `cat target/make.exit`
+
+# Publish Documentation in GitHub (requires writing permissions)
+# Use this only after generating all build options with "make dbuild"
+pubdocs:
+	rm -rf ./target/DOCS
+	rm -rf ./target/WIKI
+	find ./target -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | xargs -i sh -c 'mkdir -p ./target/DOCS/{} && cp -rf ./target/{}/doc/html/* ./target/DOCS/{}/'
+	echo "# milagro-crypto-c Source Code Documentation" > ./target/DOCS/Home.md
+	find ./target/DOCS -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | xargs -i sh -c 'echo "* [{}](https://cdn.rawgit.com/wiki/miracl/milagro-crypto-c/{}/index.html)" >> ./target/DOCS/Home.md'
+	git clone git@github.com:miracl/milagro-crypto-c.wiki.git ./target/WIKI
+	mv -f ./target/WIKI/.git ./target/DOCS/
+	cd ./target/DOCS/ && \
+	git add . -A && \
+	git commit -m 'Update documentation' && \
+	git push origin master --force
+	rm -rf ./target/DOCS
+	rm -rf ./target/WIKI
