@@ -655,8 +655,8 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  =  @CMAKE_CURRENT_BINARY_DIR@/include \
-                          @CMAKE_CURRENT_BINARY_DIR@/src \
+INPUT                  =  @CMAKE_CURRENT_BINARY_DIR@/../include \
+                          @CMAKE_CURRENT_BINARY_DIR@/../src \
                           @CMAKE_CURRENT_SOURCE_DIR@/../doc/AMCL.dox
 
 # This tag can be used to specify the character encoding of the source files
