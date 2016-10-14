@@ -34,18 +34,18 @@
 
 /* Field size is assumed to be greater than or equal to group size */
 
-#define PGS MODBYTES  /**< WCC Group Size */
-#define PFS MODBYTES  /**< WCC Field Size */
-#define PAS 16  /**< AES-GCM Symmetric Key Size */
-#define PIV 12  /**< AES-GCM Initialization Vector Size */
-#define PTAG 16  /**< AES-GCM MAC Size */
+#define PGS MODBYTES          /**< WCC Group Size */
+#define PFS MODBYTES          /**< WCC Field Size */
+#define PAS 16                /**< AES-GCM Symmetric Key Size */
+#define PIV 12                /**< AES-GCM Initialization Vector Size */
+#define PTAG 16               /**< AES-GCM MAC Size */
 
-#define WCC_OK                     0    /**< Function completed without error */
-#define WCC_INVALID_POINT         -51 /**< Point is NOT on the curve */
+#define WCC_OK 0              /**< Function completed without error */
+#define WCC_INVALID_POINT -51 /**< Point is NOT on the curve */
 
 #define TIME_SLOT_MINUTES 1440 /**< Time Slot = 1 day */
 
-#define HASH_TYPE_WCC SHA256 /**< Choose Hash function */
+#define HASH_TYPE_WCC SHA256   /**< Choose Hash function */
 
 /**
  * @brief Generate a random integer
@@ -165,7 +165,7 @@ int WCC_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2);
  * @param  TPG1      Time Permit in G1
  * @return rtn       Returns 0 if successful or else an error code
  */
-int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *G1TP);
+int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG1);
 
 /**
  * @brief Calculate time permit in G2
@@ -183,7 +183,7 @@ int WCC_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *G1TP);
  * @param  TPG2      Time Permit in G2
  * @return rtn       Returns 0 if successful or else an error code
  */
-int WCC_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *G2TP);
+int WCC_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2);
 
 /**
  * @brief Calculate the sender AES key
@@ -275,7 +275,7 @@ void WCC_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
  * @param  ID     Value to hash
  * @param  HID    sha256 hashed value
  */
-void WCC_HASH_ID(int sha, octet *,octet *);
+void WCC_HASH_ID(int sha,octet *ID,octet *HID);
 
 /**
  * @brief Add two members from the group G1
@@ -287,7 +287,7 @@ void WCC_HASH_ID(int sha, octet *,octet *);
  * @param  R       returns member of G1 = R1+R2
  * @return         Returns 0 if successful or else an error code
  */
-int WCC_RECOMBINE_G1(octet *,octet *,octet *);
+int WCC_RECOMBINE_G1(octet *R1,octet *R2,octet *R);
 
 /**
  * @brief Add two members from the group G2
@@ -299,7 +299,7 @@ int WCC_RECOMBINE_G1(octet *,octet *,octet *);
  * @param  W       returns member of G2 = W1+W2
  * @return         Returns 0 if successful or else an error code
  */
-int WCC_RECOMBINE_G2(octet *,octet *,octet *);
+int WCC_RECOMBINE_G2(octet *W1,octet *W2,octet *W);
 
 /**
  * @brief Get today's date as days from the epoch
@@ -318,7 +318,7 @@ unsign32 WCC_today(void);
  * @param RNG     cryptographically secure random number generator
  * @param SEED    random seed value
  */
-void WCC_CREATE_CSPRNG(csprng *,octet *);
+void WCC_CREATE_CSPRNG(csprng *RNG,octet *SEED);
 
 /**
  * @brief Kill a random number generator

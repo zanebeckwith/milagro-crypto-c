@@ -35,8 +35,9 @@
 #include <string.h>
 #include "amcl.h"
 
-/* Curve types */
-
+/**
+ * Curve types
+ */
 #if CURVETYPE==WEIERSTRASS
 #define CURVETYPE_DESC "WEIERSTRASS"
 #elif CURVETYPE==EDWARDS
@@ -47,8 +48,9 @@
 #define CURVETYPE_DESC ""
 #endif
 
-/* curves */
-
+/**
+ * Curve choice description
+ */
 #if CHOICE==BN254
 #define CHOICE_DESC "BN254"
 #elif CHOICE==BN254_T
@@ -93,8 +95,9 @@
 #define CHOICE_DESC ""
 #endif
 
-/* modulus types */
-
+/**
+ * Modulus type
+ */
 #if MODTYPE==NOT_SPECIAL
 #define MODTYPE_DESC "NOT_SPECIAL - Modulus of no exploitable form"
 #elif MODTYPE==PSEUDO_MERSENNE
