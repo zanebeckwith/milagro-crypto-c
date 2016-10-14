@@ -16,6 +16,8 @@
 # Get vendor and project name
 : ${VENDOR:=vendor}
 : ${PROJECT:=project}
+
+# Make target to execute
 : ${MAKETARGET:=qa}
 
 # Name of the base development Docker image
