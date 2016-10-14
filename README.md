@@ -47,6 +47,13 @@ To build the project inside a Docker container (requires Docker):
 make dbuild
 ```
 
+To build a particular set of options inside a Docker container:
+```
+MAKETARGET='build TYPE=LINUX_64BIT_NIST256_RSA2048' make dbuild
+```
+The list of pre-defined options can be listed by typing ```make```
+
+
 The base Docker building environment is defined in the following Dockerfile:
 ```
 resources/DockerDev/Dockerfile
