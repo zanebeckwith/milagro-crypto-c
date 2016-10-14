@@ -37,7 +37,8 @@ FROM ${DOCKERDEV}
 RUN mkdir -p ${PRJPATH}
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
-RUN make ${MAKETARGET} || (echo \$? > target/make.exit)
+RUN GOPATH=/root go get github.com/stretchr/testify/assert && \
+make ${MAKETARGET} || (echo \$? > target/make.exit)
 EOM
 
 # Define the temporary Docker image name
