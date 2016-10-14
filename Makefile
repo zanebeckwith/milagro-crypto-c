@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all format clean qa build_group build build_qa_item build_item buildx dbuild
+.PHONY: help all format clean qa build_group build build_qa_item build_item buildx dbuild pubdocs
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -168,11 +168,11 @@ clean:
 qa:
 	go get github.com/stretchr/testify/assert
 	@mkdir -p target/
-	@echo 0 > target/make_qa.exit
+	@echo 0 > target/make.exit
 	@echo '' > target/make_qa_errors.log
 	make build_group BUILD_GROUP=BUILDS
 	@cat target/make_qa_errors.log
-	@exit `cat target/make_qa.exit`
+	@exit `cat target/make.exit`
 
 # Build the specified group of options
 build_group:
@@ -184,7 +184,7 @@ build:
 
 # Same as build_item but stores the exit code and faling items
 build_qa_item:
-	make build_item ITEM=${ITEM} || (echo $$? > target/make_qa.exit && echo ${ITEM} >> target/make_qa_errors.log);
+	make build_item ITEM=${ITEM} || (echo $$? > target/make.exit && echo ${ITEM} >> target/make_qa_errors.log);
  
 # Build the specified item entry from the BUILDS list
 build_item:
@@ -219,6 +219,23 @@ endif
 dbuild:
 	@mkdir -p target
 	@rm -rf target/*
-	@echo 0 > target/make_qa.exit
-	VENDOR=$(VENDOR) PROJECT=$(PROJECT) ./dockerbuild.sh
-	@exit `cat target/make_qa.exit`
+	@echo 0 > target/make.exit
+	VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET='$(MAKETARGET)' ./dockerbuild.sh
+	@exit `cat target/make.exit`
+
+# Publish Documentation in GitHub (requires writing permissions)
+# Use this only after generating all build options with "make dbuild"
+pubdocs:
+	rm -rf ./target/DOCS
+	rm -rf ./target/WIKI
+	find ./target -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | xargs -i sh -c 'mkdir -p ./target/DOCS/{} && cp -rf ./target/{}/doc/html/* ./target/DOCS/{}/'
+	echo "# milagro-crypto-c Source Code Documentation" > ./target/DOCS/Home.md
+	find ./target/DOCS -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | xargs -i sh -c 'echo "* [{}](https://cdn.rawgit.com/wiki/miracl/milagro-crypto-c/{}/index.html)" >> ./target/DOCS/Home.md'
+	git clone git@github.com:miracl/milagro-crypto-c.wiki.git ./target/WIKI
+	mv -f ./target/WIKI/.git ./target/DOCS/
+	cd ./target/DOCS/ && \
+	git add . -A && \
+	git commit -m 'Update documentation' && \
+	git push origin master --force
+	rm -rf ./target/DOCS
+	rm -rf ./target/WIKI
