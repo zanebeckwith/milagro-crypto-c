@@ -358,7 +358,7 @@ int MPIN_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W);
  * @param W the output =X.G or (1/x).G
  * @return 0 or an error code
  */
-int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *x,octet *G,octet *W);
+int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W);
 
 /**
  * @brief Hash the session transcript

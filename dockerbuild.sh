@@ -11,11 +11,14 @@
 # This script requires Docker
 
 # EXAMPLE USAGE:
-# VENDOR=vendorname PROJECT=projectname ./dockerbuild.sh
+# VENDOR=vendorname PROJECT=projectname MAKETARGET=qa ./dockerbuild.sh
 
 # Get vendor and project name
 : ${VENDOR:=vendor}
 : ${PROJECT:=project}
+
+# Make target to execute
+: ${MAKETARGET:=qa}
 
 # Name of the base development Docker image
 DOCKERDEV=${VENDOR}/dev_${PROJECT}
@@ -34,7 +37,8 @@ FROM ${DOCKERDEV}
 RUN mkdir -p ${PRJPATH}
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
-RUN make qa || (echo \$? > target/make_qa.exit)
+RUN GOPATH=/root go get github.com/stretchr/testify/assert && \
+make ${MAKETARGET} || (echo \$? > target/make.exit)
 EOM
 
 # Define the temporary Docker image name

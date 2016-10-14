@@ -168,11 +168,11 @@ clean:
 qa:
 	go get github.com/stretchr/testify/assert
 	@mkdir -p target/
-	@echo 0 > target/make_qa.exit
+	@echo 0 > target/make.exit
 	@echo '' > target/make_qa_errors.log
 	make build_group BUILD_GROUP=BUILDS
 	@cat target/make_qa_errors.log
-	@exit `cat target/make_qa.exit`
+	@exit `cat target/make.exit`
 
 # Build the specified group of options
 build_group:
@@ -184,7 +184,7 @@ build:
 
 # Same as build_item but stores the exit code and faling items
 build_qa_item:
-	make build_item ITEM=${ITEM} || (echo $$? > target/make_qa.exit && echo ${ITEM} >> target/make_qa_errors.log);
+	make build_item ITEM=${ITEM} || (echo $$? > target/make.exit && echo ${ITEM} >> target/make_qa_errors.log);
  
 # Build the specified item entry from the BUILDS list
 build_item:
@@ -219,6 +219,6 @@ endif
 dbuild:
 	@mkdir -p target
 	@rm -rf target/*
-	@echo 0 > target/make_qa.exit
-	VENDOR=$(VENDOR) PROJECT=$(PROJECT) ./dockerbuild.sh
-	@exit `cat target/make_qa.exit`
+	@echo 0 > target/make.exit
+	VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET='$(MAKETARGET)' ./dockerbuild.sh
+	@exit `cat target/make.exit`
