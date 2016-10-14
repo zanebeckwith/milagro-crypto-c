@@ -1,20 +1,29 @@
 # AMCL header files
 
-set(AMCL_HEADERS
+set(COPY_HEADERS
 ecdh.h  
 rsa.h    
 x509.h
 version.h
-utils.h
+utils.h)
+
+set(AMCL_HEADERS
+${CMAKE_CURRENT_BINARY_DIR}/ecdh.h  
+${CMAKE_CURRENT_BINARY_DIR}/rsa.h    
+${CMAKE_CURRENT_BINARY_DIR}/x509.h
+${CMAKE_CURRENT_BINARY_DIR}/version.h
+${CMAKE_CURRENT_BINARY_DIR}/utils.h
 ${CMAKE_CURRENT_BINARY_DIR}/arch.h
 ${CMAKE_CURRENT_BINARY_DIR}/amcl.h) 
 
 if(BUILD_MPIN)
-  set(AMCL_HEADERS ${AMCL_HEADERS} mpin.h)
+  set(COPY_HEADERS ${COPY_HEADERS} mpin.h)
+  set(AMCL_HEADERS ${AMCL_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/mpin.h)
 endif(BUILD_MPIN)
 
 if(BUILD_WCC)
-  set(AMCL_HEADERS ${AMCL_HEADERS} wcc.h)
+  set(COPY_HEADERS ${COPY_HEADERS} wcc.h)
+  set(AMCL_HEADERS ${AMCL_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/wcc.h)
 endif(BUILD_WCC)
 
 install (DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
@@ -27,5 +36,8 @@ install (FILES ${AMCL_HEADERS} DESTINATION include PERMISSIONS
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
 
-# Copy headers file for testing before installation
+# Copy header files to binary include directory
+file(COPY ${COPY_HEADERS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Copy header files for testing before installation
 file(COPY ${AMCL_HEADERS} DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
