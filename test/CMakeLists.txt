@@ -184,6 +184,8 @@ if(AMCL_CHOICE STREQUAL "NIST521")
   set_tests_properties (test_ecdsa_sign_NIST521_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
   add_test(NAME test_ecdsa_verify_NIST521_SHA256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/P-521/sha256Verify.rsp sha256)
   set_tests_properties (test_ecdsa_verify_NIST521_SHA256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+  add_test(NAME test_ecdsa_verify_NIST521_SHA512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/P-521/sha512Verify.rsp sha512)
+  set_tests_properties (test_ecdsa_verify_NIST521_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif(AMCL_CHOICE STREQUAL "NIST521")
 
 if((AMCL_CHOICE STREQUAL "NIST521")  AND (AMCL_FFLEN STREQUAL "8") AND (BUILD_X509))
