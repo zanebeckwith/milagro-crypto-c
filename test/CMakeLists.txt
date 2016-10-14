@@ -298,6 +298,18 @@ if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
 
+if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CHUNK STREQUAL "64") AND (BUILD_X509))
+  message(STATUS "Run ${AMCL_CHOICE} x509 Tests")
+  add_executable (test_x509 test_x509.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_x509 x509) 
+  # test
+  add_test(NAME test_x509_NIST256_1 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/2048_P256/pkits-vect.txt)
+  set_tests_properties (test_x509_NIST256_1 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+  add_test(NAME test_x509_NIST256_2 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/2048_P256/x509-vect.txt)
+  set_tests_properties (test_x509_NIST256_2 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CHUNK STREQUAL "64") AND (BUILD_X509))
+
 if((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
   message(STATUS "Run ${AMCL_CHOICE} RSA3072 Tests")
   add_executable (test_rsa_sign test_rsa_sign.c)
