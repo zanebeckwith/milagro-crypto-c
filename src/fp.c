@@ -669,7 +669,8 @@ int FP_equals(BIG x,BIG y)
 	FP_reduce(y);
 	if (BIG_comp(x,y)==0)
         return 1;
-    return 0;
+	else
+		return 0;
 }
 
 /*

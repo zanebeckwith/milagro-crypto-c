@@ -1576,7 +1576,7 @@ extern void FP_div2(BIG x,BIG y);
  *
  * @param x BIG number, on exit  = y^z mod Modulus
  * @param y BIG number
- * @param z Big number exponent
+ * @param z BIG number exponent
  */
 extern void FP_pow(BIG x,BIG y,BIG z);
 
