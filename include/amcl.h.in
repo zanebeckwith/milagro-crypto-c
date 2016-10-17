@@ -1649,6 +1649,17 @@ extern int FP_qr(BIG x);
  */
 extern void FP_inv(BIG x,BIG y);
 
+/**
+ * @brief Tests for equality of two FP (BIG)
+ *
+ * Tests for equality of two FP (BIG).
+ *
+ * @param x BIG instance to be compared
+ * @param y BIG instance to be compared
+ * @return 1 if x=y, else returns 0
+ */
+extern int FP_equals(BIG x,BIG y);
+
 /* FP2 prototypes */
 
 /**
