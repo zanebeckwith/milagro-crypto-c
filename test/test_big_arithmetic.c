@@ -34,10 +34,11 @@
 int main()
 {
     int i;
-    char raw[256];
+    char raw[256], bytes[MODBYTES];
     csprng rng;
 
     BIG F,G,H;
+    DBIG DF,DG;
 
     /* Fake random source */
     RAND_clean(&rng);
@@ -77,30 +78,45 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    /* Testing small multiplication and division by 2 */
-    BIG_random(F,&rng);
-    BIG_copy(G,F);
+    /* Testing small multiplication and division by 3 */
     for (i=0;i<100;i++)
-        BIG_imul(G,G,3);
-    for (i=0;i<100;i++)
-        BIG_div3(G);
-    if(!BIG_comp(G,F))
     {
-        printf("ERROR testing small multiplication and division by 2 BIG\n");
-        exit(EXIT_FAILURE);
+        BIG_random(F,&rng);
+    	BIG_copy(G,F);
+        BIG_imul(G,G,3);
+        BIG_div3(G);
+        if(BIG_comp(G,F))
+            {
+                printf("ERROR testing small multiplication and division by 3 BIG\n");
+                exit(EXIT_FAILURE);
+            }
     }
 
-    /* Testing small square  */
+    /* Testing square  */
     for (i=0;i<100;i++)
     {
         BIG_random(F,&rng);
         BIG_copy(G,F);
-        BIG_sqr(G,G);
-        BIG_mul(F,F,F);
-        if(!BIG_comp(G,F))
+        BIG_sqr(DG,G);
+        BIG_mul(DF,F,F);
+        if(BIG_dcomp(DG,DF))
         {
         	printf("ERROR testing square BIG\n");
         	exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Testing from and to bytes conversion  */
+    for (i=0;i<100;i++)
+    {
+        BIG_random(F,&rng);
+        BIG_copy(G,F);
+        BIG_toBytes(bytes,G);
+        BIG_fromBytes(G,bytes);
+        if(BIG_comp(G,F))
+        {
+            printf("ERROR testing from and to bytes conversion BIG\n");
+            exit(EXIT_FAILURE);
         }
     }
 
