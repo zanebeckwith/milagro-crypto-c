@@ -92,7 +92,7 @@ int main()
             }
     }
 
-    /* Testing square  */
+    /* Testing square */
     for (i=0;i<100;i++)
     {
         BIG_random(F,&rng);
@@ -106,7 +106,7 @@ int main()
         }
     }
 
-    /* Testing from and to bytes conversion  */
+    /* Testing from and to bytes conversion */
     for (i=0;i<100;i++)
     {
         BIG_random(F,&rng);
@@ -120,7 +120,7 @@ int main()
         }
     }
 
-    /* Testing small increment and decrement  */
+    /* Testing small increment and decrement */
     for (i=0;i<100;i++)
     {
         BIG_random(F,&rng);
@@ -130,6 +130,31 @@ int main()
         if(BIG_comp(G,F))
         {
             printf("ERROR testing small increment and decrement BIG\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Testing small increment and decrement */
+    for (i=0;i<100;i++)
+    {
+        BIG_random(F,&rng);
+        BIG_copy(G,F);
+
+        if(BIG_comp(G,F))
+        {
+            printf("ERROR testing small increment and decrement BIG\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Testing random with modulo */
+    for (i=0;i<100;i++)
+    {
+    	BIG_random(G,&rng);
+    	BIG_randomnum(F,G,&rng);
+        if(BIG_comp(F,G)>0)
+        {
+            printf("ERROR testing random with modulo BIG\n");
             exit(EXIT_FAILURE);
         }
     }
