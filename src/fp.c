@@ -662,17 +662,6 @@ void FP_sqrt(BIG r,BIG a)
     }
 }
 
-/* Tests for equality of two FPs */
-int FP_equals(BIG x,BIG y)
-{
-	FP_reduce(x);
-	FP_reduce(y);
-	if (BIG_comp(x,y)==0)
-        return 1;
-	else
-		return 0;
-}
-
 /*
 int main()
 {

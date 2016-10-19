@@ -37,7 +37,7 @@ int main()
     char raw[256], bytes[MODBYTES];
     csprng rng;
 
-    BIG F,G,H;
+    BIG F,G,H,I,Z;
     DBIG DF,DG;
 
     /* Fake random source */
@@ -66,13 +66,26 @@ int main()
     }
 
     /* Testing addition, subtraction */
-    BIG_random(F,&rng);
-    BIG_random(H,&rng);
-    BIG_copy(G,F);
-    BIG_add(G,G,H);
-    BIG_sub(G,G,H);
-    BIG_sub(H,H,H);
-    if(BIG_comp(G,F) | !BIG_iszilch(H))
+    for (i=0;i<100;i++)
+    {
+        BIG_random(F,&rng);
+        BIG_random(H,&rng);
+        BIG_copy(G,F);
+        BIG_add(G,G,H);
+        BIG_sub(G,G,H);
+        BIG_sub(H,H,H);
+        if(BIG_comp(G,F) | !BIG_iszilch(H))
+        {
+            printf("ERROR testing addition/subtraction BIG\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    BIG_one(I);
+    BIG_zero(Z);
+    BIG_zero(F);
+    BIG_add(F,F,F);
+    BIG_add(Z,I,Z);
+    if(BIG_comp(Z,I) | !BIG_iszilch(F))
     {
         printf("ERROR testing addition/subtraction BIG\n");
         exit(EXIT_FAILURE);
@@ -119,6 +132,13 @@ int main()
             exit(EXIT_FAILURE);
         }
     }
+    BIG_toBytes(bytes,G);
+    BIG_fromBytesLen(G,bytes,MODBYTES);
+    if(BIG_comp(G,F))
+    {
+        printf("ERROR testing from and to bytes conversion BIG\n");
+        exit(EXIT_FAILURE);
+    }
 
     /* Testing small increment and decrement */
     for (i=0;i<100;i++)
@@ -139,7 +159,6 @@ int main()
     {
         BIG_random(F,&rng);
         BIG_copy(G,F);
-
         if(BIG_comp(G,F))
         {
             printf("ERROR testing small increment and decrement BIG\n");
@@ -150,14 +169,30 @@ int main()
     /* Testing random with modulo */
     for (i=0;i<100;i++)
     {
-    	BIG_random(G,&rng);
-    	BIG_randomnum(F,G,&rng);
+        BIG_random(G,&rng);
+        BIG_randomnum(F,G,&rng);
         if(BIG_comp(F,G)>0)
         {
             printf("ERROR testing random with modulo BIG\n");
             exit(EXIT_FAILURE);
         }
     }
+
+    /* Testing inverse mod parity
+    BIG_one(I);
+    for (i=0;i<100;i++)
+    {
+        BIG_random(F,&rng);
+        BIG_randomnum(H,F,&rng);
+        BIG_mod(F,H);
+        BIG_invmodp(G,F,H);
+        BIG_modmul(F,F,G,H);
+        if(BIG_comp(F,I))
+        {
+            printf("ERROR testing bit parity BIG\n");
+            exit(EXIT_FAILURE);
+        }
+    } */
 
     printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
