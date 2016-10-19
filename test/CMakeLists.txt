@@ -83,11 +83,11 @@ set_tests_properties (test_aes_decrypt_CTR_256 PROPERTIES PASS_REGULAR_EXPRESSIO
 
 # Test on Arithmetic
 # smoke tests  
-add_executable (test_fp_arithmetic test_fp_arithmetic.c)
+add_executable (test_BIG_arithmetic test_big_arithmetic.c)
 # Link the executable to the libraries
-target_link_libraries (test_fp_arithmetic amcl )
+target_link_libraries (test_BIG_arithmetic amcl )
 # tests  
-do_test (test_fp_arithmetic "SUCCESS")
+do_test (test_BIG_arithmetic "SUCCESS")
 
 if(BUILD_MPIN)
   add_executable (test_mpin test_mpin.c)
