@@ -120,6 +120,20 @@ int main()
         }
     }
 
+    /* Testing small increment and decrement  */
+    for (i=0;i<100;i++)
+    {
+        BIG_random(F,&rng);
+        BIG_copy(G,F);
+        BIG_inc(G,i);
+        BIG_dec(G,i);
+        if(BIG_comp(G,F))
+        {
+            printf("ERROR testing small increment and decrement BIG\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
     printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
 }
