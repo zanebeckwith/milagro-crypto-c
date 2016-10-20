@@ -81,11 +81,15 @@ chunk muladd(chunk x,chunk y,chunk c,chunk *r)
 #endif
 
 /*
+
 // Alternative non Standard Solution required if no type available that can store double the wordlength
 // The use of compiler intrinsics is permitted
+
+
 #if CHUNK==64
 #ifdef _WIN64
 #include <intrin.h>
+
 static INLINE chunk muladd(chunk x,chunk y,chunk c,chunk *r)
 {
 	chunk t,e;
@@ -98,11 +102,14 @@ static INLINE chunk muladd(chunk x,chunk y,chunk c,chunk *r)
 		t-=(b>e);
 	else
 		t+=(b<e);
+
 	*r=b&MASK;
 	return (chunk)((t<<(CHUNK-BASEBITS)) | (b>>BASEBITS));
 }
+
 #endif
 #endif
+
 */
 
 /* Tests for BIG equal to zero */
@@ -562,13 +569,17 @@ void BIG_mul(DBIG c,BIG a,BIG b)
     /*
     	for (i=0;i<NLEN;i++)
     		d[i]=(dchunk)a[i]*b[i];
+
     	s[0]=d[0];
     	for (i=1;i<NLEN;i++)
     		s[i]=s[i-1]+d[i];
+
     	s[2*NLEN-2]=d[NLEN-1];
     	for (i=2*NLEN-3;i>=NLEN;i--)
     		s[i]=s[i+1]+d[i-NLEN+1];
+
     	c[0]=s[0]&BMASK; co=s[0]>>BASEBITS;
+
     	for (j=1;j<NLEN;j++)
     	{
     		t=co+s[j];
@@ -576,6 +587,7 @@ void BIG_mul(DBIG c,BIG a,BIG b)
     			t+=(dchunk)(a[i]-a[k])*(b[k]-b[i]);
     		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
     	}
+
     	for (j=NLEN;j<2*NLEN-2;j++)
     	{
     		t=co+s[j];
@@ -583,6 +595,7 @@ void BIG_mul(DBIG c,BIG a,BIG b)
     			t+=(dchunk)(a[i]-a[k])*(b[k]-b[i]);
     		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
     	}
+
     	t=(dchunk)s[2*NLEN-2]+co;
     	c[2*NLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
     	c[2*NLEN-1]=(chunk)co;
@@ -592,16 +605,19 @@ void BIG_mul(DBIG c,BIG a,BIG b)
     	c[0]=(chunk)t&BMASK; co=t>>BASEBITS;
     	t=(dchunk)a[1]*b[0]+(dchunk)a[0]*b[1]+co;
     	c[1]=(chunk)t&BMASK; co=t>>BASEBITS;
+
     	for (j=2;j<NLEN;j++)
     	{
     		t=co; for (i=0;i<=j;i++) t+=(dchunk)a[j-i]*b[i];
     		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
     	}
+
     	for (j=NLEN;j<DNLEN-2;j++)
     	{
     		t=co; for (i=j-NLEN+1;i<NLEN;i++) t+=(dchunk)a[j-i]*b[i];
     		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
     	}
+
     	t=(dchunk)a[NLEN-1]*b[NLEN-1]+co;
     	c[DNLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
     	c[DNLEN-1]=(chunk)co;
@@ -1134,13 +1150,16 @@ nbs is number of bits processed, and nzs is number of trailing 0s detected */
 int BIG_nafbits(BIG x,BIG x3,int i,int *nbs,int *nzs)
 {
 	int j,r,nb;
+
 	nb=BIG_bit(x3,i)-BIG_bit(x,i);
 	*nbs=1;
 	*nzs=0;
 	if (nb==0) return 0;
 	if (i==0) return nb;
+
     if (nb>0) r=1;
     else      r=(-1);
+
     for (j=i-1;j>0;j--)
     {
         (*nbs)++;
@@ -1150,12 +1169,14 @@ int BIG_nafbits(BIG x,BIG x3,int i,int *nbs,int *nzs)
         if (nb<0) r-=1;
         if (abs(r)>5) break;
     }
+
 	if (r%2!=0 && j!=0)
     { // backtrack
         if (nb>0) r=(r-1)/2;
         if (nb<0) r=(r+1)/2;
         (*nbs)--;
     }
+
     while (r%2==0)
     { // remove trailing zeros
         r/=2;
@@ -1376,3 +1397,4 @@ void BIG_mod2m(BIG x,int m)
     x[wd]&=msk;
     for (i=wd+1; i<NLEN; i++) x[i]=0;
 }
+
