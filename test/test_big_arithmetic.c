@@ -119,6 +119,22 @@ int main()
         }
     }
 
+    /* Testing square mod */
+    for (i=0;i<100;i++)
+    {
+        BIG_random(H,&rng);
+        BIG_randomnum(F,H,&rng);
+        BIG_copy(G,F);
+        BIG_modsqr(G,G,H);
+        BIG_sqr(DF,F);
+        BIG_dmod(F,DF,H);
+        if(BIG_comp(G,F))
+        {
+        	printf("ERROR testing mod square BIG\n");
+        	exit(EXIT_FAILURE);
+        }
+    }
+
     /* Testing from and to bytes conversion */
     for (i=0;i<100;i++)
     {
@@ -178,21 +194,20 @@ int main()
         }
     }
 
-    /* Testing inverse mod parity
-    BIG_one(I);
+    /* Testing mod neg */
     for (i=0;i<100;i++)
     {
-        BIG_random(F,&rng);
-        BIG_randomnum(H,F,&rng);
-        BIG_mod(F,H);
-        BIG_invmodp(G,F,H);
-        BIG_modmul(F,F,G,H);
-        if(BIG_comp(F,I))
+        BIG_random(H,&rng);
+        BIG_randomnum(F,H,&rng);
+        BIG_modneg(G,F,H);
+        BIG_modneg(G,G,H);
+        BIG_norm(G);BIG_norm(F);
+        if(BIG_comp(F,G))
         {
-            printf("ERROR testing bit parity BIG\n");
-            exit(EXIT_FAILURE);
+        	printf("ERROR testing mod neg BIG\n");
+        	exit(EXIT_FAILURE);
         }
-    } */
+    }
 
     printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
