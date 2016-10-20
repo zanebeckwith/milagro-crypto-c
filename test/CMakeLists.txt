@@ -34,9 +34,9 @@ add_executable (test_aes_decrypt test_aes_decrypt.c)
 # Link the executable to the libraries
 target_link_libraries (test_hash amcl) 
 target_link_libraries (test_gcm_encrypt amcl) 
-target_link_libraries (test_gcm_decrypt  amcl) 
+target_link_libraries (test_gcm_decrypt amcl) 
 target_link_libraries (test_aes_encrypt amcl) 
-target_link_libraries (test_aes_decrypt  amcl) 
+target_link_libraries (test_aes_decrypt amcl) 
 
 # hash tests
 add_test(NAME test_hash_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/256/SHA256ShortMsg.rsp sha256)
@@ -80,6 +80,14 @@ add_test(NAME test_aes_decrypt_CTR_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ae
 set_tests_properties (test_aes_decrypt_CTR_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_decrypt_CTR_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL256.rsp  CTR)
 set_tests_properties (test_aes_decrypt_CTR_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+
+# Test on Arithmetic
+# smoke tests  
+add_executable (test_BIG_arithmetic test_big_arithmetic.c)
+# Link the executable to the libraries
+target_link_libraries (test_BIG_arithmetic amcl )
+# tests  
+do_test (test_BIG_arithmetic "SUCCESS")
 
 if(BUILD_MPIN)
   add_executable (test_mpin test_mpin.c)
