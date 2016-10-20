@@ -42,7 +42,7 @@ int main()
 
     /* Fake random source */
     RAND_clean(&rng);
-    for (i=0;i<256;i++) raw[i]=(char)i;
+    for (i=0; i<256; i++) raw[i]=(char)i;
     RAND_seed(&rng,256,raw);
 
     /* Set to zero */
@@ -66,7 +66,7 @@ int main()
     }
 
     /* Testing addition, subtraction */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(F,&rng);
         BIG_random(H,&rng);
@@ -92,21 +92,21 @@ int main()
     }
 
     /* Testing small multiplication and division by 3 */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(F,&rng);
-    	BIG_copy(G,F);
+        BIG_copy(G,F);
         BIG_imul(G,G,3);
         BIG_div3(G);
         if(BIG_comp(G,F))
-            {
-                printf("ERROR testing small multiplication and division by 3 BIG\n");
-                exit(EXIT_FAILURE);
-            }
+        {
+            printf("ERROR testing small multiplication and division by 3 BIG\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     /* Testing square */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(F,&rng);
         BIG_copy(G,F);
@@ -114,13 +114,13 @@ int main()
         BIG_mul(DF,F,F);
         if(BIG_dcomp(DG,DF))
         {
-        	printf("ERROR testing square BIG\n");
-        	exit(EXIT_FAILURE);
+            printf("ERROR testing square BIG\n");
+            exit(EXIT_FAILURE);
         }
     }
 
     /* Testing square mod */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(H,&rng);
         BIG_randomnum(F,H,&rng);
@@ -130,13 +130,13 @@ int main()
         BIG_dmod(F,DF,H);
         if(BIG_comp(G,F))
         {
-        	printf("ERROR testing mod square BIG\n");
-        	exit(EXIT_FAILURE);
+            printf("ERROR testing mod square BIG\n");
+            exit(EXIT_FAILURE);
         }
     }
 
     /* Testing from and to bytes conversion */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(F,&rng);
         BIG_copy(G,F);
@@ -157,7 +157,7 @@ int main()
     }
 
     /* Testing small increment and decrement */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(F,&rng);
         BIG_copy(G,F);
@@ -171,7 +171,7 @@ int main()
     }
 
     /* Testing small increment and decrement */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(F,&rng);
         BIG_copy(G,F);
@@ -183,7 +183,7 @@ int main()
     }
 
     /* Testing random with modulo */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(G,&rng);
         BIG_randomnum(F,G,&rng);
@@ -195,17 +195,18 @@ int main()
     }
 
     /* Testing mod neg */
-    for (i=0;i<100;i++)
+    for (i=0; i<100; i++)
     {
         BIG_random(H,&rng);
         BIG_randomnum(F,H,&rng);
         BIG_modneg(G,F,H);
         BIG_modneg(G,G,H);
-        BIG_norm(G);BIG_norm(F);
+        BIG_norm(G);
+        BIG_norm(F);
         if(BIG_comp(F,G))
         {
-        	printf("ERROR testing mod neg BIG\n");
-        	exit(EXIT_FAILURE);
+            printf("ERROR testing mod neg BIG\n");
+            exit(EXIT_FAILURE);
         }
     }
 
