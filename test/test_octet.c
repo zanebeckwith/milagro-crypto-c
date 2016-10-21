@@ -45,6 +45,37 @@ int main()
     for (i=0; i<256; i++) raw[i]=(char)i;
     RAND_seed(&rng,256,raw);
 
+    /* test comparison */
+    for (len = 1; len <= 101; len=len+10)
+    {
+        OCT_rand(&W,&rng,len);
+        OCT_copy(&V,&W);
+        if(!OCT_comp(&V,&W))
+        {
+            printf("ERROR comparing two equal octet, OCTET\n");
+            exit(EXIT_FAILURE);
+        }
+        for (i = 0; i < len; ++i) {
+            if(!OCT_ncomp(&V,&W,i))
+            {
+                printf("ERROR comparing two equal octet, OCTET\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+        OCT_rand(&V,&rng,len);
+        if(OCT_comp(&V,&W))
+        {
+            printf("ERROR comparing two different octet, OCTET\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    OCT_rand(&W,&rng,0);
+    OCT_copy(&V,&W);
+    if(!OCT_comp(&V,&W))
+    {
+        printf("ERROR comparing two equal octet, OCTET\n");
+        exit(EXIT_FAILURE);
+    }
 
     for (len = 100; len > 0; len=len-10)
     {
@@ -93,6 +124,8 @@ int main()
             }
         }
     }
+
+
 
     printf("SUCCESS\n");
     return 0;
