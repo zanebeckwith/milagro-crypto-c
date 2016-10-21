@@ -17,11 +17,14 @@
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
 
+# CVS path (path to the parent dir containing the project)
+CVSPATH=github.com/miracl
+
 # Project owner
-OWNER=miracl
+OWNER=MIRACL
 
 # Project vendor
-VENDOR=${OWNER}
+VENDOR=miracl
 
 # Project name
 PROJECT=amcl
@@ -220,7 +223,7 @@ dbuild:
 	@mkdir -p target
 	@rm -rf target/*
 	@echo 0 > target/make.exit
-	VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET='$(MAKETARGET)' ./dockerbuild.sh
+	CVSPATH=$(CVSPATH) VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET='$(MAKETARGET)' ./dockerbuild.sh
 	@exit `cat target/make.exit`
 
 # Publish Documentation in GitHub (requires writing permissions)

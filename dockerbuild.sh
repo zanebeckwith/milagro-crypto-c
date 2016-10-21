@@ -11,13 +11,14 @@
 # This script requires Docker
 
 # EXAMPLE USAGE:
-# VENDOR=vendorname PROJECT=projectname MAKETARGET=qa ./dockerbuild.sh
+# VENDOR=vendorname PROJECT=projectname MAKETARGET=buildall ./dockerbuild.sh
 
 # Get vendor and project name
+: ${CVSPATH:=project}
 : ${VENDOR:=vendor}
 : ${PROJECT:=project}
 
-# Make target to execute
+# make target to execute
 : ${MAKETARGET:=qa}
 
 # Name of the base development Docker image
@@ -27,7 +28,7 @@ DOCKERDEV=${VENDOR}/dev_${PROJECT}
 docker build -t ${DOCKERDEV} ./resources/DockerDev/
 
 # Define the project root path
-PRJPATH=/root/src/${PROJECT}
+PRJPATH=/root/src/${CVSPATH}/${PROJECT}
 
 # Generate a temporary Dockerfile to build and test the project
 # NOTE: The exit status of the RUN command is stored to be returned later,
@@ -52,6 +53,10 @@ CONTAINER_ID=$(docker run -d ${DOCKER_IMAGE_NAME})
 
 # Copy all build/test artifacts back to the host
 docker cp ${CONTAINER_ID}:"${PRJPATH}/target" ./
+
+# Change paths of coverage report (if any)
+CURRENTDIR=`pwd`
+sed -i "s|${PRJPATH}/|${CURRENTDIR}/|" ${CURRENTDIR}/target/COVERAGE/coverage/amcl.info || true
 
 # Remove the temporary container and image
 docker rm -f ${CONTAINER_ID} || true
