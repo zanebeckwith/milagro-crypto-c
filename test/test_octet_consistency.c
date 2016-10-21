@@ -1,7 +1,7 @@
 /**
- * @file test_octet.c
+ * @file test_octet_consistency.c
  * @author Alessandro Budroni
- * @brief Test function for ECC
+ * @brief Test function for octect consistency
  *
  * LICENSE
  *

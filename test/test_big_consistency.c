@@ -1,7 +1,7 @@
 /**
  * @file test_BIG_arithmetic.c
  * @author Alessandro Budroni
- * @brief Test for aritmetics with BIG
+ * @brief Test for consistency with BIG
  *
  * LICENSE
  *
