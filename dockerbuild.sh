@@ -11,7 +11,7 @@
 # This script requires Docker
 
 # EXAMPLE USAGE:
-# VENDOR=vendorname PROJECT=projectname MAKETARGET=buildall ./dockerbuild.sh
+# CVSPATH=github.com/owner VENDOR=vendorname PROJECT=projectname MAKETARGET=buildall ./dockerbuild.sh
 
 # Get vendor and project name
 : ${CVSPATH:=project}
@@ -19,7 +19,7 @@
 : ${PROJECT:=project}
 
 # make target to execute
-: ${MAKETARGET:=qa}
+: ${MAKETARGET:=buildall}
 
 # Name of the base development Docker image
 DOCKERDEV=${VENDOR}/dev_${PROJECT}

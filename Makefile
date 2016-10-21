@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all format clean qa build_group build build_qa_item build_item buildx dbuild pubdocs
+.PHONY: help all format clean qa build_group build build_qa_item build_item buildx buildall dbuild pubdocs
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -217,6 +217,9 @@ else
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0
 endif
+
+# Alias for building all inside the Docker container
+buildall: qa
 
 # Build everything inside a Docker container
 dbuild:
