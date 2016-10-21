@@ -36,63 +36,63 @@ int main()
 {
     int i,j,len=100;
     int len64 = ((len/3) + 2)*4+1, lenHex = 28*len;
-    char raw[256], bytes[len], bytes64[len64], bytesHex[lenHex], v[len], w[len];
-    octet V={0,sizeof(v),v}, W={0,sizeof(w),w};
+    char raw[256], bytes[len+1], bytes64[len64+1], bytesHex[lenHex+1], v[len], w[len];
+    octet V= {0,sizeof(v),v}, W= {0,sizeof(w),w};
     csprng rng;
 
     /* Fake random source */
     RAND_clean(&rng);
-    for (i=0;i<256;i++) raw[i]=(char)i;
+    for (i=0; i<256; i++) raw[i]=(char)i;
     RAND_seed(&rng,256,raw);
 
 
-    for (len = 100; len > 0; len=len-10) {
+    for (len = 100; len > 0; len=len-10)
+    {
 
-    	W.max = len; V.max = len;
-		/* test conversion to and from base64 */
-		for (j = 0; j < 10; ++j)
-		{
-			OCT_rand(&W,&rng,len);
-			OCT_copy(&V,&W);
-			OCT_tobase64(bytes64,&W);
-			OCT_frombase64(&W,bytes64);
-			if(!OCT_comp(&V,&W))
-			{
-				printf("ERROR converting to and from base64 OCTET\n");
-				exit(EXIT_FAILURE);
-			}
-		}
+        W.max = len;
+        V.max = len;
+        /* test conversion to and from base64 */
+        for (j = 0; j < 10; ++j)
+        {
+            OCT_rand(&W,&rng,len);
+            OCT_copy(&V,&W);
+            OCT_tobase64(bytes64,&W);
+            OCT_frombase64(&W,bytes64);
+            if(!OCT_comp(&V,&W))
+            {
+                printf("ERROR converting to and from base64 OCTET\n");
+                exit(EXIT_FAILURE);
+            }
+        }
 
-		/* test conversion to and from hex */
-		for (i = 0; i < 10; ++i)
-		{
-			OCT_rand(&W,&rng,len);
-			OCT_copy(&V,&W);
-			OCT_toHex(&W,bytesHex);
-			OCT_fromHex(&W,bytesHex);
-			if(!OCT_comp(&V,&W))
-			{
-				printf("ERROR converting to and from Hex OCTET\n");
-				exit(EXIT_FAILURE);
-			}
-		}
+        /* test conversion to and from hex */
+        for (i = 0; i < 10; ++i)
+        {
+            OCT_rand(&W,&rng,len);
+            OCT_copy(&V,&W);
+            OCT_toHex(&W,bytesHex);
+            OCT_fromHex(&W,bytesHex);
+            if(!OCT_comp(&V,&W))
+            {
+                printf("ERROR converting to and from Hex OCTET\n");
+                exit(EXIT_FAILURE);
+            }
+        }
 
-		/* test conversion to and from string */
-		for (i = 0; i < 10; ++i)
-		{
-			OCT_rand(&W,&rng,len);
-			OCT_copy(&V,&W);
-			OCT_toStr(&W,bytes);
-			OCT_jstring(&W,bytes);
-			if(!OCT_comp(&V,&W))
-			{
-				printf("ERROR converting to and from string OCTET\n");
-				exit(EXIT_FAILURE);
-			}
-		}
-
+        /* test conversion to and from string */
+        for (i = 0; i < 10; ++i)
+        {
+            OCT_rand(&W,&rng,len);
+            OCT_copy(&V,&W);
+            OCT_toStr(&W,bytes);
+            OCT_jstring(&W,bytes);
+            if(!OCT_comp(&V,&W))
+            {
+                printf("ERROR converting to and from string, OCTET\n");
+                exit(EXIT_FAILURE);
+            }
+        }
     }
-
 
     printf("SUCCESS\n");
     return 0;

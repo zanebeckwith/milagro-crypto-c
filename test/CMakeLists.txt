@@ -16,14 +16,17 @@ endmacro ()
 add_executable (test_rsa test_rsa.c)
 add_executable (test_ecc test_ecc.c)
 add_executable (test_version test_version.c)
+add_executable (test_octet test_octet.c)
 # Link the executable to the libraries
 target_link_libraries (test_rsa rsa) 
 target_link_libraries (test_ecc ecdh) 
 target_link_libraries (test_version amcl) 
+target_link_libraries (test_octet amcl)
 # run tests
 do_test (test_rsa "SUCCESS")
 do_test (test_ecc "SUCCESS")
 do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
+do_test (test_octet "SUCCESS")
 
 # curve independent tests
 add_executable (test_hash test_hash.c)
@@ -36,7 +39,8 @@ target_link_libraries (test_hash amcl)
 target_link_libraries (test_gcm_encrypt amcl) 
 target_link_libraries (test_gcm_decrypt amcl) 
 target_link_libraries (test_aes_encrypt amcl) 
-target_link_libraries (test_aes_decrypt amcl) 
+target_link_libraries (test_aes_decrypt amcl)
+ 
 
 # hash tests
 add_test(NAME test_hash_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/256/SHA256ShortMsg.rsp sha256)
