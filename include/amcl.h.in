@@ -1270,8 +1270,9 @@ extern int BIG_dnbits(DBIG x);
  * @note Slow but rarely used
  * @param x BIG number to be reduced mod n
  * @param n The modulus
+ * @return 1 in case of success, -1 in case of error
  */
-extern void BIG_mod(BIG x,BIG n);
+extern int BIG_mod(BIG x,BIG n);
 
 /**
  * @brief Divide x by n - output normalised

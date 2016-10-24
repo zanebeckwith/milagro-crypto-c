@@ -1000,13 +1000,16 @@ int BIG_dnbits(BIG a)
 }
 
 /* SU= 16, Reduce x mod n - input and output normalised */
-void BIG_mod(BIG b,BIG c)
+int BIG_mod(BIG b,BIG c)
 {
     int k=0;
 
+    if (BIG_iszilch(c))
+        return -1;
+
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
-        return;
+        return 1;
     do
     {
         BIG_fshl(c,1);
@@ -1024,6 +1027,7 @@ void BIG_mod(BIG b,BIG c)
         }
         k--;
     }
+    return 1;
 }
 
 /* SU= 96, Set a=b mod c, b is destroyed. Slow but rarely used. */

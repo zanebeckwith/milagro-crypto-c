@@ -1,5 +1,5 @@
 /**
- * @file test_BIG_arithmetic.c
+ * @file test_big_consistency.c
  * @author Alessandro Budroni
  * @brief Test for consistency with BIG
  *
@@ -31,8 +31,17 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef enum { false, true } bool;
+
+//int main(int argc, char** argv)
 int main()
 {
+    /*if (argc != 2)
+    {
+        printf("usage: ./test_rsa_sign [path to test vector file]\n");
+        exit(EXIT_FAILURE);
+    }*/
+
     int i;
     char raw[256], bytes[MODBYTES];
     csprng rng;
@@ -210,6 +219,6 @@ int main()
         }
     }
 
-    printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
+    printf("SUCCESS TEST CONSISTENCY OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
 }
