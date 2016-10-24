@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_rsa_sign [path to test vector file]\n");
+        printf("usage: ./test_BIG_arithmetics [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
 
