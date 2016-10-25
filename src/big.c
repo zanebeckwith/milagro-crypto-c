@@ -269,7 +269,7 @@ void BIG_dfromBytesLen(DBIG a,char *b,int s)
 
     for (i=0; i<len; i++)
     {
-    	BIG_dshl(a,8);
+        BIG_dshl(a,8);
         a[0]+=(int)(unsigned char)b[i];
     }
 #ifdef DEBUG_NORM
