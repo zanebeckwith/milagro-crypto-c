@@ -55,7 +55,7 @@ int main()
     BIG_dzero(DG);
 
     /* Testing equal function and set zero function */
-    if(BIG_comp(G,F) | !BIG_iszilch(F) | !BIG_iszilch(G) | BIG_comp(DG,DF) | !BIG_iszilch(DF) | !BIG_iszilch(DG))
+    if(BIG_comp(G,F) | !BIG_iszilch(F) | !BIG_iszilch(G) | BIG_dcomp(DG,DF) | !BIG_diszilch(DF) | !BIG_diszilch(DG))
     {
         printf("ERROR comparing or setting zero BIG\n");
         exit(EXIT_FAILURE);
