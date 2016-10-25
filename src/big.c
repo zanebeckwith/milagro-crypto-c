@@ -1264,14 +1264,17 @@ void BIG_randomnum(BIG m,BIG q,csprng *rng)
 }
 
 /* SU= 96, Calculate x=y*z mod n */
-void BIG_modmul(BIG r,BIG a,BIG b,BIG m)
+int BIG_modmul(BIG r,BIG a,BIG b,BIG m)
 {
+    if (BIG_iszilch(m))
+        return -1;
     DBIG d;
     BIG_mod(a,m);
     BIG_mod(b,m);
 //BIG_norm(a); BIG_norm(b);
     BIG_mul(d,a,b);
     BIG_dmod(r,d,m);
+    return 1;
 }
 
 /* SU= 88, Calculate x=y^2 mod n */
@@ -1288,15 +1291,20 @@ int BIG_modsqr(BIG r,BIG a,BIG m)
 }
 
 /* SU= 16, Calculate x=-y mod n */
-void BIG_modneg(BIG r,BIG a,BIG m)
+int BIG_modneg(BIG r,BIG a,BIG m)
 {
+    if (BIG_iszilch(m))
+        return -1;
     BIG_mod(a,m);
     BIG_sub(r,m,a);
+    return 1;
 }
 
 /* SU= 136, Calculate x=y/z mod n */
-void BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
+int BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
 {
+    if (BIG_iszilch(m))
+        return -1;
     DBIG d;
     BIG z;
     BIG_mod(a,m);
@@ -1304,12 +1312,16 @@ void BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
 //BIG_norm(a); BIG_norm(z);
     BIG_mul(d,a,z);
     BIG_dmod(r,d,m);
+    return 1;
 }
 
 /* SU= 216, Calculate jacobi Symbol (x/y) */
 int BIG_jacobi(BIG a,BIG p)
 {
+    if (BIG_iszilch(p))
+        return -1;
     int n8,k,m=0;
+
     BIG t,x,n,zilch,one;
     BIG_one(one);
     BIG_zero(zilch);
@@ -1344,8 +1356,10 @@ int BIG_jacobi(BIG a,BIG p)
 }
 
 /* SU= 240, Calculate x=1/y mod n */
-void BIG_invmodp(BIG r,BIG a,BIG p)
+int BIG_invmodp(BIG r,BIG a,BIG p)
 {
+    if (BIG_iszilch(p))
+        return -1;
     BIG u,v,x1,x2,t,one;
     BIG_mod(a,p);
     BIG_copy(u,a);
@@ -1405,6 +1419,7 @@ void BIG_invmodp(BIG r,BIG a,BIG p)
         BIG_copy(r,x1);
     else
         BIG_copy(r,x2);
+    return 1;
 }
 
 /* Calculate x=x mod 2^m  */

@@ -1396,8 +1396,9 @@ extern void BIG_randomnum(BIG x,BIG n,csprng *r);
  * @param y BIG number
  * @param z BIG number
  * @param n The BIG Modulus
+ * @return -1 in case of failure, 1 in case of success
  */
-extern void BIG_modmul(BIG x,BIG y,BIG z,BIG n);
+extern int BIG_modmul(BIG x,BIG y,BIG z,BIG n);
 
 /**
  * @brief  Calculate x=y/z mod n
@@ -1409,8 +1410,9 @@ extern void BIG_modmul(BIG x,BIG y,BIG z,BIG n);
  * @param y BIG number
  * @param z BIG number
  * @param n The BIG Modulus
+ * @return -1 in case of failure, 1 in case of success
  */
-extern void BIG_moddiv(BIG x,BIG y,BIG z,BIG n);
+extern int BIG_moddiv(BIG x,BIG y,BIG z,BIG n);
 
 /**
  * @brief  Calculate x=y^2 mod n
@@ -1434,8 +1436,9 @@ extern int BIG_modsqr(BIG x,BIG y,BIG n);
  * @param x BIG number, on exit = -y mod n
  * @param y BIG number
  * @param n The BIG Modulus
+ * @return -1 in case of failure, 1 in case of success
  */
-extern void BIG_modneg(BIG x,BIG y,BIG n);
+extern int BIG_modneg(BIG x,BIG y,BIG n);
 
 /**
  * @brief  Calculate jacobi Symbol (x/y)
@@ -1468,8 +1471,9 @@ extern void BIG_invmodp(BIG x,BIG y,BIG n);
  * @note Truncation
  * @param x BIG number, on reduced mod 2^m
  * @param m new truncated size
+ * @return -1 in case of failure, 1 in case of success
  */
-extern void BIG_mod2m(BIG x,int m);
+extern int BIG_mod2m(BIG x,int m);
 
 
 
