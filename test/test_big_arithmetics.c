@@ -98,6 +98,8 @@ int main(int argc, char** argv)
     const char* BIG2sqrline = "BIG2sqr = ";
     BIG BIG1sqrmod2;
     const char* BIG1sqrmod2line = "BIG1sqrmod2 = ";
+    BIG BIG1modneg2;
+    const char* BIG1modneg2line = "BIG1modneg2 = ";
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -250,12 +252,32 @@ int main(int argc, char** argv)
             BIG_norm(supp);
             if (BIG_iszilch(BIG2) && (ret != -1))
             {
-                printf("ERROR reducing modulo BIG, line %d\n",i);
+                printf("ERROR squaring modulo BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
             else if (!BIG_iszilch(BIG2) && BIG_comp(BIG1sqrmod2,supp) != 0)
             {
-                printf("ERROR reducing modulo BIG, line %d\n",i);
+                printf("ERROR reducing squaring modulo BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test square mod
+        if (!strncmp(line,  BIG1modneg2line, strlen(BIG1modneg2line)))
+        {
+            BIG_zero(supp);
+            ret = BIG_modneg(supp,BIG1,BIG2);
+            len = strlen(BIG1modneg2line);
+            linePtr = line + len;
+            read_BIG(BIG1modneg2,linePtr);
+            BIG_norm(supp);
+            if (BIG_iszilch(BIG2) && (ret != -1))
+            {
+                printf("ERROR negative reduced modulo BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            else if (!BIG_iszilch(BIG2) && BIG_comp(BIG1modneg2,supp) != 0)
+            {
+                printf("ERROR negative reduced modulo BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }

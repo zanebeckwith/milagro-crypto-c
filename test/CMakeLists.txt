@@ -37,7 +37,7 @@ add_executable (test_BIG_arithmetics test_big_arithmetics.c)
 # Link the executable to the libraries
 target_link_libraries (test_BIG_arithmetics amcl)
 # test
-add_test(NAME test_BIG_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_BIG_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/nlen8_chunk64/nlen8_chunk64.txt)
+add_test(NAME test_BIG_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_BIG_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
 set_tests_properties (test_BIG_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
 # curve independent tests
