@@ -169,7 +169,7 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_BIG(BIG1mod2,linePtr);
             BIG_norm(supp);
-            if (BIG_iszilch(BIG2) && (ret != -1))
+            if (BIG_iszilch(BIG2) && (ret != 1))
             {
                 printf("ERROR reducing modulo BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -250,7 +250,7 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_BIG(BIG1sqrmod2,linePtr);
             BIG_norm(supp);
-            if (BIG_iszilch(BIG2) && (ret != -1))
+            if (BIG_iszilch(BIG2) && (ret != 1))
             {
                 printf("ERROR squaring modulo BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -270,7 +270,7 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_BIG(BIG1modneg2,linePtr);
             BIG_norm(supp);
-            if (BIG_iszilch(BIG2) && (ret != -1))
+            if (BIG_iszilch(BIG2) && (ret != 1))
             {
                 printf("ERROR negative reduced modulo BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
