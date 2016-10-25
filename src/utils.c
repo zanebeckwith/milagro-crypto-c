@@ -37,10 +37,10 @@
 void amcl_hex2bin(const char *src, char *dst, int src_len)
 {
     int i;
-    char v;
+    char v,c;
     for (i = 0; i < src_len/2; i++)
     {
-        char c = src[2*i];
+        c = src[2*i];
         if (c >= '0' && c <= '9')
         {
             v = c - '0';

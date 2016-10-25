@@ -261,6 +261,21 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
 #endif
 }
 
+/* Convert to DBIG number from byte array of given length */
+void BIG_dfromBytesLen(DBIG a,char *b,int s)
+{
+    int i,len=s;
+    BIG_dzero(a);
+
+    for (i=0; i<len; i++)
+    {
+    	BIG_dshl(a,8);
+        a[0]+=(int)(unsigned char)b[i];
+    }
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
+}
 
 /* SU= 88, Outputs a DBIG number to the console */
 void BIG_doutput(DBIG a)

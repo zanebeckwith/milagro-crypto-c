@@ -872,6 +872,17 @@ extern void BIG_toBytes(char *a,BIG x);
 extern void BIG_fromBytes(BIG x,char *a);
 
 /**
+ * @brief Convert to DBIG number from byte array of given length
+ *
+ * Convert to DBIG number from byte array of given length.
+ *
+ * @param x DBIG number
+ * @param a byte array
+ * @param s byte array length
+ */
+extern void BIG_dfromBytesLen(DBIG x,char *a,int s);
+
+/**
  * @brief Convert to BIG number from byte array of given length
  *
  * Convert to BIG number from byte array of given length.
