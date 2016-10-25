@@ -1275,13 +1275,16 @@ void BIG_modmul(BIG r,BIG a,BIG b,BIG m)
 }
 
 /* SU= 88, Calculate x=y^2 mod n */
-void BIG_modsqr(BIG r,BIG a,BIG m)
+int BIG_modsqr(BIG r,BIG a,BIG m)
 {
+    if (BIG_iszilch(m))
+        return -1;
     DBIG d;
     BIG_mod(a,m);
 //BIG_norm(a);
     BIG_sqr(d,a);
     BIG_dmod(r,d,m);
+    return 1;
 }
 
 /* SU= 16, Calculate x=-y mod n */
