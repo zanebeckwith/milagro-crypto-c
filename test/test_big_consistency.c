@@ -33,14 +33,8 @@
 
 typedef enum { false, true } bool;
 
-//int main(int argc, char** argv)
 int main()
 {
-    /*if (argc != 2)
-    {
-        printf("usage: ./test_rsa_sign [path to test vector file]\n");
-        exit(EXIT_FAILURE);
-    }*/
 
     int i;
     char raw[256], bytes[MODBYTES];
@@ -57,9 +51,11 @@ int main()
     /* Set to zero */
     BIG_zero(F);
     BIG_zero(G);
+    BIG_dzero(DF);
+    BIG_dzero(DG);
 
     /* Testing equal function and set zero function */
-    if(BIG_comp(G,F) | !BIG_iszilch(F) | !BIG_iszilch(G))
+    if(BIG_comp(G,F) | !BIG_iszilch(F) | !BIG_iszilch(G) | BIG_comp(DG,DF) | !BIG_iszilch(DF) | !BIG_iszilch(DG))
     {
         printf("ERROR comparing or setting zero BIG\n");
         exit(EXIT_FAILURE);
@@ -67,8 +63,10 @@ int main()
 
     /* Testing coping and equal function */
     BIG_random(F,&rng);
+    BIG_random(DF,&rng);
     BIG_copy(G,F);
-    if(BIG_comp(G,F))
+    BIG_dcopy(DG,DF);
+    if(BIG_comp(G,F) | BIG_dcomp(DG,DF))
     {
         printf("ERROR testing coping and equal BIG\n");
         exit(EXIT_FAILURE);

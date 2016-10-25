@@ -48,6 +48,18 @@ void read_BIG(BIG A, char* string)
     BIG_norm(A);
 }
 
+void read_DBIG(DBIG A, char* string)
+{
+    int len;
+    char support[LINE_LEN];
+    BIG_dzero(A);
+    len = strlen(string)+1;
+    amcl_hex2bin(string,support,len);
+    len = (len-1)/2;
+    BIG_dfromBytesLen(A,support,len);
+    BIG_dnorm(A);
+}
+
 int main(int argc, char** argv)
 {
     if (argc != 2)
@@ -64,6 +76,7 @@ int main(int argc, char** argv)
     char * linePtr = NULL;
 
     BIG supp;
+    DBIG dsupp;
 
     BIG BIG1;
     const char* BIG1line = "BIG1 = ";
@@ -77,6 +90,12 @@ int main(int argc, char** argv)
     const char* BIG1mod2line = "BIG1mod2 = ";
     BIG BIG2mod1;
     const char* BIG2mod1line = "BIG2mod1 = ";
+    DBIG BIGmul;
+    const char* BIGmulline = "BIGmul = ";
+    DBIG BIG1sqr;
+    const char* BIG1sqrline = "BIG1sqr = ";
+    DBIG BIG2sqr;
+    const char* BIG2sqrline = "BIG2sqr = ";
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -84,8 +103,6 @@ int main(int argc, char** argv)
         printf("ERROR opening test vector file\n");
         exit(EXIT_FAILURE);
     }
-
-    //bool readLine = false;
 
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
@@ -141,7 +158,7 @@ int main(int argc, char** argv)
 // test modulo 1
         if (!strncmp(line,  BIG1mod2line, strlen(BIG1mod2line)))
         {
-            BIG_zero(supp);
+            BIG_dzero(dsupp);
             BIG_copy(supp,BIG1);
             ret = BIG_mod(supp,BIG2);
             len = strlen(BIG1mod2line);
@@ -172,6 +189,51 @@ int main(int argc, char** argv)
             if (BIG_comp(BIG2mod1,supp) != 0)
             {
                 printf("ERROR reducing modulo BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test multiplication
+        if (!strncmp(line,  BIGmulline, strlen(BIGmulline)))
+        {
+            BIG_dzero(dsupp);
+            BIG_mul(dsupp,BIG1,BIG2);
+            len = strlen(BIGmulline);
+            linePtr = line + len;
+            read_DBIG(BIGmul,linePtr);
+            BIG_dnorm(supp);
+            if (BIG_dcomp(BIGmul,dsupp) != 0)
+            {
+                printf("ERROR multiplication BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test square 1
+        if (!strncmp(line,  BIG1sqrline, strlen(BIG1sqrline)))
+        {
+            BIG_dzero(dsupp);
+            BIG_sqr(dsupp,BIG1);
+            len = strlen(BIG1sqrline);
+            linePtr = line + len;
+            read_DBIG(BIG1sqr,linePtr);
+            BIG_dnorm(supp);
+            if (BIG_dcomp(BIG1sqr,dsupp) != 0)
+            {
+                printf("ERROR squaring BIG 1, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test square 2
+        if (!strncmp(line,  BIG2sqrline, strlen(BIG2sqrline)))
+        {
+            BIG_dzero(dsupp);
+            BIG_sqr(dsupp,BIG2);
+            len = strlen(BIG2sqrline);
+            linePtr = line + len;
+            read_DBIG(BIG2sqr,linePtr);
+            BIG_dnorm(supp);
+            if (BIG_dcomp(BIG2sqr,dsupp) != 0)
+            {
+                printf("ERROR squaring BIG 2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
