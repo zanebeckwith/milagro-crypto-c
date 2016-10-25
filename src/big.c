@@ -1297,6 +1297,7 @@ int BIG_modneg(BIG r,BIG a,BIG m)
         return -1;
     BIG_mod(a,m);
     BIG_sub(r,m,a);
+    BIG_mod(r,m);
     return 1;
 }
 
