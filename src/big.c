@@ -1024,7 +1024,7 @@ int BIG_mod(BIG b,BIG c)
 
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
-        return 1;
+        return 0;
     do
     {
         BIG_fshl(c,1);
