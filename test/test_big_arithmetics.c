@@ -96,6 +96,8 @@ int main(int argc, char** argv)
     const char* BIG1sqrline = "BIG1sqr = ";
     DBIG BIG2sqr;
     const char* BIG2sqrline = "BIG2sqr = ";
+    BIG BIG1sqrmod2;
+    const char* BIG1sqrmod2line = "BIG1sqrmod2 = ";
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -158,7 +160,7 @@ int main(int argc, char** argv)
 // test modulo 1
         if (!strncmp(line,  BIG1mod2line, strlen(BIG1mod2line)))
         {
-            BIG_dzero(dsupp);
+            BIG_zero(supp);
             BIG_copy(supp,BIG1);
             ret = BIG_mod(supp,BIG2);
             len = strlen(BIG1mod2line);
@@ -200,7 +202,7 @@ int main(int argc, char** argv)
             len = strlen(BIGmulline);
             linePtr = line + len;
             read_DBIG(BIGmul,linePtr);
-            BIG_dnorm(supp);
+            BIG_dnorm(dsupp);
             if (BIG_dcomp(BIGmul,dsupp) != 0)
             {
                 printf("ERROR multiplication BIG, line %d\n",i);
@@ -215,7 +217,7 @@ int main(int argc, char** argv)
             len = strlen(BIG1sqrline);
             linePtr = line + len;
             read_DBIG(BIG1sqr,linePtr);
-            BIG_dnorm(supp);
+            BIG_dnorm(dsupp);
             if (BIG_dcomp(BIG1sqr,dsupp) != 0)
             {
                 printf("ERROR squaring BIG 1, line %d\n",i);
@@ -230,10 +232,30 @@ int main(int argc, char** argv)
             len = strlen(BIG2sqrline);
             linePtr = line + len;
             read_DBIG(BIG2sqr,linePtr);
-            BIG_dnorm(supp);
+            BIG_dnorm(dsupp);
             if (BIG_dcomp(BIG2sqr,dsupp) != 0)
             {
                 printf("ERROR squaring BIG 2, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test square mod
+        if (!strncmp(line,  BIG1sqrmod2line, strlen(BIG1sqrmod2line)))
+        {
+            BIG_zero(supp);
+            ret = BIG_modsqr(supp,BIG1,BIG2);
+            len = strlen(BIG1sqrmod2line);
+            linePtr = line + len;
+            read_BIG(BIG1sqrmod2,linePtr);
+            BIG_norm(supp);
+            if (BIG_iszilch(BIG2) && (ret != -1))
+            {
+                printf("ERROR reducing modulo BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            else if (!BIG_iszilch(BIG2) && BIG_comp(BIG1sqrmod2,supp) != 0)
+            {
+                printf("ERROR reducing modulo BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
