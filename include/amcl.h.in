@@ -1461,7 +1461,7 @@ extern int BIG_jacobi(BIG x,BIG y);
  * @param y BIG number
  * @param n The BIG Modulus
  */
-extern void BIG_invmodp(BIG x,BIG y,BIG n);
+extern int BIG_invmodp(BIG x,BIG y,BIG n);
 
 /**
  * @brief Calculate x=x mod 2^m
@@ -1471,9 +1471,8 @@ extern void BIG_invmodp(BIG x,BIG y,BIG n);
  * @note Truncation
  * @param x BIG number, on reduced mod 2^m
  * @param m new truncated size
- * @return -1 in case of failure, 1 in case of success
  */
-extern int BIG_mod2m(BIG x,int m);
+extern void BIG_mod2m(BIG x,int m);
 
 
 
