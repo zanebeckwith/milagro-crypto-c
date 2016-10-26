@@ -38,6 +38,30 @@
 /* So when multiplying two numbers, their product *must* be less than MODBITS+BASEBITS*NLEN */
 /* Results *may* be one bit bigger than MODBITS */
 
+// https://graphics.stanford.edu/~seander/bithacks.html
+/* constant time log to base 2 (or number of bits in) */
+static int logb2(unsign32 v)
+{
+    int r;
+    static const sign8 MultiplyDeBruijnBitPosition2[32] =
+    {
+        0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+        31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+    };
+
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
+    v++;
+
+    r = (int)MultiplyDeBruijnBitPosition2[(v *  0x077CB531) >> 27];
+    r++;
+
+    return r;
+}
+
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
@@ -522,19 +546,12 @@ void FP_reduce(BIG a)
 void FP_neg(BIG r,BIG a)
 {
     int sb;
-    chunk ov;
     BIG m;
 
     BIG_rcopy(m,Modulus);
     BIG_norm(a);
 
-    ov=EXCESS(a);
-    sb=1;
-    while(ov!=0)
-    {
-        sb++;    /* only unpredictable branch */
-        ov>>=1;
-    }
+    sb=logb2((unsign32)EXCESS(a));
 
     BIG_fshl(m,sb);
     BIG_sub(r,m,a);
@@ -552,7 +569,6 @@ void FP_neg(BIG r,BIG a)
 #else
     }
 #endif
-
 }
 
 /* SU= 56, Modular division by 2 of a BIG in n-residue form, mod Modulus */
