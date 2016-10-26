@@ -43,7 +43,8 @@ void read_BIG(BIG A, char* string)
     BIG_zero(A);
     len = strlen(string)+1;
     amcl_hex2bin(string,support,len);
-    len = strlen(support);
+    len = (len-1)/2;;
+    printf("\n");
     BIG_fromBytesLen(A,support,len);
     BIG_norm(A);
 }
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    BIG supp;
+    BIG supp,mod,div;
     DBIG dsupp;
 
     BIG BIG1;
@@ -106,6 +107,8 @@ int main(int argc, char** argv)
     const char* nbitDBIGline = "nbitDBIG = ";
     BIG BIGdiv;
     const char* BIGdivline = "BIGdiv = ";
+    BIG BIGdivmod;
+    const char* BIGdivmodline = "BIGdivmod = ";
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -113,6 +116,9 @@ int main(int argc, char** argv)
         printf("ERROR opening test vector file\n");
         exit(EXIT_FAILURE);
     }
+
+    read_BIG(mod,"0AD6667D41791BBB74E10B982C");
+    read_BIG(div,"01487C2568E40F9F");
 
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
@@ -314,6 +320,26 @@ int main(int argc, char** argv)
             if (BIG_comp(BIGdiv,supp) != 0)
             {
                 printf("ERROR division BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test division
+        if (!strncmp(line,  BIGdivmodline, strlen(BIGdivmodline)))
+        {
+            BIG_zero(supp);
+            BIG_copy(supp,BIG1);
+            BIG_moddiv(supp,supp,div,mod);
+            len = strlen(BIGdivmodline);
+            linePtr = line + len;
+            read_BIG(BIGdivmod,linePtr);
+            BIG_norm(supp);
+            BIG_output(div);printf("\n\n");
+            BIG_output(mod);printf("\n\n");
+            BIG_output(supp);printf("\n\n");
+            BIG_output(BIGdivmod);printf("\n\n");
+            if (BIG_comp(BIGdivmod,supp) != 0)
+            {
+                printf("ERROR division modulo BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
