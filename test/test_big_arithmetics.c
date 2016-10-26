@@ -104,6 +104,8 @@ int main(int argc, char** argv)
     const char* nbitBIGline = "nbitBIG = ";
     int nbitDBIG;
     const char* nbitDBIGline = "nbitDBIG = ";
+    BIG BIGdiv;
+    const char* BIGdivline = "BIGdiv = ";
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -298,7 +300,25 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+// test division
+        if (!strncmp(line,  BIGdivline, strlen(BIGdivline)))
+        {
+            BIG_dzero(dsupp);
+            BIG_zero(supp);
+            BIG_dcopy(dsupp,BIGmul);
+            BIG_ddiv(supp,dsupp,BIGsum);
+            len = strlen(BIGdivline);
+            linePtr = line + len;
+            read_BIG(BIGdiv,linePtr);
+            BIG_norm(supp);
+            if (BIG_comp(BIGdiv,supp) != 0)
+            {
+                printf("ERROR division BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
     }
     printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
 }
+

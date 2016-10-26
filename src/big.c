@@ -1303,8 +1303,6 @@ void BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
 /* SU= 216, Calculate jacobi Symbol (x/y) */
 int BIG_jacobi(BIG a,BIG p)
 {
-    if (BIG_iszilch(p))
-        return -1;
     int n8,k,m=0;
 
     BIG t,x,n,zilch,one;
