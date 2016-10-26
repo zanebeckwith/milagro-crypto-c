@@ -266,95 +266,95 @@ void FP_mod(BIG a,DBIG d)
 
 
     /*
-        t=d[0]; d[0]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[0]*md[0]; c=(t>>BASEBITS)+d[1];
+    	t=d[0]; d[0]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[0]*md[0]; c=(t>>BASEBITS)+d[1];
 
-        for (k=1;k<NLEN;k++)
-        {
-            t = c+(dchunk)d[0]*md[k];
-            for (i=1;i<k;i++) t+=(dchunk)d[i]*md[k-i];
-            d[k]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[k]*md[0]; c=(t>>BASEBITS)+d[k+1];
-        }
-        for (k=NLEN;k<2*NLEN-1;k++)
-        {
-            t = c;
-            for (i=k-NLEN+1;i<NLEN;i++) t+=(dchunk)d[i]*md[k-i];
-            d[k]=(chunk)t&BMASK; c=(t>>BASEBITS)+d[k+1];
-        }
-        d[2*NLEN-1]=(chunk)c&BMASK;
+    	for (k=1;k<NLEN;k++)
+    	{
+    		t = c+(dchunk)d[0]*md[k];
+    		for (i=1;i<k;i++) t+=(dchunk)d[i]*md[k-i];
+    		d[k]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[k]*md[0]; c=(t>>BASEBITS)+d[k+1];
+    	}
+    	for (k=NLEN;k<2*NLEN-1;k++)
+    	{
+    		t = c;
+    		for (i=k-NLEN+1;i<NLEN;i++) t+=(dchunk)d[i]*md[k-i];
+    		d[k]=(chunk)t&BMASK; c=(t>>BASEBITS)+d[k+1];
+    	}
+    	d[2*NLEN-1]=(chunk)c&BMASK;
     */
     /*
-        sum=d[0];
-        if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-        else
-        {
-            if (MConst==1) sp=((chunk)sum)&BMASK;
-            else sp=((chunk)sum*MConst)&BMASK;
-        }
-        d[0]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-        sum=d[1]+(sum>>BASEBITS);
+    	sum=d[0];
+    	if (MConst==-1) sp=(-(chunk)sum)&BMASK;
+    	else
+    	{
+    		if (MConst==1) sp=((chunk)sum)&BMASK;
+    		else sp=((chunk)sum*MConst)&BMASK;
+    	}
+    	d[0]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
+    	sum=d[1]+(sum>>BASEBITS);
 
-        for (j=1;j<NLEN;j++)
-        {
-            sum+=(dchunk)d[0]*md[j];
-            for (i=1;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
-            if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-            else
-            {
-                if (MConst==1) sp=((chunk)sum)&BMASK;
-                else sp=((chunk)sum*MConst)&BMASK;
-            }
-            d[j]=sp;
-            dd[j]=(dchunk)sp*md[j];
-            sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-            sum=d[j+1]+(sum>>BASEBITS);
-        }
+    	for (j=1;j<NLEN;j++)
+    	{
+    		sum+=(dchunk)d[0]*md[j];
+    		for (i=1;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
+    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
+    		else
+    		{
+    			if (MConst==1) sp=((chunk)sum)&BMASK;
+    			else sp=((chunk)sum*MConst)&BMASK;
+    		}
+    		d[j]=sp;
+    		dd[j]=(dchunk)sp*md[j];
+    		sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
 
-        for (j=NLEN;j<DNLEN-2;j++)
-        {
-            for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
-            d[j]=(chunk)sum&BMASK;
-            sum=d[j+1]+(sum>>BASEBITS);
-        }
+    	for (j=NLEN;j<DNLEN-2;j++)
+    	{
+    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
+    		d[j]=(chunk)sum&BMASK;
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
 
-        sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-        d[DNLEN-2]=(chunk)sum&BMASK;
-        sum=d[DNLEN-1]+(sum>>BASEBITS);
-        d[DNLEN-1]=(chunk)sum&BMASK;
+    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
+    	d[DNLEN-2]=(chunk)sum&BMASK;
+    	sum=d[DNLEN-1]+(sum>>BASEBITS);
+    	d[DNLEN-1]=(chunk)sum&BMASK;
     */
-//  BIG_sducopy(a,d);
+//	BIG_sducopy(a,d);
     BIG_norm(a);
 
 
     /* Faster to Combafy it.. Let the compiler unroll the loops! */
     /*
-        sum=d[0];
-        for (j=0;j<NLEN;j++)
-        {
-            for (i=0;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
-            if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-            else
-            {
-                if (MConst==1) sp=((chunk)sum)&BMASK;
-                else sp=((chunk)sum*MConst)&BMASK;
-            }
-            d[j]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-            sum=d[j+1]+(sum>>BASEBITS);
-        }
+    	sum=d[0];
+    	for (j=0;j<NLEN;j++)
+    	{
+    		for (i=0;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
+    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
+    		else
+    		{
+    			if (MConst==1) sp=((chunk)sum)&BMASK;
+    			else sp=((chunk)sum*MConst)&BMASK;
+    		}
+    		d[j]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
 
-        for (j=NLEN;j<DNLEN-2;j++)
-        {
-            for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
-            d[j]=(chunk)sum&BMASK;
-            sum=d[j+1]+(sum>>BASEBITS);
-        }
+    	for (j=NLEN;j<DNLEN-2;j++)
+    	{
+    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
+    		d[j]=(chunk)sum&BMASK;
+    		sum=d[j+1]+(sum>>BASEBITS);
+    	}
 
-        sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-        d[DNLEN-2]=(chunk)sum&BMASK;
-        sum=d[DNLEN-1]+(sum>>BASEBITS);
-        d[DNLEN-1]=(chunk)sum&BMASK;
+    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
+    	d[DNLEN-2]=(chunk)sum&BMASK;
+    	sum=d[DNLEN-1]+(sum>>BASEBITS);
+    	d[DNLEN-1]=(chunk)sum&BMASK;
 
-        BIG_sducopy(a,d);
-        BIG_norm(a);
+    	BIG_sducopy(a,d);
+    	BIG_norm(a);
     */
 #else
     int j;
@@ -569,7 +569,6 @@ void FP_neg(BIG r,BIG a)
 #else
     }
 #endif
-
 }
 
 /* SU= 56, Modular division by 2 of a BIG in n-residue form, mod Modulus */
@@ -683,64 +682,64 @@ void FP_sqrt(BIG r,BIG a)
 int main()
 {
 
-    BIG r;
+	BIG r;
 
-    FP_one(r);
-    FP_sqr(r,r);
+	FP_one(r);
+	FP_sqr(r,r);
 
-    BIG_output(r);
+	BIG_output(r);
 
-    int i,carry;
-    DBIG c={0,0,0,0,0,0,0,0};
-    BIG a={1,2,3,4};
-    BIG b={3,4,5,6};
-    BIG r={11,12,13,14};
-    BIG s={23,24,25,15};
-    BIG w;
+	int i,carry;
+	DBIG c={0,0,0,0,0,0,0,0};
+	BIG a={1,2,3,4};
+	BIG b={3,4,5,6};
+	BIG r={11,12,13,14};
+	BIG s={23,24,25,15};
+	BIG w;
 
-//  printf("NEXCESS= %d\n",NEXCESS);
-//  printf("MConst= %d\n",MConst);
+//	printf("NEXCESS= %d\n",NEXCESS);
+//	printf("MConst= %d\n",MConst);
 
-    BIG_copy(b,Modulus);
-    BIG_dec(b,1);
-    BIG_norm(b);
+	BIG_copy(b,Modulus);
+	BIG_dec(b,1);
+	BIG_norm(b);
 
-    BIG_randomnum(r); BIG_norm(r); BIG_mod(r,Modulus);
-//  BIG_randomnum(s); norm(s); BIG_mod(s,Modulus);
+	BIG_randomnum(r); BIG_norm(r); BIG_mod(r,Modulus);
+//	BIG_randomnum(s); norm(s); BIG_mod(s,Modulus);
 
-//  BIG_output(r);
-//  BIG_output(s);
+//	BIG_output(r);
+//	BIG_output(s);
 
-    BIG_output(r);
-    FP_nres(r);
-    BIG_output(r);
-    BIG_copy(a,r);
-    FP_redc(r);
-    BIG_output(r);
-    BIG_dscopy(c,a);
-    FP_mod(r,c);
-    BIG_output(r);
-
-
-//  exit(0);
-
-//  copy(r,a);
-    printf("r=   "); BIG_output(r);
-    BIG_modsqr(r,r,Modulus);
-    printf("r^2= "); BIG_output(r);
-
-    FP_nres(r);
-    FP_sqrt(r,r);
-    FP_redc(r);
-    printf("r=   "); BIG_output(r);
-    BIG_modsqr(r,r,Modulus);
-    printf("r^2= "); BIG_output(r);
+	BIG_output(r);
+	FP_nres(r);
+	BIG_output(r);
+	BIG_copy(a,r);
+	FP_redc(r);
+	BIG_output(r);
+	BIG_dscopy(c,a);
+	FP_mod(r,c);
+	BIG_output(r);
 
 
-//  for (i=0;i<100000;i++) FP_sqr(r,r);
-//  for (i=0;i<100000;i++)
-        FP_sqrt(r,r);
+//	exit(0);
 
-    BIG_output(r);
+//	copy(r,a);
+	printf("r=   "); BIG_output(r);
+	BIG_modsqr(r,r,Modulus);
+	printf("r^2= "); BIG_output(r);
+
+	FP_nres(r);
+	FP_sqrt(r,r);
+	FP_redc(r);
+	printf("r=   "); BIG_output(r);
+	BIG_modsqr(r,r,Modulus);
+	printf("r^2= "); BIG_output(r);
+
+
+//	for (i=0;i<100000;i++) FP_sqr(r,r);
+//	for (i=0;i<100000;i++)
+		FP_sqrt(r,r);
+
+	BIG_output(r);
 }
 */
