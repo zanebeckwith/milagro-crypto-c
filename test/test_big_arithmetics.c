@@ -68,7 +68,7 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    int i=0, len=0;
+    int i=0, len=0, bitlen=0;
 
     FILE *fp;
 
@@ -100,6 +100,10 @@ int main(int argc, char** argv)
     const char* BIG1sqrmod2line = "BIG1sqrmod2 = ";
     BIG BIG1modneg2;
     const char* BIG1modneg2line = "BIG1modneg2 = ";
+    int nbitBIG;
+    const char* nbitBIGline = "nbitBIG = ";
+    int nbitDBIG;
+    const char* nbitDBIGline = "nbitDBIG = ";
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -240,7 +244,8 @@ int main(int argc, char** argv)
         if (!strncmp(line,  BIG1sqrmod2line, strlen(BIG1sqrmod2line)))
         {
             BIG_zero(supp);
-            BIG_modsqr(supp,BIG1,BIG2);
+            BIG_copy(supp,BIG1);
+            BIG_modsqr(supp,supp,BIG2);
             len = strlen(BIG1sqrmod2line);
             linePtr = line + len;
             read_BIG(BIG1sqrmod2,linePtr);
@@ -251,11 +256,12 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// test square mod
+// test negative and modulo
         if (!strncmp(line,  BIG1modneg2line, strlen(BIG1modneg2line)))
         {
             BIG_zero(supp);
-            BIG_modneg(supp,BIG1,BIG2);
+            BIG_copy(supp,BIG1);
+            BIG_modneg(supp,supp,BIG2);
             len = strlen(BIG1modneg2line);
             linePtr = line + len;
             read_BIG(BIG1modneg2,linePtr);
@@ -266,8 +272,33 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+// test counting bit BIG
+        if (!strncmp(line,nbitBIGline, strlen(nbitBIGline)))
+        {
+            len = strlen(nbitBIGline);
+            nbitBIG = BIG_nbits(BIG1);
+            linePtr = line + len;
+            sscanf(linePtr,"%d\n",&bitlen);
+            if (nbitBIG != bitlen)
+            {
+                printf("ERROR counting bit BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test counting bit DBIG
+        if (!strncmp(line,nbitDBIGline, strlen(nbitDBIGline)))
+        {
+            len = strlen(nbitDBIGline);
+            nbitDBIG = BIG_dnbits(BIGmul);
+            linePtr = line + len;
+            sscanf(linePtr,"%d\n",&bitlen);
+            if (nbitDBIG != bitlen)
+            {
+                printf("ERROR counting bit DBIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
     }
-
     printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
 }

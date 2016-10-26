@@ -1418,7 +1418,7 @@ extern void BIG_moddiv(BIG x,BIG y,BIG z,BIG n);
  *
  * @note Slow method for modular squaring
  * @param x BIG number, on exit = y^2 mod n
- * @param y BIG number
+ * @param y BIG number, on exit = y mod n
  * @param n The BIG Modulus
  */
 extern void BIG_modsqr(BIG x,BIG y,BIG n);
@@ -1430,7 +1430,7 @@ extern void BIG_modsqr(BIG x,BIG y,BIG n);
  *
  * @note Modular negation
  * @param x BIG number, on exit = -y mod n
- * @param y BIG number
+ * @param y BIG number, on exit = y mod n
  * @param n The BIG Modulus
  */
 extern void BIG_modneg(BIG x,BIG y,BIG n);
