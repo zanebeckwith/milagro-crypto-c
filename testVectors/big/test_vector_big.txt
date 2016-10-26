@@ -34,13 +34,10 @@ BIG1 = 01
 BIG2 = 00
 BIGsum = 01
 BIGsub = 01
-BIG1mod2 = -
 BIG2mod1 = 00
 BIGmul = 0
 BIG1sqr = 01
 BIG2sqr = 00
-BIG1sqrmod2 = -
-BIG1modneg2 = -
 
 #test4 - BIG1 = BIG2 = 0
 
@@ -48,13 +45,9 @@ BIG1 = 00
 BIG2 = 00
 BIGsum = 00
 BIGsub = 00
-BIG1mod2 = -
-BIG2mod1 = -
 Bigmul = 0
 BIG1sqr = 00
 BIG2sqr = 00
-BIG1sqrmod2 = -
-BIG1modneg2 = -
 
 #test5 - BIG1 = BIG2
 BIG1 = 9A02DBD0546B24961DE8BF0F6333CBCA

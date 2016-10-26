@@ -1281,9 +1281,8 @@ extern int BIG_dnbits(DBIG x);
  * @note Slow but rarely used
  * @param x BIG number to be reduced mod n
  * @param n The modulus
- * @return 0 in case of success, 1 in case of error
  */
-extern int BIG_mod(BIG x,BIG n);
+extern void BIG_mod(BIG x,BIG n);
 
 /**
  * @brief Divide x by n - output normalised
@@ -1396,9 +1395,8 @@ extern void BIG_randomnum(BIG x,BIG n,csprng *r);
  * @param y BIG number
  * @param z BIG number
  * @param n The BIG Modulus
- * @return 1 in case of failure, 0 in case of success
  */
-extern int BIG_modmul(BIG x,BIG y,BIG z,BIG n);
+extern void BIG_modmul(BIG x,BIG y,BIG z,BIG n);
 
 /**
  * @brief  Calculate x=y/z mod n
@@ -1410,9 +1408,8 @@ extern int BIG_modmul(BIG x,BIG y,BIG z,BIG n);
  * @param y BIG number
  * @param z BIG number
  * @param n The BIG Modulus
- * @return 1 in case of failure, 0 in case of success
  */
-extern int BIG_moddiv(BIG x,BIG y,BIG z,BIG n);
+extern void BIG_moddiv(BIG x,BIG y,BIG z,BIG n);
 
 /**
  * @brief  Calculate x=y^2 mod n
@@ -1423,9 +1420,8 @@ extern int BIG_moddiv(BIG x,BIG y,BIG z,BIG n);
  * @param x BIG number, on exit = y^2 mod n
  * @param y BIG number
  * @param n The BIG Modulus
- * @return 1 in case of failure, 0 in case of success
  */
-extern int BIG_modsqr(BIG x,BIG y,BIG n);
+extern void BIG_modsqr(BIG x,BIG y,BIG n);
 
 /**
  * @brief  Calculate x=-y mod n
@@ -1436,9 +1432,8 @@ extern int BIG_modsqr(BIG x,BIG y,BIG n);
  * @param x BIG number, on exit = -y mod n
  * @param y BIG number
  * @param n The BIG Modulus
- * @return 1 in case of failure, 0 in case of success
  */
-extern int BIG_modneg(BIG x,BIG y,BIG n);
+extern void BIG_modneg(BIG x,BIG y,BIG n);
 
 /**
  * @brief  Calculate jacobi Symbol (x/y)
@@ -1460,9 +1455,8 @@ extern int BIG_jacobi(BIG x,BIG y);
  * @param x BIG number, on exit = 1/y mod n
  * @param y BIG number
  * @param n The BIG Modulus
- * @return 0 in case of success, 1 in case of error
  */
-extern int BIG_invmodp(BIG x,BIG y,BIG n);
+extern void BIG_invmodp(BIG x,BIG y,BIG n);
 
 /**
  * @brief Calculate x=x mod 2^m
