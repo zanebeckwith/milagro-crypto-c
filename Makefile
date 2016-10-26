@@ -207,6 +207,7 @@ ifneq ($(strip $(filter %COVERAGE,${BUILD_NAME})),)
 	lcov --capture --initial --directory . --output-file coverage/amcl && \
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
+	lcov --remove coverage/amcl.info "/test_*" --output-file coverage/amcl.info && \
 	genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info && \
 	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0
 else 
