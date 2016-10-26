@@ -41,12 +41,12 @@
 // https://graphics.stanford.edu/~seander/bithacks.html
 /* constant time log to base 2 (or number of bits in) */
 static int logb2(unsign32 v)
-    {
+{
     int r;
     static const sign8 MultiplyDeBruijnBitPosition2[32] =
     {
-       0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
-    31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+        0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+        31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
     };
 
     v |= v >> 1;
@@ -59,7 +59,7 @@ static int logb2(unsign32 v)
     r = (int)MultiplyDeBruijnBitPosition2[(v *  0x077CB531) >> 27];
     r++;
 
-   return r;
+    return r;
 }
 
 #if MODTYPE == PSEUDO_MERSENNE
