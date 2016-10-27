@@ -44,7 +44,6 @@ void read_BIG(BIG A, char* string)
     len = strlen(string)+1;
     amcl_hex2bin(string,support,len);
     len = (len-1)/2;;
-    printf("\n");
     BIG_fromBytesLen(A,support,len);
     BIG_norm(A);
 }
@@ -116,9 +115,6 @@ int main(int argc, char** argv)
         printf("ERROR opening test vector file\n");
         exit(EXIT_FAILURE);
     }
-
-    read_BIG(mod,"0AD6667D41791BBB74E10B982C");
-    read_BIG(div,"01487C2568E40F9F");
 
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
@@ -323,9 +319,11 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// test division
+// test division with modulo
         if (!strncmp(line,  BIGdivmodline, strlen(BIGdivmodline)))
         {
+            read_BIG(mod,"E186EB30EF");
+            read_BIG(div,"0ED5066C6815047425DF");
             BIG_zero(supp);
             BIG_copy(supp,BIG1);
             BIG_moddiv(supp,supp,div,mod);
@@ -333,10 +331,6 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_BIG(BIGdivmod,linePtr);
             BIG_norm(supp);
-            BIG_output(div);printf("\n\n");
-            BIG_output(mod);printf("\n\n");
-            BIG_output(supp);printf("\n\n");
-            BIG_output(BIGdivmod);printf("\n\n");
             if (BIG_comp(BIGdivmod,supp) != 0)
             {
                 printf("ERROR division modulo BIG, line %d\n",i);
