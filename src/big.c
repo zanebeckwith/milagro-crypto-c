@@ -997,7 +997,7 @@ int BIG_nbits(BIG a)
 }
 
 /* SU= 8, Calculate number of bits in a DBIG - output normalised */
-int BIG_dnbits(BIG a)
+int BIG_dnbits(DBIG a)
 {
     int bts,k=DNLEN-1;
     chunk c;
