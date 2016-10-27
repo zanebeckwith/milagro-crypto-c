@@ -108,6 +108,8 @@ int main(int argc, char** argv)
     const char* BIGdivline = "BIGdiv = ";
     BIG BIGdivmod;
     const char* BIGdivmodline = "BIGdivmod = ";
+    DBIG BIGpxmul;
+    const char* BIGpxmulline = "BIGpxmul = ";
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -126,7 +128,7 @@ int main(int argc, char** argv)
             read_BIG(BIG1,linePtr);
         }
 // test comparison
-        if (!strncmp(line,  BIG2line, strlen(BIG2line)))
+        if (!strncmp(line,BIG2line, strlen(BIG2line)))
         {
             len = strlen(BIG2line);
             linePtr = line + len;
@@ -138,7 +140,7 @@ int main(int argc, char** argv)
             }
         }
 // test addition
-        if (!strncmp(line,  BIGsumline, strlen(BIGsumline)))
+        if (!strncmp(line,BIGsumline, strlen(BIGsumline)))
         {
             BIG_zero(supp);
             BIG_add(supp,BIG1,BIG2);
@@ -153,7 +155,7 @@ int main(int argc, char** argv)
             }
         }
 // test subtraction
-        if (!strncmp(line,  BIGsubline, strlen(BIGsubline)))
+        if (!strncmp(line,BIGsubline, strlen(BIGsubline)))
         {
             BIG_zero(supp);
             BIG_sub(supp,BIG1,BIG2);
@@ -168,7 +170,7 @@ int main(int argc, char** argv)
             }
         }
 // test modulo 1
-        if (!strncmp(line,  BIG1mod2line, strlen(BIG1mod2line)))
+        if (!strncmp(line,BIG1mod2line, strlen(BIG1mod2line)))
         {
             BIG_zero(supp);
             BIG_copy(supp,BIG1);
@@ -184,7 +186,7 @@ int main(int argc, char** argv)
             }
         }
 // test modulo 2
-        if (!strncmp(line,  BIG2mod1line, strlen(BIG2mod1line)))
+        if (!strncmp(line,BIG2mod1line, strlen(BIG2mod1line)))
         {
             BIG_zero(supp);
             BIG_copy(supp,BIG2);
@@ -200,7 +202,7 @@ int main(int argc, char** argv)
             }
         }
 // test multiplication
-        if (!strncmp(line,  BIGmulline, strlen(BIGmulline)))
+        if (!strncmp(line,BIGmulline, strlen(BIGmulline)))
         {
             BIG_dzero(dsupp);
             BIG_mul(dsupp,BIG1,BIG2);
@@ -215,7 +217,7 @@ int main(int argc, char** argv)
             }
         }
 // test square 1
-        if (!strncmp(line,  BIG1sqrline, strlen(BIG1sqrline)))
+        if (!strncmp(line,BIG1sqrline, strlen(BIG1sqrline)))
         {
             BIG_dzero(dsupp);
             BIG_sqr(dsupp,BIG1);
@@ -230,7 +232,7 @@ int main(int argc, char** argv)
             }
         }
 // test square 2
-        if (!strncmp(line,  BIG2sqrline, strlen(BIG2sqrline)))
+        if (!strncmp(line,BIG2sqrline, strlen(BIG2sqrline)))
         {
             BIG_dzero(dsupp);
             BIG_sqr(dsupp,BIG2);
@@ -245,7 +247,7 @@ int main(int argc, char** argv)
             }
         }
 // test square mod
-        if (!strncmp(line,  BIG1sqrmod2line, strlen(BIG1sqrmod2line)))
+        if (!strncmp(line,BIG1sqrmod2line, strlen(BIG1sqrmod2line)))
         {
             BIG_zero(supp);
             BIG_copy(supp,BIG1);
@@ -261,7 +263,7 @@ int main(int argc, char** argv)
             }
         }
 // test negative and modulo
-        if (!strncmp(line,  BIG1modneg2line, strlen(BIG1modneg2line)))
+        if (!strncmp(line,BIG1modneg2line, strlen(BIG1modneg2line)))
         {
             BIG_zero(supp);
             BIG_copy(supp,BIG1);
@@ -303,7 +305,7 @@ int main(int argc, char** argv)
             }
         }
 // test division
-        if (!strncmp(line,  BIGdivline, strlen(BIGdivline)))
+        if (!strncmp(line,BIGdivline, strlen(BIGdivline)))
         {
             BIG_dzero(dsupp);
             BIG_zero(supp);
@@ -320,7 +322,7 @@ int main(int argc, char** argv)
             }
         }
 // test division with modulo
-        if (!strncmp(line,  BIGdivmodline, strlen(BIGdivmodline)))
+        if (!strncmp(line,BIGdivmodline, strlen(BIGdivmodline)))
         {
             read_BIG(mod,"E186EB30EF");
             read_BIG(div,"0ED5066C6815047425DF");
@@ -334,6 +336,21 @@ int main(int argc, char** argv)
             if (BIG_comp(BIGdivmod,supp) != 0)
             {
                 printf("ERROR division modulo BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// test multiplication
+        if (!strncmp(line,BIGpxmulline, strlen(BIGpxmulline)))
+        {
+            BIG_dzero(dsupp);
+            BIG_pxmul(dsupp,BIG1,nbitDBIG);
+            len = strlen(BIGpxmulline);
+            linePtr = line + len;
+            read_DBIG(BIGpxmul,linePtr);
+            BIG_dnorm(dsupp);
+            if (BIG_dcomp(BIGpxmul,dsupp) != 0)
+            {
+                printf("ERROR small multiplication BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
