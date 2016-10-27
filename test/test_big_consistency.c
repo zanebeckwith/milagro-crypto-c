@@ -1,5 +1,5 @@
 /**
- * @file test_BIG_arithmetic.c
+ * @file test_big_consistency.c
  * @author Alessandro Budroni
  * @brief Test for consistency with BIG
  *
@@ -31,8 +31,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef enum { false, true } bool;
+
 int main()
 {
+
     int i;
     char raw[256], bytes[MODBYTES];
     csprng rng;
@@ -48,9 +51,11 @@ int main()
     /* Set to zero */
     BIG_zero(F);
     BIG_zero(G);
+    BIG_dzero(DF);
+    BIG_dzero(DG);
 
     /* Testing equal function and set zero function */
-    if(BIG_comp(G,F) | !BIG_iszilch(F) | !BIG_iszilch(G))
+    if(BIG_comp(G,F) | !BIG_iszilch(F) | !BIG_iszilch(G) | BIG_dcomp(DG,DF) | !BIG_diszilch(DF) | !BIG_diszilch(DG))
     {
         printf("ERROR comparing or setting zero BIG\n");
         exit(EXIT_FAILURE);
@@ -58,8 +63,10 @@ int main()
 
     /* Testing coping and equal function */
     BIG_random(F,&rng);
+    BIG_random(DF,&rng);
     BIG_copy(G,F);
-    if(BIG_comp(G,F))
+    BIG_dcopy(DG,DF);
+    if(BIG_comp(G,F) | BIG_dcomp(DG,DF))
     {
         printf("ERROR testing coping and equal BIG\n");
         exit(EXIT_FAILURE);
@@ -210,6 +217,21 @@ int main()
         }
     }
 
-    printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
+    /* Testing copy from/to BIG/DBIG */
+    for (i=0; i<100; i++)
+    {
+        BIG_random(F,&rng);
+        BIG_copy(G,F);
+        BIG_dzero(DF);
+        BIG_dsucopy(DF,F);
+        BIG_sducopy(F,DF);
+        if(BIG_comp(F,G))
+        {
+            printf("ERROR testing copy from/to BIG/DBIG\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    printf("SUCCESS TEST CONSISTENCY OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
 }
