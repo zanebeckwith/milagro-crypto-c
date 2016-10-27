@@ -339,7 +339,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// test multiplication
+// test small multiplication
         if (!strncmp(line,BIGpxmulline, strlen(BIGpxmulline)))
         {
             BIG_dzero(dsupp);

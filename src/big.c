@@ -938,7 +938,7 @@ chunk BIG_norm(BIG a)
 void BIG_dnorm(DBIG a)
 {
     int i;
-    chunk d,carry=0;;
+    chunk d,carry=0;
     for (i=0; i<DNLEN-1; i++)
     {
         d=a[i]+carry;
@@ -1002,7 +1002,7 @@ int BIG_dnbits(DBIG a)
     int bts,k=DNLEN-1;
     chunk c;
     BIG_dnorm(a);
-    while (a[k]==0 && k>=0) k--;
+    while (k>=0 && a[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS*k;
     c=a[k];
