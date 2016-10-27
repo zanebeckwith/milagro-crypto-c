@@ -1054,7 +1054,7 @@ void MPIN_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
 int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,octet *MESSAGE,int TimeValue,octet *Y)
 {
     int rtn=0;
-    char m[256];
+    char m[M_SIZE];
     octet M= {0,sizeof(m),m};
 
     octet *pID;
@@ -1086,7 +1086,7 @@ int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *T
 int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue)
 {
     int rtn=0;
-    char m[256];
+    char m[M_SIZE];
     octet M= {0,sizeof(m),m};
 
     octet *pU;

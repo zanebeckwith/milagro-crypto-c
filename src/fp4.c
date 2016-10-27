@@ -1,7 +1,6 @@
 /**
  * @file fp4.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Fp^4 functions
  * @note FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1))

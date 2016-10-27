@@ -1,7 +1,6 @@
 /**
  * @file fp12.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Fp^12 functions
  * @note FP12 elements are of the form a+i.b+i^2.c

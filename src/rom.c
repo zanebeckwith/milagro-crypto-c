@@ -1,7 +1,6 @@
 /**
  * @file rom.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL ROM file with the parameters of the curves
  *

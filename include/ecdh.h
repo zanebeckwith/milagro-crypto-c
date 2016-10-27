@@ -1,7 +1,6 @@
 /**
  * @file ecdh.h
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 2nd June 2015
  *
  * AMCL ECDH Header file for implementation of standard EC protocols

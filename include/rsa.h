@@ -1,7 +1,6 @@
 /**
  * @file rsa.h
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 2nd June 2015
  *
  * AMCL RSA header file for implementation of RSA protocol

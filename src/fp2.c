@@ -1,7 +1,6 @@
 /**
  * @file fp2.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Fp^2 functions
  * @note FP2 elements are of the form a+ib, where i is sqrt(-1)
