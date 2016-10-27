@@ -217,6 +217,21 @@ int main()
         }
     }
 
+    /* Testing copy from/to BIG/DBIG */
+    for (i=0; i<100; i++)
+    {
+        BIG_random(F,&rng);
+        BIG_copy(G,F);
+        BIG_dzero(DF);
+        BIG_dsucopy(DF,F);
+        BIG_sducopy(F,DF);
+        if(BIG_comp(F,G))
+        {
+            printf("ERROR testing copy from/to BIG/DBIG\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
     printf("SUCCESS TEST CONSISTENCY OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
 }
