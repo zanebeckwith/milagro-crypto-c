@@ -100,9 +100,9 @@ int main(int argc, char** argv)
     const char* BIG1sqrmod2line = "BIG1sqrmod2 = ";
     BIG BIG1modneg2;
     const char* BIG1modneg2line = "BIG1modneg2 = ";
-    int nbitBIG;
+    int nbitBIG = 0;
     const char* nbitBIGline = "nbitBIG = ";
-    int nbitDBIG;
+    int nbitDBIG = 0;
     const char* nbitDBIGline = "nbitDBIG = ";
     BIG BIGdiv;
     const char* BIGdivline = "BIGdiv = ";
