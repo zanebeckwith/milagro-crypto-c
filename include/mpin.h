@@ -62,6 +62,9 @@
 #define TIME_SLOT_MINUTES 1440 /**< Time Slot = 1 day */
 #define HASH_TYPE_MPIN SHA256  /**< Choose Hash function */
 
+#define MESSAGE_SIZE 256  /**< Signature message size  */
+#define M_SIZE (MESSAGE_SIZE+2*PFS+1)   /**< Signature message size and G1 size */
+
 /* MPIN support functions */
 
 /* MPIN primitives */

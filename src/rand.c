@@ -1,7 +1,6 @@
 /**
  * @file rand.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Implementation of a cryptographic strong random number generator
  *

@@ -1,7 +1,6 @@
 /**
  * @file ecp2.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Weierstrass elliptic curve functions over FP2
  *
