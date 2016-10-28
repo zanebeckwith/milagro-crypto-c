@@ -260,6 +260,21 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
 #endif
 }
 
+/* Convert to DBIG number from byte array of given length */
+void BIG_dfromBytesLen(DBIG a,char *b,int s)
+{
+    int i,len=s;
+    BIG_dzero(a);
+
+    for (i=0; i<len; i++)
+    {
+        BIG_dshl(a,8);
+        a[0]+=(int)(unsigned char)b[i];
+    }
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
+}
 
 /* SU= 88, Outputs a DBIG number to the console */
 void BIG_doutput(DBIG a)
@@ -922,7 +937,7 @@ chunk BIG_norm(BIG a)
 void BIG_dnorm(DBIG a)
 {
     int i;
-    chunk d,carry=0;;
+    chunk d,carry=0;
     for (i=0; i<DNLEN-1; i++)
     {
         d=a[i]+carry;
@@ -981,12 +996,12 @@ int BIG_nbits(BIG a)
 }
 
 /* SU= 8, Calculate number of bits in a DBIG - output normalised */
-int BIG_dnbits(BIG a)
+int BIG_dnbits(DBIG a)
 {
     int bts,k=DNLEN-1;
     chunk c;
     BIG_dnorm(a);
-    while (a[k]==0 && k>=0) k--;
+    while (k>=0 && a[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS*k;
     c=a[k];
@@ -1269,6 +1284,7 @@ void BIG_modneg(BIG r,BIG a,BIG m)
 {
     BIG_mod(a,m);
     BIG_sub(r,m,a);
+    BIG_mod(r,m);
 }
 
 /* SU= 136, Calculate x=y/z mod n */
@@ -1287,6 +1303,7 @@ void BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
 int BIG_jacobi(BIG a,BIG p)
 {
     int n8,k,m=0;
+
     BIG t,x,n,zilch,one;
     BIG_one(one);
     BIG_zero(zilch);

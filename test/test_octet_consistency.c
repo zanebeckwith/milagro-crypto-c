@@ -55,7 +55,8 @@ int main()
             printf("ERROR comparing two equal octet, OCTET\n");
             exit(EXIT_FAILURE);
         }
-        for (i = 0; i < len; ++i) {
+        for (i = 0; i < len; ++i)
+        {
             if(!OCT_ncomp(&V,&W,i))
             {
                 printf("ERROR comparing two equal octet, OCTET\n");
