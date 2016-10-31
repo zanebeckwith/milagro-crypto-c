@@ -31,7 +31,7 @@ do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AM
 do_test (test_octet_consistency "SUCCESS")
 do_test (test_BIG_consistency "SUCCESS")
 
-# Arithmetics tests
+# Arithmetics tests BIG
 message(STATUS "Run ${AMCL_CHOICE} Arithmetics Tests")
 add_executable (test_BIG_arithmetics test_big_arithmetics.c)
 # Link the executable to the libraries
@@ -39,6 +39,13 @@ target_link_libraries (test_BIG_arithmetics amcl)
 # test
 add_test(NAME test_BIG_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_BIG_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
 set_tests_properties (test_BIG_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+
+# Arithmetics test FP
+if(AMCL_CHOICE STREQUAL "BN454")
+  add_executable (test_FP_arithmetics test_fp_arithmetics.c)
+  add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_BN454.txt)
+  target_link_libraries (test_FP_arithmetics amcl)
+endif(AMCL_CHOICE STREQUAL "BN454")
 
 # curve independent tests
 add_executable (test_hash test_hash.c)
