@@ -79,6 +79,10 @@ int main(int argc, char** argv)
     const char* FP_1line = "FP_1 = ";
     BIG FP_2;
     const char* FP_2line = "FP_2 = ";
+    BIG FPadd;
+    const char* FPaddline = "FPadd = ";
+    BIG FPsub;
+    const char* FPsubline = "FPsub = ";
     BIG FP_1nres;
     const char* FP_1nresline = "FP_1nres = ";
     BIG FP_2nres;
@@ -87,6 +91,12 @@ int main(int argc, char** argv)
     const char* FPmulmodline = "FPmulmod = ";
     BIG FPsmallmul;
     const char* FPsmallmulline = "FPsmallmul = ";
+    BIG FPsqr;
+    const char* FPsqrline = "FPsqr = ";
+    BIG FPreduce;
+    const char* FPreduceline = "FPreduce = ";
+    BIG FPneg;
+    const char* FPnegline = "FPneg = ";
 
 /* Set to zero */
     BIG_zero(FP_1);
@@ -128,6 +138,39 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_BIG(FP_2,linePtr);
         }
+// Addition test
+        if (!strncmp(line,FPaddline, strlen(FPaddline)))
+        {
+            len = strlen(FPaddline);
+            linePtr = line + len;
+            read_BIG(FPadd,linePtr);
+            BIG_copy(supp1,FP_2);
+            BIG_copy(supp,FP_1);
+            FP_add(supp,supp,supp1);
+            BIG_norm(supp);
+            if(BIG_comp(supp,FPadd))
+            {
+                printf("ERROR adding two FP, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Subtraction test
+        if (!strncmp(line,FPsubline, strlen(FPsubline)))
+                {
+                    len = strlen(FPsubline);
+                    linePtr = line + len;
+                    read_BIG(FPsub,linePtr);
+                    BIG_copy(supp,FP_1);
+                    BIG_copy(supp1,FP_2);
+                    FP_sub(supp,supp,supp1);
+                    FP_redc(supp);
+                    FP_nres(supp);
+                    if(BIG_comp(supp,FPsub))
+                    {
+                        printf("ERROR subtraction between two FP, line %d\n",i);
+                        exit(EXIT_FAILURE);
+                    }
+                }
 // Reduce first FP
         if (!strncmp(line,FP_1nresline, strlen(FP_1nresline)))
         {
@@ -176,38 +219,88 @@ int main(int argc, char** argv)
         }
 // Small multiplication
         if (!strncmp(line,FPsmallmulline, strlen(FPsmallmulline)))
+        {
+            len = strlen(FPsmallmulline);
+            linePtr = line + len;
+            read_BIG(FPsmallmul,linePtr);
+            FP_imul(supp,FP_1,0);
+            BIG_norm(supp);
+            if (!FP_iszilch(supp)) {
+                printf("ERROR in  multiplication by 0, line %d\n",i);
+            }
+            for (j = 1; j <= 10; ++j)
+            {
+                FP_imul(supp,FP_1,j);
+                BIG_copy(supp1,FP_1);
+                for (k = 1; k < j; ++k)
                 {
-                    len = strlen(FPsmallmulline);
+                    BIG_norm(supp1);
+                    FP_add(supp1,supp1,FP_1);
+                }
+                BIG_norm(supp1);
+                if(BIG_comp(supp,supp1) != 0)
+                {
+                    printf("ERROR in small multiplication or addition, line %d, multiplier %d\n",i,j);
+                    exit(EXIT_FAILURE);
+                }
+            }
+            if(BIG_comp(supp,FPsmallmul) | BIG_comp(supp1,supp))
+            {
+                printf("ERROR in small multiplication, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Square
+        if (!strncmp(line,FPsqrline, strlen(FPsqrline)))
+        {
+            len = strlen(FPsqrline);
+            linePtr = line + len;
+            read_BIG(FPsqr,linePtr);
+            BIG_copy(supp,FP_1);
+            FP_nres(supp);
+            FP_sqr(supp,supp);
+            FP_redc(supp);
+            if(BIG_comp(supp,FPsqr))
+            {
+                printf("ERROR in squaring FP, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Reducing Modulo
+        if (!strncmp(line,FPreduceline, strlen(FPreduceline)))
+        {
+            len = strlen(FPreduceline);
+            linePtr = line + len;
+            read_BIG(FPreduce,linePtr);
+            BIG_copy(supp,FP_1);
+            FP_reduce(supp);
+            if(BIG_comp(supp,FPreduce))
+            {
+                printf("ERROR in reducing FP, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Negative an FP
+        if (!strncmp(line,FPnegline, strlen(FPnegline)))
+                {
+                    len = strlen(FPnegline);
                     linePtr = line + len;
-                    read_BIG(FPsmallmul,linePtr);
-                    FP_imul(supp,FP_1,0);
-                    BIG_norm(supp);
-                    if (!FP_iszilch(supp)) {
-                        printf("ERROR in  multiplication by 0, line %d\n",i);
-                    }
-                    for (j = 1; j <= 5; ++j) {
-                        FP_imul(supp,FP_1,j);
-                        BIG_copy(supp1,FP_1);
-                        for (k = 1; k < j; ++k) {
-                            FP_add(supp1,supp1,FP_1);
-                        }
-                        BIG_norm(supp1);
-                        if(BIG_comp(supp,supp1))
-                        {
-                            printf("ERROR in small multiplication or addition, line %d, multiplier %d\n",i,j);
-                            exit(EXIT_FAILURE);
-                        }
-                    }
-                    if(BIG_comp(supp,FPsmallmul) | BIG_comp(supp1,supp))
+                    read_BIG(FPneg,linePtr);
+                    BIG_copy(supp,FP_1);
+                    FP_nres(supp);
+                    FP_neg(supp,supp);
+                    FP_redc(supp);
+                    if(BIG_comp(supp,FPneg))
                     {
-                        printf("ERROR in small multiplication, line %d\n",i);
+                        printf("ERROR in computing FP_neg, line %d\n",i);
                         exit(EXIT_FAILURE);
                     }
                 }
-
     }
 
     printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");
     exit(EXIT_SUCCESS);
 }
+
+//printf("supp ");BIG_output(supp);printf("\n\n");
 
