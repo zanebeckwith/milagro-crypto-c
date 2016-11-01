@@ -97,6 +97,12 @@ int main(int argc, char** argv)
     const char* FPreduceline = "FPreduce = ";
     BIG FPneg;
     const char* FPnegline = "FPneg = ";
+    BIG FPdiv2;
+    const char* FPdiv2line = "FPdiv2 = ";
+    BIG FPinv;
+    const char* FPinvline = "FPinv = ";
+    BIG FPexp;
+    const char* FPexpline = "FPexp = ";
 
 /* Set to zero */
     BIG_zero(FP_1);
@@ -250,7 +256,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// Square
+// Square and square root
         if (!strncmp(line,FPsqrline, strlen(FPsqrline)))
         {
             len = strlen(FPsqrline);
@@ -265,6 +271,17 @@ int main(int argc, char** argv)
                 printf("ERROR in squaring FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
+            /*BIG_copy(supp1,FP_1);
+            FP_nres(supp);
+            FP_sqrt(supp,supp);
+            FP_redc(supp);
+            if(BIG_comp(supp,supp1))
+            {
+                printf("supp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(supp1);printf("\n\n");
+                printf("ERROR in computing square root FP, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }*/
         }
 // Reducing Modulo
         if (!strncmp(line,FPreduceline, strlen(FPreduceline)))
@@ -282,20 +299,80 @@ int main(int argc, char** argv)
         }
 // Negative an FP
         if (!strncmp(line,FPnegline, strlen(FPnegline)))
-                {
-                    len = strlen(FPnegline);
-                    linePtr = line + len;
-                    read_BIG(FPneg,linePtr);
-                    BIG_copy(supp,FP_1);
-                    FP_nres(supp);
-                    FP_neg(supp,supp);
-                    FP_redc(supp);
-                    if(BIG_comp(supp,FPneg))
-                    {
-                        printf("ERROR in computing FP_neg, line %d\n",i);
-                        exit(EXIT_FAILURE);
-                    }
-                }
+        {
+            len = strlen(FPnegline);
+            linePtr = line + len;
+            read_BIG(FPneg,linePtr);
+            BIG_copy(supp,FP_1);
+            FP_nres(supp);
+            FP_neg(supp,supp);
+            FP_redc(supp);
+            if(BIG_comp(supp,FPneg))
+            {
+                printf("ERROR in computing FP_neg, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+/* Division by 2
+        if (!strncmp(line,FPdiv2line, strlen(FPdiv2line)))
+        {
+            len = strlen(FPdiv2line);
+            linePtr = line + len;
+            read_BIG(FPdiv2,linePtr);
+            BIG_copy(supp,FP_1);
+            FP_redc(supp);
+            FP_nres(supp);
+            FP_div2(supp,supp);
+            FP_reduce(supp);
+            if(BIG_comp(supp,FPdiv2))
+            {
+                printf("ERROR in division by 2, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }*/
+// Inverse Modulo and FP_one
+        if (!strncmp(line,FPinvline, strlen(FPinvline)))
+        {
+            len = strlen(FPdiv2line);
+            linePtr = line + len;
+            read_BIG(FPinv,linePtr);
+            BIG_copy(supp,FP_1);
+            BIG_copy(supp1,FP_1);
+            FP_nres(supp);
+            FP_inv(supp,supp);
+            FP_redc(supp);
+            if(BIG_comp(supp,FPinv))
+            {
+                printf("ERROR computing inverse modulo, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            FP_mul(supp,supp,supp1);
+            FP_nres(supp);
+            FP_one(supp1);
+            FP_redc(supp1);
+            if(BIG_comp(supp,supp1))
+            {
+                printf("ERROR multipling FP and its inverse, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// modular exponentiation
+        if (!strncmp(line,FPexpline, strlen(FPexpline)))
+        {
+            len = strlen(FPexpline);
+            linePtr = line + len;
+            read_BIG(FPexp,linePtr);
+            BIG_copy(supp,FP_1);
+            BIG_copy(supp1,FP_2);
+            FP_nres(supp);
+            FP_pow(supp,supp,supp1);
+            FP_redc(supp);
+            if(BIG_comp(supp,FPexp))
+            {
+                printf("ERROR in modular exponentiation, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
     }
 
     printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");
