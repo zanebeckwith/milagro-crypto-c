@@ -47,6 +47,12 @@ if(AMCL_CHOICE STREQUAL "BN454")
   target_link_libraries (test_FP_arithmetics amcl)
 endif(AMCL_CHOICE STREQUAL "BN454")
 
+if(AMCL_CHOICE STREQUAL "BN254_T")
+  add_executable (test_FP_arithmetics test_fp_arithmetics.c)
+  add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_BN254_T.txt)
+  target_link_libraries (test_FP_arithmetics amcl)
+endif(AMCL_CHOICE STREQUAL "BN254_T")
+
 # curve independent tests
 add_executable (test_hash test_hash.c)
 add_executable (test_gcm_encrypt test_gcm_encrypt.c)

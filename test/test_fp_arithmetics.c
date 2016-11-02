@@ -124,6 +124,11 @@ int main(int argc, char** argv)
 
 #ifdef DEBOUG
     BIG_rcopy(supp,Modulus);
+    printf("\nModulus: ");
+    BIG_output(supp);printf("\n\n");
+    BIG_zero(supp);
+    BIG_dec(supp,1);
+    FP_reduce(supp);
     BIG_output(supp);printf("\n\n");
 #endif
 
@@ -154,8 +159,11 @@ int main(int argc, char** argv)
             BIG_copy(supp,FP_1);
             FP_add(supp,supp,supp1);
             BIG_norm(supp);
+            FP_reduce(supp);
             if(BIG_comp(supp,FPadd))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FPadd);printf("\n\n");
                 printf("ERROR adding two FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -173,6 +181,8 @@ int main(int argc, char** argv)
                     FP_nres(supp);
                     if(BIG_comp(supp,FPsub))
                     {
+                        printf("comp ");BIG_output(supp);printf("\n\n");
+                        printf("read ");BIG_output(FPsub);printf("\n\n");
                         printf("ERROR subtraction between two FP, line %d\n",i);
                         exit(EXIT_FAILURE);
                     }
@@ -188,6 +198,8 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FP_1nres))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FP_1nres);printf("\n\n");
                 printf("ERROR Converts from BIG integer to n-residue form, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -203,6 +215,8 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FP_2nres))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FP_2nres);printf("\n\n");
                 printf("ERROR Converts from BIG integer to n-residue form, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -219,6 +233,8 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPmulmod))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FPmulmod);printf("\n\n");
                 printf("ERROR in multiplication and reduction by Modulo, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -246,12 +262,18 @@ int main(int argc, char** argv)
                 BIG_norm(supp1);
                 if(BIG_comp(supp,supp1) != 0)
                 {
+                    printf("comp1 ");BIG_output(supp);printf("\n\n");
+                    printf("comp2 ");BIG_output(supp1);printf("\n\n");
                     printf("ERROR in small multiplication or addition, line %d, multiplier %d\n",i,j);
                     exit(EXIT_FAILURE);
                 }
             }
+            FP_reduce(supp);FP_reduce(supp1);
             if(BIG_comp(supp,FPsmallmul) | BIG_comp(supp1,supp))
             {
+                printf("comp1 ");BIG_output(supp);printf("\n\n");
+                printf("comp2 ");BIG_output(supp1);printf("\n\n");
+                printf("read  ");BIG_output(FPsmallmul);printf("\n\n");
                 printf("ERROR in small multiplication, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -293,6 +315,8 @@ int main(int argc, char** argv)
             FP_reduce(supp);
             if(BIG_comp(supp,FPreduce))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FPreduce);printf("\n\n");
                 printf("ERROR in reducing FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -309,11 +333,13 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPneg))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FPneg);printf("\n\n");
                 printf("ERROR in computing FP_neg, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
-/* Division by 2
+// Division by 2
         if (!strncmp(line,FPdiv2line, strlen(FPdiv2line)))
         {
             len = strlen(FPdiv2line);
@@ -323,17 +349,18 @@ int main(int argc, char** argv)
             FP_redc(supp);
             FP_nres(supp);
             FP_div2(supp,supp);
-            FP_reduce(supp);
             if(BIG_comp(supp,FPdiv2))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FPdiv2);printf("\n\n");
                 printf("ERROR in division by 2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-        }*/
+        }
 // Inverse Modulo and FP_one
         if (!strncmp(line,FPinvline, strlen(FPinvline)))
         {
-            len = strlen(FPdiv2line);
+            len = strlen(FPinvline);
             linePtr = line + len;
             read_BIG(FPinv,linePtr);
             BIG_copy(supp,FP_1);
@@ -343,6 +370,8 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPinv))
             {
+                printf("comp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FPinv);printf("\n\n");
                 printf("ERROR computing inverse modulo, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -352,6 +381,8 @@ int main(int argc, char** argv)
             FP_redc(supp1);
             if(BIG_comp(supp,supp1))
             {
+                printf("comp1 ");BIG_output(supp);printf("\n\n");
+                printf("comp2 ");BIG_output(supp1);printf("\n\n");
                 printf("ERROR multipling FP and its inverse, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -369,6 +400,8 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPexp))
             {
+            	printf("supp ");BIG_output(supp);printf("\n\n");
+            	printf("read ");BIG_output(FPexp);printf("\n\n");
                 printf("ERROR in modular exponentiation, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
