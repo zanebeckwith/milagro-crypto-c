@@ -299,12 +299,12 @@ int main()
     printf("T = 0x");
     OCT_output(&T);
 
-    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y1,&R,&W,&HM);
+    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y1,&Z,&T,&HM);
     MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
     printf("Client Key = ");
     OCT_output(&CK);
 
-    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y2,&R,&W,&HM);
+    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y2,&Z,&T,&HM);
     MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
     printf("Server Key = ");
     OCT_output(&SK);
