@@ -51,7 +51,7 @@ static int logb2(unsign32 v)
 
     v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
     v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-    r = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+    r = (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     return r+1;
 }
 
@@ -671,68 +671,3 @@ void FP_sqrt(BIG r,BIG a)
     }
 }
 
-/*
-int main()
-{
-
-	BIG r;
-
-	FP_one(r);
-	FP_sqr(r,r);
-
-	BIG_output(r);
-
-	int i,carry;
-	DBIG c={0,0,0,0,0,0,0,0};
-	BIG a={1,2,3,4};
-	BIG b={3,4,5,6};
-	BIG r={11,12,13,14};
-	BIG s={23,24,25,15};
-	BIG w;
-
-//	printf("NEXCESS= %d\n",NEXCESS);
-//	printf("MConst= %d\n",MConst);
-
-	BIG_copy(b,Modulus);
-	BIG_dec(b,1);
-	BIG_norm(b);
-
-	BIG_randomnum(r); BIG_norm(r); BIG_mod(r,Modulus);
-//	BIG_randomnum(s); norm(s); BIG_mod(s,Modulus);
-
-//	BIG_output(r);
-//	BIG_output(s);
-
-	BIG_output(r);
-	FP_nres(r);
-	BIG_output(r);
-	BIG_copy(a,r);
-	FP_redc(r);
-	BIG_output(r);
-	BIG_dscopy(c,a);
-	FP_mod(r,c);
-	BIG_output(r);
-
-
-//	exit(0);
-
-//	copy(r,a);
-	printf("r=   "); BIG_output(r);
-	BIG_modsqr(r,r,Modulus);
-	printf("r^2= "); BIG_output(r);
-
-	FP_nres(r);
-	FP_sqrt(r,r);
-	FP_redc(r);
-	printf("r=   "); BIG_output(r);
-	BIG_modsqr(r,r,Modulus);
-	printf("r^2= "); BIG_output(r);
-
-
-//	for (i=0;i<100000;i++) FP_sqr(r,r);
-//	for (i=0;i<100000;i++)
-		FP_sqrt(r,r);
-
-	BIG_output(r);
-}
-*/

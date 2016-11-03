@@ -36,7 +36,7 @@ typedef enum { false, true } bool;
 int main()
 {
 
-    int i;
+    int i,j;
     char raw[256], bytes[MODBYTES];
     csprng rng;
 
@@ -108,6 +108,31 @@ int main()
         if(BIG_comp(G,F))
         {
             printf("ERROR testing small multiplication and division by 3 BIG\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Testing small multiplication and addition */
+    BIG_random(F,&rng);
+    for (j = 1; j <= 20; ++j)
+    {
+        FP_imul(H,F,j);
+        BIG_copy(G,F);
+        for (i = 1; i < j; ++i)
+        {
+            BIG_norm(G);
+            FP_add(G,G,F);
+        }
+        BIG_norm(G);
+        if(BIG_comp(H,G) != 0)
+        {
+            printf("H ");
+            BIG_output(H);
+            printf("\n\n");
+            printf("G ");
+            BIG_output(G);
+            printf("\n\n");
+            printf("ERROR testing small multiplication and addition BIG\n");
             exit(EXIT_FAILURE);
         }
     }

@@ -424,7 +424,7 @@ void BIG_add(BIG c,BIG a,BIG b)
         c[i]=a[i]+b[i];
 #ifdef DEBUG_NORM
     c[NLEN]=a[NLEN]+b[NLEN]+1;
-    if (c[NLEN]>=NEXCESS) printf("add problem - digit overflow %d\n",c[NLEN]);
+    if (c[NLEN]>=NEXCESS) printf("add problem - digit overflow %lu\n",c[NLEN]);
 #endif
 }
 

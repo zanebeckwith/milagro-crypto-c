@@ -31,8 +31,6 @@
 #include "utils.h"
 #include "utils.h"
 
-typedef enum { false, true } bool;
-
 #define LINE_LEN 10000
 #define MAX_STRING 300
 
