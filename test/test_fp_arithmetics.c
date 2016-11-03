@@ -33,7 +33,6 @@
 
 #define LINE_LEN 10000
 #define MAX_STRING 300
-//#define DEBOUG
 
 void read_BIG(BIG A, char* string)
 {
@@ -121,18 +120,6 @@ int main(int argc, char** argv)
         printf("ERROR opening test vector file\n");
         exit(EXIT_FAILURE);
     }
-
-#ifdef DEBOUG
-    BIG_rcopy(supp,Modulus);
-    printf("\nModulus: ");
-    BIG_output(supp);
-    printf("\n\n");
-    BIG_zero(supp);
-    BIG_dec(supp,1);
-    FP_reduce(supp);
-    BIG_output(supp);
-    printf("\n\n");
-#endif
 
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
