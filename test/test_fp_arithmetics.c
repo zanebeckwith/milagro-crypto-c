@@ -290,18 +290,19 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPsqr))
             {
+                printf("supp ");BIG_output(supp);printf("\n\n");
+                printf("read ");BIG_output(FPsqr);printf("\n\n");
                 printf("ERROR in squaring FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            /*BIG_copy(supp1,FP_1);
-            FP_nres(supp);
+            /*FP_nres(supp);
             FP_sqrt(supp,supp);
             FP_redc(supp);
-            if(BIG_comp(supp,supp1))
+            if(BIG_comp(supp,FP_1))
             {
                 printf("supp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(supp1);printf("\n\n");
-                printf("ERROR in computing square root FP, line %d\n",i);
+                printf("read ");BIG_output(FP_1);printf("\n\n");
+                printf("ERROR square/square root consistency FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }*/
         }
@@ -411,6 +412,3 @@ int main(int argc, char** argv)
     printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");
     exit(EXIT_SUCCESS);
 }
-
-//printf("supp ");BIG_output(supp);printf("\n\n");
-

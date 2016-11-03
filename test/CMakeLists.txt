@@ -40,18 +40,12 @@ target_link_libraries (test_BIG_arithmetics amcl)
 add_test(NAME test_BIG_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_BIG_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
 set_tests_properties (test_BIG_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
-# Arithmetics test FP
-if(AMCL_CHOICE STREQUAL "BN454")
+# Arithmetics test FP for pairing-friendly cuves
+if((AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN254_T") OR  (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN646") OR (AMCL_CHOICE STREQUAL "BLS455"))
   add_executable (test_FP_arithmetics test_fp_arithmetics.c)
-  add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_BN454.txt)
+  add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
   target_link_libraries (test_FP_arithmetics amcl)
-endif(AMCL_CHOICE STREQUAL "BN454")
-
-if(AMCL_CHOICE STREQUAL "BN254_T")
-  add_executable (test_FP_arithmetics test_fp_arithmetics.c)
-  add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_BN254_T.txt)
-  target_link_libraries (test_FP_arithmetics amcl)
-endif(AMCL_CHOICE STREQUAL "BN254_T")
+endif((AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN254_T") OR  (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN646") OR (AMCL_CHOICE STREQUAL "BLS455"))
 
 # curve independent tests
 add_executable (test_hash test_hash.c)
@@ -66,7 +60,6 @@ target_link_libraries (test_gcm_decrypt amcl)
 target_link_libraries (test_aes_encrypt amcl) 
 target_link_libraries (test_aes_decrypt amcl)
  
-
 # hash tests
 add_test(NAME test_hash_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/256/SHA256ShortMsg.rsp sha256)
 set_tests_properties (test_hash_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
