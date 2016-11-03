@@ -306,14 +306,14 @@ int main()
         printf("FAILURE Invalid Token Error Code %d\n", rtn);
     }
 
-    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y,&R,&W,&HM);
+    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
     MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
     printf("Client Key = ");
     OCT_output(&CK);
 
     /* Server will use the hashed ID if anonymous connection required.
     MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HSID);
-    MPIN_HASH_ALL(&HSID,NULL,&UT,&SEC,&Y,&R,&W,&HM);
+    MPIN_HASH_ALL(&HSID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
     */
     MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
     printf("Server Key = ");
