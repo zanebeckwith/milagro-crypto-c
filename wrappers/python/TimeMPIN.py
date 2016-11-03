@@ -225,9 +225,9 @@ if __name__ == "__main__":
 
         if MPIN_FULL:
             time_func(
-                'HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)',
+                'HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)',
                 nIter)
-            HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)
+            HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
 
             time_func(
                 'rtn, client_aes_key = mpin.client_key(HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)',
@@ -320,9 +320,9 @@ if __name__ == "__main__":
                 print "ERROR: Generating T %s" % rtn
 
             time_func(
-                'HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)',
+                'HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)',
                 nIter)
-            HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)
+            HM = mpin.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
 
             time_func(
                 'rtn, client_aes_key = mpin.client_key(HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)',

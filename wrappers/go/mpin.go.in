@@ -1174,15 +1174,15 @@ Args:
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
     y: server challenge
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
-    R: client part response
-    W: server part response
+    Z: client part response
+    T: server part response
 
 Returns:
 
     HM: hash of the input values
 
 */
-func HashAll(hashType int, hashMPinId, U, UT, V, y, R, W []byte) (HM []byte) {
+func HashAll(hashType int, hashMPinId, U, UT, V, y, Z, T []byte) (HM []byte) {
 	// Form Octets
 	hashMPinIdStr := string(hashMPinId)
 	hashMPinIdOct := GetOctet(hashMPinIdStr)
@@ -1204,19 +1204,19 @@ func HashAll(hashType int, hashMPinId, U, UT, V, y, R, W []byte) (HM []byte) {
 	VOct := GetOctet(VStr)
 	defer OctetFree(&VOct)
 
-	RStr := string(R)
-	ROct := GetOctet(RStr)
-	defer OctetFree(&ROct)
+	ZStr := string(Z)
+	ZOct := GetOctet(ZStr)
+	defer OctetFree(&ZOct)
 
-	WStr := string(W)
-	WOct := GetOctet(WStr)
-	defer OctetFree(&WOct)
+	TStr := string(T)
+	TOct := GetOctet(TStr)
+	defer OctetFree(&TOct)
 
 	HMOct := GetOctetZero(hashBytes)
 	defer OctetFree(&HMOct)
 
 	// Hash values
-	C.MPIN_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &VOct, &yOct, &ROct, &WOct, &HMOct)
+	C.MPIN_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &VOct, &yOct, &ZOct, &TOct, &HMOct)
 
 	// Convert octet to bytes
 	HM = OctetToBytes(&HMOct)
