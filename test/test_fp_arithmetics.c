@@ -421,6 +421,7 @@ int main(int argc, char** argv)
             }
             FP_mul(supp,supp,supp1);
             FP_nres(supp);
+            FP_reduce(supp);
             FP_one(supp1);
             FP_redc(supp1);
             if(BIG_comp(supp,supp1))

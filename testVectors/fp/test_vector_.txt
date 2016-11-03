@@ -1,0 +1,2 @@
+# FP ARITHMETICS - CURVE: BN454, Modulo = 0x; BIGmax = 2^
+
