@@ -104,11 +104,11 @@ int main(int argc, char** argv)
     BIG FPexp;
     const char* FPexpline = "FPexp = ";
 
-/* Set to zero */
+    /* Set to zero */
     BIG_zero(FP_1);
     BIG_zero(FP_2);
 
-/* Testing equal function and set zero function */
+    /* Testing equal function and set zero function */
     if(BIG_comp(FP_1,FP_2) && !FP_iszilch(FP_1) && !FP_iszilch(FP_2))
     {
         printf("ERROR comparing or setting zero FP\n");
@@ -125,11 +125,13 @@ int main(int argc, char** argv)
 #ifdef DEBOUG
     BIG_rcopy(supp,Modulus);
     printf("\nModulus: ");
-    BIG_output(supp);printf("\n\n");
+    BIG_output(supp);
+    printf("\n\n");
     BIG_zero(supp);
     BIG_dec(supp,1);
     FP_reduce(supp);
-    BIG_output(supp);printf("\n\n");
+    BIG_output(supp);
+    printf("\n\n");
 #endif
 
     while (fgets(line, LINE_LEN, fp) != NULL)
@@ -162,31 +164,39 @@ int main(int argc, char** argv)
             FP_reduce(supp);
             if(BIG_comp(supp,FPadd))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FPadd);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPadd);
+                printf("\n\n");
                 printf("ERROR adding two FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
 // Subtraction test
         if (!strncmp(line,FPsubline, strlen(FPsubline)))
-                {
-                    len = strlen(FPsubline);
-                    linePtr = line + len;
-                    read_BIG(FPsub,linePtr);
-                    BIG_copy(supp,FP_1);
-                    BIG_copy(supp1,FP_2);
-                    FP_sub(supp,supp,supp1);
-                    FP_redc(supp);
-                    FP_nres(supp);
-                    if(BIG_comp(supp,FPsub))
-                    {
-                        printf("comp ");BIG_output(supp);printf("\n\n");
-                        printf("read ");BIG_output(FPsub);printf("\n\n");
-                        printf("ERROR subtraction between two FP, line %d\n",i);
-                        exit(EXIT_FAILURE);
-                    }
-                }
+        {
+            len = strlen(FPsubline);
+            linePtr = line + len;
+            read_BIG(FPsub,linePtr);
+            BIG_copy(supp,FP_1);
+            BIG_copy(supp1,FP_2);
+            FP_sub(supp,supp,supp1);
+            FP_redc(supp);
+            FP_nres(supp);
+            if(BIG_comp(supp,FPsub))
+            {
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPsub);
+                printf("\n\n");
+                printf("ERROR subtraction between two FP, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
 // Reduce first FP
         if (!strncmp(line,FP_1nresline, strlen(FP_1nresline)))
         {
@@ -198,8 +208,12 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FP_1nres))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FP_1nres);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FP_1nres);
+                printf("\n\n");
                 printf("ERROR Converts from BIG integer to n-residue form, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -215,8 +229,12 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FP_2nres))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FP_2nres);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FP_2nres);
+                printf("\n\n");
                 printf("ERROR Converts from BIG integer to n-residue form, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -227,14 +245,20 @@ int main(int argc, char** argv)
             len = strlen(FPmulmodline);
             linePtr = line + len;
             read_BIG(FPmulmod,linePtr);
-            BIG_copy(supp,FP_1);BIG_copy(supp1,FP_2);
-            FP_nres(supp);FP_nres(supp1);
+            BIG_copy(supp,FP_1);
+            BIG_copy(supp1,FP_2);
+            FP_nres(supp);
+            FP_nres(supp1);
             FP_mul(supp,supp,supp1);
             FP_redc(supp);
             if(BIG_comp(supp,FPmulmod))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FPmulmod);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPmulmod);
+                printf("\n\n");
                 printf("ERROR in multiplication and reduction by Modulo, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -247,7 +271,8 @@ int main(int argc, char** argv)
             read_BIG(FPsmallmul,linePtr);
             FP_imul(supp,FP_1,0);
             BIG_norm(supp);
-            if (!FP_iszilch(supp)) {
+            if (!FP_iszilch(supp))
+            {
                 printf("ERROR in  multiplication by 0, line %d\n",i);
             }
             for (j = 1; j <= 10; ++j)
@@ -262,18 +287,29 @@ int main(int argc, char** argv)
                 BIG_norm(supp1);
                 if(BIG_comp(supp,supp1) != 0)
                 {
-                    printf("comp1 ");BIG_output(supp);printf("\n\n");
-                    printf("comp2 ");BIG_output(supp1);printf("\n\n");
+                    printf("comp1 ");
+                    BIG_output(supp);
+                    printf("\n\n");
+                    printf("comp2 ");
+                    BIG_output(supp1);
+                    printf("\n\n");
                     printf("ERROR in small multiplication or addition, line %d, multiplier %d\n",i,j);
                     exit(EXIT_FAILURE);
                 }
             }
-            FP_reduce(supp);FP_reduce(supp1);
+            FP_reduce(supp);
+            FP_reduce(supp1);
             if(BIG_comp(supp,FPsmallmul) | BIG_comp(supp1,supp))
             {
-                printf("comp1 ");BIG_output(supp);printf("\n\n");
-                printf("comp2 ");BIG_output(supp1);printf("\n\n");
-                printf("read  ");BIG_output(FPsmallmul);printf("\n\n");
+                printf("comp1 ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("comp2 ");
+                BIG_output(supp1);
+                printf("\n\n");
+                printf("read  ");
+                BIG_output(FPsmallmul);
+                printf("\n\n");
                 printf("ERROR in small multiplication, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -290,8 +326,12 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPsqr))
             {
-                printf("supp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FPsqr);printf("\n\n");
+                printf("supp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPsqr);
+                printf("\n\n");
                 printf("ERROR in squaring FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -316,8 +356,12 @@ int main(int argc, char** argv)
             FP_reduce(supp);
             if(BIG_comp(supp,FPreduce))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FPreduce);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPreduce);
+                printf("\n\n");
                 printf("ERROR in reducing FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -334,8 +378,12 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPneg))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FPneg);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPneg);
+                printf("\n\n");
                 printf("ERROR in computing FP_neg, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -352,8 +400,12 @@ int main(int argc, char** argv)
             FP_div2(supp,supp);
             if(BIG_comp(supp,FPdiv2))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FPdiv2);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPdiv2);
+                printf("\n\n");
                 printf("ERROR in division by 2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -371,8 +423,12 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPinv))
             {
-                printf("comp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FPinv);printf("\n\n");
+                printf("comp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPinv);
+                printf("\n\n");
                 printf("ERROR computing inverse modulo, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -382,8 +438,12 @@ int main(int argc, char** argv)
             FP_redc(supp1);
             if(BIG_comp(supp,supp1))
             {
-                printf("comp1 ");BIG_output(supp);printf("\n\n");
-                printf("comp2 ");BIG_output(supp1);printf("\n\n");
+                printf("comp1 ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("comp2 ");
+                BIG_output(supp1);
+                printf("\n\n");
                 printf("ERROR multipling FP and its inverse, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -401,8 +461,12 @@ int main(int argc, char** argv)
             FP_redc(supp);
             if(BIG_comp(supp,FPexp))
             {
-            	printf("supp ");BIG_output(supp);printf("\n\n");
-            	printf("read ");BIG_output(FPexp);printf("\n\n");
+                printf("supp ");
+                BIG_output(supp);
+                printf("\n\n");
+                printf("read ");
+                BIG_output(FPexp);
+                printf("\n\n");
                 printf("ERROR in modular exponentiation, line %d\n",i);
                 exit(EXIT_FAILURE);
             }

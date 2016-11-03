@@ -126,8 +126,12 @@ int main()
         BIG_norm(G);
         if(BIG_comp(H,G) != 0)
         {
-            printf("H ");BIG_output(H);printf("\n\n");
-            printf("G ");BIG_output(G);printf("\n\n");
+            printf("H ");
+            BIG_output(H);
+            printf("\n\n");
+            printf("G ");
+            BIG_output(G);
+            printf("\n\n");
             printf("ERROR testing small multiplication and addition BIG\n");
             exit(EXIT_FAILURE);
         }
