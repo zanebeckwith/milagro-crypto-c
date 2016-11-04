@@ -876,7 +876,7 @@ def kangaroo(e, f):
     return pin_error
 
 
-def hash_all(hash_type, hash_mpin_id, u, ut, v, y, r, w):
+def hash_all(hash_type, hash_mpin_id, u, ut, v, y, z, t):
     """Hash the session transcript
 
     Hash the session transcript
@@ -888,8 +888,8 @@ def hash_all(hash_type, hash_mpin_id, u, ut, v, y, r, w):
         ut: ut = x.(H(ID)+H(epoch_date|H(ID)))
         v: v = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
         y: server challenge
-        r: client part response
-        w: server part response
+        z: client part response
+        t: server part response
 
     Returns::
 
@@ -906,12 +906,12 @@ def hash_all(hash_type, hash_mpin_id, u, ut, v, y, r, w):
     u1, u1_val = make_octet(None, u)
     v1, v1_val = make_octet(None, v)
     y1, y1_val = make_octet(None, y)
-    r1, r1_val = make_octet(None, r)
-    w1, w1_val = make_octet(None, w)
+    z1, z1_val = make_octet(None, z)
+    t1, w1_val = make_octet(None, t)
 
     hm1, hm1_val = make_octet(PFS)
     libmpin.MPIN_HASH_ALL(hash_type, hash_mpin_id1,
-                          u1, ut1, v1, y1, r1, w1, hm1)
+                          u1, ut1, v1, y1, z1, t1, hm1)
 
     hm_hex = to_hex(hm1)
     return hm_hex.decode("hex")
@@ -1311,7 +1311,7 @@ if __name__ == "__main__":
                 print "ERROR: Generating T %s" % rtn
 
         if MPIN_FULL:
-            HM = hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)
+            HM = hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
 
             rtn, client_aes_key = client_key(
                 HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)
@@ -1387,7 +1387,7 @@ if __name__ == "__main__":
             if rtn != 0:
                 print "ERROR: Generating T %s" % rtn
 
-            HM = hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, r, w)
+            HM = hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
 
             rtn, client_aes_key = client_key(
                 HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)
