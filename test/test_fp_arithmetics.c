@@ -60,6 +60,7 @@ void read_DBIG(DBIG A, char* string)
 
 int main(int argc, char** argv)
 {
+
     if (argc != 2)
     {
         printf("usage: ./test_FP_arithmetics [path to test vector file]\n");
@@ -72,7 +73,7 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    BIG supp, supp1;
+    BIG M,supp, supp1;
 
     BIG FP_1;
     const char* FP_1line = "FP_1 = ";
@@ -106,6 +107,7 @@ int main(int argc, char** argv)
     /* Set to zero */
     BIG_zero(FP_1);
     BIG_zero(FP_2);
+    BIG_rcopy(M,Modulus);
 
     /* Testing equal function and set zero function */
     if(BIG_comp(FP_1,FP_2) && !FP_iszilch(FP_1) && !FP_iszilch(FP_2))
@@ -172,12 +174,17 @@ int main(int argc, char** argv)
             FP_sub(supp,supp,supp1);
             FP_redc(supp);
             FP_nres(supp);
-            if(BIG_comp(supp,FPsub))
+            BIG_sub(supp1,supp,M); // in case of lazy reduction
+            BIG_norm(supp1);
+            if((BIG_comp(supp,FPsub) != 0) && (BIG_comp(supp1,FPsub) != 0))
             {
-                printf("comp ");
+                printf("comp  ");
                 BIG_output(supp);
                 printf("\n\n");
-                printf("read ");
+                printf("comp1 ");
+                BIG_output(supp1);
+                printf("\n\n");
+                printf("read  ");
                 BIG_output(FPsub);
                 printf("\n\n");
                 printf("ERROR subtraction between two FP, line %d\n",i);
@@ -363,7 +370,9 @@ int main(int argc, char** argv)
             FP_nres(supp);
             FP_neg(supp,supp);
             FP_redc(supp);
-            if(BIG_comp(supp,FPneg))
+            BIG_sub(supp1,supp,M); // in case of lazy reduction
+            BIG_norm(supp1);
+            if((BIG_comp(supp,FPneg) != 0) && (BIG_comp(supp1,FPneg) != 0))
             {
                 printf("comp ");
                 BIG_output(supp);
