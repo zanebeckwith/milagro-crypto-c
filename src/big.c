@@ -213,6 +213,21 @@ void BIG_cmove(BIG f,BIG g,int d)
     }
 }
 
+/* Move g to f if d=1 */
+void BIG_dcmove(DBIG f,DBIG g,int d)
+{
+    int i;
+    chunk b=(chunk)-d;
+#ifdef DEBUG_NORM
+    for (i=0;i<=DNLEN;i++)
+#else
+    for (i=0;i<DNLEN;i++)
+#endif
+    {
+        f[i]^=(f[i]^g[i])&b;
+    }
+}
+
 /* SU= 64, Convert from BIG number to byte array */
 void BIG_toBytes(char *b,BIG a)
 {
@@ -983,11 +998,11 @@ void BIG_mod(BIG b,BIG c)
     }
 }
 
-/* SU= 96, Set a=b mod c, b is destroyed. Slow but rarely used. */
+/* SU= 96, Set a=b mod c, b is destroyed. Slow but rarely used. Constant time. */
 void BIG_dmod(BIG a,DBIG b,BIG c)
 {
     int k=0;
-    DBIG m;
+    DBIG m,r;
     BIG_dnorm(b);
     BIG_dscopy(m,c);
 
@@ -1006,12 +1021,10 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 
     while (k>0)
     {
-        BIG_dshr(m,1);
-        if (BIG_dcomp(b,m)>=0)
-        {
-            BIG_dsub(b,b,m);
-            BIG_dnorm(b);
-        }
+        BIG_dshr(m,1);  
+        BIG_dsub(r,b,m);
+        BIG_dnorm(r);
+        BIG_dcmove(b,r,1-((r[DNLEN-1]>>(CHUNK-1))&1));
         k--;
     }
     BIG_sdcopy(a,b);
