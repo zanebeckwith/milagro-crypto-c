@@ -580,62 +580,6 @@ void BIG_mul(DBIG c,BIG a,BIG b)
         co=t>>BASEBITS;
     }
     c[2*NLEN-1]=(chunk)co;
-    /*
-    	for (i=0;i<NLEN;i++)
-    		d[i]=(dchunk)a[i]*b[i];
-
-    	s[0]=d[0];
-    	for (i=1;i<NLEN;i++)
-    		s[i]=s[i-1]+d[i];
-
-    	s[2*NLEN-2]=d[NLEN-1];
-    	for (i=2*NLEN-3;i>=NLEN;i--)
-    		s[i]=s[i+1]+d[i-NLEN+1];
-
-    	c[0]=s[0]&BMASK; co=s[0]>>BASEBITS;
-
-    	for (j=1;j<NLEN;j++)
-    	{
-    		t=co+s[j];
-    		for (k=j,i=0;i<k;i++,k-- )
-    			t+=(dchunk)(a[i]-a[k])*(b[k]-b[i]);
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	for (j=NLEN;j<2*NLEN-2;j++)
-    	{
-    		t=co+s[j];
-    		for (k=NLEN-1,i=j-NLEN+1;i<k;i++,k--)
-    			t+=(dchunk)(a[i]-a[k])*(b[k]-b[i]);
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	t=(dchunk)s[2*NLEN-2]+co;
-    	c[2*NLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	c[2*NLEN-1]=(chunk)co;
-    */
-    /*
-    	t=(dchunk)a[0]*b[0];
-    	c[0]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	t=(dchunk)a[1]*b[0]+(dchunk)a[0]*b[1]+co;
-    	c[1]=(chunk)t&BMASK; co=t>>BASEBITS;
-
-    	for (j=2;j<NLEN;j++)
-    	{
-    		t=co; for (i=0;i<=j;i++) t+=(dchunk)a[j-i]*b[i];
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	for (j=NLEN;j<DNLEN-2;j++)
-    	{
-    		t=co; for (i=j-NLEN+1;i<NLEN;i++) t+=(dchunk)a[j-i]*b[i];
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	t=(dchunk)a[NLEN-1]*b[NLEN-1]+co;
-    	c[DNLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	c[DNLEN-1]=(chunk)co;
-    */
 #else
     int j;
     chunk carry;
@@ -1013,10 +957,11 @@ int BIG_dnbits(DBIG a)
     return bts;
 }
 
-/* SU= 16, Reduce x mod n - input and output normalised */
+/* SU= 16, Reduce x mod n - input and output normalised, constant time. */
 void BIG_mod(BIG b,BIG c)
 {
     int k=0;
+    BIG r; /**/
 
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
@@ -1031,11 +976,9 @@ void BIG_mod(BIG b,BIG c)
     while (k>0)
     {
         BIG_fshr(c,1);
-        if (BIG_comp(b,c)>=0)
-        {
-            BIG_sub(b,b,c);
-            BIG_norm(b);
-        }
+        BIG_sub(r,b,c);
+        BIG_norm(r);
+        BIG_cmove(b,r,1-((r[NLEN-1]>>(CHUNK-1))&1));
         k--;
     }
 }
