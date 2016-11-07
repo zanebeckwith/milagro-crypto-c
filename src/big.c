@@ -1020,36 +1020,37 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 /* SU= 136, x=y/n - output normalised. Slow but rarely used. */
 void BIG_ddiv(BIG a,DBIG b,BIG c)
 {
-    int k=0;
-    DBIG m;
-    BIG e;
-    BIG_dnorm(b);
-    BIG_dscopy(m,c);
+	int d,k=0;
+	DBIG m,dr;
+	BIG e,r;
+	BIG_dnorm(b);
+	BIG_dscopy(m,c);
 
-    BIG_zero(a);
-    BIG_zero(e);
-    BIG_inc(e,1);
+	BIG_zero(a);
+	BIG_zero(e); BIG_inc(e,1);
 
-    while (BIG_dcomp(b,m)>=0)
-    {
-        BIG_fshl(e,1);
-        BIG_dshl(m,1);
-        k++;
-    }
+	while (BIG_dcomp(b,m)>=0)
+	{
+		BIG_fshl(e,1);
+		BIG_dshl(m,1);
+		k++;
+	}
 
-    while (k>0)
-    {
-        BIG_dshr(m,1);
-        BIG_fshr(e,1);
-        if (BIG_dcomp(b,m)>=0)
-        {
-            BIG_add(a,a,e);
-            BIG_norm(a);
-            BIG_dsub(b,b,m);
-            BIG_dnorm(b);
-        }
-        k--;
-    }
+	while (k>0)
+	{
+		BIG_dshr(m,1);
+		BIG_fshr(e,1);
+
+		BIG_dsub(dr,b,m);
+		BIG_dnorm(dr);
+		d=1-((dr[DNLEN-1]>>(CHUNK-1))&1);
+		BIG_dcmove(b,dr,d);
+
+		BIG_add(r,a,e);
+		BIG_norm(r);
+		BIG_cmove(a,r,d);
+		k--;
+	}
 }
 
 /* SU= 136, Divide x by n - output normalised */
