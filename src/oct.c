@@ -1,7 +1,6 @@
 /**
  * @file oct.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Basic Octet string maintainance routines
  *
@@ -397,28 +396,3 @@ void OCT_toStr(octet *src,char *dst)
         sprintf(&dst[i],"%c", ch);
     }
 }
-
-/* Test program
-#include <stdio.h>
-#include "amcl.h"
-
-char test[]="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-
-int main()
-{
-	char gm[100],gn[100],t[100];
-    octet m={0,sizeof(gm),gm};
-    octet n={0,sizeof(gn),gn};
-
-	OCT_jbytes(&m,test,strlen(test));
-	OCT_output(&m);
-
-	OCT_tobase64(t,&m);
-	printf(t); printf("\n");
-
-	OCT_frombase64(&n,t);
-	OCT_output(&n);
-
-    return 0;
-}
-*/

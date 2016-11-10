@@ -38,6 +38,23 @@
 /* So when multiplying two numbers, their product *must* be less than MODBITS+BASEBITS*NLEN */
 /* Results *may* be one bit bigger than MODBITS */
 
+// https://graphics.stanford.edu/~seander/bithacks.html
+/* constant time log to base 2 (or number of bits in) */
+static int logb2(unsign32 v)
+{
+    int r;
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
+
+    v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
+    v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
+    r = (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
+    return r+1;
+}
+
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
@@ -204,7 +221,7 @@ void FP_mod(BIG a,DBIG d)
     int i,k;
     BIG md;
 
-#ifdef dchunk
+#ifdef DCHUNK
     dchunk t,c,s;
     dchunk dd[NLEN];
     chunk v[NLEN];
@@ -239,99 +256,10 @@ void FP_mod(BIG a,DBIG d)
         s-=dd[k-NLEN+1];
     }
     a[NLEN-1]=(chunk)c&BMASK;
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
 
-
-    /*
-    	t=d[0]; d[0]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[0]*md[0]; c=(t>>BASEBITS)+d[1];
-
-    	for (k=1;k<NLEN;k++)
-    	{
-    		t = c+(dchunk)d[0]*md[k];
-    		for (i=1;i<k;i++) t+=(dchunk)d[i]*md[k-i];
-    		d[k]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[k]*md[0]; c=(t>>BASEBITS)+d[k+1];
-    	}
-    	for (k=NLEN;k<2*NLEN-1;k++)
-    	{
-    		t = c;
-    		for (i=k-NLEN+1;i<NLEN;i++) t+=(dchunk)d[i]*md[k-i];
-    		d[k]=(chunk)t&BMASK; c=(t>>BASEBITS)+d[k+1];
-    	}
-    	d[2*NLEN-1]=(chunk)c&BMASK;
-    */
-    /*
-    	sum=d[0];
-    	if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-    	else
-    	{
-    		if (MConst==1) sp=((chunk)sum)&BMASK;
-    		else sp=((chunk)sum*MConst)&BMASK;
-    	}
-    	d[0]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-    	sum=d[1]+(sum>>BASEBITS);
-
-    	for (j=1;j<NLEN;j++)
-    	{
-    		sum+=(dchunk)d[0]*md[j];
-    		for (i=1;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
-    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-    		else
-    		{
-    			if (MConst==1) sp=((chunk)sum)&BMASK;
-    			else sp=((chunk)sum*MConst)&BMASK;
-    		}
-    		d[j]=sp;
-    		dd[j]=(dchunk)sp*md[j];
-    		sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	for (j=NLEN;j<DNLEN-2;j++)
-    	{
-    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
-    		d[j]=(chunk)sum&BMASK;
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-    	d[DNLEN-2]=(chunk)sum&BMASK;
-    	sum=d[DNLEN-1]+(sum>>BASEBITS);
-    	d[DNLEN-1]=(chunk)sum&BMASK;
-    */
-//	BIG_sducopy(a,d);
-    BIG_norm(a);
-
-
-    /* Faster to Combafy it.. Let the compiler unroll the loops! */
-    /*
-    	sum=d[0];
-    	for (j=0;j<NLEN;j++)
-    	{
-    		for (i=0;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
-    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-    		else
-    		{
-    			if (MConst==1) sp=((chunk)sum)&BMASK;
-    			else sp=((chunk)sum*MConst)&BMASK;
-    		}
-    		d[j]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	for (j=NLEN;j<DNLEN-2;j++)
-    	{
-    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
-    		d[j]=(chunk)sum&BMASK;
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-    	d[DNLEN-2]=(chunk)sum&BMASK;
-    	sum=d[DNLEN-1]+(sum>>BASEBITS);
-    	d[DNLEN-1]=(chunk)sum&BMASK;
-
-    	BIG_sducopy(a,d);
-    	BIG_norm(a);
-    */
 #else
     int j;
     chunk m,carry;
@@ -390,31 +318,31 @@ int tdadd=0,rdadd=0,tdneg=0,rdneg=0;
 void FP_mul(BIG r,BIG a,BIG b)
 {
     DBIG d;
-    chunk ea=EXCESS(a);
-    chunk eb=EXCESS(b);
-    if ((ea+1)>=(FEXCESS-1)/(eb+1))
+    chunk ea,eb;
+    BIG_norm(a);
+    BIG_norm(b);
+    ea=EXCESS(a);
+    eb=EXCESS(b);
+
+#ifdef DCHUNK
+    if ((dchunk)(ea+1)*(eb+1)>(dchunk)FEXCESS)
+#else
+    if ((ea+1)>FEXCESS/(eb+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
-        printf("Product too large - reducing it %d %d\n",ea,eb);
+        printf("Product too large - reducing it %d %d %d\n",ea,eb,FEXCESS);
 #endif
         FP_reduce(a);  /* it is sufficient to fully reduce just one of them < p */
 #ifdef GET_STATS
         rmul++;
     }
-    else
-    {
-        BIG_norm(a);   /* change here */
-    }
+
     tmul++;
 #else
     }
-    else
-    {
-        BIG_norm(a);   /* change here */
-    }
 #endif
 
-    BIG_norm(b);
     BIG_mul(d,a,b);
     FP_mod(r,d);
 }
@@ -456,8 +384,14 @@ void FP_imul(BIG r,BIG a,int c)
 void FP_sqr(BIG r,BIG a)
 {
     DBIG d;
-    chunk ea=EXCESS(a);
-    if ((ea+1)>=(FEXCESS-1)/(ea+1))
+    chunk ea;
+    BIG_norm(a);
+    ea=EXCESS(a);
+#ifdef DCHUNK
+    if ((dchunk)(ea+1)*(ea+1)>(dchunk)FEXCESS)
+#else
+    if ((ea+1)>FEXCESS/(ea+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ea);
@@ -466,16 +400,8 @@ void FP_sqr(BIG r,BIG a)
 #ifdef GET_STATS
         rsqr++;
     }
-    else
-    {
-        BIG_norm(a);   /* change here */
-    }
     tsqr++;
 #else
-    }
-    else
-    {
-        BIG_norm(a);   /* change here */
     }
 #endif
 
@@ -522,19 +448,12 @@ void FP_reduce(BIG a)
 void FP_neg(BIG r,BIG a)
 {
     int sb;
-    chunk ov;
     BIG m;
 
     BIG_rcopy(m,Modulus);
     BIG_norm(a);
 
-    ov=EXCESS(a);
-    sb=1;
-    while(ov!=0)
-    {
-        sb++;    /* only unpredictable branch */
-        ov>>=1;
-    }
+    sb=logb2((unsign32)EXCESS(a));
 
     BIG_fshl(m,sb);
     BIG_sub(r,m,a);
@@ -552,7 +471,6 @@ void FP_neg(BIG r,BIG a)
 #else
     }
 #endif
-
 }
 
 /* SU= 56, Modular division by 2 of a BIG in n-residue form, mod Modulus */
@@ -662,68 +580,3 @@ void FP_sqrt(BIG r,BIG a)
     }
 }
 
-/*
-int main()
-{
-
-	BIG r;
-
-	FP_one(r);
-	FP_sqr(r,r);
-
-	BIG_output(r);
-
-	int i,carry;
-	DBIG c={0,0,0,0,0,0,0,0};
-	BIG a={1,2,3,4};
-	BIG b={3,4,5,6};
-	BIG r={11,12,13,14};
-	BIG s={23,24,25,15};
-	BIG w;
-
-//	printf("NEXCESS= %d\n",NEXCESS);
-//	printf("MConst= %d\n",MConst);
-
-	BIG_copy(b,Modulus);
-	BIG_dec(b,1);
-	BIG_norm(b);
-
-	BIG_randomnum(r); BIG_norm(r); BIG_mod(r,Modulus);
-//	BIG_randomnum(s); norm(s); BIG_mod(s,Modulus);
-
-//	BIG_output(r);
-//	BIG_output(s);
-
-	BIG_output(r);
-	FP_nres(r);
-	BIG_output(r);
-	BIG_copy(a,r);
-	FP_redc(r);
-	BIG_output(r);
-	BIG_dscopy(c,a);
-	FP_mod(r,c);
-	BIG_output(r);
-
-
-//	exit(0);
-
-//	copy(r,a);
-	printf("r=   "); BIG_output(r);
-	BIG_modsqr(r,r,Modulus);
-	printf("r^2= "); BIG_output(r);
-
-	FP_nres(r);
-	FP_sqrt(r,r);
-	FP_redc(r);
-	printf("r=   "); BIG_output(r);
-	BIG_modsqr(r,r,Modulus);
-	printf("r^2= "); BIG_output(r);
-
-
-//	for (i=0;i<100000;i++) FP_sqr(r,r);
-//	for (i=0;i<100000;i++)
-		FP_sqrt(r,r);
-
-	BIG_output(r);
-}
-*/

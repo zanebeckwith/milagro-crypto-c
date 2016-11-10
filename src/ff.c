@@ -1,7 +1,6 @@
 /**
  * @file ff.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL basic functions for Large Finite Field support
  *

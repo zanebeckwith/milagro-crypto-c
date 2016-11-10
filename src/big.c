@@ -1,7 +1,6 @@
 /**
  * @file big.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL basic functions for BIG type
  *
@@ -214,6 +213,21 @@ void BIG_cmove(BIG f,BIG g,int d)
     }
 }
 
+/* Move g to f if d=1 */
+void BIG_dcmove(DBIG f,DBIG g,int d)
+{
+    int i;
+    chunk b=(chunk)-d;
+#ifdef DEBUG_NORM
+    for (i=0;i<=DNLEN;i++)
+#else
+    for (i=0;i<DNLEN;i++)
+#endif
+    {
+        f[i]^=(f[i]^g[i])&b;
+    }
+}
+
 /* SU= 64, Convert from BIG number to byte array */
 void BIG_toBytes(char *b,BIG a)
 {
@@ -261,6 +275,21 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
 #endif
 }
 
+/* Convert to DBIG number from byte array of given length */
+void BIG_dfromBytesLen(DBIG a,char *b,int s)
+{
+    int i,len=s;
+    BIG_dzero(a);
+
+    for (i=0; i<len; i++)
+    {
+        BIG_dshl(a,8);
+        a[0]+=(int)(unsigned char)b[i];
+    }
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
+}
 
 /* SU= 88, Outputs a DBIG number to the console */
 void BIG_doutput(DBIG a)
@@ -410,7 +439,7 @@ void BIG_add(BIG c,BIG a,BIG b)
         c[i]=a[i]+b[i];
 #ifdef DEBUG_NORM
     c[NLEN]=a[NLEN]+b[NLEN]+1;
-    if (c[NLEN]>=NEXCESS) printf("add problem - digit overflow %d\n",c[NLEN]);
+    if (c[NLEN]>=NEXCESS) printf("add problem - digit overflow %lu\n",c[NLEN]);
 #endif
 }
 
@@ -566,62 +595,6 @@ void BIG_mul(DBIG c,BIG a,BIG b)
         co=t>>BASEBITS;
     }
     c[2*NLEN-1]=(chunk)co;
-    /*
-    	for (i=0;i<NLEN;i++)
-    		d[i]=(dchunk)a[i]*b[i];
-
-    	s[0]=d[0];
-    	for (i=1;i<NLEN;i++)
-    		s[i]=s[i-1]+d[i];
-
-    	s[2*NLEN-2]=d[NLEN-1];
-    	for (i=2*NLEN-3;i>=NLEN;i--)
-    		s[i]=s[i+1]+d[i-NLEN+1];
-
-    	c[0]=s[0]&BMASK; co=s[0]>>BASEBITS;
-
-    	for (j=1;j<NLEN;j++)
-    	{
-    		t=co+s[j];
-    		for (k=j,i=0;i<k;i++,k-- )
-    			t+=(dchunk)(a[i]-a[k])*(b[k]-b[i]);
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	for (j=NLEN;j<2*NLEN-2;j++)
-    	{
-    		t=co+s[j];
-    		for (k=NLEN-1,i=j-NLEN+1;i<k;i++,k--)
-    			t+=(dchunk)(a[i]-a[k])*(b[k]-b[i]);
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	t=(dchunk)s[2*NLEN-2]+co;
-    	c[2*NLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	c[2*NLEN-1]=(chunk)co;
-    */
-    /*
-    	t=(dchunk)a[0]*b[0];
-    	c[0]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	t=(dchunk)a[1]*b[0]+(dchunk)a[0]*b[1]+co;
-    	c[1]=(chunk)t&BMASK; co=t>>BASEBITS;
-
-    	for (j=2;j<NLEN;j++)
-    	{
-    		t=co; for (i=0;i<=j;i++) t+=(dchunk)a[j-i]*b[i];
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	for (j=NLEN;j<DNLEN-2;j++)
-    	{
-    		t=co; for (i=j-NLEN+1;i<NLEN;i++) t+=(dchunk)a[j-i]*b[i];
-    		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	}
-
-    	t=(dchunk)a[NLEN-1]*b[NLEN-1]+co;
-    	c[DNLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
-    	c[DNLEN-1]=(chunk)co;
-    */
 #else
     int j;
     chunk carry;
@@ -923,7 +896,7 @@ chunk BIG_norm(BIG a)
 void BIG_dnorm(DBIG a)
 {
     int i;
-    chunk d,carry=0;;
+    chunk d,carry=0;
     for (i=0; i<DNLEN-1; i++)
     {
         d=a[i]+carry;
@@ -982,12 +955,12 @@ int BIG_nbits(BIG a)
 }
 
 /* SU= 8, Calculate number of bits in a DBIG - output normalised */
-int BIG_dnbits(BIG a)
+int BIG_dnbits(DBIG a)
 {
     int bts,k=DNLEN-1;
     chunk c;
     BIG_dnorm(a);
-    while (a[k]==0 && k>=0) k--;
+    while (k>=0 && a[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS*k;
     c=a[k];
@@ -999,10 +972,11 @@ int BIG_dnbits(BIG a)
     return bts;
 }
 
-/* SU= 16, Reduce x mod n - input and output normalised */
+/* SU= 16, Reduce x mod n - input and output normalised, constant time. */
 void BIG_mod(BIG b,BIG c)
 {
     int k=0;
+    BIG r; /**/
 
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
@@ -1017,20 +991,18 @@ void BIG_mod(BIG b,BIG c)
     while (k>0)
     {
         BIG_fshr(c,1);
-        if (BIG_comp(b,c)>=0)
-        {
-            BIG_sub(b,b,c);
-            BIG_norm(b);
-        }
+        BIG_sub(r,b,c);
+        BIG_norm(r);
+        BIG_cmove(b,r,1-((r[NLEN-1]>>(CHUNK-1))&1));
         k--;
     }
 }
 
-/* SU= 96, Set a=b mod c, b is destroyed. Slow but rarely used. */
+/* SU= 96, Set a=b mod c, b is destroyed. Slow but rarely used. Constant time. */
 void BIG_dmod(BIG a,DBIG b,BIG c)
 {
     int k=0;
-    DBIG m;
+    DBIG m,r;
     BIG_dnorm(b);
     BIG_dscopy(m,c);
 
@@ -1049,12 +1021,10 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 
     while (k>0)
     {
-        BIG_dshr(m,1);
-        if (BIG_dcomp(b,m)>=0)
-        {
-            BIG_dsub(b,b,m);
-            BIG_dnorm(b);
-        }
+        BIG_dshr(m,1);  
+        BIG_dsub(r,b,m);
+        BIG_dnorm(r);
+        BIG_dcmove(b,r,1-((r[DNLEN-1]>>(CHUNK-1))&1));
         k--;
     }
     BIG_sdcopy(a,b);
@@ -1063,36 +1033,37 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 /* SU= 136, x=y/n - output normalised. Slow but rarely used. */
 void BIG_ddiv(BIG a,DBIG b,BIG c)
 {
-    int k=0;
-    DBIG m;
-    BIG e;
-    BIG_dnorm(b);
-    BIG_dscopy(m,c);
+	int d,k=0;
+	DBIG m,dr;
+	BIG e,r;
+	BIG_dnorm(b);
+	BIG_dscopy(m,c);
 
-    BIG_zero(a);
-    BIG_zero(e);
-    BIG_inc(e,1);
+	BIG_zero(a);
+	BIG_zero(e); BIG_inc(e,1);
 
-    while (BIG_dcomp(b,m)>=0)
-    {
-        BIG_fshl(e,1);
-        BIG_dshl(m,1);
-        k++;
-    }
+	while (BIG_dcomp(b,m)>=0)
+	{
+		BIG_fshl(e,1);
+		BIG_dshl(m,1);
+		k++;
+	}
 
-    while (k>0)
-    {
-        BIG_dshr(m,1);
-        BIG_fshr(e,1);
-        if (BIG_dcomp(b,m)>=0)
-        {
-            BIG_add(a,a,e);
-            BIG_norm(a);
-            BIG_dsub(b,b,m);
-            BIG_dnorm(b);
-        }
-        k--;
-    }
+	while (k>0)
+	{
+		BIG_dshr(m,1);
+		BIG_fshr(e,1);
+
+		BIG_dsub(dr,b,m);
+		BIG_dnorm(dr);
+		d=1-((dr[DNLEN-1]>>(CHUNK-1))&1);
+		BIG_dcmove(b,dr,d);
+
+		BIG_add(r,a,e);
+		BIG_norm(r);
+		BIG_cmove(a,r,d);
+		k--;
+	}
 }
 
 /* SU= 136, Divide x by n - output normalised */
@@ -1270,6 +1241,7 @@ void BIG_modneg(BIG r,BIG a,BIG m)
 {
     BIG_mod(a,m);
     BIG_sub(r,m,a);
+    BIG_mod(r,m);
 }
 
 /* SU= 136, Calculate x=y/z mod n */
@@ -1288,6 +1260,7 @@ void BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
 int BIG_jacobi(BIG a,BIG p)
 {
     int n8,k,m=0;
+
     BIG t,x,n,zilch,one;
     BIG_one(one);
     BIG_zero(zilch);

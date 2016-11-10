@@ -872,6 +872,17 @@ extern void BIG_toBytes(char *a,BIG x);
 extern void BIG_fromBytes(BIG x,char *a);
 
 /**
+ * @brief Convert to DBIG number from byte array of given length
+ *
+ * Convert to DBIG number from byte array of given length.
+ *
+ * @param x DBIG number
+ * @param a byte array
+ * @param s byte array length
+ */
+extern void BIG_dfromBytesLen(DBIG x,char *a,int s);
+
+/**
  * @brief Convert to BIG number from byte array of given length
  *
  * Convert to BIG number from byte array of given length.
@@ -1142,18 +1153,18 @@ extern void BIG_shl(BIG x,int s);
 /**
  * @brief Fast shifts a BIG left by a small number of bits - input must be normalised, output will be normalised
  *
- The number of bits to be shifted must be less than BASEBITS
- @param x BIG number to be shifted, must be normalized
- @param s Number of bits to shift
- @return Overflow bits
+ * The number of bits to be shifted must be less than BASEBITS
+ * @param x BIG number to be shifted, must be normalized
+ * @param s Number of bits to shift
+ * @return Overflow bits
  */
 extern chunk BIG_fshl(BIG x,int s);
 
 /**
  * @brief Shifts a DBIG left by any number of bits - input must be normalised, output normalised
  *
- @param x DBIG number to be shifted, must be normalized
- @param s Number of bits to shift, can be > BASEBITS
+ * @param x DBIG number to be shifted, must be normalized
+ * @param s Number of bits to shift, can be > BASEBITS
  */
 extern void BIG_dshl(DBIG x,int s);
 
@@ -1181,8 +1192,8 @@ extern chunk BIG_fshr(BIG x,int s);
 /**
  * @brief Shifts a DBIG right by any number of bits - input must be normalised, output normalised
  *
- @param x DBIG number to be shifted, must be normalized
- @param s Number of bits to shift, can be > BASEBITS
+ * @param x DBIG number to be shifted, must be normalized
+ * @param s Number of bits to shift, can be > BASEBITS
  */
 extern void BIG_dshr(DBIG x,int s);
 
@@ -1407,7 +1418,7 @@ extern void BIG_moddiv(BIG x,BIG y,BIG z,BIG n);
  *
  * @note Slow method for modular squaring
  * @param x BIG number, on exit = y^2 mod n
- * @param y BIG number
+ * @param y BIG number, on exit = y mod n
  * @param n The BIG Modulus
  */
 extern void BIG_modsqr(BIG x,BIG y,BIG n);
@@ -1419,7 +1430,7 @@ extern void BIG_modsqr(BIG x,BIG y,BIG n);
  *
  * @note Modular negation
  * @param x BIG number, on exit = -y mod n
- * @param y BIG number
+ * @param y BIG number, on exit = y mod n
  * @param n The BIG Modulus
  */
 extern void BIG_modneg(BIG x,BIG y,BIG n);
@@ -1576,7 +1587,7 @@ extern void FP_div2(BIG x,BIG y);
  *
  * @param x BIG number, on exit  = y^z mod Modulus
  * @param y BIG number
- * @param z Big number exponent
+ * @param z BIG number exponent
  */
 extern void FP_pow(BIG x,BIG y,BIG z);
 

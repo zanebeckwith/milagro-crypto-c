@@ -1,7 +1,6 @@
 /**
  * @file ecdh.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 2nd June 2015
  * @brief ECDH/ECIES/ECDSA function source file for implementation of standard EC protocols
  *

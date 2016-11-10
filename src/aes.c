@@ -1,7 +1,6 @@
 /**
  * @file aes.c
  * @author Mike Scott
- * @author Kealan McCusker
  * @date 19th May 2015
  * @brief AMCL Implementation of the NIST Advanced Ecryption Standard (AES)
  *

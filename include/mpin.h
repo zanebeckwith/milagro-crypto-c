@@ -62,6 +62,9 @@
 #define TIME_SLOT_MINUTES 1440 /**< Time Slot = 1 day */
 #define HASH_TYPE_MPIN SHA256  /**< Choose Hash function */
 
+#define MESSAGE_SIZE 256  /**< Signature message size  */
+#define M_SIZE (MESSAGE_SIZE+2*PFS+1)   /**< Signature message size and G1 size */
+
 /* MPIN support functions */
 
 /* MPIN primitives */
@@ -371,11 +374,11 @@ int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W);
  * @param CU is the client output = x.(H(ID)+H(T|H(ID)))
  * @param Y is the server challenge
  * @param V is the client part response
- * @param R is the client part response
- * @param W is the server part response
+ * @param Z is the client part response
+ * @param T is the server part response
  * @param H the output is the hash of all of the above that apply
  */
-void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,octet *W,octet *H);
+void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *Z,octet *T,octet *H);
 
 /**
  * @brief Create a client secret in G1 from a master secret and the client ID
