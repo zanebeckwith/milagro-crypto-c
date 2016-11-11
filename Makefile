@@ -236,8 +236,9 @@ pubdocs:
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
 	find ./target -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | xargs -i sh -c 'mkdir -p ./target/DOCS/{} && cp -rf ./target/{}/doc/html/* ./target/DOCS/{}/'
-	echo "# milagro-crypto-c Source Code Documentation" > ./target/DOCS/Home.md
-	find ./target/DOCS -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | xargs -i sh -c 'echo "* [{}](https://cdn.rawgit.com/wiki/miracl/milagro-crypto-c/{}/index.html)" >> ./target/DOCS/Home.md'
+	#echo "# milagro-crypto-c Source Code Documentation" > ./target/DOCS/Home.md
+	#find ./target/DOCS -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | xargs -i sh -c 'echo "* [{}](https://cdn.rawgit.com/wiki/miracl/milagro-crypto-c/{}/index.html)" >> ./target/DOCS/Home.md'
+	cp ./doc/Home.md ./target/DOCS/
 	git clone git@github.com:miracl/milagro-crypto-c.wiki.git ./target/WIKI
 	mv -f ./target/WIKI/.git ./target/DOCS/
 	cd ./target/DOCS/ && \
