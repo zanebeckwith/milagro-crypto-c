@@ -269,6 +269,22 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
 #endif
 }
 
+/* Convert to DBIG number from byte array of given length */
+void BIG_dfromBytesLen(DBIG a,char *b,int s)
+{
+    int i,len=s;
+    BIG_dzero(a);
+
+    for (i=0; i<len; i++)
+    {
+         BIG_dshl(a,8);
+         a[0]+=(int)(unsigned char)b[i];
+     }
+#ifdef DEBUG_NORM
+     a[NLEN]=0;
+#endif
+}
+
 
 /* SU= 88 */
 void BIG_doutput(DBIG a)
@@ -1302,6 +1318,7 @@ void BIG_modneg(BIG r,BIG a,BIG m)
 {
     BIG_mod(a,m);
     BIG_sub(r,m,a);
+    BIG_mod(r,m);
 }
 
 /* Set a=a/b mod m */
@@ -1432,20 +1449,3 @@ void BIG_mod2m(BIG x,int m)
     x[wd]&=msk;
     for (i=wd+1; i<NLEN; i++) x[i]=0;
 }
-
-/* Convert to DBIG number from byte array of given length */
-void BIG_dfromBytesLen(DBIG a,char *b,int s)
-{
-    int i,len=s;
-    BIG_dzero(a);
-
-    for (i=0; i<len; i++)
-    {
-        BIG_dshl(a,8);
-        a[0]+=(int)(unsigned char)b[i];
-    }
-#ifdef DEBUG_NORM
-    a[NLEN]=0;
-#endif
-}
-

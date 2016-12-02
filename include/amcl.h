@@ -892,6 +892,13 @@ extern void BIG_fromBytes(BIG x,char *a);
 	@param s byte array length
  */
 extern void BIG_fromBytesLen(BIG x,char *a,int s);
+/**@brief Convert to DBIG number from byte array of given length
+ *
+   @param x DBIG number
+   @param a byte array
+   @param s byte array length
+ */
+ extern void BIG_dfromBytesLen(DBIG x,char *a,int s);
 /**	@brief Outputs a DBIG number to the console
  *
 	@param x a DBIG number
@@ -2402,6 +2409,12 @@ extern void FF_shr(BIG *x,int n);
 	@param n size of FF in BIGs
  */
 extern void FF_output(BIG *x,int n);
+/**	@brief Formats and outputs an FF to the console, in raw form
+ *
+ 	@param x FF instance to be printed
+ 	@param n size of FF in BIGs
+ */
+extern void FF_rawoutput(BIG *x,int n);
 /**	@brief Formats and outputs an FF instance to an octet string
  *
 	Converts an FF to big-endian base 256 form.
