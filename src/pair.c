@@ -1,28 +1,21 @@
-/**
- * @file pair.c
- * @author Mike Scott
- * @date 19th May 2015
- * @brief AMCL BN Curve pairing functions
- *
- * LICENSE
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 /* AMCL BN Curve pairing functions */
 
@@ -51,44 +44,44 @@ static void PAIR_line(FP12 *v,ECP2 *A,ECP2 *B,BIG Qx,BIG Qy)
 
     FP2_copy(&Z3,&(A->z));
     FP4_zero(&c);
-    FP2_sqr(&ZZ,&(P.z)); // ZZ=Z^2
+    FP2_sqr(&ZZ,&(P.z));    /* ZZ=Z^2 */
     if (D==0)
     {
         /* addition */
         ECP2_get(&X,&Y,B);
-        FP2_mul(&T,&(P.z),&Y);    // T=Z*Y2
+        FP2_mul(&T,&(P.z),&Y);  /* T=Z*Y2 */
 
         FP2_mul(&ZZ,&ZZ,&T);
 
         FP2_neg(&NY,&(P.y));
-        FP2_add(&ZZ,&ZZ,&NY);     // ZZ=Z^3*Y2-Y (slope numerator)
-        FP2_pmul(&Z3,&Z3,Qy);     // Z3*Qy
+        FP2_add(&ZZ,&ZZ,&NY); /* ZZ=Z^3*Y2-Y (slope numerator) */
+        FP2_pmul(&Z3,&Z3,Qy);    /* Z3*Qy */
         FP2_mul(&T,&T,&(P.x));
         FP2_mul(&X,&X,&NY);
-        FP2_add(&T,&T,&X);        // Z*Y2*X-X2*Y
-        FP4_from_FP2s(&a,&Z3,&T); // a=[Z3*Qy,Z*Y2*X-X2*Y]
+        FP2_add(&T,&T,&X);       /* Z*Y2*X-X2*Y */
+        FP4_from_FP2s(&a,&Z3,&T); /* a=[Z3*Qy,Z*Y2*X-X2*Y] */
         FP2_neg(&ZZ,&ZZ);
         FP2_pmul(&ZZ,&ZZ,Qx);
-        FP4_from_FP2(&b,&ZZ);     // b=-slope*Qx
+        FP4_from_FP2(&b,&ZZ);    /* b=-slope*Qx */
     }
     else
     {
         /* doubling */
         FP2_sqr(&T,&(P.x));
-        FP2_imul(&T,&T,3);        // T=3X^2 (slope numerator)
+        FP2_imul(&T,&T,3);   /* T=3X^2 (slope numerator) */
         FP2_sqr(&Y,&(P.y));
 
-        FP2_add(&Y,&Y,&Y);        // Y=2Y^2
-        FP2_mul(&Z3,&Z3,&ZZ);     // Z3=Z3*ZZ
-        FP2_pmul(&Z3,&Z3,Qy);     // Z3=Z3*ZZ*Qy
+        FP2_add(&Y,&Y,&Y);   /* Y=2Y^2 */
+        FP2_mul(&Z3,&Z3,&ZZ);   /* Z3=Z3*ZZ */
+        FP2_pmul(&Z3,&Z3,Qy);   /* Z3=Z3*ZZ*Qy */
 
         FP2_mul(&X,&(P.x),&T);
-        FP2_sub(&X,&X,&Y);        // X=X*slope-2Y^2
-        FP4_from_FP2s(&a,&Z3,&X); // a=[Z3*ZZ*Qy , X*slope-2Y^2]
+        FP2_sub(&X,&X,&Y);      /* X=X*slope-2Y^2 */
+        FP4_from_FP2s(&a,&Z3,&X); /* a=[Z3*ZZ*Qy , X*slope-2Y^2] */
         FP2_neg(&T,&T);
         FP2_mul(&ZZ,&ZZ,&T);
         FP2_pmul(&ZZ,&ZZ,Qx);
-        FP4_from_FP2(&b,&ZZ);     // b=-slope*ZZ*Qx
+        FP4_from_FP2(&b,&ZZ);    /* b=-slope*ZZ*Qx */
     }
 
     FP12_from_FP4s(v,&a,&b,&c);
@@ -100,7 +93,7 @@ void PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
     FP2 X;
     BIG x,n,Qx,Qy;
     int i,nb;
-    ECP2 A;
+    ECP2 A,KA;
     FP12 lv;
 
     BIG_rcopy(Qx,CURVE_Fra);
@@ -153,7 +146,6 @@ void PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 
     /* R-ate fixup required for BN curves */
 #if CHOICE<BLS_CURVES
-    ECP2 KA;
     ECP2_copy(&KA,P);
     ECP2_frob(&KA,&X);
 
@@ -175,7 +167,7 @@ void PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
     FP2 X;
     BIG x,n,Qx,Qy,Sx,Sy;
     int i,nb;
-    ECP2 A,B;
+    ECP2 A,B,K;
     FP12 lv;
 
     BIG_rcopy(Qx,CURVE_Fra);
@@ -246,7 +238,6 @@ void PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
 
     /* R-ate fixup required for BN curves */
 #if CHOICE<BLS_CURVES
-    ECP2 K;
     FP12_conj(r,r);
 
     ECP2_copy(&K,P);
@@ -297,33 +288,33 @@ void PAIR_fexp(FP12 *r)
 
     /* Hard part of final exp - see Duquesne & Ghamman eprint 2015/192.pdf */
 #if CHOICE<BLS_CURVES
-    FP12_pow(&t0,r,x);    // t0=f^-u
-    FP12_usqr(&y3,&t0);   // y3=t0^2
+    FP12_pow(&t0,r,x); // t0=f^-u
+    FP12_usqr(&y3,&t0); // y3=t0^2
     FP12_copy(&y0,&t0);
-    FP12_mul(&y0,&y3);    // y0=t0*y3
+    FP12_mul(&y0,&y3); // y0=t0*y3
     FP12_copy(&y2,&y3);
-    FP12_frob(&y2,&X);    // y2=y3^p
-    FP12_mul(&y2,&y3);    // y2=y2*y3
-    FP12_usqr(&y2,&y2);   // y2=y2^2
-    FP12_mul(&y2,&y3);    // y2=y2*y3
+    FP12_frob(&y2,&X); // y2=y3^p
+    FP12_mul(&y2,&y3); //y2=y2*y3
+    FP12_usqr(&y2,&y2); //y2=y2^2
+    FP12_mul(&y2,&y3); // y2=y2*y3
 
-    FP12_pow(&t0,&y0,x);  // t0=y0^-u
-    FP12_conj(&y0,r);     // y0=~r
+    FP12_pow(&t0,&y0,x);  //t0=y0^-u
+    FP12_conj(&y0,r);     //y0=~r
     FP12_copy(&y1,&t0);
     FP12_frob(&y1,&X);
-    FP12_frob(&y1,&X);    // y1=t0^p^2
-    FP12_mul(&y1,&y0);    // y1=y0*y1
-    FP12_conj(&t0,&t0);   // t0=~t0
+    FP12_frob(&y1,&X); //y1=t0^p^2
+    FP12_mul(&y1,&y0); // y1=y0*y1
+    FP12_conj(&t0,&t0); // t0=~t0
     FP12_copy(&y3,&t0);
-    FP12_frob(&y3,&X);    // y3=t0^p
-    FP12_mul(&y3,&t0);    // y3=t0*y3
-    FP12_usqr(&t0,&t0);   // t0=t0^2
-    FP12_mul(&y1,&t0);    // y1=t0*y1
+    FP12_frob(&y3,&X); //y3=t0^p
+    FP12_mul(&y3,&t0); // y3=t0*y3
+    FP12_usqr(&t0,&t0); // t0=t0^2
+    FP12_mul(&y1,&t0); // y1=t0*y1
 
-    FP12_pow(&t0,&y3,x);  // t0=y3^-u
-    FP12_usqr(&t0,&t0);   // t0=t0^2
-    FP12_conj(&t0,&t0);   // t0=~t0
-    FP12_mul(&y3,&t0);    // y3=t0*y3
+    FP12_pow(&t0,&y3,x); // t0=y3^-u
+    FP12_usqr(&t0,&t0); //t0=t0^2
+    FP12_conj(&t0,&t0); //t0=~t0
+    FP12_mul(&y3,&t0); // y3=t0*y3
 
     FP12_frob(r,&X);
     FP12_copy(&y0,r);
@@ -332,13 +323,13 @@ void PAIR_fexp(FP12 *r)
     FP12_frob(r,&X);
     FP12_mul(&y0,r);
 
-    FP12_usqr(r,&y3);    // r=y3^2
-    FP12_mul(r,&y2);     // r=y2*r
+    FP12_usqr(r,&y3);  //r=y3^2
+    FP12_mul(r,&y2);   //r=y2*r
     FP12_copy(&y3,r);
-    FP12_mul(&y3,&y0);   // y3=r*y0
-    FP12_mul(r,&y1);     // r=r*y1
-    FP12_usqr(r,r);      // r=r^2
-    FP12_mul(r,&y3);     // r=r*y3
+    FP12_mul(&y3,&y0); // y3=r*y0
+    FP12_mul(r,&y1); // r=r*y1
+    FP12_usqr(r,r); // r=r^2
+    FP12_mul(r,&y3); // r=r*y3
     FP12_reduce(r);
 #else
 // Ghamman & Fouotsa Method
@@ -347,7 +338,7 @@ void PAIR_fexp(FP12 *r)
     FP12_pow(&y1,&y0,x);
     BIG_fshr(x,1);
     FP12_pow(&y2,&y1,x);
-    BIG_fshl(x,1);      // x must be even
+    BIG_fshl(x,1); // x must be even
     FP12_conj(&y3,r);
     FP12_mul(&y1,&y3);
 
@@ -461,7 +452,6 @@ void PAIR_fexp(FP12 *r)
 #endif
 }
 
-#ifdef USE_PATENTS
 /* GLV method */
 static void glv(BIG u[2],BIG e)
 {
@@ -488,8 +478,8 @@ static void glv(BIG u[2],BIG e)
             BIG_sub(u[i],u[i],t);
             BIG_mod(u[i],q);
         }
-#else
 
+#else
 // -(x^2).P = (Beta.x,y)
 
     BIG x,x2,q;
@@ -507,14 +497,12 @@ static void glv(BIG u[2],BIG e)
 
     return;
 }
-#endif // USE_PATENTS
 
 /* Galbraith & Scott Method */
 static void gs(BIG u[4],BIG e)
 {
-    int i;
+    int i,j;
 #if CHOICE<BLS_CURVES
-    int j;
     BIG v[4],t,q;
     DBIG d;
     BIG_rcopy(q,CURVE_Order);
@@ -558,8 +546,7 @@ static void gs(BIG u[4],BIG e)
 /* Multiply P by e in group G1 */
 void PAIR_G1mul(ECP *P,BIG e)
 {
-// Note this method is patented
-#ifdef USE_GLV
+#ifdef USE_GLV   /* Note this method is patented */
     int np,nn;
     ECP Q;
     BIG cru,t,q;
@@ -574,7 +561,7 @@ void PAIR_G1mul(ECP *P,BIG e)
     FP_nres(cru);
     FP_mul(Q.x,Q.x,cru);
 
-    // note that -a.B = a.(-B). Use a or -a depending on which is smaller
+    /* note that -a.B = a.(-B). Use a or -a depending on which is smaller */
 
     np=BIG_nbits(u[0]);
     BIG_modneg(t,u[0],q);
@@ -604,7 +591,7 @@ void PAIR_G1mul(ECP *P,BIG e)
 /* Multiply P by e in group G2 */
 void PAIR_G2mul(ECP2 *P,BIG e)
 {
-#ifdef USE_GS_G2   // Well I didn't patent it :)
+#ifdef USE_GS_G2   /* Well I didn't patent it :) */
     int i,np,nn;
     ECP2 Q[4];
     FP2 X;
@@ -647,11 +634,10 @@ void PAIR_G2mul(ECP2 *P,BIG e)
 #endif
 }
 
-/* Fast raising of a member of GT to a BIG power */
+/* f=f^e */
 void PAIR_GTpow(FP12 *f,BIG e)
 {
-// Note that this option requires a lot of RAM! Maybe better to use compressed XTR method, see fp4.c
-#ifdef USE_GS_GT
+#ifdef USE_GS_GT   /* Note that this option requires a lot of RAM! Maybe better to use compressed XTR method, see fp4.c */
     int i,np,nn;
     FP12 g[4];
     FP2 X;

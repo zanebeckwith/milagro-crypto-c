@@ -4,6 +4,9 @@ project (AMCL)
 # enable testing
 enable_testing ()
 
+# Required for amcl.h and arch.h
+add_definitions(-DCMAKE)
+
 # Extract version from the VERSION file
 file(STRINGS VERSION VERSION_FILE_CONTENT)
 string(REPLACE "." ";" VERSION_FILE_PARTS ${VERSION_FILE_CONTENT})
@@ -85,25 +88,25 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Select word length
-set(AMCL_CHUNK "64" CACHE STRING "Word length. See ./include/arch.h.in for explanation")
+set(AMCL_CHUNK "64" CACHE STRING "Word length. See ./include/arch.h for explanation")
 set(Word_Length_Values "16;32;64")
 set_property(CACHE AMCL_CHUNK PROPERTY STRINGS ${Word_Length_Values})
 message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
-set(AMCL_CHOICE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h.in for explanation")
+set(AMCL_CHOICE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h for explanation")
 set(Field_Values "NIST256;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN454;BN646;BN254;BN254_CX;BN254_T;BN254_T2;BLS455")
 set_property(CACHE AMCL_CHOICE PROPERTY STRINGS ${Field_Values})
 message(STATUS "AMCL_CHOICE='${AMCL_CHOICE}'")
 
 # Select Curve type
-set(AMCL_CURVETYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See ./include/amcl.h.in for explanation")
+set(AMCL_CURVETYPE "WEIERSTRASS" CACHE STRING "Choice of Curve. See ./include/amcl.h for explanation")
 set(Curve_Values "WEIERSTRASS;EDWARDS;MONTGOMERY")
 set_property(CACHE AMCL_CURVETYPE PROPERTY STRINGS ${Curve_Values})
 message(STATUS "AMCL_CURVETYPE='${AMCL_CURVETYPE}'")
 
 # Select Finite field support
-set(AMCL_FFLEN "8" CACHE STRING "Finite field support. See ./include/amcl.h.in for explanation")
+set(AMCL_FFLEN "8" CACHE STRING "Finite field support. See ./include/amcl.h for explanation")
 set(ff_len_values "4;8;16")
 set_property(CACHE AMCL_FFLEN PROPERTY STRINGS ${ff_Len_values})
 message(STATUS "AMCL_FFLEN='${AMCL_FFLEN}'")
@@ -111,14 +114,14 @@ message(STATUS "AMCL_FFLEN='${AMCL_FFLEN}'")
 # configure arch header file to pass CMake settings
 # to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/arch.h.in"
+  "${PROJECT_SOURCE_DIR}/include/arch.h"
   "${PROJECT_BINARY_DIR}/include/arch.h"
   )
 
 # configure amcl header file to pass CMake settings
 # to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/amcl.h.in"
+  "${PROJECT_SOURCE_DIR}/include/amcl.h"
   "${PROJECT_BINARY_DIR}/include/amcl.h"
   )
 
@@ -154,7 +157,7 @@ if(BUILD_MPIN OR BUILD_WCC)
   message(STATUS "MPIN_RANDOM_TESTS=${MPIN_RANDOM_TESTS}")
   # Configure test variables
   configure_file (
-    "${PROJECT_SOURCE_DIR}/include/config.h.in"
+    "${PROJECT_SOURCE_DIR}/include/config.h"
     "${PROJECT_BINARY_DIR}/include/config.h"
   )
 endif(BUILD_MPIN OR BUILD_WCC)

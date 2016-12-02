@@ -1,28 +1,21 @@
-/**
- * @file big.c
- * @author Mike Scott
- * @date 19th May 2015
- * @brief AMCL basic functions for BIG type
- *
- * LICENSE
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+
+	  http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+*/
 
 /* AMCL basic functions for BIG type */
 /* SU=m, SU is Stack Usage */
@@ -45,7 +38,7 @@ chunk muladd(chunk x,chunk y,chunk c,chunk *r)
 
 /* No integer type available that can store double the wordlength */
 /* accumulate partial products */
-/* Method required to calculate x*y+c+r, bottom half in r, top half returned */
+
 chunk muladd(chunk x,chunk y,chunk c,chunk *r)
 {
     chunk x0,x1,y0,y1;
@@ -111,7 +104,7 @@ static INLINE chunk muladd(chunk x,chunk y,chunk c,chunk *r)
 
 */
 
-/* Tests for BIG equal to zero */
+/* test a=0? */
 int BIG_iszilch(BIG a)
 {
     int i;
@@ -120,7 +113,7 @@ int BIG_iszilch(BIG a)
     return 1;
 }
 
-/* Tests for DBIG equal to zero */
+/* test a=0? */
 int BIG_diszilch(DBIG a)
 {
     int i;
@@ -129,7 +122,8 @@ int BIG_diszilch(DBIG a)
     return 1;
 }
 
-/* SU= 56, Outputs a BIG number to the console */
+/* SU= 56 */
+/* output a */
 void BIG_output(BIG a)
 {
     BIG b;
@@ -151,15 +145,15 @@ void BIG_output(BIG a)
     }
 }
 
-/* SU= 16, Outputs a BIG number to the console in raw form (for debugging) */
+/* SU= 16 */
 void BIG_rawoutput(BIG a)
 {
     int i;
     printf("(");
     for (i=0; i<NLEN-1; i++)
 #if CHUNK==64
-        printf("%"PRId64",",(uint64_t) a[i]);
-    printf("%"PRId64")",(uint64_t) a[NLEN-1]);
+        printf("%"PRIxMAX",",(uint64_t) a[i]);
+    printf("%"PRIxMAX")",(uint64_t) a[NLEN-1]);
 #else
         printf("%x,",(unsigned int) a[i]);
     printf("%x)",(unsigned int) a[NLEN-1]);
@@ -180,7 +174,7 @@ void BIG_rawdoutput(DBIG a)
 #endif
 }
 */
-/* Conditional constant time swap of two BIG numbers */
+/* Swap a and b if d=1 */
 void BIG_cswap(BIG a,BIG b,int d)
 {
     int i;
@@ -198,7 +192,7 @@ void BIG_cswap(BIG a,BIG b,int d)
     }
 }
 
-/* Conditional copy of BIG number */
+/* Move b to a if d=1 */
 void BIG_cmove(BIG f,BIG g,int d)
 {
     int i;
@@ -219,16 +213,17 @@ void BIG_dcmove(DBIG f,DBIG g,int d)
     int i;
     chunk b=(chunk)-d;
 #ifdef DEBUG_NORM
-    for (i=0;i<=DNLEN;i++)
+    for (i=0; i<=DNLEN; i++)
 #else
-    for (i=0;i<DNLEN;i++)
+    for (i=0; i<DNLEN; i++)
 #endif
     {
         f[i]^=(f[i]^g[i])&b;
     }
 }
 
-/* SU= 64, Convert from BIG number to byte array */
+/* convert BIG to/from bytes */
+/* SU= 64 */
 void BIG_toBytes(char *b,BIG a)
 {
     int i;
@@ -242,7 +237,7 @@ void BIG_toBytes(char *b,BIG a)
     }
 }
 
-/* SU= 16, Convert to BIG number from byte array */
+/* SU= 16 */
 void BIG_fromBytes(BIG a,char *b)
 {
     int i;
@@ -258,7 +253,6 @@ void BIG_fromBytes(BIG a,char *b)
 #endif
 }
 
-/* Convert to BIG number from byte array of given length */
 void BIG_fromBytesLen(BIG a,char *b,int s)
 {
     int i,len=s;
@@ -275,23 +269,8 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
 #endif
 }
 
-/* Convert to DBIG number from byte array of given length */
-void BIG_dfromBytesLen(DBIG a,char *b,int s)
-{
-    int i,len=s;
-    BIG_dzero(a);
 
-    for (i=0; i<len; i++)
-    {
-        BIG_dshl(a,8);
-        a[0]+=(int)(unsigned char)b[i];
-    }
-#ifdef DEBUG_NORM
-    a[NLEN]=0;
-#endif
-}
-
-/* SU= 88, Outputs a DBIG number to the console */
+/* SU= 88 */
 void BIG_doutput(DBIG a)
 {
     DBIG b;
@@ -313,7 +292,7 @@ void BIG_doutput(DBIG a)
     }
 }
 
-/* Copy b=a, Copy BIG to another BIG */
+/* Copy b=a */
 void BIG_copy(BIG b,BIG a)
 {
     int i;
@@ -324,7 +303,7 @@ void BIG_copy(BIG b,BIG a)
 #endif
 }
 
-/* Copy from ROM b=a, Copy BIG from Read-Only Memory to a BIG */
+/* Copy from ROM b=a */
 void BIG_rcopy(BIG b,const BIG a)
 {
     int i;
@@ -346,7 +325,7 @@ void BIG_dcopy(DBIG b,DBIG a)
 #endif
 }
 
-/* Copy BIG to lower half of DBIG */
+/* Copy BIG to bottom half of DBIG */
 void BIG_dscopy(DBIG b,BIG a)
 {
     int i;
@@ -362,7 +341,7 @@ void BIG_dscopy(DBIG b,BIG a)
 #endif
 }
 
-/* Copy BIG to upper half of DBIG */
+/* Copy BIG to top half of DBIG */
 void BIG_dsucopy(DBIG b,BIG a)
 {
     int i;
@@ -375,7 +354,7 @@ void BIG_dsucopy(DBIG b,BIG a)
 #endif
 }
 
-/* Copy lower half of DBIG to a BIG */
+/* Copy bottom half of DBIG to BIG */
 void BIG_sdcopy(BIG b,DBIG a)
 {
     int i;
@@ -386,7 +365,7 @@ void BIG_sdcopy(BIG b,DBIG a)
 #endif
 }
 
-/* Copy upper half of DBIG to a BIG */
+/* Copy top half of DBIG to BIG */
 void BIG_sducopy(BIG b,DBIG a)
 {
     int i;
@@ -397,7 +376,7 @@ void BIG_sducopy(BIG b,DBIG a)
 #endif
 }
 
-/* Set BIG to zero */
+/* Set a=0 */
 void BIG_zero(BIG a)
 {
     int i;
@@ -408,7 +387,6 @@ void BIG_zero(BIG a)
 #endif
 }
 
-/* Set DBIG to zero */
 void BIG_dzero(DBIG a)
 {
     int i;
@@ -419,7 +397,7 @@ void BIG_dzero(DBIG a)
 #endif
 }
 
-/* Set BIG to one (unity) */
+/* set a=1 */
 void BIG_one(BIG a)
 {
     int i;
@@ -431,7 +409,10 @@ void BIG_one(BIG a)
 #endif
 }
 
-/* SU= 8, Set BIG to sum of two BIGs - output not normalised */
+
+
+/* Set c=a+b */
+/* SU= 8 */
 void BIG_add(BIG c,BIG a,BIG b)
 {
     int i;
@@ -439,11 +420,11 @@ void BIG_add(BIG c,BIG a,BIG b)
         c[i]=a[i]+b[i];
 #ifdef DEBUG_NORM
     c[NLEN]=a[NLEN]+b[NLEN]+1;
-    if (c[NLEN]>=NEXCESS) printf("add problem - digit overflow %lu\n",c[NLEN]);
+    if (c[NLEN]>=NEXCESS) printf("add problem - digit overflow %d\n",c[NLEN]);
 #endif
 }
 
-/* Increment BIG by a small integer - output not normalised */
+/* Set c=c+d */
 void BIG_inc(BIG c,int d)
 {
     BIG_norm(c);
@@ -453,7 +434,8 @@ void BIG_inc(BIG c,int d)
 #endif
 }
 
-/* SU= 8, Set BIG to difference of two BIGs */
+/* Set c=a-b */
+/* SU= 8 */
 void BIG_sub(BIG c,BIG a,BIG b)
 {
     int i;
@@ -465,7 +447,8 @@ void BIG_sub(BIG c,BIG a,BIG b)
 #endif
 }
 
-/* SU= 8, Set DBIG to difference of two DBIGs */
+/* SU= 8 */
+
 void BIG_dsub(DBIG c,DBIG a,DBIG b)
 {
     int i;
@@ -478,7 +461,7 @@ void BIG_dsub(DBIG c,DBIG a,DBIG b)
 }
 
 
-/* Decrement BIG by a small integer - output not normalised */
+/* Set c=c-1 */
 void BIG_dec(BIG c,int d)
 {
     BIG_norm(c);
@@ -488,7 +471,7 @@ void BIG_dec(BIG c,int d)
 #endif
 }
 
-/* Multiply BIG by a small integer - output not normalised. r=a*c by c<=NEXCESS */
+/* multiplication r=a*c by c<=NEXCESS */
 void BIG_imul(BIG r,BIG a,int c)
 {
     int i;
@@ -499,7 +482,8 @@ void BIG_imul(BIG r,BIG a,int c)
 #endif
 }
 
-/* SU= 24, Multiply BIG by not-so-small small integer - output normalised. r=a*c by larger integer - c<=FEXCESS */
+/* multiplication r=a*c by larger integer - c<=FEXCESS */
+/* SU= 24 */
 chunk BIG_pmul(BIG r,BIG a,int c)
 {
     int i;
@@ -517,7 +501,8 @@ chunk BIG_pmul(BIG r,BIG a,int c)
     return carry;
 }
 
-/* SU= 16, Divide BIG by 3 - output normalised */
+/* r/=3 */
+/* SU= 16 */
 int BIG_div3(BIG r)
 {
     int i;
@@ -533,7 +518,8 @@ int BIG_div3(BIG r)
     return (int)carry;
 }
 
-/* SU= 24. Multiply BIG by even bigger small integer resulting in a DBIG - output normalised. c=a*b by even larger integer b>FEXCESS, resulting in DBIG */
+/* multiplication c=a*b by even larger integer b>FEXCESS, resulting in DBIG */
+/* SU= 24 */
 void BIG_pxmul(DBIG c,BIG a,int b)
 {
     int j;
@@ -548,7 +534,8 @@ void BIG_pxmul(DBIG c,BIG a,int b)
 #endif
 }
 
-/* SU= 72, Multiply BIG by another BIG resulting in DBIG - inputs normalised and output normalised */
+/* Set c=a*b */
+/* SU= 72 */
 void BIG_mul(DBIG c,BIG a,BIG b)
 {
     int i;
@@ -568,8 +555,12 @@ void BIG_mul(DBIG c,BIG a,BIG b)
 
 #ifdef COMBA
 
-    /* faster pseudo-Karatsuba method */
+    /* faster psuedo-Karatsuba method */
+#ifdef UNWOUND
 
+    /* Insert output of faster.c here */
+
+#else
     for (i=0; i<NLEN; i++)
         d[i]=(dchunk)a[i]*b[i];
 
@@ -595,6 +586,9 @@ void BIG_mul(DBIG c,BIG a,BIG b)
         co=t>>BASEBITS;
     }
     c[2*NLEN-1]=(chunk)co;
+
+#endif
+
 #else
     int j;
     chunk carry;
@@ -615,7 +609,8 @@ void BIG_mul(DBIG c,BIG a,BIG b)
 #endif
 }
 
-/* SU= 40, Multiply BIG by another BIG resulting in another BIG - inputs normalised and output normalised. */
+/* .. if you know the result will fit in a BIG, c must be distinct from a and b */
+/* SU= 40 */
 void BIG_smul(BIG c,BIG a,BIG b)
 {
     int i,j;
@@ -639,7 +634,8 @@ void BIG_smul(BIG c,BIG a,BIG b)
 
 }
 
-/* SU= 80, Square BIG resulting in a DBIG - input normalised and output normalised */
+/* Set c=a*a */
+/* SU= 80 */
 void BIG_sqr(DBIG c,BIG a)
 {
     int i,j,last;
@@ -653,6 +649,12 @@ void BIG_sqr(DBIG c,BIG a)
     /* Note 2*a[i] in loop below and extra addition */
 
 #ifdef COMBA
+
+#ifdef UNWOUND
+
+    /* Insert output of faster.c here */
+
+#else
 
     t=(dchunk)a[0]*a[0];
     c[0]=(chunk)t&BMASK;
@@ -719,6 +721,7 @@ void BIG_sqr(DBIG c,BIG a)
     c[DNLEN-2]=(chunk)t&BMASK;
     co=t>>BASEBITS;
     c[DNLEN-1]=(chunk)co;
+#endif
 
 #else
     chunk carry;
@@ -746,7 +749,9 @@ void BIG_sqr(DBIG c,BIG a)
 
 }
 
-/* SU= 32, Shifts a BIG left by any number of bits - input must be normalised, output normalised */
+/* General shift left of a by n bits */
+/* a MUST be normalised */
+/* SU= 32 */
 void BIG_shl(BIG a,int k)
 {
     int i;
@@ -765,7 +770,9 @@ void BIG_shl(BIG a,int k)
 
 }
 
-/* SU= 16, Fast shifts a BIG left by a small number of bits - input must be normalised, output will be normalised */
+/* Fast shift left of a by n bits, where n less than a word, Return excess (but store it as well) */
+/* a MUST be normalised */
+/* SU= 16 */
 chunk BIG_fshl(BIG a,int n)
 {
     int i;
@@ -778,7 +785,8 @@ chunk BIG_fshl(BIG a,int n)
     return (a[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in ff.c */
 }
 
-/* SU= 32, Shifts a DBIG left by any number of bits - input must be normalised, output normalised */
+/* double length left shift of a by k bits - k can be > BASEBITS , a MUST be normalised */
+/* SU= 32 */
 void BIG_dshl(DBIG a,int k)
 {
     int i;
@@ -794,7 +802,9 @@ void BIG_dshl(DBIG a,int k)
 
 }
 
-/* SU= 32, Shifts a BIG right by any number of bits - input must be normalised, output normalised */
+/* General shift rightof a by k bits */
+/* a MUST be normalised */
+/* SU= 32 */
 void BIG_shr(BIG a,int k)
 {
     int i;
@@ -807,7 +817,9 @@ void BIG_shr(BIG a,int k)
 
 }
 
-/* SU= 16, Fast shifts a BIG right by a small number of bits - input must be normalised, output will be normalised */
+/* Faster shift right of a by k bits. Return shifted out part */
+/* a MUST be normalised */
+/* SU= 16 */
 chunk BIG_fshr(BIG a,int k)
 {
     int i;
@@ -818,7 +830,8 @@ chunk BIG_fshr(BIG a,int k)
     return r;
 }
 
-/* SU= 32, Shifts a DBIG right by any number of bits - input must be normalised, output normalised */
+/* double length right shift of a by k bits - can be > BASEBITS */
+/* SU= 32 */
 void BIG_dshr(DBIG a,int k)
 {
     int i;
@@ -830,7 +843,9 @@ void BIG_dshr(DBIG a,int k)
     for (i=DNLEN-m; i<DNLEN; i++ ) a[i]=0;
 }
 
-/* SU= 24, Splits a DBIG into two BIGs - input must be normalised, outputs normalised */
+/* Split DBIG d into two BIGs t|b. Split happens at n bits, where n falls into NLEN word */
+/* d MUST be normalised */
+/* SU= 24 */
 chunk BIG_split(BIG t,BIG b,DBIG d,int n)
 {
     int i;
@@ -873,7 +888,7 @@ chunk BIG_split(BIG t,BIG b,DBIG d,int n)
 
 /* you gotta keep the sign of carry! Look - no branching! */
 /* Note that sign bit is needed to disambiguate between +ve and -ve values */
-/* Normalizes a BIG number - output normalised, force all digits < 2^BASEBITS */
+/* normalise BIG - force all digits < 2^BASEBITS */
 chunk BIG_norm(BIG a)
 {
     int i;
@@ -892,11 +907,10 @@ chunk BIG_norm(BIG a)
     return (a[NLEN-1]>>((8*MODBYTES)%BASEBITS));  /* only used in ff.c */
 }
 
-/* Normalizes a DBIG number - output normalised */
 void BIG_dnorm(DBIG a)
 {
     int i;
-    chunk d,carry=0;
+    chunk d,carry=0;;
     for (i=0; i<DNLEN-1; i++)
     {
         d=a[i]+carry;
@@ -923,7 +937,6 @@ int BIG_comp(BIG a,BIG b)
     return 0;
 }
 
-/* Compares two DBIG numbers. Inputs must be normalised externally */
 int BIG_dcomp(DBIG a,DBIG b)
 {
     int i;
@@ -936,7 +949,8 @@ int BIG_dcomp(DBIG a,DBIG b)
     return 0;
 }
 
-/* SU= 8, Calculate number of bits in a BIG - output normalised */
+/* return number of bits in a */
+/* SU= 8 */
 int BIG_nbits(BIG a)
 {
     int bts,k=NLEN-1;
@@ -954,13 +968,13 @@ int BIG_nbits(BIG a)
     return bts;
 }
 
-/* SU= 8, Calculate number of bits in a DBIG - output normalised */
-int BIG_dnbits(DBIG a)
+/* SU= 8 */
+int BIG_dnbits(BIG a)
 {
     int bts,k=DNLEN-1;
     chunk c;
     BIG_dnorm(a);
-    while (k>=0 && a[k]==0) k--;
+    while (a[k]==0 && k>=0) k--;
     if (k<0) return 0;
     bts=BASEBITS*k;
     c=a[k];
@@ -972,7 +986,9 @@ int BIG_dnbits(DBIG a)
     return bts;
 }
 
-/* SU= 16, Reduce x mod n - input and output normalised, constant time. */
+
+/* Set b=b mod c */
+/* SU= 16 */
 void BIG_mod(BIG b,BIG c)
 {
     int k=0;
@@ -991,14 +1007,24 @@ void BIG_mod(BIG b,BIG c)
     while (k>0)
     {
         BIG_fshr(c,1);
+
+// constant time...
         BIG_sub(r,b,c);
         BIG_norm(r);
         BIG_cmove(b,r,1-((r[NLEN-1]>>(CHUNK-1))&1));
+        /*
+                if (BIG_comp(b,c)>=0)
+                {
+                    BIG_sub(b,b,c);
+                    BIG_norm(b);
+                }
+        */
         k--;
     }
 }
 
-/* SU= 96, Set a=b mod c, b is destroyed. Slow but rarely used. Constant time. */
+/* Set a=b mod c, b is destroyed. Slow but rarely used. */
+/* SU= 96 */
 void BIG_dmod(BIG a,DBIG b,BIG c)
 {
     int k=0;
@@ -1021,56 +1047,76 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 
     while (k>0)
     {
-        BIG_dshr(m,1);  
+        BIG_dshr(m,1);
+// constant time...
         BIG_dsub(r,b,m);
         BIG_dnorm(r);
         BIG_dcmove(b,r,1-((r[DNLEN-1]>>(CHUNK-1))&1));
+        /*
+                if (BIG_dcomp(b,m)>=0)
+                {
+                    BIG_dsub(b,b,m);
+                    BIG_dnorm(b);
+                }
+        */
         k--;
     }
     BIG_sdcopy(a,b);
 }
 
-/* SU= 136, x=y/n - output normalised. Slow but rarely used. */
+/* Set a=b/c,  b is destroyed. Slow but rarely used. */
+/* SU= 136 */
+
 void BIG_ddiv(BIG a,DBIG b,BIG c)
 {
-	int d,k=0;
-	DBIG m,dr;
-	BIG e,r;
-	BIG_dnorm(b);
-	BIG_dscopy(m,c);
+    int d,k=0;
+    DBIG m,dr;
+    BIG e,r;
+    BIG_dnorm(b);
+    BIG_dscopy(m,c);
 
-	BIG_zero(a);
-	BIG_zero(e); BIG_inc(e,1);
+    BIG_zero(a);
+    BIG_zero(e);
+    BIG_inc(e,1);
 
-	while (BIG_dcomp(b,m)>=0)
-	{
-		BIG_fshl(e,1);
-		BIG_dshl(m,1);
-		k++;
-	}
+    while (BIG_dcomp(b,m)>=0)
+    {
+        BIG_fshl(e,1);
+        BIG_dshl(m,1);
+        k++;
+    }
 
-	while (k>0)
-	{
-		BIG_dshr(m,1);
-		BIG_fshr(e,1);
+    while (k>0)
+    {
+        BIG_dshr(m,1);
+        BIG_fshr(e,1);
 
-		BIG_dsub(dr,b,m);
-		BIG_dnorm(dr);
-		d=1-((dr[DNLEN-1]>>(CHUNK-1))&1);
-		BIG_dcmove(b,dr,d);
+        BIG_dsub(dr,b,m);
+        BIG_dnorm(dr);
+        d=1-((dr[DNLEN-1]>>(CHUNK-1))&1);
+        BIG_dcmove(b,dr,d);
 
-		BIG_add(r,a,e);
-		BIG_norm(r);
-		BIG_cmove(a,r,d);
-		k--;
-	}
+        BIG_add(r,a,e);
+        BIG_norm(r);
+        BIG_cmove(a,r,d);
+        /*
+        		if (BIG_dcomp(b,m)>=0)
+        		{
+        			BIG_add(a,a,e);
+        			BIG_norm(a);
+        			BIG_dsub(b,b,m);
+        			BIG_dnorm(b);
+        		} */
+        k--;
+    }
 }
 
-/* SU= 136, Divide x by n - output normalised */
+/* SU= 136 */
+
 void BIG_sdiv(BIG a,BIG c)
 {
-    int k=0;
-    BIG m,e,b;
+    int d,k=0;
+    BIG m,e,b,r;
     BIG_norm(a);
     BIG_copy(b,a);
     BIG_copy(m,c);
@@ -1090,24 +1136,35 @@ void BIG_sdiv(BIG a,BIG c)
     {
         BIG_fshr(m,1);
         BIG_fshr(e,1);
-        if (BIG_comp(b,m)>=0)
-        {
-            BIG_add(a,a,e);
-            BIG_norm(a);
-            BIG_sub(b,b,m);
-            BIG_norm(b);
-        }
+
+        BIG_sub(r,b,m);
+        BIG_norm(r);
+        d=1-((r[NLEN-1]>>(CHUNK-1))&1);
+        BIG_cmove(b,r,d);
+
+        BIG_add(r,a,e);
+        BIG_norm(r);
+        BIG_cmove(a,r,d);
+        /*
+        		if (BIG_comp(b,m)>=0)
+        		{
+        			BIG_sub(b,b,m);
+        			BIG_norm(b);
+        			BIG_add(a,a,e);
+        			BIG_norm(a);
+        		} */
         k--;
     }
 }
 
-/* Return parity of BIG, that is the least significant bit */
+/* return LSB of a */
 int BIG_parity(BIG a)
 {
     return a[0]%2;
 }
 
-/* SU= 16, Return i-th of BIG */
+/* return n-th bit of a */
+/* SU= 16 */
 int BIG_bit(BIG a,int n)
 {
     if (a[n/BASEBITS]&((chunk)1<<(n%BASEBITS))) return 1;
@@ -1158,7 +1215,8 @@ int BIG_nafbits(BIG x,BIG x3,int i,int *nbs,int *nzs)
 }
 */
 
-/* SU= 16, Return least significant bits of a BIG */
+/* return last n bits of a, where n is small < BASEBITS */
+/* SU= 16 */
 int BIG_lastbits(BIG a,int n)
 {
     int msk=(1<<n)-1;
@@ -1166,7 +1224,7 @@ int BIG_lastbits(BIG a,int n)
     return ((int)a[0])&msk;
 }
 
-/* Create a random 8*MODBYTES size  BIG from a random number generator */
+/* get 8*MODBYTES size random number */
 void BIG_random(BIG m,csprng *rng)
 {
     int i,b,j=0,r=0;
@@ -1190,7 +1248,7 @@ void BIG_random(BIG m,csprng *rng)
 #endif
 }
 
-/* Create an unbiased random BIG from a random number generator, reduced with respect to a modulus */
+/* get random BIG from rng, modulo q. Done one bit at a time, so its portable */
 
 void BIG_randomnum(BIG m,BIG q,csprng *rng)
 {
@@ -1215,7 +1273,8 @@ void BIG_randomnum(BIG m,BIG q,csprng *rng)
 #endif
 }
 
-/* SU= 96, Calculate x=y*z mod n */
+/* Set r=a*b mod m */
+/* SU= 96 */
 void BIG_modmul(BIG r,BIG a,BIG b,BIG m)
 {
     DBIG d;
@@ -1226,7 +1285,8 @@ void BIG_modmul(BIG r,BIG a,BIG b,BIG m)
     BIG_dmod(r,d,m);
 }
 
-/* SU= 88, Calculate x=y^2 mod n */
+/* Set a=a*a mod m */
+/* SU= 88 */
 void BIG_modsqr(BIG r,BIG a,BIG m)
 {
     DBIG d;
@@ -1236,15 +1296,16 @@ void BIG_modsqr(BIG r,BIG a,BIG m)
     BIG_dmod(r,d,m);
 }
 
-/* SU= 16, Calculate x=-y mod n */
+/* Set r=-a mod m */
+/* SU= 16 */
 void BIG_modneg(BIG r,BIG a,BIG m)
 {
     BIG_mod(a,m);
     BIG_sub(r,m,a);
-    BIG_mod(r,m);
 }
 
-/* SU= 136, Calculate x=y/z mod n */
+/* Set a=a/b mod m */
+/* SU= 136 */
 void BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
 {
     DBIG d;
@@ -1256,11 +1317,11 @@ void BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
     BIG_dmod(r,d,m);
 }
 
-/* SU= 216, Calculate jacobi Symbol (x/y) */
+/* Get jacobi Symbol (a/p). Returns 0, 1 or -1 */
+/* SU= 216 */
 int BIG_jacobi(BIG a,BIG p)
 {
     int n8,k,m=0;
-
     BIG t,x,n,zilch,one;
     BIG_one(one);
     BIG_zero(zilch);
@@ -1294,7 +1355,8 @@ int BIG_jacobi(BIG a,BIG p)
     else return -1;
 }
 
-/* SU= 240, Calculate x=1/y mod n */
+/* Set r=1/a mod p. Binary method */
+/* SU= 240 */
 void BIG_invmodp(BIG r,BIG a,BIG p)
 {
     BIG u,v,x1,x2,t,one;
@@ -1358,7 +1420,7 @@ void BIG_invmodp(BIG r,BIG a,BIG p)
         BIG_copy(r,x2);
 }
 
-/* Calculate x=x mod 2^m  */
+/* set x = x mod 2^m */
 void BIG_mod2m(BIG x,int m)
 {
     int i,wd,bt;
@@ -1369,5 +1431,21 @@ void BIG_mod2m(BIG x,int m)
     msk=((chunk)1<<bt)-1;
     x[wd]&=msk;
     for (i=wd+1; i<NLEN; i++) x[i]=0;
+}
+
+/* Convert to DBIG number from byte array of given length */
+void BIG_dfromBytesLen(DBIG a,char *b,int s)
+{
+    int i,len=s;
+    BIG_dzero(a);
+
+    for (i=0; i<len; i++)
+    {
+        BIG_dshl(a,8);
+        a[0]+=(int)(unsigned char)b[i];
+    }
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
 }
 

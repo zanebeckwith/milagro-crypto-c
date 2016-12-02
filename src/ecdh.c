@@ -1,30 +1,23 @@
-/**
- * @file ecdh.c
- * @author Mike Scott
- * @date 2nd June 2015
- * @brief ECDH/ECIES/ECDSA function source file for implementation of standard EC protocols
- *
- * LICENSE
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-/* ECDH/ECIES/ECDSA function source file for implementation of standard EC protocols */
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
+
+/* ECDH/ECIES/ECDSA Functions - see main program below */
 
 #include <stdio.h>
 #include <string.h>
@@ -141,7 +134,7 @@ static void hashit(int sha,octet *p,int n,octet *x,octet *w,int pad)
     return;
 }
 
-/* Hash an octet into another octet*/
+/* Hash octet p to octet w */
 void HASH(int sha,octet *p,octet *w)
 {
     hashit(sha,p,-1,NULL,w,0);
@@ -154,13 +147,12 @@ void ECC_CREATE_CSPRNG(csprng *RNG,octet *RAW)
     RAND_seed(RNG,RAW->len,RAW->val);
 }
 
-/* Kill a random number generator */
 void ECC_KILL_CSPRNG(csprng *RNG)
 {
     RAND_clean(RNG);
 }
 
-/* Calculate HMAC of message M using key K to create tag of length len in octet tag */
+/* Calculate HMAC of m using key k. HMAC is tag of length olen */
 int HMAC(int sha,octet *m,octet *k,int olen,octet *tag)
 {
     /* Input is from an octet m        *
@@ -219,8 +211,6 @@ void KDF1(octet *z,int olen,octet *key)
     }
 }
 */
-
-/* Key Derivation Function - generates key K from inputs Z and P */
 void KDF2(int sha,octet *z,octet *p,int olen,octet *key)
 {
     /* NOTE: the parameter olen is the length of the output k in bytes */
@@ -242,7 +232,9 @@ void KDF2(int sha,octet *z,octet *p,int olen,octet *key)
 
 }
 
-/* Password Based Key Derivation Function - generates key K from password, salt and repeat counter */
+/* Password based Key Derivation Function */
+/* Input password p, salt s, and repeat count */
+/* Output key of length olen */
 void PBKDF2(int sha,octet *p,octet *s,int rep,int olen,octet *key)
 {
     int i,j,len,d=ROUNDUP(olen,sha);
@@ -318,7 +310,7 @@ void AES_CBC_IV0_ENCRYPT(octet *k,octet *m,octet *c)
     c->len=opt;
 }
 
-/* AES encrypts a plaintext to a ciphtertext */
+/* decrypts and returns TRUE if all consistent, else returns FALSE */
 int AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
 {
     /* padding is removed */
@@ -368,16 +360,19 @@ int AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
     return 1;
 }
 
-/* Generate a public/private EC GF(p) key pair. W=S.G mod EC(p) */
+/* Calculate a public/private EC GF(p) key pair. W=S.G mod EC(p),
+ * where S is the secret key and W is the public key
+ * and G is fixed generator.
+ * If RNG is NULL then the private key is provided externally in S
+ * otherwise it is generated randomly internally */
 int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 {
-    BIG r,gx,s;
+    BIG r,gx,gy,s;
     ECP G;
     int res=0;
     BIG_rcopy(gx,CURVE_Gx);
 
 #if CURVETYPE!=MONTGOMERY
-    BIG gy;
     BIG_rcopy(gy,CURVE_Gy);
     ECP_set(&G,gx,gy);
 #else
@@ -464,10 +459,10 @@ int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
     return res;
 }
 
-/* Validate an ECC public key */
+/* validate public key. Set full=true for fuller check */
 int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
 {
-    BIG q,r,wx;
+    BIG q,r,wx,wy;
     ECP WP;
     int valid;
     int res=0;
@@ -478,7 +473,6 @@ int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
     BIG_fromBytes(wx,&(W->val[1]));
     if (BIG_comp(wx,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
 #if CURVETYPE!=MONTGOMERY
-    BIG wy;
     BIG_fromBytes(wy,&(W->val[EFS+1]));
     if (BIG_comp(wy,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
 #endif
@@ -502,10 +496,10 @@ int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
     return res;
 }
 
-/* Generate Diffie-Hellman online calculation shared key Z=S.WD,IEEE-1363 */
+/* IEEE-1363 Diffie-Hellman online calculation Z=S.WD */
 int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 {
-    BIG r,s,wx;
+    BIG r,s,wx,wy;
     int valid;
     ECP W;
     int res=0;
@@ -514,7 +508,6 @@ int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 
     BIG_fromBytes(wx,&(WD->val[1]));
 #if CURVETYPE!=MONTGOMERY
-    BIG wy;
     BIG_fromBytes(wy,&(WD->val[EFS+1]));
     valid=ECP_set(&W,wx,wy);
 #else
@@ -550,10 +543,10 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
     char h[128];
     octet H= {0,sizeof(h),h};
 
-    BIG gx,gy,r,s,f,c,d,u,vx;
+    BIG gx,gy,r,s,f,c,d,u,vx,w;
     ECP G,V;
 
-    hashit(sha,F,-1,NULL,&H,sha);
+    hashit(sha,F,-1,NULL,&H,MODBYTES);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
@@ -583,7 +576,7 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
             BIG_fromBytes(u,K->val);
             BIG_mod(u,r);
         }
-
+        BIG_randomnum(w,r,RNG); /* randomize calculation */
 #ifdef AES_S
         BIG_mod2m(u,2*AES_S);
 #endif
@@ -595,11 +588,13 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
         BIG_copy(c,vx);
         BIG_mod(c,r);
         if (BIG_iszilch(c)) continue;
+        BIG_modmul(u,u,w,r);
 
         BIG_invmodp(u,u,r);
         BIG_modmul(d,s,c,r);
 
         BIG_add(d,f,d);
+        BIG_modmul(d,d,w,r);
 
         BIG_modmul(d,u,d,r);
 
@@ -625,21 +620,19 @@ int ECPVP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
     ECP G,WP;
     int valid;
 
-    hashit(sha,F,-1,NULL,&H,sha);
+    hashit(sha,F,-1,NULL,&H,MODBYTES);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
 
-    OCT_shl(C,C->len-MODBYTES);
-    OCT_shl(D,D->len-MODBYTES);
+    //OCT_shl(C,C->len-MODBYTES);
+    //OCT_shl(D,D->len-MODBYTES);
 
     BIG_fromBytes(c,C->val);
     BIG_fromBytes(d,D->val);
+    BIG_fromBytes(f,H.val);
 
-    int hlen=H.len;
-    if (hlen>MODBYTES) hlen=MODBYTES;
-
-    BIG_fromBytesLen(f,H.val,hlen);
+    //BIG_fromBytes(f,H.val);
 
     if (BIG_iszilch(c) || BIG_comp(c,r)>=0 || BIG_iszilch(d) || BIG_comp(d,r)>=0)
         res=ECDH_INVALID;

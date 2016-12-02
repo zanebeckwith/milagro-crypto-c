@@ -1,30 +1,21 @@
-/**
- * @file rand.c
- * @author Mike Scott
- * @date 19th May 2015
- * @brief AMCL Implementation of a cryptographic strong random number generator
- *
- * LICENSE
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-/* AMCL Implementation of a cryptographic strong random number generator */
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 /*
  *   Cryptographic strong random number generator
@@ -34,14 +25,14 @@
  *
  *   See ftp://ftp.rsasecurity.com/pub/pdfs/bull-1.pdf for a justification
  */
-
 /* SU=m, m is Stack Usage */
 
 #include "amcl.h"
 
-/* SU= 20, Marsaglia & Zaman random number generator */
+/* SU= 20 */
 static unsign32 sbrand(csprng *rng)
 {
+    /* Marsaglia & Zaman random number generator */
     int i,k;
     unsign32 pdiff,t;
     rng->rndptr++;
@@ -61,11 +52,12 @@ static unsign32 sbrand(csprng *rng)
     return rng->ira[0];
 }
 
-/* SU= 20, initialise random number system */
+/* SU= 20 */
 static void sirand(csprng* rng,unsign32 seed)
 {
-    /* modified so that a subsequent call "stirs" in another seed
-       value in this way as many seed bits as desired may be used */
+    /* initialise random number system */
+    /* modified so that a subsequent call "stirs" in another seed value */
+    /* in this way as many seed bits as desired may be used */
     int i,in;
     unsign32 t,m=1;
     rng->borrow=0L;
@@ -73,19 +65,20 @@ static void sirand(csprng* rng,unsign32 seed)
     rng->ira[0]^=seed;
     for (i=1; i<NK; i++)
     {
-        // fill initialisation vector
+        /* fill initialisation vector */
         in=(NV*i)%NK;
-        rng->ira[in]^=m; //note XOR
+        rng->ira[in]^=m;      /* note XOR */
         t=m;
         m=seed-m;
         seed=t;
     }
-    for (i=0; i<10000; i++) sbrand(rng ); // "warm-up" & stir the generator
+    for (i=0; i<10000; i++) sbrand(rng ); /* "warm-up" & stir the generator */
 }
 
-/* SU= 312, hash down output of RNG to re-fill the pool */
+/* SU= 312 */
 static void fill_pool(csprng *rng)
 {
+    /* hash down output of RNG to re-fill the pool */
     int i;
     hash256 sh;
     HASH256_init(&sh);
@@ -94,17 +87,18 @@ static void fill_pool(csprng *rng)
     rng->pool_ptr=0;
 }
 
-/* Pack bytes into a 32-bit word */
 static unsign32 pack(const uchar *b)
 {
+    /* pack bytes into a 32-bit Word */
     return ((unsign32)b[3]<<24)|((unsign32)b[2]<<16)|((unsign32)b[1]<<8)|(unsign32)b[0];
 }
 
-/* SU= 360, initialize RNG with some real entropy from some external source */
+/* SU= 360 */
+/* Initialize RNG with some real entropy from some external source */
 void RAND_seed(csprng *rng,int rawlen,char *raw)
 {
-    /* initialise from at least 128 byte string
-       of raw random input, and 32-bit time-of-day */
+    /* initialise from at least 128 byte string of raw  *
+     * random (keyboard?) input, and 32-bit time-of-day */
     int i;
     char digest[32];
     uchar b[4];
@@ -144,7 +138,8 @@ void RAND_clean(csprng *rng)
     rng->borrow=0;
 }
 
-/* SU= 8, get random byte */
+/* get random byte */
+/* SU= 8 */
 int RAND_byte(csprng *rng)
 {
     int r;
