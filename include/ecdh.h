@@ -36,7 +36,7 @@ under the License.
 #define EGS MODBYTES  /**< ECC Group Size in bytes */
 #define EFS MODBYTES  /**< ECC Field Size in bytes */
 
-#define HASH_TYPE_ECC SHA512
+#define HASH_TYPE_ECC SHA256  /**< Hash type */
 
 #define ECDH_OK                     0     /**< Function completed without error */
 /*#define ECDH_DOMAIN_ERROR          -1*/

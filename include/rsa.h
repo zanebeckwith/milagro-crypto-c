@@ -62,7 +62,7 @@ extern void RSA_KEY_PAIR(csprng *R,sign32 e,rsa_private_key* PRIV,rsa_public_key
  *
 	@param h is the hash type
 	@param M is the input message
-	@param F is the output encoding, ready for RSA signature
+	@param W is the output encoding, ready for RSA signature
 	@return 1 if OK, else 0
  */
 extern int PKCS15(int h,octet *M,octet *W);

@@ -452,6 +452,7 @@ void PAIR_fexp(FP12 *r)
 #endif
 }
 
+#ifdef USE_GLV
 /* GLV method */
 static void glv(BIG u[2],BIG e)
 {
@@ -497,6 +498,7 @@ static void glv(BIG u[2],BIG e)
 
     return;
 }
+#endif // USE_GLV
 
 /* Galbraith & Scott Method */
 static void gs(BIG u[4],BIG e)

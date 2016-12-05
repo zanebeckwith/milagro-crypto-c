@@ -22,7 +22,7 @@
 /* Each "limb" of a big number occupies at most (n-3) bits of an n-bit computer word. The most significant word must have at least 4 extra unused bits */
 
 /**
- * @file AMCL.h
+ * @file amcl.h
  * @author Mike Scott and Kealan McCusker
  * @date 19th May 2015
  * @brief Main Header File
@@ -76,9 +76,9 @@
 #define NIST521 12    /**< For the NIST 521-bit standard curve - WEIERSTRASS only */
 
 /* BN Curves */
-#define BN_CURVES 100
-#define BN454 100  /**< New AES-128 security BN curve - Modulus built from -0x10000010000000000000100000001  - WEIERSTRASS only */
-#define BN646 101  /**< AES-192 security BN curve -  Modulus built from t=-0x10000000000000000000004000000000000001001 - WEIERSTRASS only */
+#define BN_CURVES 100  /**< Barreto-Naehrig curves */
+#define BN454 100      /**< New AES-128 security BN curve - Modulus built from -0x10000010000000000000100000001  - WEIERSTRASS only */
+#define BN646 101      /**< AES-192 security BN curve -  Modulus built from t=-0x10000000000000000000004000000000000001001 - WEIERSTRASS only */
 
 /* A few 254-bit alternative BN curves */
 #define BN254 102  /**< Standard Nogami BN curve - fastest. Modulus built from  t=-0x4080000000000001 - WEIERSTRASS only */
@@ -89,9 +89,9 @@
 #define BN254_T2 105  /**< G2 and GT-Strong BN curve.  Modulus built from t=-0x4000020100608205 - WEIERSTRASS only */
 
 /* BLS-12 Curves */
-#define BLS_CURVES 200
-#define BLS455 200  /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
-#define BLS383 201  /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
+#define BLS_CURVES 200  /**< Barreto-Lynn-Scott curves */
+#define BLS455 200      /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
+#define BLS383 201      /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
 
 
 
@@ -149,18 +149,18 @@
 
 
 
-#define NLEN (1+((MBITS-1)/BASEBITS))	/**< Number of words in BIG. */
-#define MODBYTES (1+(MBITS-1)/8)		/**< Number of bytes in Modulus */
-#define BIGBITS (MODBYTES*8)			/**< Number of bits representable in a BIG */
-#define FF_BITS (BIGBITS*FFLEN)			/**< Finite Field Size in bits - must be BIGBITS.2^n */
+#define NLEN (1+((MBITS-1)/BASEBITS))  /**< Number of words in BIG. */
+#define MODBYTES (1+(MBITS-1)/8)       /**< Number of bytes in Modulus */
+#define BIGBITS (MODBYTES*8)	       /**< Number of bits representable in a BIG */
+#define FF_BITS (BIGBITS*FFLEN)	       /**< Finite Field Size in bits - must be BIGBITS.2^n */
 
 
 /* modulus types */
 
-#define NOT_SPECIAL 0			/**< Modulus of no exploitable form */
-#define PSEUDO_MERSENNE 1		/**< Pseudo-mersenne modulus of form $2^n-c$  */
-#define MONTGOMERY_FRIENDLY 3	/**< Montgomery Friendly modulus of form $2^a(2^b-c)-1$  */
-#define GENERALISED_MERSENNE 2	/**< Generalised-mersenne modulus of form $2^n-2^m-1$  */  /** GOLDILOCKS only */
+#define NOT_SPECIAL 0	        /**< Modulus of no exploitable form */
+#define PSEUDO_MERSENNE 1	/**< Pseudo-mersenne modulus of form $2^n-c$  */
+#define MONTGOMERY_FRIENDLY 3   /**< Montgomery Friendly modulus of form $2^a(2^b-c)-1$  */
+#define GENERALISED_MERSENNE 2  /**< Generalised-mersenne modulus of form $2^n-2^m-1$, GOLDILOCKS only */
 
 /* Built-in curves defined here */
 /* MIRACL check.cpp utility used to determine optimal choice for BASEBITS */
@@ -169,20 +169,20 @@
 
 
 #if CHOICE==NIST256
-#define MBITS 256	/**< Number of bits in Modulus */
-#define MOD8 7		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
+#define MBITS 256	      /**< Number of bits in Modulus */
+#define MOD8 7	              /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL  /**< Modulus type */
 #if CURVETYPE!=WEIERSTRASS
 #error Not supported
 #else
 #if CHUNK==16
-#define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 13  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
@@ -654,27 +654,28 @@ typedef struct
     FP2 z;  /**< z-coordinate of point */
 } ECP2;
 
-
 /**
-	@brief SHA256/384-512 hash function instance
-*/
-
+ * @brief SHA256 hash function instance */
 typedef struct
 {
     unsign32 length[2];  /**< 64-bit input length */
     unsign32 h[8];       /**< Internal state */
-    unsign32 w[80];		/**< Internal state */
-    int hlen;			/**< Hash length in bytes */
+    unsign32 w[80];	 /**< Internal state */
+    int hlen;		 /**< Hash length in bytes */
 } hash256;
 
+/**
+ * @brief SHA384-512 hash function instance */
 typedef struct
 {
     unsign64 length[2];  /**< 64-bit input length */
     unsign64 h[8];       /**< Internal state */
-    unsign64 w[80];		/**< Internal state */
-    int hlen;           /**< Hash length in bytes */
+    unsign64 w[80];	 /**< Internal state */
+    int hlen;            /**< Hash length in bytes */
 } hash512;
 
+/**
+ * @brief SHA384 hash function instance */
 typedef hash512 hash384;
 
 #define SHA256 32 /**< SHA-256 hashing */
@@ -708,7 +709,8 @@ typedef hash512 hash384;
 
 typedef struct
 {
-    int Nk,Nr;
+    int Nk;            /**< AES Key Length */
+    int Nr;            /**< AES Number of rounds */
     int mode;          /**< AES mode of operation */
     unsign32 fkey[60]; /**< subkeys for encrypton */
     unsign32 rkey[60]; /**< subkeys for decrypton */
@@ -1202,17 +1204,18 @@ extern void BIG_random(BIG x,csprng *r);
 	@param r A pointer to a Cryptographically Secure Random Number Generator
  */
 extern void BIG_randomnum(BIG x,BIG n,csprng *r);
-/**	@brief  return NAF (Non-Adjacent-Form) value as +/- 1, 3 or 5, inputs must be normalised
+/**	brief  return NAF (Non-Adjacent-Form) value as +/- 1, 3 or 5, inputs must be normalised
  *
 	Given x and 3*x extracts NAF value from given bit position, and returns number of bits processed, and number of trailing zeros detected if any
-	@param x BIG number
-	@param x3 BIG number, three times x
-	@param i bit position
-	@param nbs pointer to integer returning number of bits processed
-	@param nzs pointer to integer returning number of trailing 0s
-	@return + or - 1, 3 or 5
- */
+	param x BIG number
+	param x3 BIG number, three times x
+	param i bit position
+	param nbs pointer to integer returning number of bits processed
+	param nzs pointer to integer returning number of trailing 0s
+	return + or - 1, 3 or 5
+*/
 //extern int BIG_nafbits(BIG x,BIG x3,int i,int *nbs,int *nzs);
+
 /**	@brief  Calculate x=y*z mod n
  *
 	Slow method for modular multiplication
@@ -1298,10 +1301,10 @@ extern void FP_one(BIG x);
 /**	@brief Reduces DBIG to BIG exploiting special form of the modulus
  *
 	This function comes in different flavours depending on the form of Modulus that is currently in use.
-	@param x BIG number, on exit = y mod Modulus
-	@param y DBIG number to be reduced
+	@param r BIG number, on exit = d mod Modulus
+	@param d DBIG number to be reduced
  */
-extern void FP_mod(BIG x,DBIG y);
+extern void FP_mod(BIG r,DBIG d);
 /**	@brief Fast Modular multiplication of two BIGs in n-residue form, mod Modulus
  *
 	Uses appropriate fast modular reduction method

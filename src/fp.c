@@ -34,9 +34,9 @@ under the License.
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
-void FP_nres(BIG a) {}
+void FP_nres(BIG x) {}
 
-void FP_redc(BIG a) {}
+void FP_redc(BIG x) {}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
@@ -436,7 +436,7 @@ static int logb2(unsign32 v)
 
     v = v - ((v >> 1) & 0x55555555);
     v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
-    r = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+    r = (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     return r+1;
 }
 
