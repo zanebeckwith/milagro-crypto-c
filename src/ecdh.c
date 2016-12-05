@@ -570,13 +570,14 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
                 K->len=EFS;
                 BIG_toBytes(K->val,u);
             }
+            BIG_randomnum(w,r,RNG); /* randomize calculation */
         }
         else
         {
             BIG_fromBytes(u,K->val);
             BIG_mod(u,r);
         }
-        BIG_randomnum(w,r,RNG); /* randomize calculation */
+
 #ifdef AES_S
         BIG_mod2m(u,2*AES_S);
 #endif
@@ -588,13 +589,19 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
         BIG_copy(c,vx);
         BIG_mod(c,r);
         if (BIG_iszilch(c)) continue;
-        BIG_modmul(u,u,w,r);
+        if (RNG!=NULL)
+        {
+          BIG_modmul(u,u,w,r);
+	}
 
         BIG_invmodp(u,u,r);
         BIG_modmul(d,s,c,r);
 
         BIG_add(d,f,d);
-        BIG_modmul(d,d,w,r);
+        if (RNG!=NULL)
+        {
+            BIG_modmul(d,d,w,r);
+	}
 
         BIG_modmul(d,u,d,r);
 
