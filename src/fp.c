@@ -34,14 +34,24 @@ under the License.
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
-void FP_nres(BIG x) {}
+/* Converts from BIG integer to n-residue form mod Modulus */
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
-void FP_redc(BIG x) {}
+/* Converts from n-residue form back to BIG integer form */
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
 {
-    BIG t,b,m;
+    BIG t,b;
     chunk v,tw;
     BIG_split(t,b,d,MODBITS);
 
@@ -76,9 +86,19 @@ void FP_mod(BIG r,DBIG d)
 /* This only applies to Curve C448, so specialised (for now) */
 #if MODTYPE == GENERALISED_MERSENNE
 
-void FP_nres(BIG a) {}
+/* Converts from BIG integer to n-residue form mod Modulus */
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
-void FP_redc(BIG a) {}
+/* Converts from n-residue form back to BIG integer form */
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)

@@ -546,7 +546,7 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
     BIG gx,gy,r,s,f,c,d,u,vx,w;
     ECP G,V;
 
-    hashit(sha,F,-1,NULL,&H,MODBYTES);
+    hashit(sha,F,-1,NULL,&H,sha);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
@@ -627,17 +627,21 @@ int ECPVP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
     ECP G,WP;
     int valid;
 
-    hashit(sha,F,-1,NULL,&H,MODBYTES);
+    hashit(sha,F,-1,NULL,&H,sha);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
 
-    //OCT_shl(C,C->len-MODBYTES);
-    //OCT_shl(D,D->len-MODBYTES);
+    OCT_shl(C,C->len-MODBYTES);
+    OCT_shl(D,D->len-MODBYTES);
 
     BIG_fromBytes(c,C->val);
     BIG_fromBytes(d,D->val);
-    BIG_fromBytes(f,H.val);
+
+    int hlen=H.len;
+    if (hlen>MODBYTES) hlen=MODBYTES;
+
+    BIG_fromBytesLen(f,H.val,hlen);
 
     //BIG_fromBytes(f,H.val);
 

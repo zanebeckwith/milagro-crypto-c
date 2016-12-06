@@ -772,7 +772,7 @@ void ECP_add(ECP *P,ECP *Q)
     BIG_norm(P->z);
 
 #else
-    BIG b,A,B,C,D,E,F,G,H,I;
+    BIG b,A,B,C,D,E,F,G;
 
     BIG_rcopy(b,CURVE_B);
     FP_nres(b);
