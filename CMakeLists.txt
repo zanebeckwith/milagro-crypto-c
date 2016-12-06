@@ -4,9 +4,6 @@ project (AMCL)
 # enable testing
 enable_testing ()
 
-# Required for amcl.h and arch.h
-add_definitions(-DCMAKE)
-
 # Extract version from the VERSION file
 file(STRINGS VERSION VERSION_FILE_CONTENT)
 string(REPLACE "." ";" VERSION_FILE_PARTS ${VERSION_FILE_CONTENT})

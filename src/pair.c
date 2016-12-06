@@ -510,7 +510,7 @@ static void gs(BIG u[4],BIG e)
 {
     int i;
 #if CHOICE<BLS_CURVES
-    int j
+    int j;
     BIG v[4],t,q;
     DBIG d;
     BIG_rcopy(q,CURVE_Order);

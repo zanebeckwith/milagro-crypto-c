@@ -262,7 +262,7 @@ unsign32 MPIN_today(void)
 {
     /* return time in slots since epoch */
     unsign32 ti=(unsign32)time(NULL);
-    return (long)(ti/(60*TIME_SLOT_MINUTES));
+    return (uint32_t)(ti/(60*TIME_SLOT_MINUTES));
 }
 
 /* Hash the M-Pin transcript - new */
@@ -1065,7 +1065,7 @@ void MPIN_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
 int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,octet *MESSAGE,int TimeValue,octet *Y)
 {
     int rtn=0;
-    char m[256];
+    char m[M_SIZE];
     octet M= {0,sizeof(m),m};
 
     octet *pID;
@@ -1097,7 +1097,7 @@ int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *T
 int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue)
 {
     int rtn=0;
-    char m[256];
+    char m[M_SIZE];
     octet M= {0,sizeof(m),m};
 
     octet *pU;
@@ -1136,18 +1136,6 @@ void MPIN_AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T
     T->len=16;
 }
 
-/* Return the Field size */
-int MPIN_FS()
-{
-    return PFS;
-}
-
-/* Return the Group size */
-int MPIN_GS()
-{
-    return PGS;
-}
-
 /* AES-GCM Decryption of octets, K is key, H is header,
    P is plaintext, C is ciphertext, T is authentication tag */
 void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
@@ -1159,6 +1147,18 @@ void MPIN_AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T
     P->len=C->len;
     GCM_finish(&g,T->val);
     T->len=16;
+}
+
+/* Return the Field size */
+int MPIN_FS()
+{
+    return PFS;
+}
+
+/* Return the Group size */
+int MPIN_GS()
+{
+    return PGS;
 }
 
 /*
