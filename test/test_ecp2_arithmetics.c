@@ -31,7 +31,7 @@
 #include "utils.h"
 
 #define LINE_LEN 1000
-#define MAX_STRING 400
+#define MAX_STRING 1000
 
 void read_BIG(BIG A, char* string)
 {
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     ECP2 ECP2aux, inf;
     FP2 FP2aux1,FP2aux2;
 
-    char oct[len];
+    char oct[LINE_LEN];
     octet OCTaux= {0,sizeof(oct),oct};
 
     ECP2 ecp2[4];
@@ -148,7 +148,6 @@ int main(int argc, char** argv)
             linePtr = line + len;
             if(!read_ECP2(&ecp2[0],linePtr) || ECP2_isinf(&ecp2[0]))
             {
-                ECP2_output(&ecp2[0]);
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -370,9 +369,6 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            ECP2_output(&ECP2aux);
-            ECP2_output(&ecp2set1);
-            ECP2_output(&ecp2set2);
             if((!ECP2_equals(&ECP2aux,&ecp2set2)) && (!ECP2_equals(&ECP2aux,&ecp2set1)))
             {
                 printf("ERROR computing ECP2 from coordinate x and with y set2, line %d\n",i);
