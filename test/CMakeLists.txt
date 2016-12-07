@@ -45,6 +45,14 @@ add_executable (test_FP_arithmetics test_fp_arithmetics.c)
 add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
 target_link_libraries (test_FP_arithmetics amcl)
 
+# Aritmetics test for ecp2
+if((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_T") OR (AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN646")) 
+  add_executable (test_ecp2_arithmetics test_ecp2_arithmetics.c)
+  add_test(NAME test_ecp2_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecp2_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/ecp2/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
+  target_link_libraries (test_ecp2_arithmetics amcl)
+  set_tests_properties (test_ecp2_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_T") OR (AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN646"))
+
 # curve independent tests
 add_executable (test_hash test_hash.c)
 add_executable (test_gcm_encrypt test_gcm_encrypt.c)
