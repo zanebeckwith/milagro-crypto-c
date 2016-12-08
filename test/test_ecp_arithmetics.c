@@ -79,16 +79,26 @@ int main(int argc, char** argv)
     char * linePtr = NULL;
 
     ECP inf, ECPaux1;
-    BIG Mod;
-#if CURVETYPE==WEIERSTRASS
-    ECP ECPaux2;
-    BIG BIGaux1, BIGaux2, BIGlazy1, BIGlazy2;
+    BIG BIGaux1, Mod;
 
     char oct[len];
     octet OCTaux = {0,sizeof(oct),oct};
+#if CURVETYPE==WEIERSTRASS
+    ECP ECPaux2;
+    BIG BIGaux2, BIGlazy1, BIGlazy2;
 #endif
     ECP ecp1;
     const char* ECP1line = "ECP1 = ";
+    ECP ecpdbl;
+    const char* ECPdblline = "ECPdbl = ";
+    BIG BIGscalar1;
+    const char* BIGscalar1line = "BIGscalar1 = ";
+    ECP ecpmul;
+    const char* ECPmulline = "ECPmul = ";
+    ECP ecpwrong;
+    const char* ECPwrongline = "ECPwrong = ";
+    ECP ecpinf;
+    const char* ECPinfline = "ECPinf = ";
 #if CURVETYPE==WEIERSTRASS
     ECP ecp2;
     const char* ECP2line = "ECP2 = ";
@@ -98,28 +108,20 @@ int main(int argc, char** argv)
     const char* ECPnegline = "ECPneg = ";
     ECP ecpsub;
     const char* ECPsubline = "ECPsub = ";
-#endif
-    ECP ecpdbl;
-    const char* ECPdblline = "ECPdbl = ";
-#if CURVETYPE==WEIERSTRASS
-    BIG BIGscalar1;
-    const char* BIGscalar1line = "BIGscalar1 = ";
-    ECP ecpmul;
-    const char* ECPmulline = "ECPmul = ";
     ECP ecppinmul;
     const char* ECPpinmulline = "ECPpinmul = ";
     BIG BIGscalar2;
     const char* BIGscalar2line = "BIGscalar2 = ";
     ECP ecpmul2;
     const char* ECPmul2line = "ECPmul2 = ";
-    ECP ecpwrong;
-    const char* ECPwrongline = "ECPwrong = ";
-    ECP ecpinf;
-    const char* ECPinfline = "ECPinf = ";
     ECP ecpeven;
     const char* ECPevenline = "ECPeven = ";
     ECP ecpodd;
     const char* ECPoddline = "ECPodd = ";
+#endif
+#if CURVETYPE==MONTGOMERY
+    ECP ecpmul3;
+    const char* ECPmul3line = "ECPmul3 = ";
 #endif
 
     ECP_inf(&inf);
@@ -143,7 +145,6 @@ int main(int argc, char** argv)
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
         i++;
-#if CURVETYPE==WEIERSTRASS
         if (!strncmp(line,  ECP1line, strlen(ECP1line))) // get first test vector
         {
             len = strlen(ECP1line);
@@ -153,6 +154,7 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
+#if CURVETYPE==WEIERSTRASS
             ECP_get(BIGaux1,BIGaux2,&ecp1);
             FP_nres(BIGaux1);
             FP_nres(BIGaux2);
@@ -168,6 +170,7 @@ int main(int argc, char** argv)
                 printf("ERROR computing right hand side of equation ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
+#endif
             ECP_toOctet(&OCTaux,&ecp1);
             ECP_fromOctet(&ECPaux1,&OCTaux);
             if(!ECP_equals(&ECPaux1,&ecp1)) // test octet conversion
@@ -176,6 +179,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+#if CURVETYPE==WEIERSTRASS
         if (!strncmp(line,  ECP2line, strlen(ECP2line))) //get second test vector
         {
             len = strlen(ECP2line);
@@ -190,7 +194,7 @@ int main(int argc, char** argv)
         {
             len = strlen(ECPsumline);
             linePtr = line + len;
-            if(!read_ECP(&ecpsum,linePtr))
+            if(!read_ECP(&ecpsum,linePtr) || ECP_isinf(&ecpsum))
             {
                 printf("ERROR getting test vector input ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -208,7 +212,7 @@ int main(int argc, char** argv)
         {
             len = strlen(ECPsubline);
             linePtr = line + len;
-            if(!read_ECP(&ecpsub,linePtr))
+            if(!read_ECP(&ecpsub,linePtr) || ECP_isinf(&ecpsub))
             {
                 printf("ERROR getting test vector input ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -218,7 +222,7 @@ int main(int argc, char** argv)
             ECP_affine(&ECPaux1);
             if(!ECP_equals(&ECPaux1,&ecpsub)) // test subtraction P-Q
             {
-                printf("ERROR computing negative of ECP, line %d\n",i);
+                printf("ERROR computing subtraction of two ECPs, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -226,7 +230,7 @@ int main(int argc, char** argv)
         {
             len = strlen(ECPnegline);
             linePtr = line + len;
-            if(!read_ECP(&ecpneg,linePtr))
+            if(!read_ECP(&ecpneg,linePtr) || ECP_isinf(&ecpneg))
             {
                 printf("ERROR getting test vector input ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -240,11 +244,12 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+#endif
         if (!strncmp(line,  ECPdblline, strlen(ECPdblline)))
         {
             len = strlen(ECPdblline);
             linePtr = line + len;
-            if(!read_ECP(&ecpdbl,linePtr))
+            if(!read_ECP(&ecpdbl,linePtr) || ECP_isinf(&ecpdbl))
             {
                 printf("ERROR getting test vector input ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -258,6 +263,36 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+#if CURVETYPE==MONTGOMERY
+        if (!strncmp(line,  ECPmul3line, strlen(ECPmul3line)))
+        {
+            len = strlen(ECPmul3line);
+            linePtr = line + len;
+            if(!read_ECP(&ecpmul3,linePtr) || ECP_isinf(&ecpmul3))
+            {
+                printf("ERROR getting test vector input ECP, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            BIG_one(BIGaux1);
+            BIG_inc(BIGaux1,2);
+            BIG_norm(BIGaux1);
+            ECP_copy(&ECPaux1,&ecp1);
+            ECP_mul(&ECPaux1,BIGaux1);
+            ECP_affine(&ECPaux1);
+            if(!ECP_equals(&ECPaux1,&ecpmul3))
+            {
+                printf("ERROR computing multiplication of ECP by 3, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            ECP_copy(&ECPaux1,&ecpdbl);
+            ECP_add(&ECPaux1,&ecp1,&ecp1);
+            if(!ECP_equals(&ECPaux1,&ecpmul3))
+            {
+                printf("ERROR computing multiplication of ECP by 3, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+#endif
         if (!strncmp(line,  BIGscalar1line, strlen(BIGscalar1line)))
         {
             len = strlen(BIGscalar1line);
@@ -278,10 +313,13 @@ int main(int argc, char** argv)
             ECP_affine(&ECPaux1);
             if(!ECP_equals(&ECPaux1,&ecpmul))
             {
+                ECP_outputxyz(&ECPaux1);
+                ECP_outputxyz(&ecpmul);
                 printf("ERROR computing multiplication of ECP by a scalar, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
+#if CURVETYPE==WEIERSTRASS
         if (!strncmp(line,  ECPpinmulline, strlen(ECPpinmulline)))
         {
             len = strlen(ECPpinmulline);
@@ -325,6 +363,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+#endif
         if (!strncmp(line,  ECPwrongline, strlen(ECPwrongline)))
         {
             len = strlen(ECPwrongline);
@@ -345,6 +384,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+#if CURVETYPE==WEIERSTRASS
         if (!strncmp(line,  ECPevenline, strlen(ECPevenline)))
         {
             len = strlen(ECPevenline);
@@ -376,39 +416,6 @@ int main(int argc, char** argv)
             if(!ECP_equals(&ECPaux1,&ecpodd))
             {
                 printf("ERROR computing ECP from coordinate x and with y odd, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-        }
-#endif
-#if CURVETYPE==MONTGOMERY
-        if (!strncmp(line,  ECP1line, strlen(ECP1line))) // get first test vector
-        {
-            len = strlen(ECP1line);
-            linePtr = line + len;
-            if(!read_ECP(&ecp1,linePtr) || ECP_isinf(&ecp1))
-            {
-                printf("ERROR getting test vector input ECP, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-        }
-        if (!strncmp(line,  ECPdblline, strlen(ECPdblline))) // get first test vector
-        {
-            len = strlen(ECPdblline);
-            linePtr = line + len;
-            if(!read_ECP(&ecpdbl,linePtr) || ECP_isinf(&ecpdbl))
-            {
-                printf("ERROR getting test vector input ECP, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-            ECP_copy(&ECPaux1,&ecp1);
-            ECP_dbl(&ECPaux1);
-            ECP_affine(&ECPaux1);
-            FP_reduce(ECPaux1.x);
-            if(!ECP_equals(&ECPaux1,&ecpdbl))
-            {
-                ECP_outputxyz(&ECPaux1);
-                ECP_outputxyz(&ecpdbl);
-                printf("ERROR computing double of ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
