@@ -46,12 +46,10 @@ add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arit
 target_link_libraries (test_FP_arithmetics amcl)
 
 # Aritmetics test for ecp
-if(AMCL_CURVETYPE STREQUAL "WEIERSTRASS")
   add_executable (test_ecp_arithmetics test_ecp_arithmetics.c)
   add_test(NAME test_ecp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/ecp/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
   target_link_libraries (test_ecp_arithmetics amcl)
   set_tests_properties (test_ecp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-endif(AMCL_CURVETYPE STREQUAL "WEIERSTRASS")
 
 # Aritmetics test for ecp2
 if((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_T") OR (AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN646")) 
