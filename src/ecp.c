@@ -1107,3 +1107,62 @@ void ECP_mul2(ECP *P,ECP *Q,BIG e,BIG f)
 }
 
 #endif
+
+
+#ifdef HAS_MAIN
+
+int main()
+{
+    int i;
+    ECP G,P;
+    csprng RNG;
+    BIG r,s,x,y,b,m,w,q;
+    BIG_rcopy(x,CURVE_Gx);
+#if CURVETYPE!=MONTGOMERY
+    BIG_rcopy(y,CURVE_Gy);
+#endif
+    BIG_rcopy(m,Modulus);
+
+    printf("x= ");
+    BIG_output(x);
+    printf("\n");
+#if CURVETYPE!=MONTGOMERY
+    printf("y= ");
+    BIG_output(y);
+    printf("\n");
+#endif
+    RNG_seed(&RNG,3,"abc");
+
+#if CURVETYPE!=MONTGOMERY
+    ECP_set(&G,x,y);
+#else
+    ECP_set(&G,x);
+#endif
+    if (ECP_isinf(&G)) printf("Failed to set - point not on curve\n");
+    else printf("set success\n");
+
+    ECP_output(&G);
+
+    BIG_rcopy(r,CURVE_Order); //BIG_dec(r,7);
+    printf("r= ");
+    BIG_output(r);
+    printf("\n");
+
+    ECP_copy(&P,&G);
+
+    ECP_mul(&P,r);
+
+    ECP_output(&P);
+//exit(0);
+    BIG_randomnum(w,&RNG);
+    BIG_mod(w,r);
+
+    ECP_copy(&P,&G);
+    ECP_mul(&P,w);
+
+    ECP_output(&P);
+
+    return 0;
+}
+
+#endif
