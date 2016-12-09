@@ -159,7 +159,6 @@ void FP_redc(BIG a)
 void FP_mod(BIG a,DBIG d)
 {
     int i;
-    chunk k;
 
     for (i=0; i<NLEN; i++)
         d[NLEN+i]+=muladd(d[i],MConst-1,d[i],&d[NLEN+i-1]);

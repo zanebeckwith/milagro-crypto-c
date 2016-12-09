@@ -367,12 +367,13 @@ int AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
  * otherwise it is generated randomly internally */
 int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 {
-    BIG r,gx,gy,s;
+    BIG r,gx,s;
     ECP G;
     int res=0;
     BIG_rcopy(gx,CURVE_Gx);
 
 #if CURVETYPE!=MONTGOMERY
+    BIG gy;
     BIG_rcopy(gy,CURVE_Gy);
     ECP_set(&G,gx,gy);
 #else
@@ -462,7 +463,7 @@ int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 /* validate public key. Set full=true for fuller check */
 int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
 {
-    BIG q,r,wx,wy;
+    BIG q,r,wx;
     ECP WP;
     int valid;
     int res=0;
@@ -473,6 +474,7 @@ int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
     BIG_fromBytes(wx,&(W->val[1]));
     if (BIG_comp(wx,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
 #if CURVETYPE!=MONTGOMERY
+    BIG wy;
     BIG_fromBytes(wy,&(W->val[EFS+1]));
     if (BIG_comp(wy,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
 #endif
@@ -499,7 +501,7 @@ int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
 /* IEEE-1363 Diffie-Hellman online calculation Z=S.WD */
 int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 {
-    BIG r,s,wx,wy;
+    BIG r,s,wx;
     int valid;
     ECP W;
     int res=0;
@@ -508,6 +510,7 @@ int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 
     BIG_fromBytes(wx,&(WD->val[1]));
 #if CURVETYPE!=MONTGOMERY
+    BIG wy;
     BIG_fromBytes(wy,&(WD->val[EFS+1]));
     valid=ECP_set(&W,wx,wy);
 #else
