@@ -1,4 +1,4 @@
-#Choice: MF256, Type: WEIERSTRASS
+#Choice: MF256, Type: MONTGOMERY
 #Modulus:=0xffa7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff; A:= -54314; B:=1;
 
 #test1

@@ -1,4 +1,4 @@
-#Choice: MS255, Type: WEIERSTRASS
+#Choice: MS255, Type: MONTGOMERY
 #Modulus:=0x7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd03; A:= -240222; B:=1; 
 
 #test1
