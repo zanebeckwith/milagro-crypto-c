@@ -124,9 +124,12 @@ int main(int argc, char** argv)
     const char* ECPmul3line = "ECPmul3 = ";
 #endif
 
-    ECP_inf(&inf);
+    //ECP_inf(&inf);
 
     BIG_rcopy(Mod,Modulus);
+
+    //printf("\n\n");BIG_output(Mod);printf("\n");
+    //printf("\n\nA %d \n\n",CURVE_A);
 
     if(!ECP_isinf(&inf))
     {
@@ -259,6 +262,8 @@ int main(int argc, char** argv)
             ECP_affine(&ECPaux1);
             if(!ECP_equals(&ECPaux1,&ecpdbl))
             {
+                ECP_outputxyz(&ECPaux1);
+                ECP_outputxyz(&ecpdbl);
                 printf("ERROR computing double of ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
