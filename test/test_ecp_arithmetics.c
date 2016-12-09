@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     ECP inf, ECPaux1;
     BIG BIGaux1, Mod;
 
-    char oct[len];
+    char oct[LINE_LEN];
     octet OCTaux = {0,sizeof(oct),oct};
 #if CURVETYPE==WEIERSTRASS
     ECP ECPaux2;
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     const char* ECPmul3line = "ECPmul3 = ";
 #endif
 
-    //ECP_inf(&inf);
+    ECP_inf(&inf);
 
     BIG_rcopy(Mod,Modulus);
 
