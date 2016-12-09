@@ -902,7 +902,7 @@ extern void BIG_fromBytesLen(BIG x,char *a,int s);
    @param a byte array
    @param s byte array length
  */
- extern void BIG_dfromBytesLen(DBIG x,char *a,int s);
+extern void BIG_dfromBytesLen(DBIG x,char *a,int s);
 /**	@brief Outputs a DBIG number to the console
  *
 	@param x a DBIG number

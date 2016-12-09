@@ -167,8 +167,8 @@ int main(int argc, char** argv)
             BIG_sub(BIGlazy2,BIGaux2,Mod); // in case of lazy reduction
             BIG_norm(BIGlazy1);
             BIG_norm(BIGlazy2);
-            if ((BIG_comp(BIGaux1,BIGaux2)!=0) && (BIG_comp(BIGlazy1,BIGlazy2)!=0) && 
-            	(BIG_comp(BIGaux1,BIGlazy2)!=0) && (BIG_comp(BIGlazy1,BIGaux2)!=0)) // test if y^2=x^3+Ax+B
+            if ((BIG_comp(BIGaux1,BIGaux2)!=0) && (BIG_comp(BIGlazy1,BIGlazy2)!=0) &&
+                    (BIG_comp(BIGaux1,BIGlazy2)!=0) && (BIG_comp(BIGlazy1,BIGaux2)!=0)) // test if y^2=x^3+Ax+B
             {
                 printf("ERROR computing right hand side of equation ECP, line %d\n",i);
                 exit(EXIT_FAILURE);

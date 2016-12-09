@@ -594,8 +594,8 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
         if (BIG_iszilch(c)) continue;
         if (RNG!=NULL)
         {
-          BIG_modmul(u,u,w,r);
-	}
+            BIG_modmul(u,u,w,r);
+        }
 
         BIG_invmodp(u,u,r);
         BIG_modmul(d,s,c,r);
@@ -604,7 +604,7 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
         if (RNG!=NULL)
         {
             BIG_modmul(d,d,w,r);
-	}
+        }
 
         BIG_modmul(d,u,d,r);
 
