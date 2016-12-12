@@ -1302,6 +1302,7 @@ void BIG_modneg(BIG r,BIG a,BIG m)
 {
     BIG_mod(a,m);
     BIG_sub(r,m,a);
+    BIG_mod(r,m);
 }
 
 /* Set a=a/b mod m */
