@@ -974,7 +974,7 @@ int BIG_dnbits(BIG a)
     int bts,k=DNLEN-1;
     chunk c;
     BIG_dnorm(a);
-    while (a[k]==0 && k>=0) k--;
+    while (k>=0 && a[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS*k;
     c=a[k];

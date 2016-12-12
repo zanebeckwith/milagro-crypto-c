@@ -91,6 +91,8 @@
 #define CHOICE_DESC "BN454"
 #elif CHOICE==BLS455
 #define CHOICE_DESC "BLS455"
+#elif CHOICE==BLS383
+#define CHOICE_DESC "BLS383"
 #else
 #define CHOICE_DESC ""
 #endif
