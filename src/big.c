@@ -269,22 +269,6 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
 #endif
 }
 
-/* Convert to DBIG number from byte array of given length */
-void BIG_dfromBytesLen(DBIG a,char *b,int s)
-{
-    int i,len=s;
-    BIG_dzero(a);
-
-    for (i=0; i<len; i++)
-    {
-        BIG_dshl(a,8);
-        a[0]+=(int)(unsigned char)b[i];
-    }
-#ifdef DEBUG_NORM
-    a[NLEN]=0;
-#endif
-}
-
 
 /* SU= 88 */
 void BIG_doutput(DBIG a)
@@ -789,7 +773,7 @@ void BIG_shl(BIG a,int k)
 /* Fast shift left of a by n bits, where n less than a word, Return excess (but store it as well) */
 /* a MUST be normalised */
 /* SU= 16 */
-chunk BIG_fshl(BIG a,int n)
+int BIG_fshl(BIG a,int n)
 {
     int i;
 
@@ -798,7 +782,7 @@ chunk BIG_fshl(BIG a,int n)
         a[i]=((a[i]<<n)&BMASK)|(a[i-1]>>(BASEBITS-n));
     a[0]=(a[0]<<n)&BMASK;
 
-    return (a[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in ff.c */
+    return (int)(a[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in ff.c */
 }
 
 /* double length left shift of a by k bits - k can be > BASEBITS , a MUST be normalised */
@@ -836,14 +820,14 @@ void BIG_shr(BIG a,int k)
 /* Faster shift right of a by k bits. Return shifted out part */
 /* a MUST be normalised */
 /* SU= 16 */
-chunk BIG_fshr(BIG a,int k)
+int BIG_fshr(BIG a,int k)
 {
     int i;
     chunk r=a[0]&(((chunk)1<<k)-1); /* shifted out part */
     for (i=0; i<NLEN-1; i++)
         a[i]=(a[i]>>k)|((a[i+1]<<(BASEBITS-k))&BMASK);
     a[NLEN-1]=a[NLEN-1]>>k;
-    return r;
+    return (int)r;
 }
 
 /* double length right shift of a by k bits - can be > BASEBITS */
@@ -905,7 +889,7 @@ chunk BIG_split(BIG t,BIG b,DBIG d,int n)
 /* you gotta keep the sign of carry! Look - no branching! */
 /* Note that sign bit is needed to disambiguate between +ve and -ve values */
 /* normalise BIG - force all digits < 2^BASEBITS */
-chunk BIG_norm(BIG a)
+int BIG_norm(BIG a)
 {
     int i;
     chunk d,carry=0;
@@ -920,13 +904,13 @@ chunk BIG_norm(BIG a)
 #ifdef DEBUG_NORM
     a[NLEN]=0;
 #endif
-    return (a[NLEN-1]>>((8*MODBYTES)%BASEBITS));  /* only used in ff.c */
+    return (int)(a[NLEN-1]>>((8*MODBYTES)%BASEBITS));  /* only used in ff.c */
 }
 
 void BIG_dnorm(DBIG a)
 {
     int i;
-    chunk d,carry=0;
+    chunk d,carry=0;;
     for (i=0; i<DNLEN-1; i++)
     {
         d=a[i]+carry;
@@ -984,13 +968,13 @@ int BIG_nbits(BIG a)
     return bts;
 }
 
-/* SU= 8, Calculate number of bits in a DBIG - output normalised */
-int BIG_dnbits(DBIG a)
+/* SU= 8 */
+int BIG_dnbits(BIG a)
 {
     int bts,k=DNLEN-1;
     chunk c;
     BIG_dnorm(a);
-    while (k>=0 && a[k]==0) k--;
+    while (a[k]==0 && k>=0) k--;
     if (k<0) return 0;
     bts=BASEBITS*k;
     c=a[k];
@@ -1318,7 +1302,6 @@ void BIG_modneg(BIG r,BIG a,BIG m)
 {
     BIG_mod(a,m);
     BIG_sub(r,m,a);
-    BIG_mod(r,m);
 }
 
 /* Set a=a/b mod m */
@@ -1448,4 +1431,21 @@ void BIG_mod2m(BIG x,int m)
     msk=((chunk)1<<bt)-1;
     x[wd]&=msk;
     for (i=wd+1; i<NLEN; i++) x[i]=0;
+}
+
+// new
+/* Convert to DBIG number from byte array of given length */
+void BIG_dfromBytesLen(DBIG a,char *b,int s)
+{
+    int i,len=s;
+    BIG_dzero(a);
+
+    for (i=0; i<len; i++)
+    {
+        BIG_dshl(a,8);
+        a[0]+=(int)(unsigned char)b[i];
+    }
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
 }
