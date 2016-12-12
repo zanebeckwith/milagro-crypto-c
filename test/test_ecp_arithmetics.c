@@ -58,7 +58,7 @@ int read_ECP(ECP *ecp, char* string)
     read_BIG(x,string);
 #if CURVETYPE==MONTGOMERY
     return ECP_set(ecp,x);
-#elif CURVETYPE==WEIERSTRASS
+#else
     stringy++;
     read_BIG(y,stringy);
     return ECP_set(ecp,x,y);
@@ -83,9 +83,9 @@ int main(int argc, char** argv)
 
     char oct[LINE_LEN];
     octet OCTaux = {0,sizeof(oct),oct};
-#if CURVETYPE==WEIERSTRASS
+#if CURVETYPE!=MONTGOMERY
     ECP ECPaux2;
-    BIG BIGaux2, BIGlazy1, BIGlazy2;
+    BIG BIGaux2;
 #endif
     ECP ecp1;
     const char* ECP1line = "ECP1 = ";
@@ -99,11 +99,13 @@ int main(int argc, char** argv)
     const char* ECPwrongline = "ECPwrong = ";
     ECP ecpinf;
     const char* ECPinfline = "ECPinf = ";
-#if CURVETYPE==WEIERSTRASS
+#if CURVETYPE!=MONTGOMERY
     ECP ecp2;
     const char* ECP2line = "ECP2 = ";
     ECP ecpsum;
     const char* ECPsumline = "ECPsum = ";
+#endif
+#if CURVETYPE==WEIERSTRASS
     ECP ecpneg;
     const char* ECPnegline = "ECPneg = ";
     ECP ecpsub;
@@ -128,8 +130,13 @@ int main(int argc, char** argv)
 
     BIG_rcopy(Mod,Modulus);
 
-    //printf("\n\n");BIG_output(Mod);printf("\n");
-    //printf("\n\nA %d \n\n",CURVE_A);
+#ifdef DEBUG
+    BIG_rcopy(BIGaux1,CURVE_B);
+
+    printf("\nModulus:= 0x");BIG_output(Mod);printf(";\n");
+    printf("A:= %d;\n",CURVE_A);
+    printf("B:= 0x");BIG_output(BIGaux1);printf(";\n\n");
+#endif
 
     if(!ECP_isinf(&inf))
     {
@@ -157,18 +164,15 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-#if CURVETYPE==WEIERSTRASS
+#if CURVETYPE!=MONTGOMERY
             ECP_get(BIGaux1,BIGaux2,&ecp1);
             FP_nres(BIGaux1);
             FP_nres(BIGaux2);
             FP_sqr(BIGaux2,BIGaux2);
             ECP_rhs(BIGaux1,BIGaux1);
-            BIG_sub(BIGlazy1,BIGaux1,Mod); // in case of lazy reduction
-            BIG_sub(BIGlazy2,BIGaux2,Mod); // in case of lazy reduction
-            BIG_norm(BIGlazy1);
-            BIG_norm(BIGlazy2);
-            if ((BIG_comp(BIGaux1,BIGaux2)!=0) && (BIG_comp(BIGlazy1,BIGlazy2)!=0) && 
-            	(BIG_comp(BIGaux1,BIGlazy2)!=0) && (BIG_comp(BIGlazy1,BIGaux2)!=0)) // test if y^2=x^3+Ax+B
+            FP_reduce(BIGaux1); // in case of lazy reduction
+            FP_reduce(BIGaux2); // in case of lazy reduction
+            if ((BIG_comp(BIGaux1,BIGaux2)!=0)) // test if y^2=x^3+Ax+B
             {
                 printf("ERROR computing right hand side of equation ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -182,7 +186,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-#if CURVETYPE==WEIERSTRASS
+#if CURVETYPE!=MONTGOMERY
         if (!strncmp(line,  ECP2line, strlen(ECP2line))) //get second test vector
         {
             len = strlen(ECP2line);
@@ -211,6 +215,8 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+#endif
+#if CURVETYPE==WEIERSTRASS
         if (!strncmp(line,  ECPsubline, strlen(ECPsubline)))
         {
             len = strlen(ECPsubline);
