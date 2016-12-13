@@ -33,7 +33,6 @@
 #define LINE_LEN 1000
 #define MAX_STRING 400
 #define PIN 1234
-//#define DEBUG
 
 void read_BIG(BIG A, char* string)
 {
@@ -84,11 +83,21 @@ int main(int argc, char** argv)
     char oct[LINE_LEN];
     octet OCTaux = {0,sizeof(oct),oct};
 #if CURVETYPE!=MONTGOMERY
-    ECP ECPaux2;
     BIG BIGaux2;
+    ECP ECPaux2;
 #endif
     ECP ecp1;
     const char* ECP1line = "ECP1 = ";
+#if CURVETYPE!=MONTGOMERY
+    ECP ecp2;
+    const char* ECP2line = "ECP2 = ";
+    ECP ecpsum;
+    const char* ECPsumline = "ECPsum = ";
+    ECP ecpneg;
+    const char* ECPnegline = "ECPneg = ";
+    ECP ecpsub;
+    const char* ECPsubline = "ECPsub = ";
+#endif
     ECP ecpdbl;
     const char* ECPdblline = "ECPdbl = ";
     BIG BIGscalar1;
@@ -100,16 +109,6 @@ int main(int argc, char** argv)
     ECP ecpinf;
     const char* ECPinfline = "ECPinf = ";
 #if CURVETYPE!=MONTGOMERY
-    ECP ecp2;
-    const char* ECP2line = "ECP2 = ";
-    ECP ecpsum;
-    const char* ECPsumline = "ECPsum = ";
-#endif
-#if CURVETYPE==WEIERSTRASS
-    ECP ecpneg;
-    const char* ECPnegline = "ECPneg = ";
-    ECP ecpsub;
-    const char* ECPsubline = "ECPsub = ";
     ECP ecppinmul;
     const char* ECPpinmulline = "ECPpinmul = ";
     BIG BIGscalar2;
@@ -127,16 +126,7 @@ int main(int argc, char** argv)
 #endif
 
     ECP_inf(&inf);
-
     BIG_rcopy(Mod,Modulus);
-
-#ifdef DEBUG
-    BIG_rcopy(BIGaux1,CURVE_B);
-
-    printf("\nModulus:= 0x");BIG_output(Mod);printf(";\n");
-    printf("A:= %d;\n",CURVE_A);
-    printf("B:= 0x");BIG_output(BIGaux1);printf(";\n\n");
-#endif
 
     if(!ECP_isinf(&inf))
     {
@@ -172,7 +162,7 @@ int main(int argc, char** argv)
             ECP_rhs(BIGaux1,BIGaux1);
             FP_reduce(BIGaux1); // in case of lazy reduction
             FP_reduce(BIGaux2); // in case of lazy reduction
-            if ((BIG_comp(BIGaux1,BIGaux2)!=0)) // test if y^2=x^3+Ax+B
+            if ((BIG_comp(BIGaux1,BIGaux2)!=0)) // test if y^2=f(x)
             {
                 printf("ERROR computing right hand side of equation ECP, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -215,8 +205,6 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-#endif
-#if CURVETYPE==WEIERSTRASS
         if (!strncmp(line,  ECPsubline, strlen(ECPsubline)))
         {
             len = strlen(ECPsubline);
@@ -330,7 +318,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-#if CURVETYPE==WEIERSTRASS
+#if CURVETYPE!=MONTGOMERY
         if (!strncmp(line,  ECPpinmulline, strlen(ECPpinmulline)))
         {
             len = strlen(ECPpinmulline);
@@ -395,7 +383,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-#if CURVETYPE==WEIERSTRASS
+#if CURVETYPE!=MONTGOMERY
         if (!strncmp(line,  ECPevenline, strlen(ECPevenline)))
         {
             len = strlen(ECPevenline);
