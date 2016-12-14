@@ -1,0 +1,1 @@
+# FP2 ARITHMETICS - CURVE: NIST384, Modulo = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000ffffffff; BIGmax = 2^384

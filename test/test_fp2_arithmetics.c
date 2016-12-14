@@ -58,11 +58,26 @@ void read_DBIG(DBIG A, char* string)
     BIG_dnorm(A);
 }
 
+void read_FP2(FP2 *fp2, char* stringx)
+{
+    char *stringy;
+    BIG x,y;
+
+    stringy = strchr(stringx1,',');
+    stringy[0] = '\0';
+    stringy++;
+
+    read_BIG(x,stringx);
+    read_BIG(y,stringy);
+    
+    FP2_from_BIGs(fp2,x,y);
+}
+
 int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_fp_arithmetics [path to test vector file]\n");
+        printf("usage: ./test_fp2_arithmetics [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -72,16 +87,19 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    BIG M,supp, supp1;
+    BIG M;
 
-    BIG FP_1;
-    const char* FP_1line = "FP_1 = ";
-    BIG FP_2;
-    const char* FP_2line = "FP_2 = ";
-    BIG FPadd;
-    const char* FPaddline = "FPadd = ";
-    BIG FPsub;
-    const char* FPsubline = "FPsub = ";
+    FP2 
+
+    FP2 FP2_1;
+    const char* FP2_1line = "FP2_1 = ";
+    FP2 FP2_2;
+    const char* FP2_2line = "FP2_2 = ";
+    FP2 FP2add;
+    const char* FP2addline = "FP2add = ";
+    BIG FP2sub;
+    const char* FP2subline = "FP2sub = ";
+/*
     BIG FP_1nres;
     const char* FP_1nresline = "FP_1nres = ";
     BIG FP_2nres;
@@ -102,16 +120,17 @@ int main(int argc, char** argv)
     const char* FPinvline = "FPinv = ";
     BIG FPexp;
     const char* FPexpline = "FPexp = ";
+*/
 
 // Set to zero
-    BIG_zero(FP_1);
-    BIG_zero(FP_2);
+    FP2_zero(FP2_1);
+    FP2_zero(FP2_2);
     BIG_rcopy(M,Modulus);
 
 // Testing equal function and set zero function
-    if(BIG_comp(FP_1,FP_2) || !FP_iszilch(FP_1) || !FP_iszilch(FP_2))
+    if(!FP2_equals(FP2_1,FP2_2) || !FP2_iszilch(FP2_1) || !FP2_iszilch(FP2_2))
     {
-        printf("ERROR comparing FPs or setting FP to zero FP\n");
+        printf("ERROR comparing FP2s or setting FP2 to zero FP\n");
         exit(EXIT_FAILURE);
     }
 
@@ -125,21 +144,21 @@ int main(int argc, char** argv)
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
         i++;
-// Read first FP
-        if (!strncmp(line,FP_1line, strlen(FP_1line)))
+// Read first FP2
+        if (!strncmp(line,FP2_1line, strlen(FP2_1line)))
         {
-            len = strlen(FP_1line);
+            len = strlen(FP2_1line);
             linePtr = line + len;
-            read_BIG(FP_1,linePtr);
+            read_FP2(FP2_1,linePtr);
         }
-// Read second FP
-        if (!strncmp(line,FP_2line, strlen(FP_2line)))
+// Read second FP2
+        if (!strncmp(line,FP2_2line, strlen(FP2_2line)))
         {
-            len = strlen(FP_2line);
+            len = strlen(FP2_2line);
             linePtr = line + len;
-            read_BIG(FP_2,linePtr);
+            read_BIG(FP2_2,linePtr);
         }
-// Addition test
+/* Addition test
         if (!strncmp(line,FPaddline, strlen(FPaddline)))
         {
             len = strlen(FPaddline);
@@ -328,7 +347,7 @@ int main(int argc, char** argv)
                 printf("ERROR in squaring FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            /*FP_nres(supp);
+            ------------FP_nres(supp);
             FP_sqrt(supp,supp);
             FP_redc(supp);
             if(BIG_comp(supp,FP_1))
@@ -337,7 +356,7 @@ int main(int argc, char** argv)
                 printf("read ");BIG_output(FP_1);printf("\n\n");
                 printf("ERROR square/square root consistency FP, line %d\n",i);
                 exit(EXIT_FAILURE);
-            }*/
+            }
         }
 // Reducing Modulo
         if (!strncmp(line,FPreduceline, strlen(FPreduceline)))
@@ -466,7 +485,7 @@ int main(int argc, char** argv)
                 printf("ERROR in modular exponentiation, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-        }
+        }*/
     }
 
     printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");

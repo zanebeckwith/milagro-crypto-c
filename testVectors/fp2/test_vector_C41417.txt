@@ -1,0 +1,1 @@
+# FP ARITHMETICS - CURVE: C41417, Modulo = 3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffef; BIGmax = 2^416

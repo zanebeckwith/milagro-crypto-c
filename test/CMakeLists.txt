@@ -31,19 +31,24 @@ do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AM
 do_test (test_octet_consistency "SUCCESS")
 do_test (test_BIG_consistency "SUCCESS")
 
-# Arithmetics tests BIG
+# Arithmetics tests big
 message(STATUS "Run ${AMCL_CHOICE} Arithmetics Tests")
 add_executable (test_BIG_arithmetics test_big_arithmetics.c)
 # Link the executable to the libraries
 target_link_libraries (test_BIG_arithmetics amcl)
 # test
-add_test(NAME test_BIG_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_BIG_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
-set_tests_properties (test_BIG_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+add_test(NAME test_big_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_big_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
+set_tests_properties (test_big_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
-# Arithmetics test FP for pairing-friendly cuves
-add_executable (test_FP_arithmetics test_fp_arithmetics.c)
-add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
-target_link_libraries (test_FP_arithmetics amcl)
+# Arithmetics test fp
+add_executable (test_fp_arithmetics test_fp_arithmetics.c)
+add_test(NAME test_fp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
+target_link_libraries (test_fp_arithmetics amcl)
+
+# Arithmetics test fp2
+add_executable (test_fp2_arithmetics test_fp_arithmetics.c)
+add_test(NAME test_fp2_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp2_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp2/test_vector_${AMCL_CHOICE}.txt)
+target_link_libraries (test_fp2_arithmetics amcl)
 
 # Aritmetics test for ecp 
   add_executable (test_ecp_arithmetics test_ecp_arithmetics.c)
@@ -51,7 +56,7 @@ target_link_libraries (test_FP_arithmetics amcl)
   target_link_libraries (test_ecp_arithmetics amcl)
   set_tests_properties (test_ecp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
-# Aritmetics test for ecp2
+# Aritmetics test for ecp2 for pairing-friendly curves
 if((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_T") OR (AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN646")) 
   add_executable (test_ecp2_arithmetics test_ecp2_arithmetics.c)
   add_test(NAME test_ecp2_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecp2_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/ecp2/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)

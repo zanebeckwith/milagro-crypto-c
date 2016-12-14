@@ -1,0 +1,1 @@
+# FP ARITHMETICS - CURVE: GOLDILOCKS, Modulo = fffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffff; BIGmax = 2^448
