@@ -152,12 +152,6 @@ int main(int argc, char** argv)
             FP_reduce(supp);
             if(BIG_comp(supp,FPadd))
             {
-                printf("comp ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("read ");
-                BIG_output(FPadd);
-                printf("\n\n");
                 printf("ERROR adding two FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -177,15 +171,6 @@ int main(int argc, char** argv)
             BIG_norm(supp1);
             if((BIG_comp(supp,FPsub) != 0) && (BIG_comp(supp1,FPsub) != 0))
             {
-                printf("comp  ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("comp1 ");
-                BIG_output(supp1);
-                printf("\n\n");
-                printf("read  ");
-                BIG_output(FPsub);
-                printf("\n\n");
                 printf("ERROR subtraction between two FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }

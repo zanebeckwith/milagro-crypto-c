@@ -46,7 +46,7 @@ add_test(NAME test_fp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp_arit
 target_link_libraries (test_fp_arithmetics amcl)
 
 # Arithmetics test fp2
-add_executable (test_fp2_arithmetics test_fp_arithmetics.c)
+add_executable (test_fp2_arithmetics test_fp2_arithmetics.c)
 add_test(NAME test_fp2_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp2_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp2/test_vector_${AMCL_CHOICE}.txt)
 target_link_libraries (test_fp2_arithmetics amcl)
 

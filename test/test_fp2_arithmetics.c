@@ -63,7 +63,7 @@ void read_FP2(FP2 *fp2, char* stringx)
     char *stringy;
     BIG x,y;
 
-    stringy = strchr(stringx1,',');
+    stringy = strchr(stringx,',');
     stringy[0] = '\0';
     stringy++;
 
@@ -81,15 +81,14 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    int i = 0, len = 0, j = 0, k = 0;
+    int i = 0, len = 0;
     FILE *fp;
 
     char line[LINE_LEN];
     char * linePtr = NULL;
 
     BIG M;
-
-    FP2 
+    FP2 FP2aux1, FP2aux2;
 
     FP2 FP2_1;
     const char* FP2_1line = "FP2_1 = ";
@@ -97,7 +96,7 @@ int main(int argc, char** argv)
     const char* FP2_2line = "FP2_2 = ";
     FP2 FP2add;
     const char* FP2addline = "FP2add = ";
-    BIG FP2sub;
+    FP2 FP2sub;
     const char* FP2subline = "FP2sub = ";
 /*
     BIG FP_1nres;
@@ -123,12 +122,12 @@ int main(int argc, char** argv)
 */
 
 // Set to zero
-    FP2_zero(FP2_1);
-    FP2_zero(FP2_2);
+    FP2_zero(&FP2_1);
+    FP2_zero(&FP2_2);
     BIG_rcopy(M,Modulus);
 
 // Testing equal function and set zero function
-    if(!FP2_equals(FP2_1,FP2_2) || !FP2_iszilch(FP2_1) || !FP2_iszilch(FP2_2))
+    if(!FP2_equals(&FP2_1,&FP2_2) || !FP2_iszilch(&FP2_1) || !FP2_iszilch(&FP2_2))
     {
         printf("ERROR comparing FP2s or setting FP2 to zero FP\n");
         exit(EXIT_FAILURE);
@@ -149,67 +148,48 @@ int main(int argc, char** argv)
         {
             len = strlen(FP2_1line);
             linePtr = line + len;
-            read_FP2(FP2_1,linePtr);
+            read_FP2(&FP2_1,linePtr);
         }
 // Read second FP2
         if (!strncmp(line,FP2_2line, strlen(FP2_2line)))
         {
             len = strlen(FP2_2line);
             linePtr = line + len;
-            read_BIG(FP2_2,linePtr);
+            read_FP2(&FP2_2,linePtr);
         }
-/* Addition test
-        if (!strncmp(line,FPaddline, strlen(FPaddline)))
+// Addition test
+        if (!strncmp(line,FP2addline, strlen(FP2addline)))
         {
-            len = strlen(FPaddline);
+            len = strlen(FP2addline);
             linePtr = line + len;
-            read_BIG(FPadd,linePtr);
-            BIG_copy(supp1,FP_2);
-            BIG_copy(supp,FP_1);
-            FP_add(supp,supp,supp1);
-            BIG_norm(supp);
-            FP_reduce(supp);
-            if(BIG_comp(supp,FPadd))
+            read_FP2(&FP2add,linePtr);
+            FP2_copy(&FP2aux1,&FP2_1);
+            FP2_copy(&FP2aux2,&FP2_2);
+            FP2_add(&FP2aux1,&FP2aux1,&FP2aux2);
+            FP2_reduce(&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2add))
             {
-                printf("comp ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("read ");
-                BIG_output(FPadd);
-                printf("\n\n");
-                printf("ERROR adding two FP, line %d\n",i);
+                printf("ERROR adding two FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
 // Subtraction test
-        if (!strncmp(line,FPsubline, strlen(FPsubline)))
+        if (!strncmp(line,FP2subline, strlen(FP2subline)))
         {
-            len = strlen(FPsubline);
+            len = strlen(FP2subline);
             linePtr = line + len;
-            read_BIG(FPsub,linePtr);
-            BIG_copy(supp,FP_1);
-            BIG_copy(supp1,FP_2);
-            FP_sub(supp,supp,supp1);
-            FP_redc(supp);
-            FP_nres(supp);
-            BIG_sub(supp1,supp,M); // in case of lazy reduction
-            BIG_norm(supp1);
-            if((BIG_comp(supp,FPsub) != 0) && (BIG_comp(supp1,FPsub) != 0))
+            read_FP2(&FP2sub,linePtr);
+            FP2_copy(&FP2aux1,&FP2_1);
+            FP2_copy(&FP2aux2,&FP2_2);
+            FP2_sub(&FP2aux1,&FP2aux1,&FP2aux2);
+            FP2_reduce(&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2sub) != 0)
             {
-                printf("comp  ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("comp1 ");
-                BIG_output(supp1);
-                printf("\n\n");
-                printf("read  ");
-                BIG_output(FPsub);
-                printf("\n\n");
-                printf("ERROR subtraction between two FP, line %d\n",i);
+                printf("ERROR subtraction between two FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
-// Reduce first FP
+/* Reduce first FP
         if (!strncmp(line,FP_1nresline, strlen(FP_1nresline)))
         {
             len = strlen(FP_1nresline);
