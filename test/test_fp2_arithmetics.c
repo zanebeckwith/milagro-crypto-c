@@ -69,7 +69,7 @@ void read_FP2(FP2 *fp2, char* stringx)
 
     read_BIG(x,stringx);
     read_BIG(y,stringy);
-    
+
     FP2_from_BIGs(fp2,x,y);
 }
 
@@ -141,11 +141,11 @@ int main(int argc, char** argv)
     FP2_one(&FP2aux2);
 
 // Testing equal function and set one function
-if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2aux2))
+    if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2aux2))
     {
         printf("ERROR comparing FP2s or setting FP2 to unity FP\n");
         exit(EXIT_FAILURE);
-    }   
+    }
 
 
     fp = fopen(argv[1], "r");
@@ -277,8 +277,6 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2conj))
             {
-                FP2_output(&FP2aux1);printf("\n\n");
-                FP2_output(&FP2conj);printf("\n\n");
                 printf("ERROR computing conjugate of FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -315,8 +313,6 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_reduce(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2pow))
             {
-                FP2_output(&FP2aux1);printf("\n\n");
-                FP2_output(&FP2pow);printf("\n\n");
                 printf("ERROR in raising FP by power BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -356,9 +352,6 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_neg(&FP2aux2,&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2_1) && !FP2_equals(&FP2aux2,&FP2_1))
             {
-                FP2_output(&FP2aux2);printf("\n\n");
-                FP2_output(&FP2aux1);printf("\n\n");
-                FP2_output(&FP2_1);printf("\n\n");
                 printf("ERROR square/square root consistency FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -378,7 +371,7 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
                 exit(EXIT_FAILURE);
             }
         }
-// Inverse 
+// Inverse
         if (!strncmp(line,FP2invline, strlen(FP2invline)))
         {
             len = strlen(FP2invline);
