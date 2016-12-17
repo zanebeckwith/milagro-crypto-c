@@ -102,14 +102,26 @@ int main(int argc, char** argv)
     const char* FP2subline = "FP2sub = ";
     FP2 FP2conj;
     const char* FP2conjline = "FP2conj = ";
-    BIG FPmul;
-    const char* FPmulline = "FPmul = ";
+    BIG BIGsc;
+    const char* BIGscline = "BIGsc = ";
     FP2 FP2pmul;
     const char* FP2pmulline = "FP2pmul = ";
     FP2 FP2imul;
     const char* FP2imulline = "FP2imul = ";
     FP2 FP2sqr;
     const char* FP2sqrline = "FP2sqr = ";
+    FP2 FP2mul;
+    const char* FP2mulline = "FP2mul = ";
+    FP2 FP2inv;
+    const char* FP2invline = "FP2inv = ";
+    FP2 FP2div2;
+    const char* FP2div2line = "FP2div2 = ";
+    FP2 FP2_mulip;
+    const char* FP2_mulipline = "FP2_mulip = ";
+    FP2 FP2_divip;
+    const char* FP2_divipline = "FP2_divip = ";
+    FP2 FP2pow;
+    const char* FP2powline = "FP2pow = ";
 
     BIG_rcopy(M,Modulus);
 
@@ -213,6 +225,7 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_copy(&FP2aux2,&FP2_2);
             FP2_add(&FP2aux1,&FP2aux1,&FP2aux2);
             FP2_reduce(&FP2aux1);
+            FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2add))
             {
                 printf("ERROR adding two FP2, line %d\n",i);
@@ -228,6 +241,7 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_copy(&FP2aux1,&FP2_1);
             FP2_neg(&FP2aux1,&FP2aux1);
             FP2_reduce(&FP2aux1);
+            FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2neg))
             {
                 printf("ERROR in computing negative of FP2, line %d\n",i);
@@ -244,6 +258,7 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_copy(&FP2aux2,&FP2_2);
             FP2_sub(&FP2aux1,&FP2aux1,&FP2aux2);
             FP2_reduce(&FP2aux1);
+            FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2sub) != 0)
             {
                 printf("ERROR subtraction between two FP2, line %d\n",i);
@@ -259,6 +274,7 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_copy(&FP2aux1,&FP2_1);
             FP2_conj(&FP2aux1,&FP2aux1);
             FP2_reduce(&FP2aux1);
+            FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2conj))
             {
                 FP2_output(&FP2aux1);printf("\n\n");
@@ -268,26 +284,40 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             }
         }
 // Read multiplicator
-        if (!strncmp(line,FPmulline, strlen(FPmulline)))
+        if (!strncmp(line,BIGscline, strlen(BIGscline)))
         {
-            len = strlen(FPmulline);
+            len = strlen(BIGscline);
             linePtr = line + len;
-            read_BIG(FPmul,linePtr);
+            read_BIG(BIGsc,linePtr);
         }
-// Multiplication by FPmul
+// Multiplication by BIGsc
         if (!strncmp(line,FP2pmulline, strlen(FP2pmulline)))
         {
             len = strlen(FP2pmulline);
             linePtr = line + len;
             read_FP2(&FP2pmul,linePtr);
-            FP2_pmul(&FP2aux1,&FP2_1,FPmul);
+            FP2_pmul(&FP2aux1,&FP2_1,BIGsc);
             FP_nres(FP2aux1.a);
             FP_nres(FP2aux1.b);
             if(!FP2_equals(&FP2aux1,&FP2pmul))
             {
-                FP2_output(&FP2aux1);printf("\n\n");
-                FP2_output(&FP2pmul);printf("\n\n");
                 printf("ERROR in multiplication by BIG, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Raise FP2 by power BIGsc
+        if (!strncmp(line,FP2powline, strlen(FP2powline)))
+        {
+            len = strlen(FP2powline);
+            linePtr = line + len;
+            read_FP2(&FP2pow,linePtr);
+            FP2_pow(&FP2aux1,&FP2_1,BIGsc);
+            FP2_reduce(&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2pow))
+            {
+                FP2_output(&FP2aux1);printf("\n\n");
+                FP2_output(&FP2pow);printf("\n\n");
+                printf("ERROR in raising FP by power BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -300,10 +330,9 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_imul(&FP2aux1,&FP2_1,j);
             j++;
             FP2_reduce(&FP2aux1);
+            FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2imul))
             {
-                FP2_output(&FP2aux1);printf("\n\n");
-                FP2_output(&FP2imul);printf("\n\n");
                 printf("ERROR in multiplication by small integer, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -317,126 +346,93 @@ if(!FP2_equals(&FP2aux1,&FP2aux2) || !FP2_isunity(&FP2aux1) || !FP2_isunity(&FP2
             FP2_copy(&FP2aux1,&FP2_1);
             FP2_sqr(&FP2aux1,&FP2aux1);
             FP2_reduce(&FP2aux1);
+            FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2sqr))
             {
                 printf("ERROR in squaring FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            /*FP_nres(supp);
-            FP_sqrt(supp,supp);
-            FP_redc(supp);
-            if(BIG_comp(supp,FP_1))
+            FP2_sqrt(&FP2aux1,&FP2aux1);
+            FP2_neg(&FP2aux2,&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2_1) && !FP2_equals(&FP2aux2,&FP2_1))
             {
-                printf("supp ");BIG_output(supp);printf("\n\n");
-                printf("read ");BIG_output(FP_1);printf("\n\n");
-                printf("ERROR square/square root consistency FP, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }*/
-        }
-/* Reducing Modulo
-        if (!strncmp(line,FPreduceline, strlen(FPreduceline)))
-        {
-            len = strlen(FPreduceline);
-            linePtr = line + len;
-            read_BIG(FPreduce,linePtr);
-            BIG_copy(supp,FP_1);
-            FP_reduce(supp);
-            if(BIG_comp(supp,FPreduce))
-            {
-                printf("comp ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("read ");
-                BIG_output(FPreduce);
-                printf("\n\n");
-                printf("ERROR in reducing FP, line %d\n",i);
+                FP2_output(&FP2aux2);printf("\n\n");
+                FP2_output(&FP2aux1);printf("\n\n");
+                FP2_output(&FP2_1);printf("\n\n");
+                printf("ERROR square/square root consistency FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
-// Division by 2
-        if (!strncmp(line,FPdiv2line, strlen(FPdiv2line)))
+// Multiplication between two FP2s
+        if (!strncmp(line,FP2mulline, strlen(FP2mulline)))
         {
-            len = strlen(FPdiv2line);
+            len = strlen(FP2mulline);
             linePtr = line + len;
-            read_BIG(FPdiv2,linePtr);
-            BIG_copy(supp,FP_1);
-            FP_redc(supp);
-            FP_nres(supp);
-            FP_div2(supp,supp);
-            if(BIG_comp(supp,FPdiv2))
+            read_FP2(&FP2mul,linePtr);
+            FP2_mul(&FP2aux1,&FP2_1,&FP2_2);
+            FP2_reduce(&FP2aux1);
+            FP2_norm(&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2mul))
             {
-                printf("comp ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("read ");
-                BIG_output(FPdiv2);
-                printf("\n\n");
-                printf("ERROR in division by 2, line %d\n",i);
+                printf("ERROR in multiplication between two FPs, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
-// Inverse Modulo and FP_one
-        if (!strncmp(line,FPinvline, strlen(FPinvline)))
+// Inverse 
+        if (!strncmp(line,FP2invline, strlen(FP2invline)))
         {
-            len = strlen(FPinvline);
+            len = strlen(FP2invline);
             linePtr = line + len;
-            read_BIG(FPinv,linePtr);
-            BIG_copy(supp,FP_1);
-            BIG_copy(supp1,FP_1);
-            FP_nres(supp);
-            FP_inv(supp,supp);
-            FP_redc(supp);
-            if(BIG_comp(supp,FPinv))
+            read_FP2(&FP2inv,linePtr);
+            FP2_copy(&FP2aux1,&FP2_1);
+            FP2_inv(&FP2aux1,&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2inv))
             {
-                printf("comp ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("read ");
-                BIG_output(FPinv);
-                printf("\n\n");
-                printf("ERROR computing inverse modulo, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-            FP_mul(supp,supp,supp1);
-            FP_nres(supp);
-            FP_reduce(supp);
-            FP_one(supp1);
-            FP_redc(supp1);
-            if(BIG_comp(supp,supp1))
-            {
-                printf("comp1 ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("comp2 ");
-                BIG_output(supp1);
-                printf("\n\n");
-                printf("ERROR multipling FP and its inverse, line %d\n",i);
+                printf("ERROR in computing inverse of FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
-// modular exponentiation
-        if (!strncmp(line,FPexpline, strlen(FPexpline)))
+// Divide an FP2 by 2
+        if (!strncmp(line,FP2div2line, strlen(FP2div2line)))
         {
-            len = strlen(FPexpline);
+            len = strlen(FP2div2line);
             linePtr = line + len;
-            read_BIG(FPexp,linePtr);
-            BIG_copy(supp,FP_1);
-            BIG_copy(supp1,FP_2);
-            FP_nres(supp);
-            FP_pow(supp,supp,supp1);
-            FP_redc(supp);
-            if(BIG_comp(supp,FPexp))
+            read_FP2(&FP2div2,linePtr);
+            FP2_div2(&FP2aux1,&FP2_1);
+            if(!FP2_equals(&FP2aux1,&FP2div2))
             {
-                printf("supp ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("read ");
-                BIG_output(FPexp);
-                printf("\n\n");
-                printf("ERROR in modular exponentiation, line %d\n",i);
+                printf("ERROR in computing division FP2 by 2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-        }*/
+        }
+// Multiply an FP2 by (1+sqrt(-1))
+        if (!strncmp(line,FP2_mulipline, strlen(FP2_mulipline)))
+        {
+            len = strlen(FP2_mulipline);
+            linePtr = line + len;
+            read_FP2(&FP2_mulip,linePtr);
+            FP2_copy(&FP2aux1,&FP2_1);
+            FP2_mul_ip(&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2_mulip))
+            {
+                printf("ERROR in computing multiplication of FP2 by (1+sqrt(-1)), line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Divide an FP2 by (1+sqrt(-1))
+        if (!strncmp(line,FP2_divipline, strlen(FP2_divipline)))
+        {
+            len = strlen(FP2_divipline);
+            linePtr = line + len;
+            read_FP2(&FP2_divip,linePtr);
+            FP2_copy(&FP2aux1,&FP2_1);
+            FP2_div_ip(&FP2aux1);
+            if(!FP2_equals(&FP2aux1,&FP2_divip))
+            {
+                printf("ERROR in computing division of FP2 by (1+sqrt(-1)), line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
     }
 
     printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");

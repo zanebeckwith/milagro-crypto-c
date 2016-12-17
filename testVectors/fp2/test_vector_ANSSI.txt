@@ -1,1 +1,0 @@
-# FP ARITHMETICS - CURVE: ANSSI, Modulo = f1fd178c0b3ad58f10126de8ce42435b3961adbcabc8ca6de8fcf353d86e9c03; BIGmax = 2^256

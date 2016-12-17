@@ -1,1 +1,0 @@
-# FP ARITHMETICS - CURVE: HIFIVE, Modulo = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd; BIGmax = 2^336

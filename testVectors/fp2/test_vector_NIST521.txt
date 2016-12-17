@@ -1,1 +1,0 @@
-# FP2 ARITHMETICS - CURVE: NIST521, Modulo = 01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff; BIGmax = 2^521

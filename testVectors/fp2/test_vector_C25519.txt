@@ -1,1 +1,0 @@
-# FP ARITHMETICS - CURVE: C25519, Modulo = 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed; BIGmax = 2^256
