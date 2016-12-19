@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_FP_arithmetics [path to test vector file]\n");
+        printf("usage: ./test_fp_arithmetics [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -103,15 +103,15 @@ int main(int argc, char** argv)
     BIG FPexp;
     const char* FPexpline = "FPexp = ";
 
-    /* Set to zero */
+// Set to zero
     BIG_zero(FP_1);
     BIG_zero(FP_2);
     BIG_rcopy(M,Modulus);
 
-    /* Testing equal function and set zero function */
-    if(BIG_comp(FP_1,FP_2) && !FP_iszilch(FP_1) && !FP_iszilch(FP_2))
+// Testing equal function and set zero function
+    if(BIG_comp(FP_1,FP_2) || !FP_iszilch(FP_1) || !FP_iszilch(FP_2))
     {
-        printf("ERROR comparing or setting zero FP\n");
+        printf("ERROR comparing FPs or setting FP to zero FP\n");
         exit(EXIT_FAILURE);
     }
 
@@ -152,12 +152,6 @@ int main(int argc, char** argv)
             FP_reduce(supp);
             if(BIG_comp(supp,FPadd))
             {
-                printf("comp ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("read ");
-                BIG_output(FPadd);
-                printf("\n\n");
                 printf("ERROR adding two FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -177,15 +171,6 @@ int main(int argc, char** argv)
             BIG_norm(supp1);
             if((BIG_comp(supp,FPsub) != 0) && (BIG_comp(supp1,FPsub) != 0))
             {
-                printf("comp  ");
-                BIG_output(supp);
-                printf("\n\n");
-                printf("comp1 ");
-                BIG_output(supp1);
-                printf("\n\n");
-                printf("read  ");
-                BIG_output(FPsub);
-                printf("\n\n");
                 printf("ERROR subtraction between two FP, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -468,6 +453,7 @@ int main(int argc, char** argv)
             }
         }
     }
+    fclose(fp);
 
     printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");
     exit(EXIT_SUCCESS);
