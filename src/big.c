@@ -889,7 +889,7 @@ chunk BIG_split(BIG t,BIG b,DBIG d,int n)
 /* you gotta keep the sign of carry! Look - no branching! */
 /* Note that sign bit is needed to disambiguate between +ve and -ve values */
 /* normalise BIG - force all digits < 2^BASEBITS */
-int BIG_norm(BIG a)
+chunk BIG_norm(BIG a)
 {
     int i;
     chunk d,carry=0;
