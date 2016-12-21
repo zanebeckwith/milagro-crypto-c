@@ -187,7 +187,7 @@ int main(int argc, char** argv)
     char octbuf[LINE_LEN];
     octet oct = {0,sizeof(octbuf),octbuf};
     const char* OCTline = "OCT = ";
-    const char* OCTstringline = "OCTstring = ";
+    //const char* OCTstringline = "OCTstring = ";
 
     fgetpos(stdout, &pos);
     fd = dup(fileno(stdout));
@@ -298,9 +298,9 @@ int main(int argc, char** argv)
             read_OCT(&oct,linePtr,strlen(linePtr));
             printf("%s",OCTline);
             OCT_output(&oct);
-            printf("%s",OCTstringline);
-            OCT_output_string(&oct);
-            printf("\n");
+            //printf("%s",OCTstringline);
+            //OCT_output_string(&oct);
+            //printf("\n");
         }
     }
 
@@ -310,10 +310,20 @@ int main(int argc, char** argv)
     clearerr(stdout);
     fsetpos(stdout, &pos);        /* for C9X */
 
-    writtenFile = fopen("stdout.out","r");
+    writtenFile = fopen("./test/stdout.out","r");
     if (writtenFile == NULL)
     {
         printf("ERROR opening output file\n");
+        exit(EXIT_FAILURE);
+    }
+    fclose(testVectFile);
+
+    // Check the equality of the output with the test vector file
+
+    testVectFile = fopen(argv[1],"r");
+    if (testVectFile == NULL)
+    {
+        printf("ERROR opening test vector file\n");
         exit(EXIT_FAILURE);
     }
 
