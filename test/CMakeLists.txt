@@ -2,7 +2,7 @@
 
 # Add the binary tree directory to the search path for linking and include files
 link_directories (${PROJECT_BINARY_DIR}/src)
-include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
+include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR}/include )
 
 #define macro to simplify adding tests
 macro (do_test arg result)
