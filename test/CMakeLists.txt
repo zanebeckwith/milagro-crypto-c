@@ -66,6 +66,12 @@ if((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BLS383") OR (AMCL_C
   set_tests_properties (test_ecp2_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BLS383") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_T") OR (AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN646"))
 
+# Aritmetics test output functions (used only for debug) 
+add_executable (test_output_functions test_output_functions.c)
+add_test(NAME test_output_functions COMMAND ${TARGET_SYSTEM_EMULATOR} test_output_functions ${PROJECT_SOURCE_DIR}/testVectors/output/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
+target_link_libraries (test_output_functions amcl)
+set_tests_properties (test_output_functions PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+
 # curve independent tests
 add_executable (test_hash test_hash.c)
 add_executable (test_gcm_encrypt test_gcm_encrypt.c)
@@ -402,4 +408,3 @@ if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVE
   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
-
