@@ -1048,7 +1048,6 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
     while (k>0)
     {
         BIG_dshr(m,1);
-// constant time...
         BIG_dsub(r,b,m);
         BIG_dnorm(r);
         BIG_dcmove(b,r,1-((r[DNLEN-1]>>(CHUNK-1))&1));
@@ -1099,14 +1098,6 @@ void BIG_ddiv(BIG a,DBIG b,BIG c)
         BIG_add(r,a,e);
         BIG_norm(r);
         BIG_cmove(a,r,d);
-        /*
-        		if (BIG_dcomp(b,m)>=0)
-        		{
-        			BIG_add(a,a,e);
-        			BIG_norm(a);
-        			BIG_dsub(b,b,m);
-        			BIG_dnorm(b);
-        		} */
         k--;
     }
 }
