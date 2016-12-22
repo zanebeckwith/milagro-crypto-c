@@ -62,15 +62,26 @@ void read_DBIG(DBIG A, char* string)
     BIG_dnorm(A);
 }
 
+#if (CHOICE >= BN_CURVES)
 void read_FP2(FP2 *fp2, char* stringx)
 {
     char *stringy, *end;
     BIG x,y;
     stringx++;
     stringy = strchr(stringx,',');
+    if (stringy == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     stringy[0] = '\0';
     stringy++;
     end = strchr(stringy,']');
+    if (end == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     end[0] = '\0';
 
     read_BIG(x,stringx);
@@ -78,21 +89,35 @@ void read_FP2(FP2 *fp2, char* stringx)
 
     FP2_from_FPs(fp2,x,y);
 }
+#endif
 
 int read_ECP(ECP *ecp, char* string)
 {
     BIG x;
+    char *end;
 #if CURVETYPE!=MONTGOMERY
     BIG y;
-#endif
-    char *stringy, *end;
+    char *stringy;
     string++;
     stringy = strchr(string,',');
+    if (stringy == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     stringy[0] = '\0';
 	stringy++;
     end = strchr(stringy,')');
+#else
+    string++;
+    end = strchr(string,')');
+#endif
+    if (end == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     end[0] = '\0';
-
     read_BIG(x,string);
 #if CURVETYPE==MONTGOMERY
     return ECP_set(ecp,x);
@@ -111,15 +136,35 @@ int read_ECP2(ECP2 *ecp2, char* stringx1)
 
     stringx1 += 2;
     stringx2 = strchr(stringx1,',');
+    if (stringx2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     stringx2[0] = '\0';
     stringx2 ++;
     stringy1 = strchr(stringx2,']');
+    if (stringy1 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     stringy1[0] = '\0';
     stringy1 += 3;
     stringy2 = strchr(stringy1,',');
+    if (stringy2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     stringy2[0] = '\0';
     stringy2++;
     end = strchr(stringy2,']');
+    if (end == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
     end[0] = '\0';
 
     read_BIG(x1,stringx1);
@@ -136,17 +181,17 @@ int read_ECP2(ECP2 *ecp2, char* stringx1)
 
 void read_OCT(octet *oct, char* string, int len)
 {
-	char buff[len];
-	buff[len] = '\0';
+	char buff[len-1];
+	buff[len-1] = '\0';
 	strncpy(buff,string,len-1);
 	OCT_fromHex(oct,buff);
 }
 
 int main(int argc, char** argv)
 {
-    if (argc != 2)
+    if (argc != 3)
     {
-        printf("usage: ./test_ecp2_arithmetics [path to test vector file]\n");
+        printf("usage: ./test_ecp2_arithmetics [path to test vector file] [path to output directory]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -189,19 +234,19 @@ int main(int argc, char** argv)
     const char* OCTline = "OCT = ";
     //const char* OCTstringline = "OCTstring = ";
 
-    fgetpos(stdout, &pos);
-    fd = dup(fileno(stdout));
-
-    if(freopen("./test/stdout.out", "w", stdout) == NULL)
-    {
-    	printf("ERROR redirecting stdout\n");
-        exit(EXIT_FAILURE);
-    }
-    
     testVectFile = fopen(argv[1],"r");
     if (testVectFile == NULL)
     {
         printf("ERROR opening test vector file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fgetpos(stdout, &pos);
+    fd = dup(fileno(stdout));
+
+    if(freopen(argv[2], "w", stdout) == NULL)
+    {
+    	printf("ERROR redirecting stdout\n");
         exit(EXIT_FAILURE);
     }
 
@@ -242,6 +287,7 @@ int main(int argc, char** argv)
             FP_rawoutput(fp);
             printf("\n\n");
         }
+#if (CHOICE >= BN_CURVES)
         if (!strncmp(line,  FP2line, strlen(FP2line)))
         {
             len = strlen(FP2line);
@@ -256,6 +302,7 @@ int main(int argc, char** argv)
             FP2_rawoutput(&fp2);
             printf("\n\n");
         }
+#endif
         if (!strncmp(line,  ECPline, strlen(ECPline)))
         {
             len = strlen(ECPline);
@@ -267,13 +314,18 @@ int main(int argc, char** argv)
             ECP_outputxyz(&ecp);
             BIG_copy(bigaux,ecp.x);
             BIG_inc(bigaux,100);
+#if CURVETYPE!=MONTGOMERY
             ECP_set(&ecpinf,bigaux,ecpinf.y);
+#else
+            ECP_set(&ecpinf,bigaux);
+#endif
             printf("%s",ECPinfline);
             ECP_output(&ecpinf);
             printf("%s",ECPinfxyzline);
             ECP_outputxyz(&ecpinf);
             printf("\n");
         }
+#if (CHOICE >= BN_CURVES)
         if (!strncmp(line,  ECP2line, strlen(ECP2line)))
         {
             len = strlen(ECP2line);
@@ -291,6 +343,7 @@ int main(int argc, char** argv)
             ECP2_outputxyz(&ecp2inf);
             printf("\n");
         }
+#endif
         if (!strncmp(line,  OCTline, strlen(OCTline)))
         {
             len = strlen(OCTline);
@@ -304,13 +357,14 @@ int main(int argc, char** argv)
         }
     }
 
+    // Restore stdout
     fflush(stdout);
     dup2(fd, fileno(stdout));
     close(fd);
     clearerr(stdout);
     fsetpos(stdout, &pos);        /* for C9X */
 
-    writtenFile = fopen("./test/stdout.out","r");
+    writtenFile = fopen(argv[2],"r");
     if (writtenFile == NULL)
     {
         printf("ERROR opening output file\n");
@@ -339,8 +393,9 @@ int main(int argc, char** argv)
         printf("ERROR output does not match the expected one \n");
         exit(EXIT_FAILURE);
     }
-
+    fclose(writtenFile);
     fclose(testVectFile);
+
     printf("SUCCESS TEST OUTPUT FUNCTIONS PASSED\n");
     exit(EXIT_SUCCESS);
 }

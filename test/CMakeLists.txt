@@ -66,11 +66,13 @@ if((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BLS383") OR (AMCL_C
   set_tests_properties (test_ecp2_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif((AMCL_CHOICE STREQUAL "BLS455") OR (AMCL_CHOICE STREQUAL "BLS383") OR (AMCL_CHOICE STREQUAL "BN254_CX") OR (AMCL_CHOICE STREQUAL "BN254_T2") OR (AMCL_CHOICE STREQUAL "BN254_T") OR (AMCL_CHOICE STREQUAL "BN454") OR (AMCL_CHOICE STREQUAL "BN646"))
 
-# Aritmetics test output functions (used only for debug) 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+# Aritmetics test output functions (used only for debug) - Linux specific code
 add_executable (test_output_functions test_output_functions.c)
-add_test(NAME test_output_functions COMMAND ${TARGET_SYSTEM_EMULATOR} test_output_functions ${PROJECT_SOURCE_DIR}/testVectors/output/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
+add_test(NAME test_output_functions COMMAND ${TARGET_SYSTEM_EMULATOR} test_output_functions ${PROJECT_SOURCE_DIR}/testVectors/output/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}_${AMCL_CHUNK}.txt ${PROJECT_BINARY_DIR}/Testing/Temporary/stdout.out)
 target_link_libraries (test_output_functions amcl)
 set_tests_properties (test_output_functions PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # curve independent tests
 add_executable (test_hash test_hash.c)
