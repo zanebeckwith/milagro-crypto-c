@@ -23,6 +23,9 @@ option (BUILD_WCC "Build WCC" ON)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
 option (USE_PATENTS "Use patents for G1 and G2 multiplication" OFF)
 option (USE_ANONYMOUS "Anonymous authentication for M-Pin Full" OFF)
+option (DEBUG_REDUCE "Print debug message for field reduction" OFF)
+option (DEBUG_NORM "Detect digit overflow" OFF)
+option (GET_STATS "Debug statistics" OFF)
 
 # Allow the developer to select if Dynamic or Static libraries are built
 # Set the default LIB_TYPE variable to STATIC
@@ -120,6 +123,18 @@ configure_file (
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/amcl.h"
   "${PROJECT_BINARY_DIR}/include/amcl.h"
+  )
+
+# Configure PIN
+set(AMCL_MAXPIN 10000 CACHE STRING "Maximum PIN value. See ./include/mpin.h for explanation")
+set(AMCL_PBLEN 14 CACHE STRING "Maximum PIN value in bits. See ./include/mpin.h for explanation")
+message(STATUS "AMCL_MAXPIN=${AMCL_MAXPIN}")
+
+# configure mpin header file to pass CMake settings
+# to the source code
+configure_file (
+  "${PROJECT_SOURCE_DIR}/include/mpin.h"
+  "${PROJECT_BINARY_DIR}/include/mpin.h"
   )
 
 # Build libx509

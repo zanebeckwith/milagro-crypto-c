@@ -38,27 +38,25 @@ under the License.
 
 #define PGS MODBYTES  /**< MPIN Group Size */
 #define PFS MODBYTES  /**< MPIN Field Size */
-#define PAS 16  /**< MPIN Symmetric Key Size */
+#define PAS 16        /**< MPIN Symmetric Key Size */
 
-#define MPIN_OK                     0  /**< Function completed without error */
-/*#define MPIN_DOMAIN_ERROR          -11
-#define MPIN_INVALID_PUBLIC_KEY    -12
-#define MPIN_ERROR                 -13*/
-#define MPIN_INVALID_POINT         -14	/**< Point is NOT on the curve */
-/*#define MPIN_DOMAIN_NOT_FOUND      -15
-#define MPIN_OUT_OF_MEMORY         -16
-#define MPIN_DIV_BY_ZERO           -17
-#define MPIN_WRONG_ORDER           -18*/
-#define MPIN_BAD_PIN               -19  /**< Bad PIN number entered */
+#define MPIN_OK             0   /**< Function completed without error */
+#define MPIN_INVALID_POINT  -14	/**< Point is NOT on the curve */
+#define MPIN_BAD_PIN        -19 /**< Bad PIN number entered */
 
 
 /* Configure your PIN here */
 
-#define MAXPIN 10000 /**< max PIN */
-#define PBLEN 14   /**< max length of PIN in bits */
+#ifdef CMAKE
+#define MAXPIN @AMCL_MAXPIN@ /**< max PIN */
+#define PBLEN @AMCL_PBLEN@   /**< max length of PIN in bits */
+#else
+#define MAXPIN 10000         /**< max PIN */
+#define PBLEN 14             /**< max length of PIN in bits */
+#endif
 
-#define TIME_SLOT_MINUTES 1440 /**< Time Slot = 1 day */
-#define HASH_TYPE_MPIN SHA256 /**< Choose Hash function */
+#define TIME_SLOT_MINUTES 1440  /**< Time Slot = 1 day */
+#define HASH_TYPE_MPIN SHA256   /**< Choose Hash function */
 
 #define MESSAGE_SIZE 256  /**< Signature message size  */
 #define M_SIZE (MESSAGE_SIZE+2*PFS+1)   /**< Signature message size and G1 size */

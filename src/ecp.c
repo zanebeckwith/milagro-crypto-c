@@ -53,6 +53,7 @@ static void ECP_cswap(ECP *P,ECP *Q,int d)
 #endif
 }
 
+#if CURVETYPE!=MONTGOMERY
 /* Conditional move Q to P dependant on d */
 static void ECP_cmove(ECP *P,ECP *Q,int d)
 {
@@ -74,6 +75,7 @@ static int teq(sign32 b,sign32 c)
     x-=1;  // if x=0, x now -1
     return (int)((x>>31)&1);
 }
+#endif // CURVETYPE!=MONTGOMERY
 
 #if CURVETYPE!=MONTGOMERY
 /* Constant time select from pre-computed table */
