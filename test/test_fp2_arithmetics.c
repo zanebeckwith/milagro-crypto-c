@@ -46,18 +46,6 @@ void read_BIG(BIG A, char* string)
     BIG_norm(A);
 }
 
-void read_DBIG(DBIG A, char* string)
-{
-    int len;
-    char support[LINE_LEN];
-    BIG_dzero(A);
-    len = strlen(string)+1;
-    amcl_hex2bin(string,support,len);
-    len = (len-1)/2;
-    BIG_dfromBytesLen(A,support,len);
-    BIG_dnorm(A);
-}
-
 void read_FP2(FP2 *fp2, char* stringx)
 {
     char *stringy;
