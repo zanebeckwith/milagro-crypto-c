@@ -106,7 +106,7 @@ int read_ECP(ECP *ecp, char* string)
         exit(EXIT_FAILURE);
     }
     stringy[0] = '\0';
-	stringy++;
+    stringy++;
     end = strchr(stringy,')');
 #else
     string++;
@@ -181,10 +181,10 @@ int read_ECP2(ECP2 *ecp2, char* stringx1)
 
 void read_OCT(octet *oct, char* string, int len)
 {
-	char buff[len-1];
-	buff[len-1] = '\0';
-	strncpy(buff,string,len-1);
-	OCT_fromHex(oct,buff);
+    char buff[len-1];
+    buff[len-1] = '\0';
+    strncpy(buff,string,len-1);
+    OCT_fromHex(oct,buff);
 }
 
 int main(int argc, char** argv)
@@ -202,28 +202,28 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-	BIG big, bigaux;
+    BIG big, bigaux;
     const char* BIGline = "BIG = ";
     const char* BIGrawline = "BIGraw = ";
-	DBIG dbig;
+    DBIG dbig;
     const char* DBIGline = "DBIG = ";
-	BIG fp;
+    BIG fp;
     const char* FPline = "FP = ";
     const char* FPrawline = "FPraw = ";
 #if (CHOICE >= BN_CURVES)
-	FP2 fp2, fp2aux;
+    FP2 fp2, fp2aux;
     const char* FP2line = "FP2 = ";
     const char* FP2rawline = "FP2raw = ";
 #endif
-	ECP ecp;
-	ECP ecpinf;	
+    ECP ecp;
+    ECP ecpinf;
     const char* ECPline = "ECP = ";
     const char* ECPxyzline = "ECPxyz = ";
     const char* ECPinfline = "ECPinf = ";
     const char* ECPinfxyzline = "ECPinfxyz = ";
 #if (CHOICE >= BN_CURVES)
-	ECP2 ecp2;
-	ECP2 ecp2inf;
+    ECP2 ecp2;
+    ECP2 ecp2inf;
     const char* ECP2line = "ECP2 = ";
     const char* ECP2xyzline = "ECP2xyz = ";
     const char* ECP2infline = "ECP2inf = ";
@@ -246,7 +246,7 @@ int main(int argc, char** argv)
 
     if(freopen(argv[2], "w", stdout) == NULL)
     {
-    	printf("ERROR redirecting stdout\n");
+        printf("ERROR redirecting stdout\n");
         exit(EXIT_FAILURE);
     }
 
@@ -384,12 +384,14 @@ int main(int argc, char** argv)
     ch1 = getc(testVectFile);
     ch2 = getc(writtenFile);
 
-    while ((ch1 != EOF) && (ch2 != EOF) && (ch1 == ch2)) {
+    while ((ch1 != EOF) && (ch2 != EOF) && (ch1 == ch2))
+    {
         ch1 = getc(testVectFile);
         ch2 = getc(writtenFile);
     }
 
-    if (ch1 != ch2){
+    if (ch1 != ch2)
+    {
         printf("ERROR output does not match the expected one \n");
         exit(EXIT_FAILURE);
     }
