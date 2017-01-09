@@ -1,28 +1,21 @@
-/**
- * @file ff.c
- * @author Mike Scott
- * @date 19th May 2015
- * @brief AMCL basic functions for Large Finite Field support
- *
- * LICENSE
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 /* AMCL basic functions for Large Finite Field support */
 
@@ -75,7 +68,7 @@ static int invmod256(int a)
     return U;
 }
 
-/* Set BIG to inverse mod 2^256. This is very fast! */
+/* a=1/a mod 2^BIGBITS. This is very fast! */
 void BIG_invmod2m(BIG a)
 {
     int i;
@@ -125,7 +118,7 @@ void FF_rcopy(BIG x[],const BIG y[],int n)
 }
 */
 
-/* Copy one FF element of given length to another */
+/* x=y */
 void FF_copy(BIG x[],BIG y[],int n)
 {
     int i;
@@ -163,7 +156,7 @@ static void FF_sducopy(BIG x[],BIG y[],int n)
         BIG_copy(x[i],y[n+i]);
 }
 
-/* Set FF element of given size to zero */
+/* set to zero */
 void FF_zero(BIG x[],int n)
 {
     int i;
@@ -171,7 +164,7 @@ void FF_zero(BIG x[],int n)
         BIG_zero(x[i]);
 }
 
-/* Tests for FF element equal to zero */
+/* test equals 0 */
 int FF_iszilch(BIG x[],int n)
 {
     int i;
@@ -180,7 +173,7 @@ int FF_iszilch(BIG x[],int n)
     return 1;
 }
 
-/* Shift right by BIGBITS-bit words */
+/* shift right by BIGBITS-bit words */
 static void FF_shrw(BIG a[],int n)
 {
     int i;
@@ -191,7 +184,7 @@ static void FF_shrw(BIG a[],int n)
     }
 }
 
-/* Shift left by BIGBITS-bit words */
+/* shift left by BIGBITS-bit words */
 static void FF_shlw(BIG a[],int n)
 {
     int i;
@@ -202,19 +195,19 @@ static void FF_shlw(BIG a[],int n)
     }
 }
 
-/* Return parity of an FF, that is the least significant bit */
+/* extract last bit */
 int FF_parity(BIG x[])
 {
     return BIG_parity(x[0]);
 }
 
-/* Return least significant m bits of an FF */
+/* extract last m bits */
 int FF_lastbits(BIG x[],int m)
 {
     return BIG_lastbits(x[0],m);
 }
 
-/* Set FF element of given size to unity */
+/* x=1 */
 void FF_one(BIG x[],int n)
 {
     int i;
@@ -223,7 +216,7 @@ void FF_one(BIG x[],int n)
         BIG_zero(x[i]);
 }
 
-/* Initialize an FF element of given length from a 32-bit integer m. x=m, where m is 32-bit int */
+/* x=m, where m is 32-bit int */
 void FF_init(BIG x[],sign32 m,int n)
 {
     int i;
@@ -238,7 +231,7 @@ void FF_init(BIG x[],sign32 m,int n)
         BIG_zero(x[i]);
 }
 
-/* Compares two FF numbers. Inputs must be normalised externally */
+/* compare x and y - must be normalised */
 int FF_comp(BIG x[],BIG y[],int n)
 {
     int i,j;
@@ -250,7 +243,7 @@ int FF_comp(BIG x[],BIG y[],int n)
     return 0;
 }
 
-/* Recursive add */
+/* recursive add */
 static void FF_radd(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n)
 {
     int i;
@@ -258,7 +251,7 @@ static void FF_radd(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n)
         BIG_add(z[zp+i],x[xp+i],y[yp+i]);
 }
 
-/* Recursive inc */
+/* recursive inc */
 static void FF_rinc(BIG z[],int zp,BIG y[],int yp,int n)
 {
     int i;
@@ -276,7 +269,7 @@ static void FF_rsub(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n)
 }
 */
 
-/* Recursive dec */
+/* recursive dec */
 static void FF_rdec(BIG z[],int zp,BIG y[],int yp,int n)
 {
     int i;
@@ -284,7 +277,7 @@ static void FF_rdec(BIG z[],int zp,BIG y[],int yp,int n)
         BIG_sub(z[zp+i],z[zp+i],y[yp+i]);
 }
 
-/* Addition of two FFs */
+/* simple add */
 void FF_add(BIG z[],BIG x[],BIG y[],int n)
 {
     int i;
@@ -292,7 +285,7 @@ void FF_add(BIG z[],BIG x[],BIG y[],int n)
         BIG_add(z[i],x[i],y[i]);
 }
 
-/* Subtraction of two FFs */
+/* simple sub */
 void FF_sub(BIG z[],BIG x[],BIG y[],int n)
 {
     int i;
@@ -300,21 +293,20 @@ void FF_sub(BIG z[],BIG x[],BIG y[],int n)
         BIG_sub(z[i],x[i],y[i]);
 }
 
-/* Increment an FF by an integer,and normalise */
+/* increment/decrement by a small integer */
 void FF_inc(BIG x[],int m,int n)
 {
     BIG_inc(x[0],m);
     FF_norm(x,n);
 }
 
-/* Decrement an FF by an integer,and normalise */
 void FF_dec(BIG x[],int m,int n)
 {
     BIG_dec(x[0],m);
     FF_norm(x,n);
 }
 
-/* Normalise - but hold any overflow in top part unless n<0 */
+/* normalise - but hold any overflow in top part unless n<0 */
 static void FF_rnorm(BIG z[],int zp,int n)
 {
     int i,trunc=0;
@@ -336,42 +328,40 @@ static void FF_rnorm(BIG z[],int zp,int n)
     if (trunc) z[zp+n-1][NLEN-1]^=carry<<P_TBITS;
 }
 
-/* Normalises the components of an FF */
 void FF_norm(BIG z[],int n)
 {
     FF_rnorm(z,0,n);
 }
 
-/* Shift left an FF by 1 bit */
+/* shift left by one bit */
 void FF_shl(BIG x[],int n)
 {
     int i;
-    chunk carry,delay_carry=0;
+    int carry,delay_carry=0;
     for (i=0; i<n-1; i++)
     {
         carry=BIG_fshl(x[i],1);
         x[i][0]|=delay_carry;
-        x[i][NLEN-1]^=carry<<P_TBITS;
+        x[i][NLEN-1]^=(chunk)carry<<P_TBITS;
         delay_carry=carry;
     }
     BIG_fshl(x[n-1],1);
     x[n-1][0]|=delay_carry;
 }
 
-/* Shift right an FF by 1 bit */
+/* shift right by one bit */
 void FF_shr(BIG x[],int n)
 {
     int i;
-    chunk carry;
+    int carry;
     for (i=n-1; i>0; i--)
     {
         carry=BIG_fshr(x[i],1);
-        x[i-1][NLEN-1]|=carry<<P_TBITS;
+        x[i-1][NLEN-1]|=(chunk)carry<<P_TBITS;
     }
     BIG_fshr(x[0],1);
 }
 
-/* Formats and outputs an FF to the console */
 void FF_output(BIG x[],int n)
 {
     int i;
@@ -383,7 +373,6 @@ void FF_output(BIG x[],int n)
     }
 }
 
-/* Formats and outputs an FF to the console, in raw form */
 void FF_rawoutput(BIG x[],int n)
 {
     int i;
@@ -394,7 +383,7 @@ void FF_rawoutput(BIG x[],int n)
     }
 }
 
-/* Formats and outputs an FF instance to an octet string */
+/* Convert FFs to/from octet strings */
 void FF_toOctet(octet *w,BIG x[],int n)
 {
     int i;
@@ -405,7 +394,6 @@ void FF_toOctet(octet *w,BIG x[],int n)
     }
 }
 
-/* Populates an FF instance from an octet string */
 void FF_fromOctet(BIG x[],octet *w,int n)
 {
     int i;
@@ -415,7 +403,7 @@ void FF_fromOctet(BIG x[],octet *w,int n)
     }
 }
 
-/* In-place swapping using xor - side channel resistant */
+/* in-place swapping using xor - side channel resistant */
 static void FF_cswap(BIG a[],BIG b[],int d,int n)
 {
     int i;
@@ -469,9 +457,9 @@ static void FF_karsqr(BIG z[],int zp,BIG x[],int xp,BIG t[],int tp,int n)
     FF_rnorm(z,zp+nd2,n);  /* was FF_rnorm(z,zp,2*n)  */
 }
 
-/* Calculates Least Significant bottom half of x*y */
 static void FF_karmul_lower(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,BIG t[],int tp,int n)
 {
+    /* Calculates Least Significant bottom half of x*y */
     int nd2;
     if (n==1)
     {
@@ -488,9 +476,9 @@ static void FF_karmul_lower(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,BIG t[]
     FF_rnorm(z,zp+nd2,-nd2);  /* truncate it */
 }
 
-/* Calculates Most Significant upper half of x*y, given lower part */
 static void FF_karmul_upper(BIG z[],BIG x[],BIG y[],BIG t[],int n)
 {
+    /* Calculates Most Significant upper half of x*y, given lower part */
     int nd2;
 
     nd2=n/2;
@@ -512,7 +500,7 @@ static void FF_karmul_upper(BIG z[],BIG x[],BIG y[],BIG t[],int n)
     FF_rnorm(z,nd2,n);
 }
 
-/* Multiplication of two FFs */
+/* z=x*y */
 void FF_mul(BIG z[],BIG x[],BIG y[],int n)
 {
 #ifndef C99
@@ -525,7 +513,7 @@ void FF_mul(BIG z[],BIG x[],BIG y[],int n)
     FF_karmul(z,0,x,0,y,0,t,0,n);
 }
 
-/* Return low part of product */
+/* return low part of product */
 static void FF_lmul(BIG z[],BIG x[],BIG y[],int n)
 {
 #ifndef C99
@@ -538,7 +526,7 @@ static void FF_lmul(BIG z[],BIG x[],BIG y[],int n)
     FF_karmul_lower(z,0,x,0,y,0,t,0,n);
 }
 
-/* FF mod a modulus */
+/* Set b=b mod c */
 void FF_mod(BIG b[],BIG c[],int n)
 {
     int k=0;
@@ -565,7 +553,7 @@ void FF_mod(BIG b[],BIG c[],int n)
     }
 }
 
-/* Square an FF */
+/* z=x^2 */
 void FF_sqr(BIG z[],BIG x[],int n)
 {
 #ifndef C99
@@ -601,7 +589,10 @@ static void FF_reduce(BIG r[],BIG T[],BIG N[],BIG ND[],int n)
     FF_norm(r,n);
 }
 
-/* Reduces a double-length FF with respect to a given modulus */
+
+/* Set r=a mod b */
+/* a is of length - 2*n */
+/* r,b is of length - n */
 void FF_dmod(BIG r[],BIG a[],BIG b[],int n)
 {
     int k;
@@ -633,7 +624,8 @@ void FF_dmod(BIG r[],BIG a[],BIG b[],int n)
     FF_mod(r,b,n);
 }
 
-/* Invert an FF mod a prime modulus. Binary method - a<p on entry */
+/* Set r=1/a mod p. Binary method - a<p on entry */
+
 void FF_invmodp(BIG r[],BIG a[],BIG p[],int n)
 {
 #ifndef C99
@@ -769,7 +761,6 @@ static void FF_invmod2m(BIG U[],BIG a[],int n)
     FF_norm(U,n);
 }
 
-/* Create an FF from a random number generator */
 void FF_random(BIG x[],csprng *rng,int n)
 {
     int i;
@@ -781,7 +772,7 @@ void FF_random(BIG x[],csprng *rng,int n)
     while (BIG_nbits(x[n-1])<MODBYTES*8) BIG_random(x[n-1],rng);
 }
 
-/* Create a random FF less than a given modulus from a random number generator */
+/* generate random x mod p */
 void FF_randomnum(BIG x[],BIG p[],csprng *rng,int n)
 {
     int i;
@@ -806,7 +797,11 @@ static void FF_modmul(BIG z[],BIG x[],BIG y[],BIG p[],BIG ND[],int n)
 #endif
     chunk ex=P_EXCESS(x[n-1]);
     chunk ey=P_EXCESS(y[n-1]);
-    if ((ex+1)>=(P_FEXCESS-1)/(ey+1))
+#ifdef dchunk
+    if ((dchunk)(ex+1)*(ey+1)>(dchunk)P_FEXCESS)
+#else
+    if ((ex+1)>P_FEXCESS/(ey+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d %d\n",ex,ey);
@@ -826,7 +821,11 @@ static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
     BIG d[2*n];
 #endif
     chunk ex=P_EXCESS(x[n-1]);
-    if ((ex+1)>=(P_FEXCESS-1)/(ex+1))
+#ifdef dchunk
+    if ((dchunk)(ex+1)*(ex+1)>(dchunk)P_FEXCESS)
+#else
+    if ((ex+1)>P_FEXCESS/(ex+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ex);
@@ -837,7 +836,7 @@ static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
     FF_reduce(z,d,p,ND,n);
 }
 
-/* Calculate r=x^e mod p, side channel resistant. Montgomery Ladder, for large e */
+/* r=x^e mod p using side-channel resistant Montgomery Ladder, for large e */
 void FF_skpow(BIG r[],BIG x[],BIG e[],BIG p[],int n)
 {
     int i,b;
@@ -868,7 +867,7 @@ void FF_skpow(BIG r[],BIG x[],BIG e[],BIG p[],int n)
     FF_redc(r,p,ND,n);
 }
 
-/* Calculate r=x^e mod p, using side channel resistant Montgomery Ladder, for short e */
+/* r=x^e mod p using side-channel resistant Montgomery Ladder, for short e */
 void FF_skspow(BIG r[],BIG x[],BIG e,BIG p[],int n)
 {
     int i,b;
@@ -895,7 +894,7 @@ void FF_skspow(BIG r[],BIG x[],BIG e,BIG p[],int n)
     FF_redc(r,p,ND,n);
 }
 
-/* Calculate r=x^e mod m - right-to-left method */
+/* raise to an integer power - right-to-left method */
 void FF_power(BIG r[],BIG x[],int e,BIG p[],int n)
 {
     int f=1;
@@ -929,7 +928,7 @@ void FF_power(BIG r[],BIG x[],int e,BIG p[],int n)
     FF_redc(r,p,ND,n);
 }
 
-/* Calculate r=x^e mod m, faster but not side channel resistant */
+/* r=x^e mod p, faster but not side channel resistant */
 void FF_pow(BIG r[],BIG x[],BIG e[],BIG p[],int n)
 {
     int i,b;
@@ -954,7 +953,7 @@ void FF_pow(BIG r[],BIG x[],BIG e[],BIG p[],int n)
     FF_redc(r,p,ND,n);
 }
 
-/* Calculate double exponentiation r=x^e.y^f mod m */
+/* double exponentiation r=x^e.y^f mod p */
 void FF_pow2(BIG r[],BIG x[],BIG e,BIG y[],BIG f,BIG p[],int n)
 {
     int i,eb,fb;
@@ -992,9 +991,9 @@ void FF_pow2(BIG r[],BIG x[],BIG e,BIG y[],BIG f,BIG p[],int n)
     FF_redc(r,p,ND,n);
 }
 
-/* integer GCD, returns GCD of x and y */
 static sign32 igcd(sign32 x,sign32 y)
 {
+    /* integer GCD, returns GCD of x and y */
     sign32 r;
     if (y==0) return x;
     while ((r=x%y)!=0)
@@ -1002,7 +1001,7 @@ static sign32 igcd(sign32 x,sign32 y)
     return y;
 }
 
-/* Test quickly if an FF has factor in common with integer s */
+/* quick and dirty check for common factor with s */
 int FF_cfactor(BIG w[],sign32 s,int n)
 {
     int r;

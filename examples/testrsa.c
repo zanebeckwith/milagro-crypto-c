@@ -18,8 +18,6 @@ under the License.
 */
 
 /* test driver and function exerciser for RSA API Functions */
-/*   gcc -std=c99 -g ./testrsa.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lrsa -o testrsat */
-
 
 #include <stdio.h>
 #include <time.h>

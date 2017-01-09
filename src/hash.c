@@ -1,28 +1,21 @@
-/**
- * @file hash.c
- * @author Mike Scott
- * @date 19th May 2015
- * @brief Implementation of the Secure Hashing Algorithm (SHA-256/384/512)
- *
- * LICENSE
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 /*
  * Implementation of the Secure Hashing Algorithm (SHA-256/384/512)
@@ -63,7 +56,6 @@ static const unsign32 K_256[64]=
 #define ZERO 0
 
 /* functions */
-/* SU=m, m is Stack Usage */
 
 #define S(m,n,x) (((x)>>n) | ((x)<<(m-n)))
 #define R(n,x) ((x)>>n)
@@ -124,7 +116,7 @@ static void HASH256_transform(hash256 *sh)
     sh->h[7]+=h;
 }
 
-/* Initialise an instance of SHA256 */
+/* Initialise Hash function */
 void HASH256_init(hash256 *sh)
 {
     /* re-initialise */
@@ -143,7 +135,7 @@ void HASH256_init(hash256 *sh)
     sh->hlen=32;
 }
 
-/* Process a single byte to the hash */
+/* process a single byte */
 void HASH256_process(hash256 *sh,int byte)
 {
     /* process the next message byte */
@@ -163,7 +155,8 @@ void HASH256_process(hash256 *sh,int byte)
     if ((sh->length[0]%512)==0) HASH256_transform(sh);
 }
 
-/* SU= 24, Generate 32-byte hash */
+/* SU= 24 */
+/* Generate 32-byte Hash */
 void HASH256_hash(hash256 *sh,char *digest)
 {
     /* pad message and finish - supply digest */
@@ -229,9 +222,10 @@ static const unsign64 K_512[80]=
     0x4cc5d4becb3e42b6 ,0x597f299cfc657e2a ,0x5fcb6fab3ad6faec ,0x6c44198c4a475817
 };
 
-/* Basic transformation step */
+
 static void HASH512_transform(hash512 *sh)
 {
+    /* basic transformation step */
     unsign64 a,b,c,d,e,f,g,h,t1,t2;
     int j;
     for (j=16; j<80; j++)
@@ -270,7 +264,6 @@ static void HASH512_transform(hash512 *sh)
     sh->h[7]+=h;
 }
 
-/* Initialise an instance of SHA384 */
 void HASH384_init(hash384 *sh)
 {
     /* re-initialise */
@@ -290,21 +283,18 @@ void HASH384_init(hash384 *sh)
 
 }
 
-/* Process a single byte to the hash */
 void HASH384_process(hash384 *sh,int byte)
 {
     /* process the next message byte */
     HASH512_process(sh,byte);
 }
 
-/* Generate 48-byte hash */
 void HASH384_hash(hash384 *sh,char *hash)
 {
     /* pad message and finish - supply digest */
     HASH512_hash(sh,hash);
 }
 
-/* Initialise an instance of SHA512 */
 void HASH512_init(hash512 *sh)
 {
     /* re-initialise */
@@ -324,7 +314,6 @@ void HASH512_init(hash512 *sh)
     sh->hlen=64;
 }
 
-/* Process a single byte to the hash */
 void HASH512_process(hash512 *sh,int byte)
 {
     /* process the next message byte */
@@ -344,7 +333,6 @@ void HASH512_process(hash512 *sh,int byte)
     if ((sh->length[0]%1024)==0) HASH512_transform(sh);
 }
 
-/* Generate 64-byte hash */
 void HASH512_hash(hash512 *sh,char *hash)
 {
     /* pad message and finish - supply digest */

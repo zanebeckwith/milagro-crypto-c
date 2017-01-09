@@ -48,7 +48,7 @@ int main()
     octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
 
     /* Hash values of ID */
-    char hcid[32];
+    char hcid[PFS];
     octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
 
     /* Client secret and shares */

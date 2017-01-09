@@ -18,7 +18,6 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
-/* gcc -std=c99 -O3 testecdh.c ecdh.c amcl.a -o testecdh.exe */
 
 #include <stdio.h>
 #include <stdlib.h>
