@@ -85,7 +85,10 @@ The above packages can be installed in different ways, depending on the Operatin
 
 As Makefile is present at the project root that reads the options defined in
 config.mk. Change these options and then type  ```make``` to build and test
-the library
+the library.
+
+If you have docker installed then type ```./dockerbuild.sh``` to build and test
+the library in a docker container.
 
 ##### Manual build
 

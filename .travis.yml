@@ -21,7 +21,7 @@ services:
 
 script:
   - make dbuild
-  - make
+  - dockerbuild.sh
 
 after_success:
   - coveralls-lcov /home/travis/build/miracl/milagro-crypto-c/target/COVERAGE/coverage/amcl.info

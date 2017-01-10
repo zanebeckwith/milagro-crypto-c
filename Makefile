@@ -265,7 +265,7 @@ dbuild:
 	@mkdir -p target
 	@rm -rf target/*
 	@echo 0 > target/make.exit
-	CVSPATH=$(CVSPATH) VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET='$(MAKETARGET)' ./dockerbuild.sh
+	CVSPATH=$(CVSPATH) VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET=buildall ./dockerbuild.sh
 	@exit `cat target/make.exit`
 
 # Publish Documentation in GitHub (requires writing permissions)
