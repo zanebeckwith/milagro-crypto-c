@@ -17,6 +17,9 @@
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
 
+# Project root directory
+PROJECTROOT=$(shell pwd)
+
 # CVS path (path to the parent dir containing the project)
 CVSPATH=github.com/miracl
 
@@ -34,6 +37,9 @@ VERSION=$(shell cat VERSION)
 
 # Project release number (packaging build number)
 RELEASE=$(shell cat RELEASE)
+
+# Include default build configuration
+include $(PROJECTROOT)/config.mk
 
 # Common CMake options for building the language wrappers
 WRAPPERS="-DBUILD_PYTHON=on,-DBUILD_GO=on,-DGO_PATH=${GOPATH}"
@@ -122,12 +128,45 @@ space +=
 
 # --- MAKE TARGETS ---
 
+# Default build configured in config.mk
+all: 
+	@echo -e "\n\n*** BUILD default - see config.mk ***\n"
+	rm -rf target/default/*
+	mkdir -p target/default
+	cd target/default && \
+	cmake -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
+	-DCMAKE_INSTALL_PREFIX=$(INSTALL_PATH) \
+	-DBUILD_SHARED_LIBS=$(AMCL_BUILD_SHARED_LIBS) \
+	-DBUILD_PYTHON=$(AMCL_BUILD_PYTHON) \
+	-DBUILD_GO=$(AMCL_BUILD_GO) \
+	-DGO_PATH=${GOPATH} \
+	-DAMCL_CHUNK=$(AMCL_CHUNK) \
+	-DAMCL_CHOICE=$(AMCL_CHOICE) \
+	-DAMCL_CURVETYPE=$(AMCL_CURVETYPE) \
+	-DAMCL_FFLEN=$(AMCL_FFLEN) \
+	-DBUILD_MPIN=$(AMCL_BUILD_MPIN) \
+	-DBUILD_WCC=$(AMCL_BUILD_WCC) \
+	-DBUILD_DOXYGEN=$(AMCL_BUILD_DOXYGEN) \
+	-DUSE_ANONYMOUS=$(AMCL_USE_ANONYMOUS) \
+	-DAMCL_MAXPIN=$(AMCL_MAXPIN) \
+	-DAMCL_PBLEN=$(AMCL_PBLEN) \
+	../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
+	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0
+ifeq ($(AMCL_BUILD_DOXYGEN),ON)
+	cd target/default && \
+	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0 
+endif
+
+
 # Display general help about this command
 help:
 	@echo ""
 	@echo "$(PROJECT) Makefile."
 	@echo "The following commands are available:"
 	@echo ""
+	@echo "    make         :  Build library based on options in config.mk"
 	@echo "    make format  :  Format the source code"
 	@echo "    make clean   :  Remove any build artifact"
 	@echo "    make qa      :  build all versions and generate reports"
@@ -151,9 +190,6 @@ help:
 		echo "    make build TYPE=$(word 1,$(subst :, ,${PARAMS}))" ; \
 	)
 	@echo ""
-
-# Alias for help target
-all: help
 
 # Format the source code
 format:
@@ -217,8 +253,8 @@ else
 	cmake $(subst $(comma),$(space),${BUILD_PARAMS}) ../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
 	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
-	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
-	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0
+	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0
 endif
 
 # Alias for building all inside the Docker container
