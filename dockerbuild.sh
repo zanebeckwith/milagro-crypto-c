@@ -19,7 +19,7 @@
 : ${PROJECT:=project}
 
 # make target to execute
-: ${MAKETARGET:=all}
+: ${MAKETARGET:=default}
 
 # Name of the base development Docker image
 DOCKERDEV=${VENDOR}/dev_${PROJECT}

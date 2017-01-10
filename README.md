@@ -87,7 +87,7 @@ As Makefile is present at the project root that reads the options defined in
 config.mk. Change these options and then type  ```make``` to build and test
 the library.
 
-If you have docker installed then type ```./dockerbuild.sh``` to build and test
+If you have docker installed then type ```make dbuild``` to build and test
 the library in a docker container.
 
 ##### Manual build
