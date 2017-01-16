@@ -172,7 +172,7 @@ In order for this to work NSSI has to have been installed
 This project includes a Makefile that allows you to test and build the project in a Linux-compatible system with simple commands.  
 All the artifacts and reports produced using this Makefile are stored in the *target* folder.  
 
-All the packages listed in the *resources/DockerDev/Dockerfile* file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a [Docker](https://www.docker.com) container using the command "make dbuild".
+All the packages listed in the *resources/DockerDev/Dockerfile* file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a [Docker](https://www.docker.com) container using the command "MAKETARGET=buildall make dbuild".
 
 To see all available options:
 ```
@@ -181,10 +181,10 @@ make help
 
 To build the project inside a Docker container (requires Docker):
 ```
-make dbuild
+MAKETARGET=buildall make dbuild
 ```
 
-To build a particular set of options inside a Docker container:
+To build a particular set of predefined makefile options inside a Docker container:
 ```
 MAKETARGET='build TYPE=LINUX_64BIT_NIST256_RSA2048' make dbuild
 ```
@@ -196,7 +196,7 @@ The base Docker building environment is defined in the following Dockerfile:
 resources/DockerDev/Dockerfile
 ```
 
-To execute all the default test builds and generate reports in the current environment:
+To execute all the test builds and generate reports in the current environment:
 ```
 make qa
 ```
