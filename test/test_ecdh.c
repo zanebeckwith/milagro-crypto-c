@@ -42,17 +42,6 @@ typedef enum { false, true } bool;
 
 int main(int argc, char** argv)
 {
-
-    BIG Gx, Gy, Mod;
-    BIG_rcopy(Gx,CURVE_Gx);
-    BIG_rcopy(Gy,CURVE_Gy);
-    BIG_rcopy(Mod, Modulus);
-
-    printf("Gx : "); BIG_output(Gx);printf("\n");
-    printf("Gy : "); BIG_output(Gy);printf("\n");
-    printf("Mod : "); BIG_output(Mod);printf("\n");
-
-
     if (argc != 2)
     {
         printf("usage: ./test_ecdh [path to test vector file]\n");

@@ -1,9 +1,0 @@
-[C22519]
-
-COUNT = 0
-QCAVSx = 
-QCAVSy = 
-dIUT = 
-QIUTx = 
-QIUTy = 
-ZIUT = 
