@@ -116,23 +116,22 @@ int main()
     BIG_random(F,&rng);
     for (j = 1; j <= 20; ++j)
     {
-        FP_imul(H,F,j);
+        BIG_imul(H,F,j);
         BIG_copy(G,F);
         for (i = 1; i < j; ++i)
         {
-            BIG_norm(G);
-            FP_add(G,G,F);
+            BIG_add(G,G,F);
         }
         BIG_norm(G);
+        BIG_norm(H);
         if(BIG_comp(H,G) != 0)
         {
-            printf("H ");
+            printf("\nH ");
             BIG_output(H);
-            printf("\n\n");
-            printf("G ");
+            printf("\nG ");
             BIG_output(G);
             printf("\n\n");
-            printf("ERROR testing small multiplication and addition BIG\n");
+            printf("ERROR testing small multiplication and addition BIG, %d\n",j);
             exit(EXIT_FAILURE);
         }
     }

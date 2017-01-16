@@ -43,3 +43,17 @@ AMCL_USE_ANONYMOUS:=OFF
 # Configure PIN 
 AMCL_MAXPIN:=10000
 AMCL_PBLEN:=14
+
+# Print debug message for field reduction ON/OFF
+DEBUG_REDUCE:=OFF
+
+# Detect digit overflow ON/OFF
+DEBUG_NORM:=OFF
+
+# Architecture
+CMAKE_C_FLAGS=-m64
+
+# Tool chain 
+# options: ../../resources/cmake/mingw64-cross.cmake
+#          ../../resources/cmake/mingw32-cross.cmake
+CMAKE_TOOLCHAIN_FILE=
