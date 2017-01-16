@@ -310,7 +310,6 @@ build_item:
 # Build with the specified parameters
 buildx:
 	@echo -e "\n\n*** BUILD ${BUILD_NAME} ***\n"
-	mkdir -p target/info
 	rm -rf target/${BUILD_NAME}/*
 ifneq ($(strip $(filter %COVERAGE,${BUILD_NAME})),)
 	mkdir -p target/${BUILD_NAME}/coverage
