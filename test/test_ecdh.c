@@ -42,17 +42,6 @@ typedef enum { false, true } bool;
 
 int main(int argc, char** argv)
 {
-
-    BIG Gx, Gy, Mod;
-    BIG_rcopy(Gx,CURVE_Gx);
-    BIG_rcopy(Gy,CURVE_Gy);
-    BIG_rcopy(Mod, Modulus);
-
-    printf("Gx : "); BIG_output(Gx);printf("\n");
-    printf("Gy : "); BIG_output(Gy);printf("\n");
-    printf("Mod : "); BIG_output(Mod);printf("\n");
-
-
     if (argc != 2)
     {
         printf("usage: ./test_ecdh [path to test vector file]\n");
@@ -247,13 +236,6 @@ int main(int argc, char** argv)
             QCAVSOct.len=1;
             OCT_joctet(&QCAVSOct,&QCAVSxOct);
 #endif
-
-#ifdef DEBUG
-            printf("dIUTOct: ");
-            OCT_output(&dIUTOct);
-            printf("\n");
-#endif
-
             // Check correct public key generated
             ECP_KEY_PAIR_GENERATE(NULL,&dIUTOct,&QOct);
             rc = OCT_comp(&QOct,&QIUTOct);
@@ -261,9 +243,9 @@ int main(int argc, char** argv)
             {
                 printf("ERROR: TEST ECDH KEYPAIR FAILED LINE %d\n",i);
 #ifdef DEBUG
-                printf("QOct: ");
+                printf("\nQOct:    ");
                 OCT_output(&QOct);
-                printf("QIUTOct: ");
+                printf("\nQIUTOct: ");
                 OCT_output(&QIUTOct);
                 printf("\n");
 #endif
@@ -275,19 +257,17 @@ int main(int argc, char** argv)
             rc = OCT_comp(&ZOct,&ZIUTOct);
             if (!rc)
             {
+
                 printf("TEST ECDH Z FAILED LINE %d\n",i);
+#ifdef DEBUG
+                printf("\nZOct:    ");
+                OCT_output(&ZOct);
+                printf("\nZIUTOct: ");
+                OCT_output(&ZIUTOct);
+                printf("\n");
+#endif
                 exit(EXIT_FAILURE);
             }
-
-#ifdef DEBUG
-            printf("ZOct: ");
-            OCT_output(&ZOct);
-            printf("\n");
-            printf("ZIUTOct: ");
-            OCT_output(&ZIUTOct);
-            printf("\n");
-#endif
-
             free(dIUT);
             dIUT = NULL;
             free(ZIUT);

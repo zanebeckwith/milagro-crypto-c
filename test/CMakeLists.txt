@@ -347,12 +347,14 @@ if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVE
   # test
   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
 
+if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "MONTGOMERY"))
   message(STATUS "Run ${AMCL_CHOICE} ECDH Tests")
   add_executable (test_ecdh test_ecdh.c)
   # Link the executable to the libraries
   target_link_libraries (test_ecdh ecdh) 
   # test
-  add_test(NAME test_ecdh COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/C22519/KAS_ECC_CDH_PrimitiveTest.txt)
+  add_test(NAME test_ecdh COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/C25519/KAS_ECC_CDH_PrimitiveTest.txt)
   set_tests_properties (test_ecdh PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
+endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "MONTGOMERY"))
