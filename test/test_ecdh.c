@@ -243,9 +243,9 @@ int main(int argc, char** argv)
             {
                 printf("ERROR: TEST ECDH KEYPAIR FAILED LINE %d\n",i);
 #ifdef DEBUG
-                printf("\nQOct:    ");
+                printf("\nline %d QOct:    ",i);
                 OCT_output(&QOct);
-                printf("\nQIUTOct: ");
+                printf("\nline %d QIUTOct: ",i);
                 OCT_output(&QIUTOct);
                 printf("\n");
 #endif
@@ -260,9 +260,9 @@ int main(int argc, char** argv)
 
                 printf("TEST ECDH Z FAILED LINE %d\n",i);
 #ifdef DEBUG
-                printf("\nZOct:    ");
+                printf("\nline %d ZOct: ",i);
                 OCT_output(&ZOct);
-                printf("\nZIUTOct: ");
+                printf("\nline %dZIUTOct: ",i);
                 OCT_output(&ZIUTOct);
                 printf("\n");
 #endif
