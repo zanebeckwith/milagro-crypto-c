@@ -83,7 +83,7 @@ The above packages can be installed in different ways, depending on the Operatin
 
 ##### Quick start
 
-As Makefile is present at the project root that reads the options defined in
+A Makefile is present at the project root that reads the options defined in
 config.mk. Change these options and then type  ```make``` to build and test
 the library.
 

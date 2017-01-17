@@ -3,8 +3,8 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th April 2016
+ * @brief Wang / Chow Choo (WCC) definitions
  *
- * AMCL Wang / Chow Choo (WCC) definitions
  *
  * LICENSE
  *

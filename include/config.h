@@ -3,8 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 19th May 2015
- *
- * File for configuration
+ * @brief Test configuration file
  *
  * LICENSE
  *
