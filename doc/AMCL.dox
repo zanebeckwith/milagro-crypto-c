@@ -1,5 +1,5 @@
 /*
-  This file contains NO source code, just some documentation for Doxygen to parse.
+  This file contains NO source code, just some documentation for doxygen to parse.
 */
 
 /*!
@@ -36,7 +36,7 @@ under the License.
 
   \section platforms Platforms
 
-  The software can be compiled and installed for the following operating systems:
+  The software can be compiled and installed for these operating systems;
 
 <ul type="disc">
   <li>Linux</li>
@@ -52,177 +52,230 @@ under the License.
 
   git mirror https://github.com/apache/incubator-milagro
 
-
-
-  \section quickstart Quick Start
-
-<p>This project includes a Makefile that allows you to test and build the project in a Linux-compatible system with simple commands.<br>
-All the artifacts and reports produced using this Makefile are stored in the <em>target</em> folder.</p>
-<p>All the packages listed in the <em>resources/DockerDev/Dockerfile</em> file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a <a href="https://www.docker.com" data-original-href="https://www.docker.com">Docker</a> container using the command "make dbuild".</p>
-<p>To see all available options:</p>
-<pre><code>make help
-</code></pre>
-<p>To build the project inside a Docker container (requires Docker):</p>
-<pre><code>make dbuild
-</code></pre>
-<p>The base Docker building environment is defined in the following Dockerfile:</p>
-<pre><code>resources/DockerDev/Dockerfile
-</code></pre>
-<p>To execute all the default test builds and generate reports in the current environment:</p>
-<pre><code>make qa
-</code></pre>
-<p>To format the code (please use this command before submitting any pull request):</p>
-<pre><code>make format
-</code></pre>
-
-
-
-  \section dockercommands Useful Docker commands
-
-<p>To manually create the container you can execute:</p>
-<pre><code><span class="hljs-symbol">docker</span> <span class="hljs-keyword">build </span>--tag=<span class="hljs-string">"miracl/amcldev"</span> .
-</code></pre>
-<p>To log into the newly created container:</p>
-<pre><code>docker run -t -<span class="hljs-selector-tag">i</span> miracl/amcldev /bin/bash
-</code></pre>
-<p>To get the container ID:</p>
-<pre><code>CONTAINER_ID=`docker ps -<span class="hljs-literal">a</span> | grep miracl/amcldev | cut -c1-<span class="hljs-number">12</span>`
-</code></pre>
-<p>To delete the newly created docker container:</p>
-<pre><code>docker rm -f $CONTAINER_ID
-</code></pre>
-<p>To delete the docker image:</p>
-<pre><code>docker rmi <span class="hljs-_">-f</span> miracl/amcldev
-</code></pre>
-<p>To delete all containers</p>
-<pre><code>docker rm $<span class="hljs-comment">(docker ps -a -q)</span>
-</code></pre>
-<p>To delete all images</p>
-<pre><code>    docker rmi $(docker images -<span class="hljs-keyword">q</span>)
-</code></pre>
-
-
-
-  \section manualbuilds Manual Builds
-
-  \subsection dependencies Software Dependencies
-
-<p>In order to build this library, the following packages are required:</p>
-<ul>
-<li><a href="https://cmake.org/" data-original-href="https://cmake.org/">CMake</a> is required to build the source code.</li>
-<li><a href="https://cffi.readthedocs.org/en/release-0.8/" data-original-href="https://cffi.readthedocs.org/en/release-0.8/">CFFI</a>, the C Foreign Function Interface for Python is required in order to execute tests.</li>
-<li><a href="http://doxygen.org" data-original-href="http://doxygen.org">Doxygen</a> is required to build the source code documentation.</li>
-<li><a href="https://golang.org/dl/" data-original-href="https://golang.org/dl/">GO</a> and <a href="https://www.python.org/" data-original-href="https://www.python.org/">Python</a> languages are required to build the language wrappers.</li>
-<li>Please refer to the <em>resources/DockerDev/Dockerfile</em> file for any additional dependency.</li>
-</ul>
-<p>The above packages can be installed in different ways, depending on the Operating System used:</p>
-<ul>
-<li><strong>Debian/Ubuntu Linux</strong></li>
-</ul>
-<pre><code>sudo apt-get install -y git cmake build-essential python python-dev python-pip libffi-dev doxygen doxygen-latex parallel
-sudo pip install cffi
-</code></pre>
-<ul>
-<li><strong>RedHat/CentOS/Fedora Linux</strong></li>
-</ul>
-<pre><code>sudo yum groupinstall "Development Tools" "Development Libraries"
-sudo yum install -y git cmake python libpython-devel python-pip libffi-devel doxygen doxygen-latex parallel
-sudo pip install cffi
-</code></pre>
-<ul>
-<li><strong>MacOs</strong></li>
-</ul>
-<pre><code>ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install cmake
-brew install pkg-config libffi
-sudo pip install cffi
-brew install doxygen
-brew install parallel
-</code></pre>
-<ul>
-<li><strong>Windows</strong>
-<ul>
-<li>Minimalist GNU for Windows <a href="http://www.mingw.org" data-original-href="http://www.mingw.org">MinGW</a> provides the tool set used to build the library and should be installed</li>
-<li>When the MinGW installer starts select the <strong>mingw32-base</strong> and <strong>mingw32-gcc-g++</strong> components</li>
-<li>From the menu select <em>"Installation"</em> → <em>"Apply Changes"</em>, then click <em>"Apply"</em></li>
-<li>Finally add <em>C:\\MinGW\\bin</em> to the PATH variable</li>
-<li>pip install cffi</li>
-<li>install CMake following the instructions on <a href="http://www.cmake.org" data-original-href="http://www.cmake.org">http://www.cmake.org</a></li>
-<li>install Doxygen following the instructions on <a href="http://www.doxygen.org" data-original-href="http://www.doxygen.org">http://www.doxygen.org</a></li>
-</ul>
-</li>
-</ul>
-
-
-  \subsection build Build Instructions
-
-<p>NOTE: The default build is for 64 bit machines</p>
-
-<h4>Linux and Mac</h4>
-
-<pre><code>git clone https://github.com/miracl/milagro-crypto-c
-cd milagro-crypto-c
-mkdir -p target/build
-cd target/build
-cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl ../..
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
-make
-make test
-make doc
-sudo make install
-</code></pre>
-<p>On Debian/Ubuntu machine instead of executing the <em>"sudo make install"</em> command it is possible to execute <em>"sudo checkinstall"</em> to build and install a DEB package.</p>
-<p>Now you can set the path to where libs and python package are installed:</p>
-<pre><code>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./:/opt/amcl/lib
-export PYTHONPATH=/usr/lib/python2.7/dist-packages
-</code></pre>
-<p>NOTE: The build can be configured by setting flags on the command line, for example:</p>
-<pre><code>
-cmake -DAMCL_CHUNK=64 ../..
-cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..
-</code></pre>
-<p>To list other available CMake options, use:</p>
-<pre><code>cmake -LH
-</code></pre>
-
-<h5>Uninstall software</h5>
-
-<pre><code>sudo make uninstall
-</code></pre>
-
-<h5>Building an installer</h5>
-
-<p>After having built the libraries you can build a binary installer and a source distribution by running this command</p>
-<pre><code>make package
-</code></pre>
-
-<h4>Windows</h4>
-
-<p>Start a command prompt as an administrator</p>
-<pre><code>git clone https://github.com/miracl/milagro-crypto-c
-cd milagro-crypto-c
-mkdir target\\build
-cd target\\build
-cmake -G "MinGW Makefiles" ..\\..
-mingw32-make
-mingw32-make test
-mingw32-make doc
-mingw32-make install
-</code></pre>
-<p>Post install append the PATH system variable to point to the install ./lib:</p>
-<p><em>My Computer -&gt; Properties -&gt; Advanced &gt; Environment Variables</em></p>
-<p>The build can be configured using by setting flags on the command line i.e.</p>
-<pre><code>cmake -G "MinGW Makefiles" -D BUILD_PYTHON=on ..
-</code></pre>
-
-<h5>Uninstall software</h5>
-
-<pre><code>mingw32-make uninstall
-</code></pre>
-<h5>Building an installer</h5>
-<p>After having built the libraries you can build a Windows installer using this command</p>
-<pre><code>sudo mingw32-make package
-</code></pre>
-<p>In order for this to work NSSI has to have been installed</p>
+  \section installonmainpage Installation
+ 
+  There are instructions for building for \ref linux, \ref mac and \ref windows.
 
 */
+
+
+/*!
+  \page linux Linux 
+
+<h2>Software dependencies</h2>
+
+CMake is required to build the library and can usually be installed from
+the operating system package manager.
+
+<ul type="disc">
+  <li>sudo apt-get install cmake</li>
+</ul>
+
+If not, then you can download it from www.cmake.org
+
+In order to use the language wrappers install <a href="https://www.python.org">GO</a> and 
+ <a href="https://golang.org/dl/">GO</a> if required.
+
+The C Foreign Function Interface for Python <a href="https://cffi.readthedocs.org/en/latest/">CFFI</a> module
+is also required if you wish to use the Python module.
+
+<ul type="disc">
+  <li>sudo pip install cffi</li>
+</ul>
+
+In order to build the documentation <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a> is required.
+
+<h2>Quick Start</h2>
+
+<p>A Makefile is present at the project root that reads the options defined in
+config.mk. Change these options and then type  ```make``` to build and test
+the library.</p>
+
+<p>If <a href="https://www.docker.com/">docker</a> is installed then type ```make dbuild``` to build and test
+the library in a docker container.</p>
+
+<h2>Manual build</h2>
+
+<p>The default build is for 64 bit machines, Elliptic curve BN_254_CX and curve type Weierstrass</p>
+
+<ol type="disc">
+  <li>mkdir target/build</li>
+  <li>cd target/build</li>
+  <li>cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl ../..
+  <li>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
+  <li>make</li>
+  <li>make test</li>
+  <li>make doc</li>
+  <li>sudo make install</li>
+</ol>
+
+<p>The build can be configured using by setting flags on the command line i.e.</p>
+
+<ol type="disc">
+  <li>cmake  -D CMAKE_INSTALL_PREFIX=/opt/amcl -D WORD_LENGTH=32 ../..</li>
+</ol>
+
+<p>list available CMake options</p>
+
+<ol type="disc">
+  <li>cmake -LH</li>
+</ol>
+
+<h2>Uninstall software</h2>
+
+<ul type="disc">
+  <li>sudo make uninstall</li>
+</ul>
+
+<h2>Building an installer</h2>
+
+<p>After having built the libraries you can build a binary installer and a source distribution by running this command</p>
+
+<ul type="disc">
+  <li>make package</li>
+</ul>
+
+*/
+
+
+
+
+/*!
+  \page mac Mac OS 
+
+<h2>Software dependencies</h2>
+
+Install <a href="http://brew.sh/">Homebrew</a>
+
+<ul type="disc">
+  <li>ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"</li>
+</ul>
+
+Install  <a href="http://www.cmake.org/download/">cmake</a>
+
+<ul type="disc">
+  <li>brew install cmake</li>
+</ul>
+
+In order to use the language wrappers install <a href="https://www.python.org">GO</a> and 
+ <a href="https://golang.org/dl/">GO</a> if required.
+
+The C Foreign Function Interface for Python <a href="https://cffi.readthedocs.org/en/latest/">CFFI</a> module
+is also required if you wish to use the Python module.
+
+<ul type="disc">
+  <li>brew install pkg-config libffi</li>
+  <li>sudo pip install cffi</li>
+</ul>
+
+In order to build the documentation <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a> is required.
+
+<ul type="disc">
+  <li>brew install doxygen</li>
+</ul>
+
+<h2>Build Instructions</h2>
+
+<p>The default build is for 64 bit machines, Elliptic curve BN_254_CX and curve type Weierstrass</p>
+
+<ol type="disc">
+  <li>mkdir -p target/build</li>
+  <li>cd target/build</li>
+  <li>cmake ../..</li>
+  <li>make</li>
+  <li>make test</li>
+  <li>make doc</li>
+  <li>sudo make install</li>
+</ol>
+
+<p>The build can be configured using by setting flags on the command line i.e.</p>
+
+<ol type="disc">
+  <li>cmake -DWORD_LENGTH=32 ../..</li>
+</ol>
+
+<h2>Uninstall software</h2>
+
+<ul type="disc">
+  <li>sudo make uninstall</li>
+</ul>
+
+*/
+
+/*!
+  \page windows Windows
+
+<h2>Software dependencies</h2>
+
+<p>Minimalist GNU for Windows <a href="http://www.mingw.org/">MinGW</a> provides the 
+tool set used to build the library and should be installed. When the MinGW installer
+starts select the mingw32-base and mingw32-gcc-g++ components. From the menu select
+"Installation" -> "Apply Changes", then click "Apply". Finally add C:\\MinGW\\bin
+to the PATH variable.</p>
+
+<p>CMake is required to build the library and can be downloaded from www.cmake.org</p>
+
+In order to use the language wrappers install <a href="https://www.python.org">GO</a> and 
+ <a href="https://golang.org/dl/">GO</a> if required.
+
+<p>The C Foreign Function Interface for Python <a href="https://cffi.readthedocs.org/en/latest/">CFFI</a> module
+is also required, if you wish to use the Python module.</p>
+
+<ul type="disc">
+  <li>pip install cffi</li>
+</ul>
+
+In order to build the documentation <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a> is required.
+
+<h2>Build Instructions</h2>
+
+<p>Start a command prompt as an administrator</p>
+
+<p>The default build is for 64 bit machines, Elliptic curve BN_254_CX and curve type Weierstrass</p>
+
+<ol type="disc">
+  <li>mkdir target\\build</li>
+  <li>cd target\\build</li>
+  <li>cmake -G "MinGW Makefiles" ..\\..</li>
+  <li>mingw32-make</li>
+  <li>mingw32-make test</li>
+  <li>mingw32-make doc</li>
+  <li>mingw32-make install</li>
+</ol>
+
+<p>
+
+Post install append the PATH system variable to point to the install ./lib.
+
+My Computer -> Properties -> Advanced > Environment Variables
+
+</p>
+
+
+<p>The build can be configured using by setting flags on the command line i.e.</p>
+
+<ol type="disc">
+  <li>cmake -G "MinGW Makefiles" -DWORD_LENGTH=32 ../..</li>
+</ol>
+
+<h2>Uninstall software</h2>
+
+<ul type="disc">
+  <li>mingw32-make uninstall</li>
+</ul>
+
+<h2>Building an installer</h2>
+
+<p>After having built the libraries you can build a Windows installer using this command</p>
+
+<ul type="disc">
+  <li>sudo mingw32-make package</li>
+</ul>
+
+<p>In order for this to work <a href="http://nsis.sourceforge.net/Download">NSSI</a> has
+to have been installed</p>
+
+*/
+
+
+

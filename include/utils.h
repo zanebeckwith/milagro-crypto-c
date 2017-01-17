@@ -3,8 +3,7 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th July 2016
- *
- * AMCL Support functions for M-Pin servers
+ * @brief General utility functions
  *
  * LICENSE
  *
