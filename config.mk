@@ -14,10 +14,10 @@ AMCL_CURVETYPE:=WEIERSTRASS
 AMCL_FFLEN:=8
 
 # Build type Debug Release Coverage ASan Check CheckFull
-BUILD_TYPE:=Release
+CMAKE_BUILD_TYPE:=Release
 
 # Install path
-INSTALL_PATH:=/opt/amcl
+CMAKE_INSTALL_PATH:=/opt/amcl
 
 # Build Shared Libraries ON/OFF
 AMCL_BUILD_SHARED_LIBS:=ON
