@@ -345,19 +345,18 @@ dbuild:
 	@exit `cat target/make.exit`
 
 # Publish Documentation in GitHub (requires writing permissions)
-# Use this only after generating all build options with "make dbuild"
+# Use this only after generating with default build i.e. "make"
 pubdocs:
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
-	find ./target -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | xargs -i sh -c 'mkdir -p ./target/DOCS/{} && cp -rf ./target/{}/doc/html/* ./target/DOCS/{}/'
-	#echo "# milagro-crypto-c Source Code Documentation" > ./target/DOCS/Home.md
-	#find ./target/DOCS -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | xargs -i sh -c 'echo "* [{}](https://cdn.rawgit.com/wiki/miracl/milagro-crypto-c/{}/index.html)" >> ./target/DOCS/Home.md'
+	mkdir -p ./target/DOCS/doc
+	cp -r ./target/default/doc/html/* ./target/DOCS/doc
 	cp ./doc/Home.md ./target/DOCS/
-	git clone git@github.com:miracl/milagro-crypto-c.wiki.git ./target/WIKI
+	git clone https://github.com/miracl/milagro-crypto-c.wiki.git ./target/WIKI
 	mv -f ./target/WIKI/.git ./target/DOCS/
 	cd ./target/DOCS/ && \
 	git add . -A && \
 	git commit -m 'Update documentation' && \
-	git push origin master --force
+	git push origin master --force 
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
