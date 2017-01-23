@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        printf("usage: ./test_aes_encrypt [path to test vector file] [mode:ECB||CBC||CTR]\n");
+        printf("usage: ./test_aes_encrypt [path to test vector file] [mode:ECB||CBC||CTR||CFB1]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -88,6 +88,11 @@ int main(int argc, char** argv)
     {
         mode = CTR16;
         blockSize=16;
+    }
+    else if (!strcmp(argv[2], "CFB1"))
+    {
+        mode = CFB1;
+        blockSize=1;
     }
     else
     {
