@@ -190,7 +190,7 @@ int main(int argc, char** argv)
 
             // Allocate memory
             l1 = strlen(linePtr);
-            CIPHERTEXT1 = (char*) malloc(PLAINTEXTLen);
+            CIPHERTEXT1 = (char*) malloc(PLAINTEXTLen+1);
             if (CIPHERTEXT1==NULL)
                 exit(EXIT_FAILURE);
 
