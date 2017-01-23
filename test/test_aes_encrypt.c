@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        printf("usage: ./test_aes_encrypt [path to test vector file] [mode:ECB||CBC||CTR]\n");
+        printf("usage: ./test_aes_encrypt [path to test vector file] [mode:ECB||CBC||CTR|CFB1]\n");
         exit(EXIT_FAILURE);
     }
 
