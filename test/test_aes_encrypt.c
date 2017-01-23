@@ -89,6 +89,11 @@ int main(int argc, char** argv)
         mode = CTR16;
         blockSize=16;
     }
+    else if (!strcmp(argv[2], "CFB1"))
+    {
+        mode = CFB1;
+        blockSize=1;
+    }
     else
     {
         mode = CBC;
