@@ -38,18 +38,11 @@ int main()
     csprng RNG;
     BIG s,r,x,y;
     ECP P,G;
-    FP12 g;
     int i,iterations;
     clock_t start;
     double elapsed;
     char pr[10];
     unsigned long ran;
-    rsa_public_key pub;
-    rsa_private_key priv;
-    char m[RFS],d[RFS],c[RFS];
-    octet M= {0,sizeof(m),m};
-    octet D= {0,sizeof(d),d};
-    octet C= {0,sizeof(c),c};
 
 #if CHOICE==NIST256
     printf("NIST256 Curve\n");
@@ -161,7 +154,7 @@ int main()
     if (!ECP_isinf(&P))
     {
         printf("FAILURE - rG!=O\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     iterations=0;
@@ -179,7 +172,6 @@ int main()
     printf("EC  mul - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-    printf("All tests pass\n");
-
-    return 0;
+    printf("SUCCESS BENCHMARK TEST OF EC FUNCTIONS PASSED\n");
+    exit(EXIT_SUCCESS);
 }

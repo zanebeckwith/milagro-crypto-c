@@ -36,9 +36,6 @@
 int main()
 {
     csprng RNG;
-    BIG s,r,x,y;
-    ECP P,G;
-    FP12 g;
     int i,iterations;
     clock_t start;
     double elapsed;
@@ -120,11 +117,10 @@ int main()
         if (M.val[i]!=D.val[i])
         {
             printf("FAILURE - RSA decryption\n");
-            return 0;
+            exit(EXIT_FAILURE);
         }
     }
 
-    printf("All tests pass\n");
-
-    return 0;
+    printf("SUCCESS BENCHMARK TEST OF RSA FUNCTIONS PASSED\n");
+    exit(EXIT_SUCCESS);
 }

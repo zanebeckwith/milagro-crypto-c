@@ -107,7 +107,7 @@ int main()
     if (!ECP_isinf(&P))
     {
         printf("FAILURE - rG!=O\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     iterations=0;
@@ -142,7 +142,7 @@ int main()
     if (!ECP2_isinf(&Q))
     {
         printf("FAILURE - rQ!=O\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     iterations=0;
@@ -170,7 +170,7 @@ int main()
     if (!FP12_isunity(&g))
     {
         printf("FAILURE - g^r!=1\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     iterations=0;
@@ -272,7 +272,7 @@ int main()
     if (!FP12_equals(&g,&w))
     {
         printf("FAILURE - e(sQ,p)!=e(Q,sP) \n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     ECP2_copy(&Q,&W);
@@ -284,10 +284,9 @@ int main()
     if (!FP12_equals(&g,&w))
     {
         printf("FAILURE - e(sQ,p)!=e(Q,P)^s \n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
-    printf("All tests pass\n");
-
-    return 0;
+    printf("SUCCESS BENCHMARK TEST OF PAIR FUNCTIONS PASSED\n");
+    exit(EXIT_SUCCESS);
 }
