@@ -179,7 +179,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(test)
-add_subdirectory(test/benchmarks)
+add_subdirectory(test/benchmark)
 
 # Only build Python for shared libs
 if (NOT BUILD_SHARED_LIBS)
@@ -224,6 +224,20 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+# benchmarks
+add_custom_command(
+	OUTPUT benchmark_target
+	COMMAND benchtest_rsa
+	COMMAND benchtest_ec
+	COMMAND benchtest_pair
+	VERBATIM
+)
+
+add_custom_target(
+  benchmark
+  DEPENDS benchmark_target
+)
 
 # Build a CPack driven installer package
 include (InstallRequiredSystemLibraries)
