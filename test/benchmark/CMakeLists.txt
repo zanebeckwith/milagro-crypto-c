@@ -21,7 +21,9 @@ add_custom_command(
 	OUTPUT benchmark_target
 	COMMAND benchtest_rsa
 	COMMAND benchtest_ec
+if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
 	COMMAND benchtest_pair
+endif(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
 	VERBATIM
 )
 
