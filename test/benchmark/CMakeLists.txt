@@ -15,19 +15,3 @@ if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
   # Link the executable to the libraries
   target_link_libraries (benchtest_pair amcl) 
 endif(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
-
-# benchmarks
-add_custom_command(
-	OUTPUT benchmark_target
-	COMMAND benchtest_rsa
-	COMMAND benchtest_ec
-if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
-	COMMAND benchtest_pair
-endif(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
-	VERBATIM
-)
-
-add_custom_target(
-  benchmark
-  DEPENDS benchmark_target
-)
