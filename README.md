@@ -107,6 +107,10 @@ NOTE: The default build is for 64 bit machines
 
 On Debian/Ubuntu machine instead of executing the *"sudo make install"* command it is possible to execute *"sudo checkinstall"* to build and install a DEB package.
 
+If you want to run the benchmark tests, use:
+
+    make benchmark
+
 Now you can set the path to where libs and python package are installed:
 
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./:/opt/amcl/lib
