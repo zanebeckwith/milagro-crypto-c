@@ -225,20 +225,6 @@ configure_file(
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
-# benchmarks
-add_custom_command(
-	OUTPUT benchmark_target
-	COMMAND benchtest_rsa
-	COMMAND benchtest_ec
-	COMMAND benchtest_pair
-	VERBATIM
-)
-
-add_custom_target(
-  benchmark
-  DEPENDS benchmark_target
-)
-
 # Build a CPack driven installer package
 include (InstallRequiredSystemLibraries)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
