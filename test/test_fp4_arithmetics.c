@@ -47,6 +47,33 @@ void read_BIG(BIG A, char* string)
     BIG_norm(A);
 }
 
+void read_FP2(FP2 *fp2, char* stringx)
+{
+    char *stringy, *end;
+    BIG x,y;
+
+    stringx++;
+    stringy = strchr(stringx,',');
+    if (stringy == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringy[0] = '\0';
+    stringy++;
+    end = strchr(stringy,']');
+    if (end == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+
+    read_BIG(x,stringx);
+    read_BIG(y,stringy);
+
+    FP2_from_BIGs(fp2,x,y);
+}
+
 void read_FP4(FP4 *fp4, char* stringx1)
 {
     char *stringx2, *stringy1, *stringy2, *end;
@@ -105,7 +132,7 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    int i = 0, len = 0, j = 0;
+    int i = 0, len = 0, j = 1;
     FILE *fp;
 
     char line[LINE_LEN];
@@ -128,15 +155,15 @@ int main(int argc, char** argv)
     const char* FP4conjline = "FP4conj = ";
     FP4 FP4nconj;
     const char* FP4nconjline = "FP4nconj = ";
-/*    BIG BIGsc;
-    const char* BIGscline = "BIGsc = ";
+/*    FP2 FP2sc;
+    const char* FP2scline = "FP2sc = ";
     FP4 FP4pmul;
-    const char* FP4pmulline = "FP4pmul = ";
+    const char* FP4pmulline = "FP4pmul = ";*/
     FP4 FP4imul;
     const char* FP4imulline = "FP4imul = ";
     FP4 FP4sqr;
     const char* FP4sqrline = "FP4sqr = ";
-    FP4 FP4mul;
+/*    FP4 FP4mul;
     const char* FP4mulline = "FP4mul = ";
     FP4 FP4inv;
     const char* FP4invline = "FP4inv = ";
@@ -290,11 +317,6 @@ int main(int argc, char** argv)
             FP4_nconj(&FP4aux1,&FP4aux1);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
-            printf("\naux1\n");
-            FP4_output(&FP4aux1);
-            printf("\n\nFP4nconj\n");
-            FP4_output(&FP4nconj);
-            printf("\n\n");
             if(!FP4_equals(&FP4aux1,&FP4nconj))
             {
                 printf("ERROR computing negative conjugate of FP4, line %d\n",i);
@@ -302,41 +324,39 @@ int main(int argc, char** argv)
             }
         }
 /* Read multiplicator
-        if (!strncmp(line,BIGscline, strlen(BIGscline)))
+        if (!strncmp(line,FP2scline, strlen(FP2scline)))
         {
-            len = strlen(BIGscline);
+            len = strlen(FP2scline);
             linePtr = line + len;
-            read_BIG(BIGsc,linePtr);
+            read_FP2(&FP2sc,linePtr);
+            printf("\nsc1\n");
+            FP2_output(&FP2sc);
+            printf("\n\n");
         }
-// Multiplication by BIGsc
+// Multiplication by FP2
         if (!strncmp(line,FP4pmulline, strlen(FP4pmulline)))
         {
             len = strlen(FP4pmulline);
             linePtr = line + len;
             read_FP4(&FP4pmul,linePtr);
-            FP4_pmul(&FP4aux1,&FP4_1,BIGsc);
-            FP_nres(FP4aux1.a);
-            FP_nres(FP4aux1.b);
+            FP4_pmul(&FP4aux1,&FP4_1,&FP2sc);
+            FP_nres(FP4aux1.a.a);
+            FP_nres(FP4aux1.a.b);
+            FP_nres(FP4aux1.b.a);
+            FP_nres(FP4aux1.b.b);
+            FP4_reduce(&FP4aux1);
+            FP4_norm(&FP4aux1);
+            printf("\naux1\n");
+            FP4_output(&FP4aux1);
+            printf("\n\nFP4pmul\n");
+            FP4_output(&FP4pmul);
+            printf("\n\n");
             if(!FP4_equals(&FP4aux1,&FP4pmul))
             {
-                printf("ERROR in multiplication by BIG, line %d\n",i);
+                printf("ERROR in multiplication by FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-        }
-// Raise FP4 by power BIGsc
-        if (!strncmp(line,FP4powline, strlen(FP4powline)))
-        {
-            len = strlen(FP4powline);
-            linePtr = line + len;
-            read_FP4(&FP4pow,linePtr);
-            FP4_pow(&FP4aux1,&FP4_1,BIGsc);
-            FP4_reduce(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4pow))
-            {
-                printf("ERROR in raising FP by power BIG, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-        }
+        }*/
 // Multiplication by j = 1..10
         if (!strncmp(line,FP4imulline, strlen(FP4imulline)))
         {
@@ -363,16 +383,28 @@ int main(int argc, char** argv)
             FP4_sqr(&FP4aux1,&FP4aux1);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
+            printf("\nFP4aux1\n");
+            FP4_output(&FP4aux1);
+            printf("\n\nFP4sqr\n");
+            FP4_output(&FP4sqr);
+            printf("\n\n");
             if(!FP4_equals(&FP4aux1,&FP4sqr))
             {
                 printf("ERROR in squaring FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            FP4_sqrt(&FP4aux1,&FP4aux1);
-            FP4_neg(&FP4aux2,&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4_1) && !FP4_equals(&FP4aux2,&FP4_1))
+        }
+/* Raise FP4 by power BIGsc
+        if (!strncmp(line,FP4powline, strlen(FP4powline)))
+        {
+            len = strlen(FP4powline);
+            linePtr = line + len;
+            read_FP4(&FP4pow,linePtr);
+            FP4_pow(&FP4aux1,&FP4_1,BIGsc);
+            FP4_reduce(&FP4aux1);
+            if(!FP4_equals(&FP4aux1,&FP4pow))
             {
-                printf("ERROR square/square root consistency FP4, line %d\n",i);
+                printf("ERROR in raising FP by power BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
