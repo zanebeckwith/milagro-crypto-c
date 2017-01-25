@@ -120,13 +120,15 @@ int main(int argc, char** argv)
     const char* FP4_2line = "FP4_2 = ";
     FP4 FP4add;
     const char* FP4addline = "FP4add = ";
-/*    FP4 FP4neg;
+    FP4 FP4neg;
     const char* FP4negline = "FP4neg = ";
     FP4 FP4sub;
     const char* FP4subline = "FP4sub = ";
     FP4 FP4conj;
     const char* FP4conjline = "FP4conj = ";
-    BIG BIGsc;
+    FP4 FP4nconj;
+    const char* FP4nconjline = "FP4nconj = ";
+/*    BIG BIGsc;
     const char* BIGscline = "BIGsc = ";
     FP4 FP4pmul;
     const char* FP4pmulline = "FP4pmul = ";
@@ -154,7 +156,7 @@ int main(int argc, char** argv)
     FP4_zero(&FP4aux2);
 
 // Testing equal function and set zero function
-    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_iszilch(&FP4aux1) || !FP4_iszilch(&FP4aux2))
+    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_iszilch(&FP4aux1) || !FP4_iszilch(&FP4aux2) || !FP4_isreal(&FP4aux1))
     {
         printf("ERROR comparing FP4s or setting FP4 to zero FP\n");
         exit(EXIT_FAILURE);
@@ -165,7 +167,7 @@ int main(int argc, char** argv)
     FP4_one(&FP4aux2);
 
 // Testing equal function and set one function
-    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isunity(&FP4aux1) || !FP4_isunity(&FP4aux2))
+    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isunity(&FP4aux1) || !FP4_isunity(&FP4aux2) || !FP4_isreal(&FP4aux1))
     {
         printf("ERROR comparing FP4s or setting FP4 to unity FP\n");
         exit(EXIT_FAILURE);
@@ -188,38 +190,22 @@ int main(int argc, char** argv)
             len = strlen(FP4_1line);
             linePtr = line + len;
             read_FP4(&FP4_1,linePtr);
-            /*
-            FP4_from_FPs(&FP4aux1,FP4_1.a,FP4_1.b);
-            if(!FP4_equals(&FP4aux1,&FP4_1) != 0)
+// test FP4_from_FP2s
+            FP4_from_FP2s(&FP4aux1,&FP4_1.a,&FP4_1.b);
+            if(!FP4_equals(&FP4aux1,&FP4_1))
             {
-                printf("ERROR in generating FP4 from two FPs, line %d\n",i);
+                printf("ERROR in generating FP4 from two FP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            FP4_from_BIGs(&FP4aux1,FP4_1.a,FP4_1.b);
-            FP_redc(FP4aux1.a);
-            FP_redc(FP4aux1.b);
-            if(!FP4_equals(&FP4aux1,&FP4_1) != 0)
-            {
-                printf("ERROR in generating FP4 from two BIGs, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-            FP4_from_FP(&FP4aux1,FP4_1.a);
+// test FP4_from_FP2 and FP4_isreal
+            FP4_from_FP2(&FP4aux1,&FP4_1.a);
             FP4_copy(&FP4aux2,&FP4_1);
-            BIG_zero(FP4aux2.b);
-            if(!FP4_equals(&FP4aux1,&FP4aux2) != 0)
+            FP2_zero(&FP4aux2.b);
+            if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isreal(&FP4aux1))
             {
-                printf("ERROR in generating FP4 from one FP, line %d\n",i);
+                printf("ERROR in generating FP4 from one FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            FP4_from_BIG(&FP4aux1,FP4_1.a);
-            FP_redc(FP4aux1.a);
-            FP4_copy(&FP4aux2,&FP4_1);
-            BIG_zero(FP4aux2.b);
-            if(!FP4_equals(&FP4aux1,&FP4aux2) != 0)
-            {
-                printf("ERROR in generating FP4 from one BIG, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }*/
         }
 // Read second FP4
         if (!strncmp(line,FP4_2line, strlen(FP4_2line)))
@@ -227,11 +213,6 @@ int main(int argc, char** argv)
             len = strlen(FP4_2line);
             linePtr = line + len;
             read_FP4(&FP4_2,linePtr);
-            printf("\nFP_1\n");
-            FP4_output(&FP4_1);
-            printf("\n\nFP_2\n");
-            FP4_output(&FP4_2);
-            printf("\n");
         }
 // Addition test
         if (!strncmp(line,FP4addline, strlen(FP4addline)))
@@ -244,18 +225,13 @@ int main(int argc, char** argv)
             FP4_add(&FP4aux1,&FP4aux1,&FP4aux2);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
-            printf("\n\nFP_add1\n");
-            FP4_output(&FP4aux1);
-            printf("\n\nFP_add2\n");
-            FP4_output(&FP4add);
-            printf("\n");
             if(!FP4_equals(&FP4aux1,&FP4add))
             {
                 printf("ERROR adding two FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
-/* Negative an FP
+// Test negative of an FP4
         if (!strncmp(line,FP4negline, strlen(FP4negline)))
         {
             len = strlen(FP4negline);
@@ -288,7 +264,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// Compute conjugate
+// Test conjugate
         if (!strncmp(line,FP4conjline, strlen(FP4conjline)))
         {
             len = strlen(FP4conjline);
@@ -304,7 +280,28 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// Read multiplicator
+// Test negative conjugate
+        if (!strncmp(line,FP4nconjline, strlen(FP4nconjline)))
+        {
+            len = strlen(FP4nconjline);
+            linePtr = line + len;
+            read_FP4(&FP4nconj,linePtr);
+            FP4_copy(&FP4aux1,&FP4_1);
+            FP4_nconj(&FP4aux1,&FP4aux1);
+            FP4_reduce(&FP4aux1);
+            FP4_norm(&FP4aux1);
+            printf("\naux1\n");
+            FP4_output(&FP4aux1);
+            printf("\n\nFP4nconj\n");
+            FP4_output(&FP4nconj);
+            printf("\n\n");
+            if(!FP4_equals(&FP4aux1,&FP4nconj))
+            {
+                printf("ERROR computing negative conjugate of FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+/* Read multiplicator
         if (!strncmp(line,BIGscline, strlen(BIGscline)))
         {
             len = strlen(BIGscline);

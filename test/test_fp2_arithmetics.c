@@ -220,7 +220,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// Negative an FP
+// Negative an FP2
         if (!strncmp(line,FP2negline, strlen(FP2negline)))
         {
             len = strlen(FP2negline);
