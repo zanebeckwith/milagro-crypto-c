@@ -179,6 +179,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(test)
+add_subdirectory(benchmark)
 
 # Only build Python for shared libs
 if (NOT BUILD_SHARED_LIBS)
