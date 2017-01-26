@@ -89,6 +89,56 @@ void read_FP2(FP2 *fp2, char* stringx)
 
     FP2_from_FPs(fp2,x,y);
 }
+
+void read_FP4(FP4 *fp4, char* stringx1)
+{
+    char *stringx2, *stringy1, *stringy2, *end;
+    BIG x1,x2,y1,y2;
+    FP2 x,y;
+
+    stringx1 += 2;
+    stringx2 = strchr(stringx1,',');
+    if (stringx2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringx2[0] = '\0';
+    stringx2 ++;
+    stringy1 = strchr(stringx2,']');
+    if (stringy1 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringy1[0] = '\0';
+    stringy1 += 3;
+    stringy2 = strchr(stringy1,',');
+    if (stringy2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringy2[0] = '\0';
+    stringy2++;
+    end = strchr(stringy2,']');
+    if (end == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    end[0] = '\0';
+
+    read_BIG(x1,stringx1);
+    read_BIG(x2,stringx2);
+    read_BIG(y1,stringy1);
+    read_BIG(y2,stringy2);
+
+    FP2_from_BIGs(&x,x1,x2);
+    FP2_from_BIGs(&y,y1,y2);
+
+    FP4_from_FP2s(fp4,&x,&y);
+}
 #endif
 
 int read_ECP(ECP *ecp, char* string)
@@ -214,6 +264,9 @@ int main(int argc, char** argv)
     FP2 fp2, fp2aux;
     const char* FP2line = "FP2 = ";
     const char* FP2rawline = "FP2raw = ";
+    FP4 fp4;
+    const char* FP4line = "FP4 = ";
+    const char* FP4rawline = "FP4raw = ";
 #endif
     ECP ecp;
     ECP ecpinf;
@@ -300,6 +353,18 @@ int main(int argc, char** argv)
             printf("\n");
             printf("%s",FP2rawline);
             FP2_rawoutput(&fp2);
+            printf("\n\n");
+        }
+        if (!strncmp(line,  FP4line, strlen(FP4line)))
+        {
+            len = strlen(FP4line);
+            linePtr = line + len;
+            read_FP4(&fp4,linePtr);
+            printf("%s",FP4line);
+            FP4_output(&fp4);
+            printf("\n");
+            printf("%s",FP4rawline);
+            FP4_rawoutput(&fp4);
             printf("\n\n");
         }
 #endif
