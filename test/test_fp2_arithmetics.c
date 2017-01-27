@@ -301,7 +301,7 @@ int main(int argc, char** argv)
             FP2_reduce(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2pow))
             {
-                printf("ERROR in raising FP by power BIG, line %d\n",i);
+                printf("ERROR in raising FP2 by power BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -355,7 +355,7 @@ int main(int argc, char** argv)
             FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2mul))
             {
-                printf("ERROR in multiplication between two FPs, line %d\n",i);
+                printf("ERROR in multiplication between two FP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
