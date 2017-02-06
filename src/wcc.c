@@ -675,18 +675,6 @@ unsign32 WCC_today(void)
     return (uint32_t)(ti/(60*TIME_SLOT_MINUTES));
 }
 
-/* Initialise a random number generator */
-void WCC_CREATE_CSPRNG(csprng *RNG,octet *SEED)
-{
-    RAND_seed(RNG,SEED->len,SEED->val);
-}
-
-/* Deletes all internal state */
-void WCC_KILL_CSPRNG(csprng *RNG)
-{
-    RAND_clean(RNG);
-}
-
 /* Performe the hash ID using sha256 */
 void WCC_HASH_ID(int sha,octet *ID,octet *HID)
 {

@@ -83,9 +83,9 @@ extern void WCC_HASH_ID(int sha, octet *,octet *);
 extern int WCC_RECOMBINE_G1(octet *,octet *,octet *);
 extern int WCC_RECOMBINE_G2(octet *,octet *,octet *);
 extern unsigned int WCC_today(void);
-extern void WCC_CREATE_CSPRNG(csprng *,octet *);
+extern void CREATE_CSPRNG(csprng *,octet *);
 extern void version(char* info);
-extern void WCC_KILL_CSPRNG(csprng *RNG);
+extern void KILL_CSPRNG(csprng *RNG);
 
 """)
 
@@ -325,7 +325,7 @@ if __name__ == "__main__":
 
     # random number generator
     RNG = ffi.new("csprng*")
-    libwcc.WCC_CREATE_CSPRNG(RNG, RAW)
+    libwcc.CREATE_CSPRNG(RNG, RAW)
 
     # Today's date in epoch days
     date = libwcc.WCC_today()
@@ -504,4 +504,4 @@ if __name__ == "__main__":
         print "libwcc.WCC_RECEIVER_KEY(HASH_TYPE_WCC,date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2) Error %s" % rtn
     print "{0}'s AES Key: {1}".format(bob_id, toHex(KEY2))
 
-    libwcc.WCC_KILL_CSPRNG(RNG)
+    libwcc.KILL_CSPRNG(RNG)

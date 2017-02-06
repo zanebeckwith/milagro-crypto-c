@@ -29,6 +29,7 @@ under the License.
 #include <time.h>
 #include "mpin.h"
 #include "wcc.h"
+#include "randapi.h"
 
 #define DEBUG
 
@@ -134,7 +135,7 @@ int main()
     for (i=0; i<32; i++) SEED.val[i]=i+1;
 
     /* initialise random number generator */
-    WCC_CREATE_CSPRNG(&RNG,&SEED);
+    CREATE_CSPRNG(&RNG,&SEED);
 
     /* Generate Client master secret for MIRACL and Customer */
     rtn = WCC_RANDOM_GENERATE(&RNG,&MS1);
@@ -453,7 +454,7 @@ int main()
         return 1;
     }
 
-    WCC_KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
 
     return 0;
 }

@@ -93,7 +93,7 @@
 /* BLS-12 Curves */
 #define BLS_CURVES 200 /**< Barreto-Lynn-Scott curves */
 #define BLS455 200     /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
-#define BLS383 201     /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
+#define BLS383 201     /**< New AES-128 security BLS curve - Modulus built from -0x1101000000040110  - WEIERSTRASS only */
 
 
 
@@ -161,7 +161,6 @@
 #define MODBYTES (1+(MBITS-1)/8)      /**< Number of bytes in Modulus */
 #define BIGBITS (MODBYTES*8)	      /**< Number of bits representable in a BIG */
 #define FF_BITS (BIGBITS*FFLEN)	      /**< Finite Field Size in bits - must be BIGBITS.2^n */
-
 
 /* modulus types */
 
@@ -368,10 +367,10 @@
 #error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 28		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
@@ -390,7 +389,7 @@
 #define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 61		     /**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
@@ -565,6 +564,14 @@ typedef chunk DBIG[DNLEN];   /**< Define type DBIG as array of chunks */
 
 /* catch field excesses */
 #define EXCESS(a) ((a[NLEN-1]&OMASK)>>(TBITS)) /**< Field Excess */
+
+
+#define P_MBITS (MODBYTES*8) /**< TODO */
+#define P_TBITS (P_MBITS%BASEBITS) /**< TODO */
+#define P_EXCESS(a) ((a[NLEN-1])>>(P_TBITS)) /**< TODO */
+#define P_FEXCESS ((chunk)1<<(BASEBITS*NLEN-P_MBITS)) /**< TODO */
+
+
 
 /* Field Params - see rom.c */
 extern const BIG Modulus;  /**< Actual Modulus set in rom.c */

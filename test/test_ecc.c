@@ -30,6 +30,7 @@
 #include <string.h>
 #include <time.h>
 #include "ecdh.h"
+#include "randapi.h"
 
 //#define DEBUG
 
@@ -79,7 +80,7 @@ int main()
     RAW.val[3]=ran>>24;
     for (i=0; i<100; i++) RAW.val[i]=i;
 
-    ECC_CREATE_CSPRNG(&RNG,&RAW);
+    CREATE_CSPRNG(&RNG,&RAW);
 
 // Set salt
     for (j=0; j<100; j++)
@@ -223,7 +224,7 @@ int main()
 #endif
     }
 
-    ECC_KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
 
     printf("SUCCESS\n");
     return 0;
