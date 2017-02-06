@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     char * linePtr = NULL;
 
     BIG M;
-    FP2 FP2aux1, FP2aux2;
+    FP2 FP2aux1, FP2aux2, FP2aux3, FP2aux4;
 
     FP2 FP2_1;
     const char* FP2_1line = "FP2_1 = ";
@@ -203,7 +203,7 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_FP2(&FP2_2,linePtr);
         }
-// Addition test
+// Addition tests
         if (!strncmp(line,FP2addline, strlen(FP2addline)))
         {
             len = strlen(FP2addline);
@@ -212,15 +212,36 @@ int main(int argc, char** argv)
             FP2_copy(&FP2aux1,&FP2_1);
             FP2_copy(&FP2aux2,&FP2_2);
             FP2_add(&FP2aux1,&FP2aux1,&FP2aux2);
+            FP2_copy(&FP2aux3,&FP2_1); // test commutativity P+Q = Q+P
+            FP2_add(&FP2aux2,&FP2aux2,&FP2aux3);
             FP2_reduce(&FP2aux1);
             FP2_norm(&FP2aux1);
-            if(!FP2_equals(&FP2aux1,&FP2add))
+            FP2_reduce(&FP2aux2);
+            FP2_norm(&FP2aux2);
+            if(!FP2_equals(&FP2aux1,&FP2add) || !FP2_equals(&FP2aux2,&FP2add))
             {
                 printf("ERROR adding two FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
+            FP2_copy(&FP2aux1,&FP2_1); // test associativity (P+Q)+R = P+(Q+R)
+            FP2_copy(&FP2aux3,&FP2_1);
+            FP2_copy(&FP2aux2,&FP2_2);
+            FP2_copy(&FP2aux4,&FP2add);
+            FP2_add(&FP2aux1,&FP2aux1,&FP2aux2);
+            FP2_add(&FP2aux1,&FP2aux1,&FP2aux4);
+            FP2_add(&FP2aux2,&FP2aux2,&FP2aux4);
+            FP2_add(&FP2aux2,&FP2aux2,&FP2aux3);
+            FP2_reduce(&FP2aux1);
+            FP2_reduce(&FP2aux2);
+            FP2_norm(&FP2aux1);
+            FP2_norm(&FP2aux2);
+            if(!FP2_equals(&FP2aux1,&FP2aux2))
+            {
+                printf("ERROR testing associativity between three FP2s, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
         }
-// Negative an FP
+// Negative an FP2
         if (!strncmp(line,FP2negline, strlen(FP2negline)))
         {
             len = strlen(FP2negline);
@@ -301,7 +322,7 @@ int main(int argc, char** argv)
             FP2_reduce(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2pow))
             {
-                printf("ERROR in raising FP by power BIG, line %d\n",i);
+                printf("ERROR in raising FP2 by power BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -355,7 +376,7 @@ int main(int argc, char** argv)
             FP2_norm(&FP2aux1);
             if(!FP2_equals(&FP2aux1,&FP2mul))
             {
-                printf("ERROR in multiplication between two FPs, line %d\n",i);
+                printf("ERROR in multiplication between two FP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }

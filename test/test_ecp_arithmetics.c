@@ -199,9 +199,23 @@ int main(int argc, char** argv)
             ECP_copy(&ECPaux1,&ecp1);
             ECP_add(&ECPaux1,&ecp2);
             ECP_affine(&ECPaux1);
-            if(!ECP_equals(&ECPaux1,&ecpsum)) // test addition P+Q
+            ECP_copy(&ECPaux2,&ecp2);
+            ECP_add(&ECPaux2,&ecp1);
+            ECP_affine(&ECPaux2);
+            if(!ECP_equals(&ECPaux1,&ecpsum) || !ECP_equals(&ECPaux2,&ecpsum)) // test addition P+Q and Q+P (commutativity)
             {
                 printf("ERROR adding two ECPs, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            ECP_copy(&ECPaux1,&ecp1); // test associativity
+            ECP_add(&ECPaux1,&ecp2);
+            ECP_add(&ECPaux1,&ecpsum);
+            ECP_copy(&ECPaux2,&ecpsum);
+            ECP_add(&ECPaux2,&ecp2);
+            ECP_add(&ECPaux2,&ecp1);
+            if(!ECP_equals(&ECPaux1,&ECPaux2)) // test associativity (P+Q)+R = P+(Q+R)
+            {
+                printf("ERROR testing associativity between three ECPs, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }

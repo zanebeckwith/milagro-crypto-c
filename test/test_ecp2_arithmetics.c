@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    ECP2 ECP2aux, inf;
+    ECP2 ECP2aux1, ECP2aux2, inf;
     FP2 FP2aux1,FP2aux2;
 
     char oct[LINE_LEN];
@@ -160,8 +160,8 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
             ECP2_toOctet(&OCTaux,&ecp2[0]);
-            ECP2_fromOctet(&ECP2aux,&OCTaux);
-            if(!ECP2_equals(&ECP2aux,&ecp2[0]))
+            ECP2_fromOctet(&ECP2aux1,&OCTaux);
+            if(!ECP2_equals(&ECP2aux1,&ecp2[0]))
             {
                 printf("ERROR converting ECP2 to/from OCTET, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -206,12 +206,28 @@ int main(int argc, char** argv)
                 printf("ERROR reading test vector input ECP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            ECP2_copy(&ECP2aux,&ecp2[0]);
-            ECP2_add(&ECP2aux,&ecp2[1]);
-            ECP2_affine(&ECP2aux);
-            if(!ECP2_equals(&ECP2aux,&ecp2sum))
+            ECP2_copy(&ECP2aux1,&ecp2[0]);
+            ECP2_add(&ECP2aux1,&ecp2[1]);
+            ECP2_affine(&ECP2aux1);
+            ECP2_copy(&ECP2aux2,&ecp2[1]); // testing commutativity P+Q = Q+P
+            ECP2_add(&ECP2aux2,&ecp2[0]);
+            ECP2_affine(&ECP2aux2);            
+            if(!ECP2_equals(&ECP2aux1,&ecp2sum) || !ECP2_equals(&ECP2aux2,&ecp2sum))
             {
                 printf("ERROR adding two ECP2s, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            ECP2_copy(&ECP2aux1,&ecp2[0]); // testing associativity (P+Q)+R = P+(Q+R)
+            ECP2_add(&ECP2aux1,&ecp2[1]);
+            ECP2_add(&ECP2aux1,&ecp2[2]);
+            ECP2_affine(&ECP2aux1);
+            ECP2_copy(&ECP2aux2,&ecp2[2]);
+            ECP2_add(&ECP2aux2,&ecp2[1]);
+            ECP2_add(&ECP2aux2,&ecp2[0]);
+            ECP2_affine(&ECP2aux2);
+            if(!ECP2_equals(&ECP2aux1,&ECP2aux2))
+            {
+                printf("ERROR testing associativity bewtween three ECP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -224,10 +240,10 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            ECP2_copy(&ECP2aux,&ecp2[0]);
-            ECP2_neg(&ECP2aux);
-            ECP2_affine(&ECP2aux);
-            if(!ECP2_equals(&ECP2aux,&ecp2neg))
+            ECP2_copy(&ECP2aux1,&ecp2[0]);
+            ECP2_neg(&ECP2aux1);
+            ECP2_affine(&ECP2aux1);
+            if(!ECP2_equals(&ECP2aux1,&ecp2neg))
             {
                 printf("ERROR computing negative of ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -242,10 +258,10 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            ECP2_copy(&ECP2aux,&ecp2[0]);
-            ECP2_sub(&ECP2aux,&ecp2[1]);
-            ECP2_affine(&ECP2aux);
-            if(!ECP2_equals(&ECP2aux,&ecp2sub))
+            ECP2_copy(&ECP2aux1,&ecp2[0]);
+            ECP2_sub(&ECP2aux1,&ecp2[1]);
+            ECP2_affine(&ECP2aux1);
+            if(!ECP2_equals(&ECP2aux1,&ecp2sub))
             {
                 printf("ERROR performing subtraction bewtween two ECP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -260,10 +276,10 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            ECP2_copy(&ECP2aux,&ecp2[0]);
-            ECP2_dbl(&ECP2aux);
-            ECP2_affine(&ECP2aux);
-            if(!ECP2_equals(&ECP2aux,&ecp2dbl))
+            ECP2_copy(&ECP2aux1,&ecp2[0]);
+            ECP2_dbl(&ECP2aux1);
+            ECP2_affine(&ECP2aux1);
+            if(!ECP2_equals(&ECP2aux1,&ecp2dbl))
             {
                 printf("ERROR computing double of ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -302,10 +318,10 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            ECP2_copy(&ECP2aux,&ecp2[0]);
-            ECP2_mul(&ECP2aux,BIGscalar[0]);
-            ECP2_affine(&ECP2aux);
-            if(!ECP2_equals(&ECP2aux,&ecp2mul))
+            ECP2_copy(&ECP2aux1,&ecp2[0]);
+            ECP2_mul(&ECP2aux1,BIGscalar[0]);
+            ECP2_affine(&ECP2aux1);
+            if(!ECP2_equals(&ECP2aux1,&ecp2mul))
             {
                 printf("ERROR computing multiplication of ECP2 by a scalar, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -320,9 +336,9 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            ECP2_mul4(&ECP2aux,ecp2,BIGscalar);
-            ECP2_affine(&ECP2aux);
-            if(!ECP2_equals(&ECP2aux,&ecp2mul4))
+            ECP2_mul4(&ECP2aux1,ecp2,BIGscalar);
+            ECP2_affine(&ECP2aux1);
+            if(!ECP2_equals(&ECP2aux1,&ecp2mul4))
             {
                 printf("ERROR computing linear combination of 4 ECP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -358,7 +374,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
             ECP2_get(&FP2aux1,&FP2aux2,&ecp2[0]);
-            ECP2_setx(&ECP2aux,&FP2aux1);
+            ECP2_setx(&ECP2aux1,&FP2aux1);
         }
         if (!strncmp(line,  ECP2set2line, strlen(ECP2set2line)))
         {
@@ -369,7 +385,7 @@ int main(int argc, char** argv)
                 printf("ERROR getting test vector input ECP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            if((!ECP2_equals(&ECP2aux,&ecp2set2)) && (!ECP2_equals(&ECP2aux,&ecp2set1)))
+            if((!ECP2_equals(&ECP2aux1,&ecp2set2)) && (!ECP2_equals(&ECP2aux1,&ecp2set1)))
             {
                 printf("ERROR computing ECP2 from coordinate x and with y set2, line %d\n",i);
                 exit(EXIT_FAILURE);
