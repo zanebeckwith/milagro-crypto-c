@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define LINE_LEN 10000
+#define LINE_LEN 1000
 #define MAX_STRING 300
 
 void read_BIG(BIG A, char* string)

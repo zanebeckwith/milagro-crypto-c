@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define LINE_LEN 10000
+#define LINE_LEN 1000
 #define MAX_STRING 300
 
 void read_BIG(BIG A, char* string)
@@ -440,6 +440,6 @@ int main(int argc, char** argv)
     }
     fclose(fp);
 
-    printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");
+    printf("SUCCESS TEST ARITMETIC OF FP2 PASSED\n");
     exit(EXIT_SUCCESS);
 }

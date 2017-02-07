@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define LINE_LEN 10000
+#define LINE_LEN 1000
 #define MAX_STRING 300
 
 
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_fp2_arithmetics [path to test vector file]\n");
+        printf("usage: ./test_fp4_arithmetics [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -523,6 +523,6 @@ int main(int argc, char** argv)
     }
     fclose(fp);
 
-    printf("SUCCESS TEST ARITMETIC OF FP PASSED\n");
+    printf("SUCCESS TEST ARITMETIC OF FP4 PASSED\n");
     exit(EXIT_SUCCESS);
 }
