@@ -158,8 +158,8 @@ int main(int argc, char** argv)
     const char* FP4nconjline = "FP4nconj = ";
     FP2 FP2sc;
     const char* FP2scline = "FP2sc = ";
-/*    FP4 FP4pmul;
-    const char* FP4pmulline = "FP4pmul = ";*/
+    /*    FP4 FP4pmul;
+        const char* FP4pmulline = "FP4pmul = ";*/
     FP4 FP4imul;
     const char* FP4imulline = "FP4imul = ";
     FP4 FP4sqr;
@@ -361,33 +361,33 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_FP2(&FP2sc,linePtr);
         }
-/* Multiplication by FP2
-        if (!strncmp(line,FP4pmulline, strlen(FP4pmulline)))
-        {
-            len = strlen(FP4pmulline);
-            linePtr = line + len;
-            read_FP4(&FP4pmul,linePtr);
-            FP4_pmul(&FP4aux1,&FP4_1,&FP2sc);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            FP2 fp2;
-            FP2_copy(&fp2,&FP4_1.a);
-            FP2_mul(&fp2,&fp2,&FP2sc);
-            printf("\nfp2 \n");
-            FP2_reduce(&fp2);
-            FP2_norm(&fp2);
-            FP2_output(&fp2);
-            if(!FP4_equals(&FP4aux1,&FP4pmul))
-            {
-                printf("\nFPaux1\n");
-            	FP4_output(&FP4aux1);
-            	printf("\n\nFP4pmul\n");
-            	FP4_output(&FP4pmul);
-            	printf("\n\n");
-                printf("ERROR in multiplication by FP2, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-        }*/
+        /* Multiplication by FP2
+                if (!strncmp(line,FP4pmulline, strlen(FP4pmulline)))
+                {
+                    len = strlen(FP4pmulline);
+                    linePtr = line + len;
+                    read_FP4(&FP4pmul,linePtr);
+                    FP4_pmul(&FP4aux1,&FP4_1,&FP2sc);
+                    FP4_reduce(&FP4aux1);
+                    FP4_norm(&FP4aux1);
+                    FP2 fp2;
+                    FP2_copy(&fp2,&FP4_1.a);
+                    FP2_mul(&fp2,&fp2,&FP2sc);
+                    printf("\nfp2 \n");
+                    FP2_reduce(&fp2);
+                    FP2_norm(&fp2);
+                    FP2_output(&fp2);
+                    if(!FP4_equals(&FP4aux1,&FP4pmul))
+                    {
+                        printf("\nFPaux1\n");
+                    	FP4_output(&FP4aux1);
+                    	printf("\n\nFP4pmul\n");
+                    	FP4_output(&FP4pmul);
+                    	printf("\n\n");
+                        printf("ERROR in multiplication by FP2, line %d\n",i);
+                        exit(EXIT_FAILURE);
+                    }
+                }*/
 // Multiplication by j = 0..10
         if (!strncmp(line,FP4imulline, strlen(FP4imulline)))
         {
@@ -494,7 +494,7 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_BIG(BIGsc,linePtr);
         }
-// Raise FP4 by BIG power 
+// Raise FP4 by BIG power
         if (!strncmp(line,FP4powline, strlen(FP4powline)))
         {
             len = strlen(FP4powline);

@@ -224,7 +224,7 @@ int main(int argc, char** argv)
                 printf("ERROR adding two FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
- // test associativity (P+Q)+R = P+(Q+R)
+// test associativity (P+Q)+R = P+(Q+R)
             FP2_copy(&FP2aux1,&FP2_1);
             FP2_copy(&FP2aux3,&FP2_1);
             FP2_copy(&FP2aux2,&FP2_2);
