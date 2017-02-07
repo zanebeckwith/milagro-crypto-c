@@ -132,13 +132,14 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    int i = 0, len = 0, j = 1;
+    int i = 0, len = 0, j = 0;
     FILE *fp;
 
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    BIG M;
+    BIG M, Fr_a, Fr_b;
+    FP2 Frob;
     FP4 FP4aux1, FP4aux2;
 
     FP4 FP4_1;
@@ -157,8 +158,8 @@ int main(int argc, char** argv)
     const char* FP4nconjline = "FP4nconj = ";
     FP2 FP2sc;
     const char* FP2scline = "FP2sc = ";
-    FP4 FP4pmul;
-    const char* FP4pmulline = "FP4pmul = ";
+/*    FP4 FP4pmul;
+    const char* FP4pmulline = "FP4pmul = ";*/
     FP4 FP4imul;
     const char* FP4imulline = "FP4imul = ";
     FP4 FP4sqr;
@@ -173,8 +174,17 @@ int main(int argc, char** argv)
     const char* BIGscline = "BIGsc = ";
     FP4 FP4pow;
     const char* FP4powline = "FP4pow = ";
+    FP4 FP4frob;
+    const char* FP4frobline = "FP4frob = ";
 
     BIG_rcopy(M,Modulus);
+    BIG_rcopy(Fr_a,CURVE_Fra);
+    BIG_rcopy(Fr_b,CURVE_Frb);
+    FP2_from_BIGs(&Frob,Fr_a,Fr_b);
+
+    printf("Frob constant: ");
+    FP2_output(&Frob);
+    printf("\n\n");
 
 // Set to zero
     FP4_zero(&FP4aux1);
@@ -219,8 +229,8 @@ int main(int argc, char** argv)
             FP4_from_FP2s(&FP4aux1,&FP4_1.a,&FP4_1.b);
             if(!FP4_equals(&FP4aux1,&FP4_1))
             {
-                //printf("ERROR in generating FP4 from two FP2s, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR in generating FP4 from two FP2s, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
 // test FP4_from_FP2 and FP4_isreal
             FP4_from_FP2(&FP4aux1,&FP4_1.a);
@@ -228,8 +238,8 @@ int main(int argc, char** argv)
             FP2_zero(&FP4aux2.b);
             if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isreal(&FP4aux1))
             {
-                //printf("ERROR in generating FP4 from one FP2, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR in generating FP4 from one FP2, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
         }
 // Read second FP4
@@ -252,8 +262,8 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4add))
             {
-                //printf("ERROR adding two FP4, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR adding two FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
         }
 // Test negative of an FP4
@@ -268,8 +278,8 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4neg))
             {
-                //printf("ERROR in computing negative of FP4, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR in computing negative of FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
         }
 // Subtraction test
@@ -285,8 +295,8 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4sub) != 0)
             {
-                //printf("ERROR subtraction between two FP4, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR subtraction between two FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
         }
 // Test conjugate
@@ -301,8 +311,8 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4conj))
             {
-                //printf("ERROR computing conjugate of FP4, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR computing conjugate of FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
         }
 // Test negative conjugate
@@ -317,8 +327,8 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4nconj))
             {
-                //printf("ERROR computing negative conjugate of FP4, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR computing negative conjugate of FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
         }
 // Read multiplicator
@@ -328,19 +338,22 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_FP2(&FP2sc,linePtr);
         }
-// Multiplication by FP2
+/* Multiplication by FP2
         if (!strncmp(line,FP4pmulline, strlen(FP4pmulline)))
         {
             len = strlen(FP4pmulline);
             linePtr = line + len;
             read_FP4(&FP4pmul,linePtr);
             FP4_pmul(&FP4aux1,&FP4_1,&FP2sc);
-            FP_nres(FP4aux1.a.a);
-            FP_nres(FP4aux1.a.b);
-            FP_nres(FP4aux1.b.a);
-            FP_nres(FP4aux1.b.b);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
+            FP2 fp2;
+            FP2_copy(&fp2,&FP4_1.a);
+            FP2_mul(&fp2,&fp2,&FP2sc);
+            printf("\nfp2 \n");
+            FP2_reduce(&fp2);
+            FP2_norm(&fp2);
+            FP2_output(&fp2);
             if(!FP4_equals(&FP4aux1,&FP4pmul))
             {
                 printf("\nFPaux1\n");
@@ -348,14 +361,11 @@ int main(int argc, char** argv)
             	printf("\n\nFP4pmul\n");
             	FP4_output(&FP4pmul);
             	printf("\n\n");
-
-                //printf("ERROR in multiplication by FP2, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("ERROR in multiplication by FP2, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
-            else
-                printf("1\n\n");
-        }
-// Multiplication by j = 1..10
+        }*/
+// Multiplication by j = 0..10
         if (!strncmp(line,FP4imulline, strlen(FP4imulline)))
         {
             len = strlen(FP4imulline);
@@ -381,18 +391,16 @@ int main(int argc, char** argv)
             FP4_sqr(&FP4aux1,&FP4aux1);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
-            /*printf("\nFP4aux1\n");
-            FP4_output(&FP4aux1);
-            printf("\n\nFP4sqr\n");
-            FP4_output(&FP4sqr);
-            printf("\n\n");*/
             if(!FP4_equals(&FP4aux1,&FP4sqr))
             {
-                //printf("ERROR in squaring FP4, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("\nFP4aux1\n");
+                FP4_output(&FP4aux1);
+                printf("\n\nFP4sqr\n");
+                FP4_output(&FP4sqr);
+                printf("\n\n");
+                printf("ERROR in squaring FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
-            else
-                printf("1\n\n");
         }
 // Multiplication between two FP4s
         if (!strncmp(line,FP4mulline, strlen(FP4mulline)))
@@ -403,18 +411,16 @@ int main(int argc, char** argv)
             FP4_mul(&FP4aux1,&FP4_1,&FP4_2);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
-            /*printf("\nFP4aux1\n");
-            FP4_output(&FP4aux1);
-            printf("\n\nFP4mul\n");
-            FP4_output(&FP4mul);
-            printf("\n\n");*/
             if(!FP4_equals(&FP4aux1,&FP4mul))
             {
-                //printf("ERROR in multiplication between two FP4s, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("\nFP4aux1\n");
+                FP4_output(&FP4aux1);
+                printf("\n\nFP4mul\n");
+                FP4_output(&FP4mul);
+                printf("\n\n");
+                printf("ERROR in multiplication between two FP4s, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
-            else
-                printf("1\n\n");
         }
 // Inverse
         if (!strncmp(line,FP4invline, strlen(FP4invline)))
@@ -426,18 +432,16 @@ int main(int argc, char** argv)
             FP4_inv(&FP4aux1,&FP4aux1);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
-            /*printf("\nFP4aux1\n");
-            FP4_output(&FP4aux1);
-            printf("\n\nFP4inv\n");
-            FP4_output(&FP4inv);
-            printf("\n\n");*/
             if(!FP4_equals(&FP4aux1,&FP4inv))
             {
-                //printf("ERROR in computing inverse of FP4, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("\nFP4aux1\n");
+                FP4_output(&FP4aux1);
+                printf("\n\nFP4inv\n");
+                FP4_output(&FP4inv);
+                printf("\n\n");
+                printf("ERROR in computing inverse of FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
-            else
-                printf("1\n\n");
         }
 // Test multiplication of an FP4 instance by sqrt(1+sqrt(-1))
         if (!strncmp(line,FP4muljline, strlen(FP4muljline)))
@@ -451,16 +455,14 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4mulj))
             {
-                /*printf("\nFP4aux1\n");
+                printf("\nFP4aux1\n");
                 FP4_output(&FP4aux1);
                 printf("\n\nFP4mulj\n");
                 FP4_output(&FP4mulj);
-                printf("\n\n");*/
-                //printf("ERROR in  multiplication of an FP4 instance by sqrt(1+sqrt(-1)), line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("\n\n");
+                printf("ERROR in  multiplication of an FP4 instance by sqrt(1+sqrt(-1)), line %d\n",i);
+                exit(EXIT_FAILURE);
             }
-            else
-                printf("1\n\n");
         }
 // Read exponent
         if (!strncmp(line,BIGscline, strlen(BIGscline)))
@@ -479,16 +481,34 @@ int main(int argc, char** argv)
             FP4_reduce(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4pow))
             {
-                /*printf("\nFP4aux1\n");
+                printf("\nFP4aux1\n");
                 FP4_output(&FP4aux1);
                 printf("\n\nFP4pow\n");
                 FP4_output(&FP4pow);
-                printf("\n\n");*/
-                //printf("ERROR in raising FP2 by BIG power, line %d\n",i);
-                printf("0\n\n");//exit(EXIT_FAILURE);
+                printf("\n\n");
+                printf("ERROR in raising FP4 by BIG power, line %d\n",i);
+                exit(EXIT_FAILURE);
             }
-            else
-                printf("1\n\n");
+        }
+// Raises an FP4 to the power of the internal modulus p, using the Frobenius constant f
+        if (!strncmp(line,FP4frobline, strlen(FP4frobline)))
+        {
+            len = strlen(FP4frobline);
+            linePtr = line + len;
+            read_FP4(&FP4frob,linePtr);
+            FP4_copy(&FP4aux1,&FP4_1);
+            FP4_frob(&FP4aux1,&Frob);
+            FP4_reduce(&FP4aux1);
+            if(!FP4_equals(&FP4aux1,&FP4frob))
+            {
+                printf("\nFP4aux1\n");
+                FP4_output(&FP4aux1);
+                printf("\n\nFP4frob\n");
+                FP4_output(&FP4frob);
+                printf("\n\n");
+                printf("ERROR in raising FP4 by an internal modulus p, using the Frobenius constant f, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
         }
     }
     fclose(fp);
