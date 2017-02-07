@@ -67,6 +67,7 @@ void read_FP2(FP2 *fp2, char* stringx)
         printf("ERROR unexpected test vector\n");
         exit(EXIT_FAILURE);
     }
+    end[0] = '\0';
 
     read_BIG(x,stringx);
     read_BIG(y,stringy);
@@ -158,8 +159,8 @@ int main(int argc, char** argv)
     const char* FP4nconjline = "FP4nconj = ";
     FP2 FP2sc;
     const char* FP2scline = "FP2sc = ";
-    /*    FP4 FP4pmul;
-        const char* FP4pmulline = "FP4pmul = ";*/
+    FP4 FP4pmul;
+    const char* FP4pmulline = "FP4pmul = ";
     FP4 FP4imul;
     const char* FP4imulline = "FP4imul = ";
     FP4 FP4sqr;
@@ -361,33 +362,21 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_FP2(&FP2sc,linePtr);
         }
-        /* Multiplication by FP2
-                if (!strncmp(line,FP4pmulline, strlen(FP4pmulline)))
-                {
-                    len = strlen(FP4pmulline);
-                    linePtr = line + len;
-                    read_FP4(&FP4pmul,linePtr);
-                    FP4_pmul(&FP4aux1,&FP4_1,&FP2sc);
-                    FP4_reduce(&FP4aux1);
-                    FP4_norm(&FP4aux1);
-                    FP2 fp2;
-                    FP2_copy(&fp2,&FP4_1.a);
-                    FP2_mul(&fp2,&fp2,&FP2sc);
-                    printf("\nfp2 \n");
-                    FP2_reduce(&fp2);
-                    FP2_norm(&fp2);
-                    FP2_output(&fp2);
-                    if(!FP4_equals(&FP4aux1,&FP4pmul))
-                    {
-                        printf("\nFPaux1\n");
-                    	FP4_output(&FP4aux1);
-                    	printf("\n\nFP4pmul\n");
-                    	FP4_output(&FP4pmul);
-                    	printf("\n\n");
-                        printf("ERROR in multiplication by FP2, line %d\n",i);
-                        exit(EXIT_FAILURE);
-                    }
-                }*/
+// Multiplication by FP2
+        if (!strncmp(line,FP4pmulline, strlen(FP4pmulline)))
+        {
+            len = strlen(FP4pmulline);
+            linePtr = line + len;
+            read_FP4(&FP4pmul,linePtr);
+            FP4_pmul(&FP4aux1,&FP4_1,&FP2sc);
+            FP4_reduce(&FP4aux1);
+            FP4_norm(&FP4aux1);
+            if(!FP4_equals(&FP4aux1,&FP4pmul))
+            {
+                printf("ERROR in multiplication by FP2, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
 // Multiplication by j = 0..10
         if (!strncmp(line,FP4imulline, strlen(FP4imulline)))
         {
@@ -416,11 +405,6 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4sqr))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4sqr\n");
-                FP4_output(&FP4sqr);
-                printf("\n\n");
                 printf("ERROR in squaring FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -436,11 +420,6 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4mul))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4mul\n");
-                FP4_output(&FP4mul);
-                printf("\n\n");
                 printf("ERROR in multiplication between two FP4s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -457,11 +436,6 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4inv))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4inv\n");
-                FP4_output(&FP4inv);
-                printf("\n\n");
                 printf("ERROR in computing inverse of FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -478,11 +452,6 @@ int main(int argc, char** argv)
             FP4_norm(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4mulj))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4mulj\n");
-                FP4_output(&FP4mulj);
-                printf("\n\n");
                 printf("ERROR in  multiplication of an FP4 instance by sqrt(1+sqrt(-1)), line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -504,11 +473,6 @@ int main(int argc, char** argv)
             FP4_reduce(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4pow))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4pow\n");
-                FP4_output(&FP4pow);
-                printf("\n\n");
                 printf("ERROR in raising FP4 by BIG power, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -524,11 +488,6 @@ int main(int argc, char** argv)
             FP4_reduce(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4frob))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4frob\n");
-                FP4_output(&FP4frob);
-                printf("\n\n");
                 printf("ERROR in raising FP4 by an internal modulus p, using the Frobenius constant f, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -543,11 +502,6 @@ int main(int argc, char** argv)
             FP4_reduce(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4_xtrA))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4_xtrA\n");
-                FP4_output(&FP4_xtrA);
-                printf("\n\n");
                 printf("ERROR in testing the XTR addition function r=w*x-conj(x)*y+z, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
@@ -562,11 +516,6 @@ int main(int argc, char** argv)
             FP4_reduce(&FP4aux1);
             if(!FP4_equals(&FP4aux1,&FP4_xtrD))
             {
-                printf("\nFP4aux1\n");
-                FP4_output(&FP4aux1);
-                printf("\n\nFP4_xtrD\n");
-                FP4_output(&FP4_xtrD);
-                printf("\n\n");
                 printf("ERROR in testing the XTR doubling function r=x^2-2*conj(x), line %d\n",i);
                 exit(EXIT_FAILURE);
             }
