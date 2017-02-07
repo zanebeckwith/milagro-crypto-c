@@ -30,6 +30,7 @@
 #include <string.h>
 #include <time.h>
 #include "mpin.h"
+#include "randapi.h"
 
 int main()
 {
@@ -103,7 +104,7 @@ int main()
     for (i=0; i<100; i++) SEED.val[i]=i+1;
 
     /* initialise random number generator */
-    MPIN_CREATE_CSPRNG(&RNG,&SEED);
+    CREATE_CSPRNG(&RNG,&SEED);
 
     /* Hash ID */
     MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
@@ -281,6 +282,6 @@ int main()
     {
         printf("SUCCESS Error Code %d\n", rtn);
     }
-    MPIN_KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
     return 0;
 }

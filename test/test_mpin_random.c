@@ -31,6 +31,7 @@
 #include <time.h>
 #include "config.h"
 #include "mpin.h"
+#include "randapi.h"
 
 // Define PIN range:
 #define MAX_RANGE 10000
@@ -130,7 +131,7 @@ int main()
     OCT_output(&SEED);
 
     /* initialise random number generator */
-    MPIN_CREATE_CSPRNG(&RNG,&SEED);
+    CREATE_CSPRNG(&RNG,&SEED);
 
     for(iter=1; iter<nRandomTests+1; iter++)
     {
@@ -322,6 +323,6 @@ int main()
             printf("Iteration %d SUCCESS Error Code %d\n\n", iter, rtn);
         }
     }
-    MPIN_KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
     return 0;
 }
