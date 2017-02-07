@@ -140,7 +140,7 @@ int main(int argc, char** argv)
 
     BIG M, Fr_a, Fr_b;
     FP2 Frob;
-    FP4 FP4aux1, FP4aux2;
+    FP4 FP4aux1, FP4aux2, FP4aux3, FP4aux4;
 
     FP4 FP4_1;
     const char* FP4_1line = "FP4_1 = ";
@@ -258,11 +258,34 @@ int main(int argc, char** argv)
             FP4_copy(&FP4aux1,&FP4_1);
             FP4_copy(&FP4aux2,&FP4_2);
             FP4_add(&FP4aux1,&FP4aux1,&FP4aux2);
+// test commutativity P+Q = Q+P
+            FP4_copy(&FP4aux3,&FP4_1);
+            FP4_add(&FP4aux2,&FP4aux2,&FP4aux3);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4add))
+            FP4_reduce(&FP4aux2);
+            FP4_norm(&FP4aux2);
+            if(!FP4_equals(&FP4aux1,&FP4add) || !FP4_equals(&FP4aux2,&FP4add))
             {
                 printf("ERROR adding two FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+// test associativity (P+Q)+R = P+(Q+R)
+            FP4_copy(&FP4aux1,&FP4_1);
+            FP4_copy(&FP4aux3,&FP4_1);
+            FP4_copy(&FP4aux2,&FP4_2);
+            FP4_copy(&FP4aux4,&FP4add);
+            FP4_add(&FP4aux1,&FP4aux1,&FP4aux2);
+            FP4_add(&FP4aux1,&FP4aux1,&FP4aux4);
+            FP4_add(&FP4aux2,&FP4aux2,&FP4aux4);
+            FP4_add(&FP4aux2,&FP4aux2,&FP4aux3);
+            FP4_reduce(&FP4aux1);
+            FP4_reduce(&FP4aux2);
+            FP4_norm(&FP4aux1);
+            FP4_norm(&FP4aux2);
+            if(!FP4_equals(&FP4aux1,&FP4aux2))
+            {
+                printf("ERROR testing associativity between three FP4s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
