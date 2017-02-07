@@ -2062,7 +2062,7 @@ extern void FP4_reduce(FP4 *x);
 	@param b BIG number
  */
 extern void FP4_pow(FP4 *x,FP4 *y,BIG b);
-/**	@brief Raises an FP4 to the power of the internal modulus p, using the Frobenius
+/**	@brief Raises an FP4 to the power of the internal modulus p, using the Frobenius constant
  *
 	@param x FP4 instance, on exit = x^p
 	@param f FP2 precalculated Frobenius constant

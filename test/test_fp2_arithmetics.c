@@ -212,7 +212,8 @@ int main(int argc, char** argv)
             FP2_copy(&FP2aux1,&FP2_1);
             FP2_copy(&FP2aux2,&FP2_2);
             FP2_add(&FP2aux1,&FP2aux1,&FP2aux2);
-            FP2_copy(&FP2aux3,&FP2_1); // test commutativity P+Q = Q+P
+// test commutativity P+Q = Q+P
+            FP2_copy(&FP2aux3,&FP2_1);
             FP2_add(&FP2aux2,&FP2aux2,&FP2aux3);
             FP2_reduce(&FP2aux1);
             FP2_norm(&FP2aux1);
@@ -223,7 +224,8 @@ int main(int argc, char** argv)
                 printf("ERROR adding two FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            FP2_copy(&FP2aux1,&FP2_1); // test associativity (P+Q)+R = P+(Q+R)
+// test associativity (P+Q)+R = P+(Q+R)
+            FP2_copy(&FP2aux1,&FP2_1);
             FP2_copy(&FP2aux3,&FP2_1);
             FP2_copy(&FP2aux2,&FP2_2);
             FP2_copy(&FP2aux4,&FP2add);

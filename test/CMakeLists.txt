@@ -44,12 +44,18 @@ set_tests_properties (test_big_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SU
 add_executable (test_fp_arithmetics test_fp_arithmetics.c)
 add_test(NAME test_fp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
 target_link_libraries (test_fp_arithmetics amcl)
+set_tests_properties (test_fp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
-# Arithmetics test fp2 for pairing-friendly curves
+# Arithmetics test fp2 and fp4 for pairing-friendly curves
 if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
   add_executable (test_fp2_arithmetics test_fp2_arithmetics.c)
+  add_executable (test_fp4_arithmetics test_fp4_arithmetics.c)
   add_test(NAME test_fp2_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp2_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp2/test_vector_${AMCL_CHOICE}.txt)
+  add_test(NAME test_fp4_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp4_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp4/test_vector_${AMCL_CHOICE}.txt)
   target_link_libraries (test_fp2_arithmetics amcl)
+  target_link_libraries (test_fp4_arithmetics amcl)
+  set_tests_properties (test_fp2_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+  set_tests_properties (test_fp4_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
 
 # Aritmetics test for ecp 
