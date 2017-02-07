@@ -186,10 +186,6 @@ int main(int argc, char** argv)
     BIG_rcopy(Fr_b,CURVE_Frb);
     FP2_from_BIGs(&Frob,Fr_a,Fr_b);
 
-    printf("Frob constant: ");
-    FP2_output(&Frob);
-    printf("\n\n");
-
 // Set to zero
     FP4_zero(&FP4aux1);
     FP4_zero(&FP4aux2);
