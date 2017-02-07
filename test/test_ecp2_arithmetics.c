@@ -211,7 +211,7 @@ int main(int argc, char** argv)
             ECP2_affine(&ECP2aux1);
             ECP2_copy(&ECP2aux2,&ecp2[1]); // testing commutativity P+Q = Q+P
             ECP2_add(&ECP2aux2,&ecp2[0]);
-            ECP2_affine(&ECP2aux2);            
+            ECP2_affine(&ECP2aux2);
             if(!ECP2_equals(&ECP2aux1,&ecp2sum) || !ECP2_equals(&ECP2aux2,&ecp2sum))
             {
                 printf("ERROR adding two ECP2s, line %d\n",i);

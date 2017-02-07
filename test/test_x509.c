@@ -72,6 +72,9 @@ octet H= {0,sizeof(h),h};
 char hh[5000];
 octet HH= {0,sizeof(hh),hh};
 
+char hp[RFS];
+octet HP= {0,sizeof(hp),hp};
+
 // countryName
 static char cn[3]= {0x55,0x04,0x06};
 static octet CN= {3,sizeof(cn),cn};
@@ -666,10 +669,10 @@ int main(int argc, char** argv)
                     printf("TEST X509 ERROR Hash Function not supported LINE %d\n",i);
                     exit(EXIT_FAILURE);
                 }
-                PKCS15(sha,&H,&H);
+                PKCS15(sha,&H,&HP);
 
                 RSA_ENCRYPT(&PK,&SIG,&HH);
-                if (!OCT_comp(&H,&HH))
+                if (!OCT_comp(&HP,&HH))
                 {
                     printf("TEST X509 ERROR RSA VERIFICATION FAILED LINE %d\n",i);
                     exit(EXIT_FAILURE);
@@ -1028,10 +1031,10 @@ int main(int argc, char** argv)
                     printf("TEST X509 ERROR Hash Function not supported LINE %d\n",i);
                     exit(EXIT_FAILURE);
                 }
-                PKCS15(sha,&H,&H);
+                PKCS15(sha,&H,&HP);
 
                 RSA_ENCRYPT(&PK,&SIG,&HH);
-                if (!OCT_comp(&H,&HH))
+                if (!OCT_comp(&HP,&HH))
                 {
                     printf("TEST X509 ERROR RSA VERIFICATION FAILED LINE %d\n",i);
                     exit(EXIT_FAILURE);
