@@ -176,6 +176,10 @@ int main(int argc, char** argv)
     const char* FP4powline = "FP4pow = ";
     FP4 FP4frob;
     const char* FP4frobline = "FP4frob = ";
+    FP4 FP4_xtrA;
+    const char* FP4_xtrAline = "FP4_xtrA = ";
+    FP4 FP4_xtrD;
+    const char* FP4_xtrDline = "FP4_xtrD = ";
 
     BIG_rcopy(M,Modulus);
     BIG_rcopy(Fr_a,CURVE_Fra);
@@ -507,6 +511,44 @@ int main(int argc, char** argv)
                 FP4_output(&FP4frob);
                 printf("\n\n");
                 printf("ERROR in raising FP4 by an internal modulus p, using the Frobenius constant f, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Test the XTR addition function r=w*x-conj(x)*y+z
+        if (!strncmp(line,FP4_xtrAline, strlen(FP4_xtrAline)))
+        {
+            len = strlen(FP4_xtrAline);
+            linePtr = line + len;
+            read_FP4(&FP4_xtrA,linePtr);
+            FP4_xtr_A(&FP4aux1,&FP4_1,&FP4_2,&FP4add,&FP4sub);
+            FP4_reduce(&FP4aux1);
+            if(!FP4_equals(&FP4aux1,&FP4_xtrA))
+            {
+                printf("\nFP4aux1\n");
+                FP4_output(&FP4aux1);
+                printf("\n\nFP4_xtrA\n");
+                FP4_output(&FP4_xtrA);
+                printf("\n\n");
+                printf("ERROR in testing the XTR addition function r=w*x-conj(x)*y+z, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Test the XTR doubling function r=x^2-2*conj(x)
+        if (!strncmp(line,FP4_xtrDline, strlen(FP4_xtrDline)))
+        {
+            len = strlen(FP4_xtrDline);
+            linePtr = line + len;
+            read_FP4(&FP4_xtrD,linePtr);
+            FP4_xtr_D(&FP4aux1,&FP4_1);
+            FP4_reduce(&FP4aux1);
+            if(!FP4_equals(&FP4aux1,&FP4_xtrD))
+            {
+                printf("\nFP4aux1\n");
+                FP4_output(&FP4aux1);
+                printf("\n\nFP4_xtrD\n");
+                FP4_output(&FP4_xtrD);
+                printf("\n\n");
+                printf("ERROR in testing the XTR doubling function r=x^2-2*conj(x), line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
