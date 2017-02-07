@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    BIG M,supp, supp1;
+    BIG M,supp, supp1, supp2, supp3;
 
     BIG FP_1;
     const char* FP_1line = "FP_1 = ";
@@ -147,12 +147,33 @@ int main(int argc, char** argv)
             read_BIG(FPadd,linePtr);
             BIG_copy(supp1,FP_2);
             BIG_copy(supp,FP_1);
+            BIG_copy(supp2,FP_1);
             FP_add(supp,supp,supp1);
+            FP_add(supp2,supp2,supp1); // test commutativity P+Q = Q+P
             BIG_norm(supp);
             FP_reduce(supp);
-            if(BIG_comp(supp,FPadd))
+            BIG_norm(supp2);
+            FP_reduce(supp2);
+            if(BIG_comp(supp,FPadd) || BIG_comp(supp2,FPadd))
             {
-                printf("ERROR adding two FP, line %d\n",i);
+                printf("ERROR adding two FPs, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            BIG_copy(supp,FP_1); // test associativity (P+Q)+R = P+(Q+R)
+            BIG_copy(supp2,FP_1);
+            BIG_copy(supp1,FP_2);
+            BIG_copy(supp3,FPadd);
+            FP_add(supp,supp,supp1);
+            FP_add(supp,supp,supp3);
+            FP_add(supp1,supp1,supp3);
+            FP_add(supp1,supp1,supp2);
+            FP_reduce(supp);
+            FP_reduce(supp1);
+            BIG_norm(supp);
+            BIG_norm(supp1);
+            if(BIG_comp(supp,supp1))
+            {
+                printf("ERROR testing associativity between three FPs, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -171,7 +192,7 @@ int main(int argc, char** argv)
             BIG_norm(supp1);
             if((BIG_comp(supp,FPsub) != 0) && (BIG_comp(supp1,FPsub) != 0))
             {
-                printf("ERROR subtraction between two FP, line %d\n",i);
+                printf("ERROR subtraction between two FPs, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
