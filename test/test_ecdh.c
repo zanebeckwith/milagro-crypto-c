@@ -1,5 +1,5 @@
 /**
- * @file test_aes.c
+ * @file test_ecdh.c
  * @author Kealan McCusker
  * @brief Test function for ECDH
  *
@@ -38,6 +38,7 @@
 typedef enum { false, true } bool;
 
 #define LINE_LEN 500
+#define AES_len 32
 //#define DEBUG
 
 int main(int argc, char** argv)
@@ -51,8 +52,17 @@ int main(int argc, char** argv)
     FILE * fp = NULL;
     char line[LINE_LEN];
     char * linePtr = NULL;
-    int l1=0;
-    int l2=0;
+    int l1=0, l2=0, i=0;
+
+   	char raw[256], key[EAS], ciphertext[AES_len], res[AES_len], plaintext[AES_len];
+    octet Key= {0,sizeof(key),key}, Ciphertext= {0,sizeof(ciphertext),ciphertext}, Plaintext= {0,sizeof(plaintext),plaintext}, Res= {0,sizeof(res),res};
+    csprng rng;
+
+    /* Fake random source */
+    RAND_clean(&rng);
+    for (i=0; i<256; i++) raw[i]=(char)i;
+    RAND_seed(&rng,256,raw);
+
 
     char QCAVSx[EGS];
     const char* QCAVSxStr = "QCAVSx = ";
@@ -95,7 +105,6 @@ int main(int argc, char** argv)
     }
 
     bool readLine = false;
-    int i=0;
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
         i++;
@@ -280,6 +289,28 @@ int main(int argc, char** argv)
         printf("ERROR Empty test vector file\n");
         exit(EXIT_FAILURE);
     }
+
+// Self test AES-CBC
+    for(i=0; i<20; i++)
+    {
+	    OCT_rand(&Key,&rng,EAS);
+	    OCT_rand(&Plaintext,&rng,AES_len);
+
+	    OCT_output(&Key);
+	    printf("plain  \n");
+	    OCT_output(&Plaintext);
+
+	    AES_CBC_IV0_ENCRYPT(&Key,&Plaintext,&Ciphertext);
+	    rc = AES_CBC_IV0_DECRYPT(&Key,&Res,&Ciphertext);
+	    if (!rc || !OCT_comp(&Plaintext,&Res))
+	    {
+	        printf("ERROR AES_CBC decryption failed\n");
+	        exit(EXIT_FAILURE);	
+	    }
+	    printf("res  \n");
+	    OCT_output(&Res);
+	}
+
     printf("SUCCESS TEST ECDH KEYPAIR PASSED\n");
     exit(EXIT_SUCCESS);
 }
