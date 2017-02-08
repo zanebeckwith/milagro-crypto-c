@@ -3,8 +3,8 @@
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th April 2016
+ * @brief Wang / Chow Choo (WCC) definitions
  *
- * AMCL Wang / Chow Choo (WCC) definitions
  *
  * LICENSE
  *
@@ -309,24 +309,5 @@ int WCC_RECOMBINE_G2(octet *W1,octet *W2,octet *W);
  * @return today's date, as number of days elapsed since the epoch
  */
 unsign32 WCC_today(void);
-
-/**
- * @brief Initialise a random number generator
- *
- * Initialise a random number generator.
- *
- * @param RNG     cryptographically secure random number generator
- * @param SEED    random seed value
- */
-void WCC_CREATE_CSPRNG(csprng *RNG,octet *SEED);
-
-/**
- * @brief Kill a random number generator
- *
- * Deletes all internal state.
- *
- * @param RNG    cryptographically secure random number generator
- */
-void WCC_KILL_CSPRNG(csprng *RNG);
 
 #endif

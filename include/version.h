@@ -1,10 +1,8 @@
 /**
  * @file version.h
- * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th April 2016
- *
- * AMCL header support version function
+ * @brief Build information
  *
  * LICENSE
  *
@@ -91,6 +89,8 @@
 #define CHOICE_DESC "BN454"
 #elif CHOICE==BLS455
 #define CHOICE_DESC "BLS455"
+#elif CHOICE==BLS383
+#define CHOICE_DESC "BLS383"
 #else
 #define CHOICE_DESC ""
 #endif

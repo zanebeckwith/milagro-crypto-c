@@ -32,6 +32,7 @@
 #include <time.h>
 #include "wcc.h"
 #include "utils.h"
+#include "randapi.h"
 
 int main()
 {
@@ -100,7 +101,7 @@ int main()
     for (i=0; i<32; i++) SEED.val[i]=i+1;
 
     /* initialise random number generator */
-    WCC_CREATE_CSPRNG(&RNG,&SEED);
+    CREATE_CSPRNG(&RNG,&SEED);
 
     /* TA: Generate master secret  */
     rtn = WCC_RANDOM_GENERATE(&RNG,&MS);
@@ -209,7 +210,7 @@ int main()
         return 1;
     }
 
-    WCC_KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
 
     printf("SUCCESS\n");
     return 0;

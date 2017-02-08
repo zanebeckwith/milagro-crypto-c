@@ -51,6 +51,9 @@ typedef struct
 } octet;
 
 
+extern void CREATE_CSPRNG(csprng *R,octet *S);
+extern void KILL_CSPRNG(csprng *R);
+
 extern unsigned int MPIN_FS(void);
 extern unsigned int MPIN_GS(void);
 extern void MPIN_HASH_ID(int h,octet *ID,octet *HID);
@@ -70,8 +73,6 @@ extern int MPIN_KANGAROO(octet *E,octet *F);
 extern int MPIN_ENCODING(csprng *R,octet *TP);
 extern int MPIN_DECODING(octet *TP);
 extern unsigned int MPIN_today(void);
-extern void MPIN_CREATE_CSPRNG(csprng *R,octet *S);
-extern void MPIN_KILL_CSPRNG(csprng *R);
 extern int MPIN_GET_G1_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
 extern int MPIN_GET_G2_MULTIPLE(csprng *R,int type,octet *x,octet *G,octet *W);
 extern void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,octet *W,octet *H);
@@ -92,10 +93,13 @@ extern int generateOTP(csprng*);
 
 if (platform.system() == 'Windows'):
     libmpin = ffi.dlopen("libmpin.dll")
+    libmpin = ffi.dlopen("libamcl.dll")
 elif (platform.system() == 'Darwin'):
     libmpin = ffi.dlopen("libmpin.dylib")
+    libmpin = ffi.dlopen("libamcl.dylib")
 else:
     libmpin = ffi.dlopen("libmpin.so")
+    libamcl = ffi.dlopen("libamcl.so")
 
 # MPIN Group Size
 PGS = libmpin.MPIN_GS()
@@ -226,9 +230,30 @@ def create_csprng(seed):
 
     # random number generator
     rng = ffi.new('csprng*')
-    libmpin.MPIN_CREATE_CSPRNG(rng, seed_oct)
+    libamcl.CREATE_CSPRNG(rng, seed_oct)
 
     return rng
+
+
+def kill_csprng(rng):
+    """Kill a random number generator
+
+    Deletes all internal state
+
+    Args::
+
+        rng: Pointer to cryptographically secure pseudo-random number generator instance
+
+    Returns::
+
+
+
+    Raises:
+
+    """
+    libamcl.KILL_CSPRNG(rng)
+
+    return 0
 
 
 def hash_id(hash_type, mpin_id):
@@ -1417,3 +1442,5 @@ if __name__ == "__main__":
             server_aes_key, iv, header, ciphertext)
         print "decrypted message: ", plaintext2
         print "tag2 ", tag2.encode("hex")
+
+    kill_csprng(rng)

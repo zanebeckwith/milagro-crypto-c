@@ -19,7 +19,7 @@
 : ${PROJECT:=project}
 
 # make target to execute
-: ${MAKETARGET:=buildall}
+: ${MAKETARGET:=default}
 
 # Name of the base development Docker image
 DOCKERDEV=${VENDOR}/dev_${PROJECT}
@@ -56,7 +56,7 @@ docker cp ${CONTAINER_ID}:"${PRJPATH}/target" ./
 
 # Change paths of coverage report (if any)
 CURRENTDIR=`pwd`
-sed -i "s|${PRJPATH}/|${CURRENTDIR}/|" ${CURRENTDIR}/target/COVERAGE/coverage/amcl.info || true
+sed -i "s|${PRJPATH}/|${CURRENTDIR}/|" ${CURRENTDIR}/target/LINUX_64BIT_BN254_CX_COVERAGE/coverage/amcl.info || true
 
 # Remove the temporary container and image
 docker rm -f ${CONTAINER_ID} || true

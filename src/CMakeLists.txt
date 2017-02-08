@@ -2,7 +2,7 @@
 
 # Add the binary tree directory to the search path for linking and include files
 link_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
+include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR}/include )
 
 set(SOURCES_AMCL
 big.c
@@ -10,6 +10,7 @@ fp.c
 ecp.c
 hash.c
 rand.c
+randapi.c
 aes.c
 gcm.c
 oct.c

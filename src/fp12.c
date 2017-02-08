@@ -1,50 +1,46 @@
-/**
- * @file fp12.c
- * @author Mike Scott
- * @date 19th May 2015
- * @brief AMCL Fp^12 functions
- * @note FP12 elements are of the form a+i.b+i^2.c
- *
- * LICENSE
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 /* AMCL Fp^12 functions */
 /* SU=m, m is Stack Usage (no lazy )*/
+/* FP12 elements are of the form a+i.b+i^2.c */
 
 #include "amcl.h"
 
-/* SU= 8, Tests for FP12 equal to zero */
+/* test x==0 ? */
+/* SU= 8 */
 int FP12_iszilch(FP12 *x)
 {
     if (FP4_iszilch(&(x->a)) && FP4_iszilch(&(x->b)) && FP4_iszilch(&(x->c))) return 1;
     return 0;
 }
 
-/* SU= 8, Tests for FP12 equal to unity */
+/* test x==1 ? */
+/* SU= 8 */
 int FP12_isunity(FP12 *x)
 {
     if (FP4_isunity(&(x->a)) && FP4_iszilch(&(x->b)) && FP4_iszilch(&(x->c))) return 1;
     return 0;
 }
 
-/* SU= 16, Copy FP12 to another FP12 */
+/* FP12 copy w=x */
+/* SU= 16 */
 void FP12_copy(FP12 *w,FP12 *x)
 {
     if (x==w) return;
@@ -53,7 +49,8 @@ void FP12_copy(FP12 *w,FP12 *x)
     FP4_copy(&(w->c),&(x->c));
 }
 
-/* SU= 8, Set FP12 to unity */
+/* FP12 w=1 */
+/* SU= 8 */
 void FP12_one(FP12 *w)
 {
     FP4_one(&(w->a));
@@ -61,7 +58,8 @@ void FP12_one(FP12 *w)
     FP4_zero(&(w->c));
 }
 
-/* SU= 16, Tests for equality of two FP12s */
+/* return 1 if x==y, else 0 */
+/* SU= 16 */
 int FP12_equals(FP12 *x,FP12 *y)
 {
     if (FP4_equals(&(x->a),&(y->a)) && FP4_equals(&(x->b),&(y->b)) && FP4_equals(&(x->b),&(y->b)))
@@ -69,7 +67,8 @@ int FP12_equals(FP12 *x,FP12 *y)
     return 0;
 }
 
-/* SU= 8, Conjugation of FP12 */
+/* Set w=conj(x) */
+/* SU= 8 */
 void FP12_conj(FP12 *w,FP12 *x)
 {
     FP12_copy(w,x);
@@ -78,7 +77,8 @@ void FP12_conj(FP12 *w,FP12 *x)
     FP4_conj(&(w->c),&(w->c));
 }
 
-/* SU= 8, Initialise FP12 from single FP4 */
+/* Create FP12 from FP4 */
+/* SU= 8 */
 void FP12_from_FP4(FP12 *w,FP4 *a)
 {
     FP4_copy(&(w->a),a);
@@ -86,7 +86,8 @@ void FP12_from_FP4(FP12 *w,FP4 *a)
     FP4_zero(&(w->c));
 }
 
-/* SU= 16, Initialise FP12 from three FP4s */
+/* Create FP12 from 3 FP4's */
+/* SU= 16 */
 void FP12_from_FP4s(FP12 *w,FP4 *a,FP4 *b,FP4 *c)
 {
     FP4_copy(&(w->a),a);
@@ -94,8 +95,8 @@ void FP12_from_FP4s(FP12 *w,FP4 *a,FP4 *b,FP4 *c)
     FP4_copy(&(w->c),c);
 }
 
-/* SU= 600, Fast Squaring of an FP12 in "unitary" form
-   Granger-Scott Unitary Squaring. This does not benefit from lazy reduction */
+/* Granger-Scott Unitary Squaring. This does not benefit from lazy reduction */
+/* SU= 600 */
 void FP12_usqr(FP12 *w,FP12 *x)
 {
     FP4 A,B,C,D;
@@ -135,7 +136,8 @@ void FP12_usqr(FP12 *w,FP12 *x)
 
 }
 
-/* SU= 600, Squaring an FP12 */
+/* FP12 squaring w=x^2 */
+/* SU= 600 */
 void FP12_sqr(FP12 *w,FP12 *x)
 {
     /* Use Chung-Hasan SQR2 method from http://cacr.uwaterloo.ca/techreports/2006/cacr2006-24.pdf */
@@ -175,7 +177,11 @@ void FP12_sqr(FP12 *w,FP12 *x)
     FP12_norm(w);
 }
 
-/* SU= 896, Multiplication of two FP12s */
+/* FP12 full multiplication w=w*y */
+
+
+/* SU= 896 */
+/* FP12 full multiplication w=w*y */
 void FP12_mul(FP12 *w,FP12 *y)
 {
     FP4 z0,z1,z2,z3,t0,t1;
@@ -227,7 +233,9 @@ void FP12_mul(FP12 *w,FP12 *y)
     FP12_norm(w);
 }
 
-/* SU= 744, Fast multiplication of an FP12 by an FP12 that arises from an ATE pairing line function */
+/* FP12 multiplication w=w*y */
+/* SU= 744 */
+/* catering for special case that arises from special form of ATE pairing line function */
 void FP12_smul(FP12 *w,FP12 *y)
 {
     FP4 z0,z2,z3,t0,t1;
@@ -265,7 +273,8 @@ void FP12_smul(FP12 *w,FP12 *y)
     FP12_norm(w);
 }
 
-/* SU= 600, Inverting an FP12 */
+/* Set w=1/x */
+/* SU= 600 */
 void FP12_inv(FP12 *w,FP12 *x)
 {
     FP4 f0,f1,f2,f3;
@@ -302,7 +311,7 @@ void FP12_inv(FP12 *w,FP12 *x)
 }
 
 /* constant time powering by small integer of max length bts */
-/* Raises an FP12 instance x to a small integer power, side-channel resistant */
+
 void FP12_pinpow(FP12 *r,int e,int bts)
 {
     int i,b;
@@ -320,7 +329,10 @@ void FP12_pinpow(FP12 *r,int e,int bts)
     FP12_copy(r,&R[0]);
 }
 
-/* SU= 528, Raises an FP12 to the power of a BIG */
+/* SU= 528 */
+/* set r=a^b */
+/* Note this is simple square and multiply, so not side-channel safe */
+
 void FP12_pow(FP12 *r,FP12 *a,BIG b)
 {
     FP12 w;
@@ -347,6 +359,7 @@ void FP12_pow(FP12 *r,FP12 *a,BIG b)
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
 /* Timing attack secure, but not cache attack secure */
+
 void FP12_pow4(FP12 *p,FP12 *q,BIG u[4])
 {
     int i,j,a[4],nb,m;
@@ -433,7 +446,8 @@ void FP12_pow4(FP12 *p,FP12 *q,BIG u[4])
     FP12_reduce(p);
 }
 
-/* SU= 160, Raises an FP12 to the power of the internal modulus p, using the Frobenius */
+/* Set w=w^p using Frobenius */
+/* SU= 160 */
 void FP12_frob(FP12 *w,FP2 *f)
 {
     FP2 f2,f3;
@@ -448,7 +462,8 @@ void FP12_frob(FP12 *w,FP2 *f)
     FP4_pmul(&(w->c),&(w->c),&f2);
 }
 
-/* SU= 8, Normalises the components of an FP12 */
+/* SU= 8 */
+/* normalise all components of w */
 void FP12_norm(FP12 *w)
 {
     FP4_norm(&(w->a));
@@ -456,7 +471,8 @@ void FP12_norm(FP12 *w)
     FP4_norm(&(w->c));
 }
 
-/* SU= 8, Reduces all components of possibly unreduced FP12 mod Modulus */
+/* SU= 8 */
+/* reduce all components of w */
 void FP12_reduce(FP12 *w)
 {
     FP4_reduce(&(w->a));
@@ -464,14 +480,16 @@ void FP12_reduce(FP12 *w)
     FP4_reduce(&(w->c));
 }
 
-/* SU= 8, Calculate the trace of an FP12 */
+/* trace function w=trace(x) */
+/* SU= 8 */
 void FP12_trace(FP4 *w,FP12 *x)
 {
     FP4_imul(w,&(x->a),3);
     FP4_reduce(w);
 }
 
-/* SU= 8, Formats and outputs an FP12 to the console */
+/* SU= 8 */
+/* Output w in hex */
 void FP12_output(FP12 *w)
 {
     printf("[");
@@ -483,7 +501,8 @@ void FP12_output(FP12 *w)
     printf("]");
 }
 
-/* SU= 64, Formats and outputs an FP12 instance to an octet string */
+/* SU= 64 */
+/* Convert g to octet string w */
 void FP12_toOctet(octet *W,FP12 *g)
 {
     BIG a;
@@ -527,7 +546,8 @@ void FP12_toOctet(octet *W,FP12 *g)
     BIG_toBytes(&(W->val[11*MODBYTES]),a);
 }
 
-/* SU= 24, Creates an FP12 instance from an octet string */
+/* SU= 24 */
+/* Restore g from octet string w */
 void FP12_fromOctet(FP12 *g,octet *W)
 {
     BIG_fromBytes((*g).a.a.a,&W->val[0]);

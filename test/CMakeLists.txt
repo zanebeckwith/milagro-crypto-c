@@ -2,7 +2,7 @@
 
 # Add the binary tree directory to the search path for linking and include files
 link_directories (${PROJECT_BINARY_DIR}/src)
-include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include )
+include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR}/include )
 
 #define macro to simplify adding tests
 macro (do_test arg result)
@@ -16,34 +16,69 @@ endmacro ()
 add_executable (test_rsa test_rsa.c)
 add_executable (test_ecc test_ecc.c)
 add_executable (test_version test_version.c)
-add_executable (test_BIG_consistency test_big_consistency.c)
+add_executable (test_big_consistency test_big_consistency.c)
 add_executable (test_octet_consistency test_octet_consistency.c)
 # Link the executable to the libraries
 target_link_libraries (test_rsa rsa) 
 target_link_libraries (test_ecc ecdh) 
 target_link_libraries (test_version amcl) 
 target_link_libraries (test_octet_consistency amcl)
-target_link_libraries (test_BIG_consistency amcl )
+target_link_libraries (test_big_consistency amcl )
 # run tests
 do_test (test_rsa "SUCCESS")
 do_test (test_ecc "SUCCESS")
 do_test (test_version "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
 do_test (test_octet_consistency "SUCCESS")
-do_test (test_BIG_consistency "SUCCESS")
+do_test (test_big_consistency "SUCCESS")
 
-# Arithmetics tests BIG
+# Arithmetics tests big
 message(STATUS "Run ${AMCL_CHOICE} Arithmetics Tests")
-add_executable (test_BIG_arithmetics test_big_arithmetics.c)
+add_executable (test_big_arithmetics test_big_arithmetics.c)
 # Link the executable to the libraries
-target_link_libraries (test_BIG_arithmetics amcl)
+target_link_libraries (test_big_arithmetics amcl)
 # test
-add_test(NAME test_BIG_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_BIG_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
-set_tests_properties (test_BIG_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+add_test(NAME test_big_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_big_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
+set_tests_properties (test_big_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
-# Arithmetics test FP for pairing-friendly cuves
-add_executable (test_FP_arithmetics test_fp_arithmetics.c)
-add_test(NAME test_FP_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_FP_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
-target_link_libraries (test_FP_arithmetics amcl)
+# Arithmetics test fp
+add_executable (test_fp_arithmetics test_fp_arithmetics.c)
+add_test(NAME test_fp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
+target_link_libraries (test_fp_arithmetics amcl)
+set_tests_properties (test_fp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+
+# Arithmetics test fp2 and fp4 for pairing-friendly curves
+if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
+  add_executable (test_fp2_arithmetics test_fp2_arithmetics.c)
+  add_executable (test_fp4_arithmetics test_fp4_arithmetics.c)
+  add_test(NAME test_fp2_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp2_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp2/test_vector_${AMCL_CHOICE}.txt)
+  add_test(NAME test_fp4_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp4_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp4/test_vector_${AMCL_CHOICE}.txt)
+  target_link_libraries (test_fp2_arithmetics amcl)
+  target_link_libraries (test_fp4_arithmetics amcl)
+  set_tests_properties (test_fp2_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+  set_tests_properties (test_fp4_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
+
+# Aritmetics test for ecp 
+add_executable (test_ecp_arithmetics test_ecp_arithmetics.c)
+add_test(NAME test_ecp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/ecp/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
+target_link_libraries (test_ecp_arithmetics amcl)
+set_tests_properties (test_ecp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+
+# Aritmetics test for ecp2 for pairing-friendly curves
+if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
+  add_executable (test_ecp2_arithmetics test_ecp2_arithmetics.c)
+  add_test(NAME test_ecp2_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecp2_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/ecp2/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
+  target_link_libraries (test_ecp2_arithmetics amcl)
+  set_tests_properties (test_ecp2_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+# Aritmetics test output functions (used only for debug) - Linux specific code
+add_executable (test_output_functions test_output_functions.c)
+add_test(NAME test_output_functions COMMAND ${TARGET_SYSTEM_EMULATOR} test_output_functions ${PROJECT_SOURCE_DIR}/testVectors/output/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}_${AMCL_CHUNK}.txt ${PROJECT_BINARY_DIR}/Testing/Temporary/stdout.out)
+target_link_libraries (test_output_functions amcl)
+set_tests_properties (test_output_functions PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # curve independent tests
 add_executable (test_hash test_hash.c)
@@ -81,12 +116,16 @@ add_test(NAME test_aes_encrypt_ECB_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ae
 set_tests_properties (test_aes_encrypt_ECB_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_encrypt_CBC_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT128.rsp  CBC)
 set_tests_properties (test_aes_encrypt_CBC_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+add_test(NAME test_aes_encrypt_CFB1_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT128.rsp  CFB1)
+set_tests_properties (test_aes_encrypt_CFB1_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_encrypt_CBC_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT256.rsp  CBC)
 set_tests_properties (test_aes_encrypt_CBC_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_encrypt_CTR_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL128.rsp  CTR)
 set_tests_properties (test_aes_encrypt_CTR_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_encrypt_CTR_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL256.rsp  CTR)
 set_tests_properties (test_aes_encrypt_CTR_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+add_test(NAME test_aes_encrypt_CFB1_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT256.rsp  CFB1)
+set_tests_properties (test_aes_encrypt_CFB1_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
 add_test(NAME test_aes_decrypt_ECB_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT128.rsp  ECB)
 set_tests_properties (test_aes_decrypt_ECB_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
@@ -94,12 +133,16 @@ add_test(NAME test_aes_decrypt_ECB_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ae
 set_tests_properties (test_aes_decrypt_ECB_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_decrypt_CBC_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT128.rsp  CBC)
 set_tests_properties (test_aes_decrypt_CBC_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+add_test(NAME test_aes_decrypt_CFB1_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT128.rsp  CFB1)
+set_tests_properties (test_aes_decrypt_CFB1_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_decrypt_CBC_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT256.rsp  CBC)
 set_tests_properties (test_aes_decrypt_CBC_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_decrypt_CTR_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL128.rsp  CTR)
 set_tests_properties (test_aes_decrypt_CTR_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_aes_decrypt_CTR_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL256.rsp  CTR)
 set_tests_properties (test_aes_decrypt_CTR_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+add_test(NAME test_aes_decrypt_CFB1_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT256.rsp  CFB1)
+set_tests_properties (test_aes_decrypt_CFB1_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
 if(BUILD_MPIN)
   add_executable (test_mpin test_mpin.c)
@@ -248,68 +291,6 @@ if(AMCL_CHOICE STREQUAL "NIST384")
   set_tests_properties (test_ecdsa_verify_NIST384_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif(AMCL_CHOICE STREQUAL "NIST384")
 
-if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
-  message(STATUS "Run ${AMCL_CHOICE} ${AMCL_CURVETYPE} ECC Tests")
-  add_executable (test_ecdh test_ecdh.c)
-  add_executable (test_ecdsa_keypair test_ecdsa_keypair.c)
-  add_executable (test_ecdsa_sign test_ecdsa_sign.c)
-  add_executable (test_ecdsa_verify test_ecdsa_verify.c)
-  # Link the executable to the libraries
-  target_link_libraries (test_ecdh ecdh) 
-  target_link_libraries (test_ecdsa_keypair ecdh) 
-  target_link_libraries (test_ecdsa_sign ecdh) 
-  target_link_libraries (test_ecdsa_verify ecdh) 
-  # test
-  add_test(NAME test_ecdh_C25519 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/C25519/amcl_ecdh.txt)
-  set_tests_properties (test_ecdh_C25519 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_keypair_C25519 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_keypair ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/C25519/amcl_ecdsa_sha256.txt)
-  set_tests_properties (test_ecdsa_keypair_C25519 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_sign_C25519_SHA256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_sign ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/C25519/amcl_ecdsa_sha256.txt sha256)
-  set_tests_properties (test_ecdsa_sign_C25519_SHA256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_sign_C25519_SHA512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_sign ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/C25519/amcl_ecdsa_sha512.txt sha512)
-  set_tests_properties (test_ecdsa_sign_C25519_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_verify_C25519_SHA256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/C25519/amcl_ecdsa_sha256.txt sha256)
-  set_tests_properties (test_ecdsa_verify_C25519_SHA256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_verify_C25519_SHA512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/C25519/amcl_ecdsa_sha512.txt sha512)
-  set_tests_properties (test_ecdsa_verify_C25519_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
-
-if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_CURVETYPE STREQUAL "MONTGOMERY"))
-  message(STATUS "Run ${AMCL_CHOICE} ${AMCL_CURVETYPE} ECC Tests")
-  add_executable (test_ecdh test_ecdh.c)
-  # Link the executable to the libraries
-  target_link_libraries (test_ecdh ecdh) 
-  # test
-  add_test(NAME test_ecdh_C25519_MONT COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/C25519/amcl_ecdh_mont.txt)
-  set_tests_properties (test_ecdh_C25519_MONT PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_CURVETYPE STREQUAL "MONTGOMERY"))
-
-if(AMCL_CHOICE STREQUAL "GOLDILOCKS")
-  message(STATUS "Run ${AMCL_CHOICE} ECC Tests")
-  add_executable (test_ecdh test_ecdh.c)
-  add_executable (test_ecdsa_keypair test_ecdsa_keypair.c)
-  add_executable (test_ecdsa_sign test_ecdsa_sign.c)
-  add_executable (test_ecdsa_verify test_ecdsa_verify.c)
-  # Link the executable to the libraries
-  target_link_libraries (test_ecdh ecdh) 
-  target_link_libraries (test_ecdsa_keypair ecdh) 
-  target_link_libraries (test_ecdsa_sign ecdh) 
-  target_link_libraries (test_ecdsa_verify ecdh) 
-  # test
-  add_test(NAME test_ecdh_GOLDILOCKS COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/GOLDILOCKS/amcl_ecdh.txt)
-  set_tests_properties (test_ecdh_GOLDILOCKS PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_keypair_GOLDILOCKS COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_keypair ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/GOLDILOCKS/amcl_ecdsa_sha256.txt)
-  set_tests_properties (test_ecdsa_keypair_GOLDILOCKS PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_sign_GOLDILOCKS_SHA256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_sign ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/GOLDILOCKS/amcl_ecdsa_sha256.txt sha256)
-  set_tests_properties (test_ecdsa_sign_GOLDILOCKS_SHA256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_sign_GOLDILOCKS_SHA512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_sign ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/GOLDILOCKS/amcl_ecdsa_sha512.txt sha512)
-  set_tests_properties (test_ecdsa_sign_GOLDILOCKS_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_verify_GOLDILOCKS_SHA256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/GOLDILOCKS/amcl_ecdsa_sha256.txt sha256)
-  set_tests_properties (test_ecdsa_verify_GOLDILOCKS_SHA256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-  add_test(NAME test_ecdsa_verify_GOLDILOCKS_SHA512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdsa_verify ${PROJECT_SOURCE_DIR}/testVectors/ecdsa/GOLDILOCKS/amcl_ecdsa_sha512.txt sha512)
-  set_tests_properties (test_ecdsa_verify_GOLDILOCKS_SHA512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-endif(AMCL_CHOICE STREQUAL "GOLDILOCKS")
-
 if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
   message(STATUS "Run ${AMCL_CHOICE} RSA2048 Tests")
   add_executable (test_rsa_sign test_rsa_sign.c)
@@ -382,3 +363,12 @@ if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVE
   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "EDWARDS"))
 
+if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "MONTGOMERY"))
+  message(STATUS "Run ${AMCL_CHOICE} ECDH Tests")
+  add_executable (test_ecdh test_ecdh.c)
+  # Link the executable to the libraries
+  target_link_libraries (test_ecdh ecdh) 
+  # test
+  add_test(NAME test_ecdh COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/C25519/KAS_ECC_CDH_PrimitiveTest.txt)
+  set_tests_properties (test_ecdh PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE STREQUAL "MONTGOMERY"))

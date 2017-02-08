@@ -28,87 +28,7 @@ AMCL is provided in *C* language but includes a *[Python](https://www.python.org
 
 NOTE: This product includes software developed at *[The Apache Software Foundation](http://www.apache.org/)*.
 
-
-
-## Quick Start
-
-This project includes a Makefile that allows you to test and build the project in a Linux-compatible system with simple commands.  
-All the artifacts and reports produced using this Makefile are stored in the *target* folder.  
-
-All the packages listed in the *resources/DockerDev/Dockerfile* file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a [Docker](https://www.docker.com) container using the command "make dbuild".
-
-To see all available options:
-```
-make help
-```
-
-To build the project inside a Docker container (requires Docker):
-```
-make dbuild
-```
-
-To build a particular set of options inside a Docker container:
-```
-MAKETARGET='build TYPE=LINUX_64BIT_NIST256_RSA2048' make dbuild
-```
-The list of pre-defined options can be listed by typing ```make```
-
-
-The base Docker building environment is defined in the following Dockerfile:
-```
-resources/DockerDev/Dockerfile
-```
-
-To execute all the default test builds and generate reports in the current environment:
-```
-make qa
-```
-
-To format the code (please use this command before submitting any pull request):
-```
-make format
-```
-
-## Useful Docker commands
-
-To manually create the container you can execute:
-```
-docker build --tag="miracl/amcldev" .
-```
-
-To log into the newly created container:
-```
-docker run -t -i miracl/amcldev /bin/bash
-```
-
-To get the container ID:
-```
-CONTAINER_ID=`docker ps -a | grep miracl/amcldev | cut -c1-12`
-```
-
-To delete the newly created docker container:
-```
-docker rm -f $CONTAINER_ID
-```
-
-To delete the docker image:
-```
-docker rmi -f miracl/amcldev
-```
-
-To delete all containers
-```
-docker rm $(docker ps -a -q)
-```
-
-To delete all images
-```
-docker rmi $(docker images -q)
-```
-
-## Manual Builds
-
-### Software Dependencies
+## Software Dependencies
 
 In order to build this library, the following packages are required:
 
@@ -157,12 +77,22 @@ The above packages can be installed in different ways, depending on the Operatin
     * install Doxygen following the instructions on http://www.doxygen.org
 
 
-### Build Instructions
-
-NOTE: The default build is for 64 bit machines
-
+## Build Instructions
 
 #### Linux and Mac
+
+##### Quick start
+
+A Makefile is present at the project root that reads the options defined in
+config.mk. Change these options and then type  ```make``` to build and test
+the library.
+
+If you have docker installed then type ```make dbuild``` to build and test
+the library in a docker container.
+
+##### Manual build
+
+NOTE: The default build is for 64 bit machines
 
     git clone https://github.com/miracl/milagro-crypto-c
     cd milagro-crypto-c
@@ -185,7 +115,7 @@ Now you can set the path to where libs and python package are installed:
 NOTE: The build can be configured by setting flags on the command line, for example:
 
     cmake -DAMCL_CHUNK=64 ../..
-    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D USE_ANONYMOUS=on -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..
 
 To list other available CMake options, use:
 
@@ -236,3 +166,79 @@ After having built the libraries you can build a Windows installer using this co
 
 In order for this to work NSSI has to have been installed
 
+
+## Contributions
+
+This project includes a Makefile that allows you to test and build the project in a Linux-compatible system with simple commands.  
+All the artifacts and reports produced using this Makefile are stored in the *target* folder.  
+
+All the packages listed in the *resources/DockerDev/Dockerfile* file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a [Docker](https://www.docker.com) container using the command "MAKETARGET=buildall make dbuild".
+
+To see all available options:
+```
+make help
+```
+
+To build the project inside a Docker container (requires Docker):
+```
+MAKETARGET=buildall make dbuild
+```
+
+To build a particular set of predefined makefile options inside a Docker container:
+```
+MAKETARGET='build TYPE=LINUX_64BIT_NIST256_RSA2048' make dbuild
+```
+The list of pre-defined options can be listed by typing ```make help```
+
+
+The base Docker building environment is defined in the following Dockerfile:
+```
+resources/DockerDev/Dockerfile
+```
+
+To execute all the test builds and generate reports in the current environment:
+```
+make qa
+```
+
+To format the code (please use this command before submitting any pull request):
+```
+make format
+```
+
+## Useful Docker commands
+
+To manually create the container you can execute:
+```
+docker build --tag="miracl/amcldev" .
+```
+
+To log into the newly created container:
+```
+docker run -t -i miracl/amcldev /bin/bash
+```
+
+To get the container ID:
+```
+CONTAINER_ID=`docker ps -a | grep miracl/amcldev | cut -c1-12`
+```
+
+To delete the newly created docker container:
+```
+docker rm -f $CONTAINER_ID
+```
+
+To delete the docker image:
+```
+docker rmi -f miracl/amcldev
+```
+
+To delete all containers
+```
+docker rm $(docker ps -a -q)
+```
+
+To delete all images
+```
+docker rmi $(docker images -q)
+```

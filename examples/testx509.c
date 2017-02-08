@@ -174,6 +174,9 @@ octet H= {0,sizeof(h),h};
 char hh[5000];
 octet HH= {0,sizeof(hh),hh};
 
+char hp[RFS];
+octet HP= {0,sizeof(hp),hp};
+
 int main()
 {
     int res,len,sha;
@@ -312,11 +315,11 @@ int main()
             printf("Hash Function not supported\n");
             return 0;
         }
-        PKCS15(sha,&H,&H);
+        PKCS15(sha,&H,&HP);
 
         RSA_ENCRYPT(&PK,&SIG,&HH);
 
-        if (OCT_comp(&H,&HH))
+        if (OCT_comp(&HP,&HH))
             printf("RSA Signature/Verification succeeded \n");
         else
         {
@@ -446,11 +449,11 @@ int main()
             printf("Hash Function not supported\n");
             return 0;
         }
-        PKCS15(sha,&H,&H);
+        PKCS15(sha,&H,&HP);
 
         RSA_ENCRYPT(&PK,&SIG,&HH);
 
-        if (OCT_comp(&H,&HH))
+        if (OCT_comp(&HP,&HH))
             printf("RSA Signature/Verification succeeded \n");
         else
             printf("***RSA Verification Failed\n");

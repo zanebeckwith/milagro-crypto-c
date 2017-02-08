@@ -353,7 +353,8 @@ int main(int argc, char** argv)
             }
         }
     }
+
+    fclose(fp);
     printf("SUCCESS TEST ARITMETIC OF BIG PASSED\n");
     exit(EXIT_SUCCESS);
 }
-

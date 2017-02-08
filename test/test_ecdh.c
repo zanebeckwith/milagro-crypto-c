@@ -236,13 +236,6 @@ int main(int argc, char** argv)
             QCAVSOct.len=1;
             OCT_joctet(&QCAVSOct,&QCAVSxOct);
 #endif
-
-#ifdef DEBUG
-            printf("dIUTOct: ");
-            OCT_output(&dIUTOct);
-            printf("\n");
-#endif
-
             // Check correct public key generated
             ECP_KEY_PAIR_GENERATE(NULL,&dIUTOct,&QOct);
             rc = OCT_comp(&QOct,&QIUTOct);
@@ -250,9 +243,9 @@ int main(int argc, char** argv)
             {
                 printf("ERROR: TEST ECDH KEYPAIR FAILED LINE %d\n",i);
 #ifdef DEBUG
-                printf("QOct: ");
+                printf("\nline %d QOct:    ",i);
                 OCT_output(&QOct);
-                printf("QIUTOct: ");
+                printf("\nline %d QIUTOct: ",i);
                 OCT_output(&QIUTOct);
                 printf("\n");
 #endif
@@ -264,19 +257,17 @@ int main(int argc, char** argv)
             rc = OCT_comp(&ZOct,&ZIUTOct);
             if (!rc)
             {
+
                 printf("TEST ECDH Z FAILED LINE %d\n",i);
+#ifdef DEBUG
+                printf("\nline %d ZOct: ",i);
+                OCT_output(&ZOct);
+                printf("\nline %dZIUTOct: ",i);
+                OCT_output(&ZIUTOct);
+                printf("\n");
+#endif
                 exit(EXIT_FAILURE);
             }
-
-#ifdef DEBUG
-            printf("ZOct: ");
-            OCT_output(&ZOct);
-            printf("\n");
-            printf("ZIUTOct: ");
-            OCT_output(&ZIUTOct);
-            printf("\n");
-#endif
-
             free(dIUT);
             dIUT = NULL;
             free(ZIUT);
