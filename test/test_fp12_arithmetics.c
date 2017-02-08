@@ -196,7 +196,6 @@ void read_FP12(FP12 *fp12, char *stringax1)
         printf("ERROR unexpected test vector\n");
         exit(EXIT_FAILURE);
     }
-    stringcx1++;
     stringcx1[0] = '\0';
     stringcx1 += 5;
     stringcx2 = strchr(stringcx1,',');
@@ -282,6 +281,12 @@ int main(int argc, char** argv)
     const char* FP12_2line = "FP12_2 = ";
     FP12 FP12conj;
     const char* FP12conjline = "FP12conj = ";
+    FP12 FP12usquare;
+    const char* FP12usquareline = "FP12usquare = ";
+    FP12 FP12square;
+    const char* FP12squareline = "FP12square = ";
+    FP12 FP12mul;
+    const char* FP12mulline = "FP12mul = ";
 
     BIG_rcopy(M,Modulus);
     BIG_rcopy(Fr_a,CURVE_Fra);
@@ -315,12 +320,19 @@ int main(int argc, char** argv)
         {
             len = strlen(FP12_1line);
             linePtr = line + len;
-                printf("\n\n");
-                printf("%s",linePtr);
-                printf("\n\n");
             read_FP12(&FP12_1,linePtr);
-                FP12_output(&FP12_1);
-                printf("\n\n");
+            FP12_from_FP4(&FP12aux1,&FP12_1.a);
+            if(!FP4_equals(&FP12aux1.a,&FP12_1.a) || !FP4_iszilch(&FP12aux1.b) || !FP4_iszilch(&FP12aux1.c))
+            {
+                printf("ERROR setting FP12 from a FP4, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            FP12_from_FP4s(&FP12aux1,&FP12_1.a,&FP12_1.b,&FP12_1.c);
+            if(!FP12_equals(&FP12aux1,&FP12_1))
+            {
+                printf("ERROR setting FP12 from three FP4s, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
         }
 // Read second FP12
         if (!strncmp(line,FP12_2line, strlen(FP12_2line)))
@@ -328,9 +340,6 @@ int main(int argc, char** argv)
             len = strlen(FP12_2line);
             linePtr = line + len;
             read_FP12(&FP12_2,linePtr);
-                printf("\n\n");
-                FP12_output(&FP12_2);
-                printf("\n\n");
         }
 // Test FP12_conj
         if (!strncmp(line,FP12conjline, strlen(FP12conjline)))
@@ -340,17 +349,65 @@ int main(int argc, char** argv)
             read_FP12(&FP12conj,linePtr);
             FP12_copy(&FP12aux1,&FP12_1);
             FP12_conj(&FP12aux1,&FP12aux1);
-            FP12_reduce(&FP12aux1);
-            FP12_norm(&FP12aux1);
             if(!FP12_equals(&FP12aux1,&FP12conj))
+            {
+                printf("ERROR computing conjugate of FP12, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Test unitary squaring
+        if (!strncmp(line,FP12usquareline, strlen(FP12usquareline)))
+        {
+            len = strlen(FP12usquareline);
+            linePtr = line + len;
+            read_FP12(&FP12usquare,linePtr);
+            FP12_copy(&FP12aux1,&FP12_1);
+            FP12_usqr(&FP12aux1,&FP12aux1);
+            if(!FP12_equals(&FP12aux1,&FP12usquare))
             {
                 printf("\n\n");
                 FP12_output(&FP12aux1);
                 printf("\n\n");
-                FP12_output(&FP12conj);
+                printf("ERROR computing unitary square of FP12, line %d\n",i);
+                //exit(EXIT_FAILURE);
+            }
+        }
+// Test squaring
+        if (!strncmp(line,FP12squareline, strlen(FP12squareline)))
+        {
+            len = strlen(FP12squareline);
+            linePtr = line + len;
+            read_FP12(&FP12square,linePtr);
+            FP12_copy(&FP12aux1,&FP12_1);
+            FP12_sqr(&FP12aux1,&FP12aux1);
+            if(!FP12_equals(&FP12aux1,&FP12square))
+            {
                 printf("\n\n");
-                printf("ERROR computing conjugate of FP12, line %d\n",i);
-                exit(EXIT_FAILURE);
+                FP12_output(&FP12aux1);
+                printf("\n\n");
+                FP12_output(&FP12square);
+                printf("\n\n");
+                printf("ERROR computing square of FP12, line %d\n",i);
+                //exit(EXIT_FAILURE);
+            }
+        }  
+// Test multiplication
+        if (!strncmp(line,FP12mulline, strlen(FP12mulline)))
+        {
+            len = strlen(FP12mulline);
+            linePtr = line + len;
+            read_FP12(&FP12mul,linePtr);
+            FP12_copy(&FP12aux1,&FP12_1);
+            FP12_mul(&FP12aux1,&FP12_2);
+            if(!FP12_equals(&FP12aux1,&FP12mul))
+            {
+                printf("\n\n");
+                FP12_output(&FP12aux1);
+                printf("\n\n");
+                FP12_output(&FP12mul);
+                printf("\n\n");
+                printf("ERROR computing multiplication of two FP12s, line %d\n",i);
+                //exit(EXIT_FAILURE);
             }
         }        
     }
