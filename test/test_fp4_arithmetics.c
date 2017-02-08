@@ -47,6 +47,7 @@ void read_BIG(BIG A, char* string)
     BIG_norm(A);
 }
 
+// Read a structure of the type [..,..]
 void read_FP2(FP2 *fp2, char* stringx)
 {
     char *stringy, *end;
@@ -75,6 +76,7 @@ void read_FP2(FP2 *fp2, char* stringx)
     FP2_from_BIGs(fp2,x,y);
 }
 
+// Read a structure of the type [[..,..],[..,..]]
 void read_FP4(FP4 *fp4, char* stringx1)
 {
     char *stringx2, *stringy1, *stringy2, *end;
