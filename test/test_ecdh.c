@@ -38,7 +38,7 @@
 typedef enum { false, true } bool;
 
 #define LINE_LEN 500
-#define AES_len 32
+#define AES_len 16
 //#define DEBUG
 
 int main(int argc, char** argv)
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     char * linePtr = NULL;
     int l1=0, l2=0, i=0;
 
-   	char raw[256], key[EAS], ciphertext[AES_len], res[AES_len], plaintext[AES_len];
+   	char raw[256], key[EAS], ciphertext[AES_len*2], res[AES_len*2], plaintext[AES_len*2];
     octet Key= {0,sizeof(key),key}, Ciphertext= {0,sizeof(ciphertext),ciphertext}, Plaintext= {0,sizeof(plaintext),plaintext}, Res= {0,sizeof(res),res};
     csprng rng;
 
@@ -293,22 +293,17 @@ int main(int argc, char** argv)
 // Self test AES-CBC
     for(i=0; i<20; i++)
     {
-	    OCT_rand(&Key,&rng,EAS);
+	    OCT_rand(&Key,&rng,EAS*2);
 	    OCT_rand(&Plaintext,&rng,AES_len);
-
-	    OCT_output(&Key);
-	    printf("plain  \n");
-	    OCT_output(&Plaintext);
+	   	OCT_copy(&Res,&Plaintext);
 
 	    AES_CBC_IV0_ENCRYPT(&Key,&Plaintext,&Ciphertext);
-	    rc = AES_CBC_IV0_DECRYPT(&Key,&Res,&Ciphertext);
+	    rc = AES_CBC_IV0_DECRYPT(&Key,&Ciphertext,&Plaintext);
 	    if (!rc || !OCT_comp(&Plaintext,&Res))
 	    {
 	        printf("ERROR AES_CBC decryption failed\n");
 	        exit(EXIT_FAILURE);	
 	    }
-	    printf("res  \n");
-	    OCT_output(&Res);
 	}
 
     printf("SUCCESS TEST ECDH KEYPAIR PASSED\n");
