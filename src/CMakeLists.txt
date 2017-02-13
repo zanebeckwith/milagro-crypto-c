@@ -10,6 +10,7 @@ fp.c
 ecp.c
 hash.c
 rand.c
+randapi.c
 aes.c
 gcm.c
 oct.c

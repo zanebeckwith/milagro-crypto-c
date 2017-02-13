@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "rsa.h"
+#include "randapi.h"
 
 int main()
 {
@@ -54,7 +55,7 @@ int main()
     RAW.val[3]=ran>>24;
     for (i=0; i<100; i++) RAW.val[i]=i;
 
-    RSA_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
+    CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
     printf("Generating public/private key pair\n");
     RSA_KEY_PAIR(&RNG,65537,&priv,&pub,NULL,NULL);
@@ -101,7 +102,7 @@ int main()
         return 1;
     }
 
-    RSA_KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
     RSA_PRIVATE_KEY_KILL(&priv);
 
     OCT_clear(&M);

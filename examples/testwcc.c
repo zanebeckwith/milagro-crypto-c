@@ -28,6 +28,7 @@ under the License.
 #include <string.h>
 #include <time.h>
 #include "wcc.h"
+#include "randapi.h"
 
 #define DEBUG
 
@@ -116,7 +117,7 @@ int main()
 #endif
 
     /* initialise random number generator */
-    WCC_CREATE_CSPRNG(&RNG,&SEED);
+    CREATE_CSPRNG(&RNG,&SEED);
 
     /* TA: Generate master secret  */
     rtn = WCC_RANDOM_GENERATE(&RNG,&MS);
@@ -347,7 +348,7 @@ int main()
         return 1;
     }
 
-    WCC_KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
 
     return 0;
 }

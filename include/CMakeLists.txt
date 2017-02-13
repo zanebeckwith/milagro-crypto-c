@@ -1,6 +1,7 @@
 # AMCL header files
 
 set(COPY_HEADERS
+randapi.h
 ecdh.h  
 rsa.h    
 x509.h
@@ -13,6 +14,7 @@ ${CMAKE_CURRENT_BINARY_DIR}/rsa.h
 ${CMAKE_CURRENT_BINARY_DIR}/x509.h
 ${CMAKE_CURRENT_BINARY_DIR}/version.h
 ${CMAKE_CURRENT_BINARY_DIR}/utils.h
+${CMAKE_CURRENT_BINARY_DIR}/randapi.h
 ${CMAKE_CURRENT_BINARY_DIR}/arch.h
 ${CMAKE_CURRENT_BINARY_DIR}/amcl.h) 
 

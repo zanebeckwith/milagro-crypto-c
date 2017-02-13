@@ -310,23 +310,4 @@ int WCC_RECOMBINE_G2(octet *W1,octet *W2,octet *W);
  */
 unsign32 WCC_today(void);
 
-/**
- * @brief Initialise a random number generator
- *
- * Initialise a random number generator.
- *
- * @param RNG     cryptographically secure random number generator
- * @param SEED    random seed value
- */
-void WCC_CREATE_CSPRNG(csprng *RNG,octet *SEED);
-
-/**
- * @brief Kill a random number generator
- *
- * Deletes all internal state.
- *
- * @param RNG    cryptographically secure random number generator
- */
-void WCC_KILL_CSPRNG(csprng *RNG);
-
 #endif

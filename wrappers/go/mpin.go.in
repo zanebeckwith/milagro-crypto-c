@@ -25,6 +25,7 @@ package mpin
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
+#include "randapi.h"
 #include "mpin.h"
 #include "utils.h"
 */
@@ -176,7 +177,7 @@ func CreateCSPRNG(SEED []byte) C.csprng {
 	SEEDOct := GetOctet(SEEDStr)
 	defer OctetFree(&SEEDOct)
 	var RNG C.csprng
-	C.MPIN_CREATE_CSPRNG(&RNG, &SEEDOct)
+	C.CREATE_CSPRNG(&RNG, &SEEDOct)
 	return RNG
 }
 
