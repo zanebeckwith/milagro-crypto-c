@@ -273,20 +273,44 @@ int main(int argc, char** argv)
 
     BIG M, Fr_a, Fr_b;
     FP2 Frob;
+    FP4 FP4aux1;
     FP12 FP12aux1, FP12aux2;
+    char oct[12*MODBYTES];
+    octet OCT = {0,sizeof(oct),oct};
 
-    FP12 FP12_1;
+    FP12 FP_12[4];
     const char* FP12_1line = "FP12_1 = ";
-    FP12 FP12_2;
     const char* FP12_2line = "FP12_2 = ";
+    const char* FP12_3line = "FP12_3 = ";
+    const char* FP12_4line = "FP12_4 = ";
     FP12 FP12conj;
     const char* FP12conjline = "FP12conj = ";
-    FP12 FP12usquare;
-    const char* FP12usquareline = "FP12usquare = ";
+//   FP12 FP12usquare;
+//   const char* FP12usquareline = "FP12usquare = ";
     FP12 FP12square;
     const char* FP12squareline = "FP12square = ";
     FP12 FP12mul;
     const char* FP12mulline = "FP12mul = ";
+//    FP12 FP12smul;
+//    const char* FP12smulline = "FP12smul = ";
+    FP12 FP12inv;
+    const char* FP12invline = "FP12inv = ";
+    BIG BIGsc[4];
+    const char* BIGsc1line = "BIGsc1 = ";
+    const char* BIGsc2line = "BIGsc2 = ";
+    const char* BIGsc3line = "BIGsc3 = ";
+    const char* BIGsc4line = "BIGsc4 = ";
+//    FP12 FP12pow;
+//    const char* FP12powline = "FP12pow = ";
+    FP12 FP12pinpow;
+    const char* FP12pinpowline = "FP12pinpow = ";
+//    FP12 FP12pow4;
+//    const char* FP12pow4line = "FP12pow4 = ";
+    FP12 FP12frob;
+    const char* FP12frobline = "FP12frob = ";
+    FP4 FP4trace;
+    const char* FP4traceline = "FP4trace = ";
+
 
     BIG_rcopy(M,Modulus);
     BIG_rcopy(Fr_a,CURVE_Fra);
@@ -320,17 +344,24 @@ int main(int argc, char** argv)
         {
             len = strlen(FP12_1line);
             linePtr = line + len;
-            read_FP12(&FP12_1,linePtr);
-            FP12_from_FP4(&FP12aux1,&FP12_1.a);
-            if(!FP4_equals(&FP12aux1.a,&FP12_1.a) || !FP4_iszilch(&FP12aux1.b) || !FP4_iszilch(&FP12aux1.c))
+            read_FP12(&FP_12[0],linePtr);
+            FP12_from_FP4(&FP12aux1,&FP_12[0].a);
+            if(!FP4_equals(&FP12aux1.a,&FP_12[0].a) || !FP4_iszilch(&FP12aux1.b) || !FP4_iszilch(&FP12aux1.c))
             {
                 printf("ERROR setting FP12 from a FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-            FP12_from_FP4s(&FP12aux1,&FP12_1.a,&FP12_1.b,&FP12_1.c);
-            if(!FP12_equals(&FP12aux1,&FP12_1))
+            FP12_from_FP4s(&FP12aux1,&FP_12[0].a,&FP_12[0].b,&FP_12[0].c);
+            if(!FP12_equals(&FP12aux1,&FP_12[0]))
             {
                 printf("ERROR setting FP12 from three FP4s, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+            FP12_toOctet(&OCT,&FP_12[0]);
+            FP12_fromOctet(&FP12aux1,&OCT);
+            if(!FP12_equals(&FP12aux1,&FP_12[0]))
+            {
+                printf("ERROR converting FP12 to/from octet, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -339,7 +370,21 @@ int main(int argc, char** argv)
         {
             len = strlen(FP12_2line);
             linePtr = line + len;
-            read_FP12(&FP12_2,linePtr);
+            read_FP12(&FP_12[1],linePtr);
+        }
+// Read third FP12
+        if (!strncmp(line,FP12_3line, strlen(FP12_3line)))
+        {
+            len = strlen(FP12_3line);
+            linePtr = line + len;
+            read_FP12(&FP_12[2],linePtr);
+        }
+// Read fourth FP12
+        if (!strncmp(line,FP12_4line, strlen(FP12_4line)))
+        {
+            len = strlen(FP12_4line);
+            linePtr = line + len;
+            read_FP12(&FP_12[3],linePtr);
         }
 // Test FP12_conj
         if (!strncmp(line,FP12conjline, strlen(FP12conjline)))
@@ -347,7 +392,7 @@ int main(int argc, char** argv)
             len = strlen(FP12conjline);
             linePtr = line + len;
             read_FP12(&FP12conj,linePtr);
-            FP12_copy(&FP12aux1,&FP12_1);
+            FP12_copy(&FP12aux1,&FP_12[0]);
             FP12_conj(&FP12aux1,&FP12aux1);
             if(!FP12_equals(&FP12aux1,&FP12conj))
             {
@@ -355,61 +400,218 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
-// Test unitary squaring
+/* Test unitary squaring
         if (!strncmp(line,FP12usquareline, strlen(FP12usquareline)))
         {
             len = strlen(FP12usquareline);
             linePtr = line + len;
             read_FP12(&FP12usquare,linePtr);
-            FP12_copy(&FP12aux1,&FP12_1);
+            FP12_copy(&FP12aux1,&FP_12[0]);
             FP12_usqr(&FP12aux1,&FP12aux1);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
             if(!FP12_equals(&FP12aux1,&FP12usquare))
             {
-                printf("\n\n");
-                FP12_output(&FP12aux1);
-                printf("\n\n");
                 printf("ERROR computing unitary square of FP12, line %d\n",i);
-                //exit(EXIT_FAILURE);
+                exit(EXIT_FAILURE);
             }
-        }
+        }*/
 // Test squaring
         if (!strncmp(line,FP12squareline, strlen(FP12squareline)))
         {
             len = strlen(FP12squareline);
             linePtr = line + len;
             read_FP12(&FP12square,linePtr);
-            FP12_copy(&FP12aux1,&FP12_1);
+            FP12_copy(&FP12aux1,&FP_12[0]);
             FP12_sqr(&FP12aux1,&FP12aux1);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
             if(!FP12_equals(&FP12aux1,&FP12square))
             {
-                printf("\n\n");
-                FP12_output(&FP12aux1);
-                printf("\n\n");
-                FP12_output(&FP12square);
-                printf("\n\n");
                 printf("ERROR computing square of FP12, line %d\n",i);
-                //exit(EXIT_FAILURE);
+                exit(EXIT_FAILURE);
             }
         }  
-// Test multiplication
+// Test multiplication and commutativity
         if (!strncmp(line,FP12mulline, strlen(FP12mulline)))
         {
             len = strlen(FP12mulline);
             linePtr = line + len;
             read_FP12(&FP12mul,linePtr);
-            FP12_copy(&FP12aux1,&FP12_1);
-            FP12_mul(&FP12aux1,&FP12_2);
-            if(!FP12_equals(&FP12aux1,&FP12mul))
+            FP12_copy(&FP12aux1,&FP_12[0]);
+            FP12_mul(&FP12aux1,&FP_12[1]);
+            FP12_copy(&FP12aux2,&FP_12[1]);
+            FP12_mul(&FP12aux2,&FP_12[0]);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
+            FP12_reduce(&FP12aux2);
+            FP12_norm(&FP12aux2);
+            if(!FP12_equals(&FP12aux1,&FP12mul) || !FP12_equals(&FP12aux2,&FP12mul))
             {
-                printf("\n\n");
-                FP12_output(&FP12aux1);
-                printf("\n\n");
-                FP12_output(&FP12mul);
-                printf("\n\n");
                 printf("ERROR computing multiplication of two FP12s, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+/* Test s-multiplication and commutativity
+        if (!strncmp(line,FP12smulline, strlen(FP12smulline)))
+        {
+            len = strlen(FP12smulline);
+            linePtr = line + len;
+            read_FP12(&FP12smul,linePtr);
+            FP12_copy(&FP12aux1,&FP_12[0]);
+            FP12_smul(&FP12aux1,&FP_12[1]);
+            FP12_copy(&FP12aux2,&FP_12[1]);
+            FP12_smul(&FP12aux2,&FP_12[0]);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
+            FP12_reduce(&FP12aux2);
+            FP12_norm(&FP12aux2);
+            if(!FP12_equals(&FP12aux1,&FP12smul) || !FP12_equals(&FP12aux2,&FP12smul))
+            {
+                printf("ERROR computing multiplication (FP12_smul) of two FP12s, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }*/
+// Test inverse fuction
+       if (!strncmp(line,FP12invline, strlen(FP12invline)))
+        {
+            len = strlen(FP12invline);
+            linePtr = line + len;
+            read_FP12(&FP12inv,linePtr);
+            FP12_copy(&FP12aux1,&FP_12[0]);
+            FP12_inv(&FP12aux1,&FP12aux1);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
+            if(!FP12_equals(&FP12aux1,&FP12inv))
+            {
+                printf("ERROR computing inverse of a FP12, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+		}
+// Read first BIG
+        if (!strncmp(line,BIGsc1line, strlen(BIGsc1line)))
+        {
+            len = strlen(BIGsc1line);
+            linePtr = line + len;
+            read_BIG(BIGsc[0],linePtr);
+        }
+// Read second BIG
+        if (!strncmp(line,BIGsc2line, strlen(BIGsc2line)))
+        {
+            len = strlen(BIGsc2line);
+            linePtr = line + len;
+            read_BIG(BIGsc[1],linePtr);
+        }
+// Read third BIG
+        if (!strncmp(line,BIGsc3line, strlen(BIGsc3line)))
+        {
+            len = strlen(BIGsc3line);
+            linePtr = line + len;
+            read_BIG(BIGsc[2],linePtr);
+        }
+// Read fourth BIG
+        if (!strncmp(line,BIGsc4line, strlen(BIGsc4line)))
+        {
+            len = strlen(BIGsc4line);
+            linePtr = line + len;
+            read_BIG(BIGsc[3],linePtr);
+        }
+/* Test power by a BIG
+       if (!strncmp(line,FP12powline, strlen(FP12powline)))
+        {
+            len = strlen(FP12powline);
+            linePtr = line + len;
+            read_FP12(&FP12pow,linePtr);
+            FP12_copy(&FP12aux1,&FP_12[0]);
+            FP12_pow(&FP12aux1,&FP12aux1,BIGsc[0]);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
+            if(!FP12_equals(&FP12aux1,&FP12pow))
+            {
+            	printf("\n\n");
+            	BIG_output(BIGsc[0]);
+            	printf("\n\n");
+            	FP12_output(&FP12pow);
+            	printf("\n\n");
+            	FP12_output(&FP12aux1);
+            	printf("\n\n");
+                printf("ERROR computing power of a FP12 by a BIG, line %d\n",i);
                 //exit(EXIT_FAILURE);
             }
-        }        
+		}*/
+// Test power by a small integer
+       if (!strncmp(line,FP12pinpowline, strlen(FP12pinpowline)))
+        {
+            len = strlen(FP12pinpowline);
+            linePtr = line + len;
+            read_FP12(&FP12pinpow,linePtr);
+            FP12_copy(&FP12aux1,&FP_12[0]);
+            FP12_pinpow(&FP12aux1,j,10);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
+            if(!FP12_equals(&FP12aux1,&FP12pinpow))
+            {
+            	printf("\n\n");
+            	FP12_output(&FP12pinpow);
+            	printf("\n\n");
+            	FP12_output(&FP12aux1);
+            	printf("\n\n");
+                printf("ERROR computing power of a FP12 by a small integer, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+		}
+/* Test function FP12_pow4
+       if (!strncmp(line,FP12pow4line, strlen(FP12pow4line)))
+        {
+            len = strlen(FP12pow4line);
+            linePtr = line + len;
+            read_FP12(&FP12pow4,linePtr);
+            FP12_pow4(&FP12aux1,FP_12,BIGsc);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
+            if(!FP12_equals(&FP12aux1,&FP12pinpow))
+            {
+            	printf("\n\n");
+            	FP12_output(&FP12pow4);
+            	printf("\n\n");
+            	FP12_output(&FP12aux1);
+            	printf("\n\n");
+                printf("ERROR testing function FP12pow4, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+		}*/
+// Raises an FP12 to the power of the internal modulus p, using the Frobenius constant f
+        if (!strncmp(line,FP12frobline, strlen(FP12frobline)))
+        {
+            len = strlen(FP12frobline);
+            linePtr = line + len;
+            read_FP12(&FP12frob,linePtr);
+            FP12_copy(&FP12aux1,&FP_12[0]);
+            FP12_frob(&FP12aux1,&Frob);
+            FP12_reduce(&FP12aux1);
+            FP12_norm(&FP12aux1);
+            if(!FP12_equals(&FP12aux1,&FP12frob))
+            {
+                printf("ERROR in raising FP12 by an internal modulus p, using the Frobenius constant f, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
+// Test computing trace of FP12
+        if (!strncmp(line,FP4traceline, strlen(FP4traceline)))
+        {
+            len = strlen(FP4traceline);
+            linePtr = line + len;
+            read_FP4(&FP4trace,linePtr);
+            FP12_copy(&FP12aux1,&FP_12[0]);
+            FP12_trace(&FP4aux1,&FP12aux1);
+            FP4_reduce(&FP4aux1);
+            FP4_norm(&FP4aux1);
+            if(!FP4_equals(&FP4aux1,&FP4trace))
+            {
+                printf("ERROR computing trace of FP12, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }
     }
     fclose(fp);
 
