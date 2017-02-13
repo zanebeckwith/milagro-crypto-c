@@ -310,6 +310,8 @@ int main(int argc, char** argv)
     const char* FP12frobline = "FP12frob = ";
     FP4 FP4trace;
     const char* FP4traceline = "FP4trace = ";
+    FP4 FP4xtrpow;
+    const char* FP4xtrpowline = "FP4xtrpow = ";
 
 
     BIG_rcopy(M,Modulus);
@@ -612,6 +614,21 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
         }
+/* Calculates FP4 trace of an FP12 raised to the power of a BIG number
+        if (!strncmp(line,FP4xtrpowline, strlen(FP4xtrpowline)))
+        {
+            len = strlen(FP4xtrpowline);
+            linePtr = line + len;
+            read_FP4(&FP4xtrpow,linePtr);
+            FP4_xtr_pow(&FP4aux1,&FP4trace,BIGsc[0]);
+            FP4_reduce(&FP4aux1);
+            FP4_norm(&FP4aux1);
+            if(!FP4_equals(&FP4aux1,&FP4xtrpow))
+            {
+                printf("ERROR computing FP4 trace of an FP12 raised to the power of a BIG number, line %d\n",i);
+                exit(EXIT_FAILURE);
+            }
+        }*/
     }
     fclose(fp);
 
