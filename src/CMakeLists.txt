@@ -397,18 +397,18 @@ install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
         GROUP_WRITE GROUP_READ
         WORLD_WRITE WORLD_READ WORLD_EXECUTE)
 
-set(INSTALL_LIBS amcl_core amcl_curve amcl_pairing amcl_rsa amcl_ecc)
+set(INSTALL_LIBS amcl_core amcl_curve amcl_rsa amcl_ecc)
 
 if(BUILD_X509)
   set(INSTALL_LIBS ${INSTALL_LIBS} amcl_x509)
 endif(BUILD_X509)
 
 if(BUILD_MPIN)
-  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_mpin)
+  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_mpin amcl_pairing )
 endif(BUILD_MPIN)
 
 if(BUILD_WCC)
-  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_wcc)
+  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_wcc amcl_pairing )
 endif(BUILD_WCC)
 
 install (TARGETS ${INSTALL_LIBS} DESTINATION lib PERMISSIONS
