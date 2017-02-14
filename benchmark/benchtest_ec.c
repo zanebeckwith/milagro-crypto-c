@@ -44,7 +44,7 @@ int main()
     char pr[10];
     unsigned long ran;
 
-printf("\nBechmark test EC - ");
+    printf("\nBechmark test EC - ");
 
 #if CHOICE==NIST256
     printf("NIST256 Curve\n");

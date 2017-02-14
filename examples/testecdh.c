@@ -170,9 +170,9 @@ int ecdh(csprng *RNG)
         printf("***ECDSA Verification Failed\n");
         return 0;
     }
-    else 
+    else
     {
-      printf("ECDSA Signature/Verification succeeded\n");
+        printf("ECDSA Signature/Verification succeeded\n");
     }
 
 #endif
@@ -185,7 +185,7 @@ int main()
     int i;
     unsigned long ran;
 
-	char raw[100];
+    char raw[100];
     octet RAW= {0,sizeof(raw),raw};
     csprng RNG;                /* Crypto Strong RNG */
 
@@ -200,8 +200,8 @@ int main()
 
     CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
-	ecdh(&RNG);
+    ecdh(&RNG);
 
-	KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
 }
 

@@ -21,7 +21,7 @@ under the License.
 
 /* Build executible after installation:
 
-  gcc -std=c99 -g ./testx509.c -I/opt/amcl/include -L/opt/amcl/lib -lx509 -o testx509
+  gcc -std=c99 -g ./testx509.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl_x509 -lamcl_curve -lamcl_core -o testx509
 
 */
 

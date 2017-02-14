@@ -91,13 +91,13 @@ extern unsigned int WCC_today(void);
 
 if (platform.system() == 'Windows'):
     libamcl_wcc = ffi.dlopen("libamcl_wcc.dll")
-    libamcl_core = ffi.dlopen("libamcl_core.dll")    
+    libamcl_core = ffi.dlopen("libamcl_core.dll")
 elif (platform.system() == 'Darwin'):
     libamcl_wcc = ffi.dlopen("libamcl_wcc.dylib")
-    libamcl_core = ffi.dlopen("libamcl_core.dylib")    
+    libamcl_core = ffi.dlopen("libamcl_core.dylib")
 else:
     libamcl_wcc = ffi.dlopen("libamcl_wcc.so")
-    libamcl_core = ffi.dlopen("libamcl_core.so")    
+    libamcl_core = ffi.dlopen("libamcl_core.so")
 
 
 def toHex(octetValue):
