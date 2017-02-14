@@ -324,7 +324,8 @@ def get_server_secret(master_secret):
     """
     master_secret1, master_secret1_val = make_octet(None, master_secret)
     server_secret1, server_secret1_val = make_octet(G2)
-    error_code = libamcl_mpin.MPIN_GET_SERVER_SECRET(master_secret1, server_secret1)
+    error_code = libamcl_mpin.MPIN_GET_SERVER_SECRET(
+        master_secret1, server_secret1)
 
     server_secret_hex = to_hex(server_secret1)
     return error_code, server_secret_hex.decode("hex")
@@ -936,7 +937,7 @@ def hash_all(hash_type, hash_mpin_id, u, ut, v, y, z, t):
 
     hm1, hm1_val = make_octet(PFS)
     libamcl_mpin.MPIN_HASH_ALL(hash_type, hash_mpin_id1,
-                          u1, ut1, v1, y1, z1, t1, hm1)
+                               u1, ut1, v1, y1, z1, t1, hm1)
 
     hm_hex = to_hex(hm1)
     return hm_hex.decode("hex")

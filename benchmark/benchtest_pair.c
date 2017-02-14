@@ -48,7 +48,7 @@ int main()
     double elapsed;
     char pr[10];
 
-printf("Bechmark test PAIR - ");
+    printf("Bechmark test PAIR - ");
 
 #if CHOICE==BN254
     printf("BN254 Curve\n");

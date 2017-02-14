@@ -274,6 +274,8 @@ format:
 	astyle --style=allman --recursive --suffix=none 'include/*.h'
 	astyle --style=allman --recursive --suffix=none 'src/*.c'
 	astyle --style=allman --recursive --suffix=none 'test/*.c'
+	astyle --style=allman --recursive --suffix=none 'examples/*.c'
+	astyle --style=allman --recursive --suffix=none 'benchmark/*.c'
 	find ./wrappers/go -type f -name "*.go" -exec gofmt -s -w {} \;
 	find ./wrappers/go -type f -name "*.go.in" -exec gofmt -s -w {} \;
 	autopep8 --in-place --aggressive --aggressive ./wrappers/python/*.py
