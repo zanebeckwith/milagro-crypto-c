@@ -265,7 +265,8 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    int i = 0, len = 0, j = 0;
+    int i = 0, len = 0;
+//    j = 0;
     FILE *fp;
 
     char line[LINE_LEN];
@@ -302,16 +303,16 @@ int main(int argc, char** argv)
     const char* BIGsc4line = "BIGsc4 = ";
 //    FP12 FP12pow;
 //    const char* FP12powline = "FP12pow = ";
-    FP12 FP12pinpow;
-    const char* FP12pinpowline = "FP12pinpow = ";
+//    FP12 FP12pinpow;
+//    const char* FP12pinpowline = "FP12pinpow = ";
 //    FP12 FP12pow4;
 //    const char* FP12pow4line = "FP12pow4 = ";
     FP12 FP12frob;
     const char* FP12frobline = "FP12frob = ";
     FP4 FP4trace;
     const char* FP4traceline = "FP4trace = ";
-    FP4 FP4xtrpow;
-    const char* FP4xtrpowline = "FP4xtrpow = ";
+//    FP4 FP4xtrpow;
+//    const char* FP4xtrpowline = "FP4xtrpow = ";
 
 
     BIG_rcopy(M,Modulus);
@@ -541,7 +542,7 @@ int main(int argc, char** argv)
                 //exit(EXIT_FAILURE);
             }
 		}*/
-// Test power by a small integer
+/* Test power by a small integer
        if (!strncmp(line,FP12pinpowline, strlen(FP12pinpowline)))
         {
             len = strlen(FP12pinpowline);
@@ -551,6 +552,7 @@ int main(int argc, char** argv)
             FP12_pinpow(&FP12aux1,j,10);
             FP12_reduce(&FP12aux1);
             FP12_norm(&FP12aux1);
+            j++;
             if(!FP12_equals(&FP12aux1,&FP12pinpow))
             {
             	printf("\n\n");
@@ -561,7 +563,7 @@ int main(int argc, char** argv)
                 printf("ERROR computing power of a FP12 by a small integer, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-		}
+		}*/
 /* Test function FP12_pow4
        if (!strncmp(line,FP12pow4line, strlen(FP12pow4line)))
         {
