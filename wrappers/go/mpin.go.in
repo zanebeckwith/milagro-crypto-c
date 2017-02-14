@@ -21,7 +21,7 @@ package mpin
 
 /*
 #cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lmpin  -lamcl -lm
+#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_mpin -lamcl_pairing -lamcl_curve -lamcl_core
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
