@@ -331,6 +331,14 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
+// Testing equal to zero function
+    FP4_zero(&FP4aux1);
+    FP12_from_FP4(&FP12aux1,&FP4aux1);
+   	if(FP12_equals(&FP12aux1,&FP12aux2) || !FP12_iszilch(&FP12aux1))
+    {
+        printf("ERROR comparing FP12s or checking if FP12 is zero\n");
+        exit(EXIT_FAILURE);
+    }    
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
