@@ -67,6 +67,9 @@ typedef struct
   char *val;
 } octet;
 
+extern void CREATE_CSPRNG(csprng *R,octet *S);
+extern void KILL_CSPRNG(csprng *R);
+
 extern int WCC_RANDOM_GENERATE(csprng *RNG,octet* S);
 extern void WCC_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h);
 extern int WCC_GET_G2_MULTIPLE(int sha, int hashDone,octet *S,octet *ID,octet *VG2);
@@ -83,18 +86,18 @@ extern void WCC_HASH_ID(int sha, octet *,octet *);
 extern int WCC_RECOMBINE_G1(octet *,octet *,octet *);
 extern int WCC_RECOMBINE_G2(octet *,octet *,octet *);
 extern unsigned int WCC_today(void);
-extern void CREATE_CSPRNG(csprng *,octet *);
-extern void version(char* info);
-extern void KILL_CSPRNG(csprng *RNG);
 
 """)
 
 if (platform.system() == 'Windows'):
-    libwcc = ffi.dlopen("libwcc.dll")
+    libamcl_wcc = ffi.dlopen("libamcl_wcc.dll")
+    libamcl_core = ffi.dlopen("libamcl_core.dll")    
 elif (platform.system() == 'Darwin'):
-    libwcc = ffi.dlopen("libwcc.dylib")
+    libamcl_wcc = ffi.dlopen("libamcl_wcc.dylib")
+    libamcl_core = ffi.dlopen("libamcl_core.dylib")    
 else:
-    libwcc = ffi.dlopen("libwcc.so")
+    libamcl_wcc = ffi.dlopen("libamcl_wcc.so")
+    libamcl_core = ffi.dlopen("libamcl_core.so")    
 
 
 def toHex(octetValue):
@@ -125,10 +128,6 @@ def toHex(octetValue):
 if __name__ == "__main__":
     # Print hex values
     DEBUG = False
-
-    build_version = ffi.new("char []", 256)
-    libwcc.version(build_version)
-    print ffi.string(build_version)
 
     # Seed
     seedHex = "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
@@ -325,152 +324,152 @@ if __name__ == "__main__":
 
     # random number generator
     RNG = ffi.new("csprng*")
-    libwcc.CREATE_CSPRNG(RNG, RAW)
+    libamcl_core.CREATE_CSPRNG(RNG, RAW)
 
     # Today's date in epoch days
-    date = libwcc.WCC_today()
+    date = libamcl_wcc.WCC_today()
     if DEBUG:
         print "Date %s" % date
 
     # Hash IdA
-    libwcc.WCC_HASH_ID(HASH_TYPE_WCC, IdA, AHV)
+    libamcl_wcc.WCC_HASH_ID(HASH_TYPE_WCC, IdA, AHV)
     if DEBUG:
         print "IdA: %s" % toHex(IdA)
         print "AHV: %s" % toHex(AHV)
 
     # Hash IdB
-    libwcc.WCC_HASH_ID(HASH_TYPE_WCC, IdB, BHV)
+    libamcl_wcc.WCC_HASH_ID(HASH_TYPE_WCC, IdB, BHV)
     if DEBUG:
         print "IdB: %s" % toHex(IdB)
         print "BHV: %s" % toHex(BHV)
 
     # Generate master secret for MIRACL and Customer
-    rtn = libwcc.WCC_RANDOM_GENERATE(RNG, MS1)
+    rtn = libamcl_wcc.WCC_RANDOM_GENERATE(RNG, MS1)
     if rtn != 0:
-        print "libwcc.WCC_RANDOM_GENERATE(RNG,MS1) Error %s", rtn
-    rtn = libwcc.WCC_RANDOM_GENERATE(RNG, MS2)
+        print "libamcl_wcc.WCC_RANDOM_GENERATE(RNG,MS1) Error %s", rtn
+    rtn = libamcl_wcc.WCC_RANDOM_GENERATE(RNG, MS2)
     if rtn != 0:
-        print "libwcc.WCC_RANDOM_GENERATE(RNG,MS2) Error %s" % rtn
+        print "libamcl_wcc.WCC_RANDOM_GENERATE(RNG,MS2) Error %s" % rtn
     if DEBUG:
         print "MS1: %s" % toHex(MS1)
         print "MS2: %s" % toHex(MS2)
 
     # Generate Alice's sender key shares
-    rtn = libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1, AHV, A1KeyG1)
+    rtn = libamcl_wcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1, AHV, A1KeyG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1,AHV,A1KeyG1) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2, AHV, A2KeyG1)
+        print "libamcl_wcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1,AHV,A1KeyG1) Error %s" % rtn
+    rtn = libamcl_wcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2, AHV, A2KeyG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2,AHV,A2KeyG1) Error %s" % rtn
+        print "libamcl_wcc.WCC_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2,AHV,A2KeyG1) Error %s" % rtn
     if DEBUG:
         print "A1KeyG1: %s" % toHex(A1KeyG1)
         print "A2KeyG1: %s" % toHex(A2KeyG1)
 
     # Combine Alices's sender key shares
-    rtn = libwcc.WCC_RECOMBINE_G1(A1KeyG1, A2KeyG1, AKeyG1)
+    rtn = libamcl_wcc.WCC_RECOMBINE_G1(A1KeyG1, A2KeyG1, AKeyG1)
     if rtn != 0:
-        print "libwcc.WCC_RECOMBINE_G1(A1KeyG1, A2KeyG1, AKeyG1) Error %s" % rtn
+        print "libamcl_wcc.WCC_RECOMBINE_G1(A1KeyG1, A2KeyG1, AKeyG1) Error %s" % rtn
     print "AKeyG1: %s" % toHex(AKeyG1)
 
     # Generate Alice's sender time permit shares
-    rtn = libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS1, AHV, A1TPG1)
+    rtn = libamcl_wcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS1, AHV, A1TPG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS1,AHV,A1TPG1) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS2, AHV, A2TPG1)
+        print "libamcl_wcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS1,AHV,A1TPG1) Error %s" % rtn
+    rtn = libamcl_wcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS2, AHV, A2TPG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS2,AHV,A2TPG1) Error %s" % rtn
+        print "libamcl_wcc.WCC_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS2,AHV,A2TPG1) Error %s" % rtn
     if DEBUG:
         print "A1TPG1: %s" % toHex(A1TPG1)
         print "A2TPG1: %s" % toHex(A2TPG1)
 
     # Combine Alice's sender Time Permit shares
-    rtn = libwcc.WCC_RECOMBINE_G1(A1TPG1, A2TPG1, ATPG1)
+    rtn = libamcl_wcc.WCC_RECOMBINE_G1(A1TPG1, A2TPG1, ATPG1)
     if rtn != 0:
-        print "libwcc.WCC_RECOMBINE_G1(A1TPG1, A2TPG1, ATPG1) Error %s" % rtn
+        print "libamcl_wcc.WCC_RECOMBINE_G1(A1TPG1, A2TPG1, ATPG1) Error %s" % rtn
     print "ATPG1: %s" % toHex(ATPG1)
 
     # Generate Bob's receiver secret key shares
-    rtn = libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS1, BHV, B1KeyG2)
+    rtn = libamcl_wcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS1, BHV, B1KeyG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS1,BHV,B1KeyG2) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS2, BHV, B2KeyG2)
+        print "libamcl_wcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS1,BHV,B1KeyG2) Error %s" % rtn
+    rtn = libamcl_wcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS2, BHV, B2KeyG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS2,BHV,B2KeyG2) Error %s" % rtn
+        print "libamcl_wcc.WCC_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS2,BHV,B2KeyG2) Error %s" % rtn
     if DEBUG:
         print "B1KeyG2: %s" % toHex(B1KeyG2)
         print "B2KeyG2: %s" % toHex(B2KeyG2)
 
     # Combine Bobs's receiver secret key shares
-    rtn = libwcc.WCC_RECOMBINE_G2(B1KeyG2, B2KeyG2, BKeyG2)
+    rtn = libamcl_wcc.WCC_RECOMBINE_G2(B1KeyG2, B2KeyG2, BKeyG2)
     if rtn != 0:
-        print "libwcc.WCC_RECOMBINE_G2(B1KeyG2, B2KeyG2, BKeyG2) Error %s" % rtn
+        print "libamcl_wcc.WCC_RECOMBINE_G2(B1KeyG2, B2KeyG2, BKeyG2) Error %s" % rtn
     print "BKeyG2: %s" % toHex(BKeyG2)
 
     # Generate Bob's receiver time permit shares
-    rtn = libwcc.WCC_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS1, BHV, B1TPG2)
+    rtn = libamcl_wcc.WCC_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS1, BHV, B1TPG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G2_PERMIT(date,MS1,BHV,B1TPG2) Error %s" % rtn
-    rtn = libwcc.WCC_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS2, BHV, B2TPG2)
+        print "libamcl_wcc.WCC_GET_G2_PERMIT(date,MS1,BHV,B1TPG2) Error %s" % rtn
+    rtn = libamcl_wcc.WCC_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS2, BHV, B2TPG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G2_PERMIT(date,MS2,BHV,B2TPG2) Error %s" % rtn
+        print "libamcl_wcc.WCC_GET_G2_PERMIT(date,MS2,BHV,B2TPG2) Error %s" % rtn
     if DEBUG:
         print "B1TPG2: %s" % toHex(B1TPG2)
         print "B2TPG2: %s" % toHex(B2TPG2)
 
     # Combine Bob's receiver time permit shares
-    rtn = libwcc.WCC_RECOMBINE_G2(B1TPG2, B2TPG2, BTPG2)
+    rtn = libamcl_wcc.WCC_RECOMBINE_G2(B1TPG2, B2TPG2, BTPG2)
     if rtn != 0:
-        print "libwcc.WCC_RECOMBINE_G2(B1TPG2, B2TPG2, BTPG2) Error %s" % rtn
+        print "libamcl_wcc.WCC_RECOMBINE_G2(B1TPG2, B2TPG2, BTPG2) Error %s" % rtn
     print "BTPG2: %s" % toHex(BTPG2)
 
-    rtn = libwcc.WCC_RANDOM_GENERATE(RNG, X)
+    rtn = libamcl_wcc.WCC_RANDOM_GENERATE(RNG, X)
     if rtn != 0:
-        print "libwcc.WCC_RANDOM_GENERATE(RNG,X) Error %s", rtn
+        print "libamcl_wcc.WCC_RANDOM_GENERATE(RNG,X) Error %s", rtn
     if DEBUG:
         print "X: %s" % toHex(X)
 
-    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, X, IdA, PaG1)
+    rtn = libamcl_wcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, X, IdA, PaG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,X,IdA,PaG1) Error %s", rtn
+        print "libamcl_wcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,X,IdA,PaG1) Error %s", rtn
     if DEBUG:
         print "PaG1: %s" % toHex(PaG1)
 
-    rtn = libwcc.WCC_RANDOM_GENERATE(RNG, W)
+    rtn = libamcl_wcc.WCC_RANDOM_GENERATE(RNG, W)
     if rtn != 0:
-        print "libwcc.WCC_RANDOM_GENERATE(RNG,W) Error %s", rtn
+        print "libamcl_wcc.WCC_RANDOM_GENERATE(RNG,W) Error %s", rtn
     if DEBUG:
         print "W: %s" % toHex(W)
 
-    rtn = libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, W, IdA, PgG1)
+    rtn = libamcl_wcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC, date, W, IdA, PgG1)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,W,IdA,PgG1) Error %s", rtn
+        print "libamcl_wcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,W,IdA,PgG1) Error %s", rtn
     if DEBUG:
         print "PgG1: %s" % toHex(PgG1)
 
-    rtn = libwcc.WCC_RANDOM_GENERATE(RNG, Y)
+    rtn = libamcl_wcc.WCC_RANDOM_GENERATE(RNG, Y)
     if rtn != 0:
-        print "libwcc.WCC_RANDOM_GENERATE(RNG,Y) Error %s", rtn
+        print "libamcl_wcc.WCC_RANDOM_GENERATE(RNG,Y) Error %s", rtn
     if DEBUG:
         print "Y: %s" % toHex(Y)
 
-    rtn = libwcc.WCC_GET_G2_TPMULT(HASH_TYPE_WCC, date, Y, IdB, PbG2)
+    rtn = libamcl_wcc.WCC_GET_G2_TPMULT(HASH_TYPE_WCC, date, Y, IdB, PbG2)
     if rtn != 0:
-        print "libwcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,Y,IdB,PbG2) Error %s", rtn
+        print "libamcl_wcc.WCC_GET_G1_TPMULT(HASH_TYPE_WCC,date,Y,IdB,PbG2) Error %s", rtn
     if DEBUG:
         print "PbG2: %s" % toHex(PbG2)
 
     # PIA = Hq(PaG1,PbG2,PgG1,IdB)
-    libwcc.WCC_Hq(HASH_TYPE_WCC, PaG1, PbG2, PgG1, IdB, PIA)
+    libamcl_wcc.WCC_Hq(HASH_TYPE_WCC, PaG1, PbG2, PgG1, IdB, PIA)
     if DEBUG:
         print "PIA: %s" % toHex(PIA)
 
     # PIB = Hq(PbG2,PaG1,PgG1,IdA)
-    libwcc.WCC_Hq(HASH_TYPE_WCC, PbG2, PaG1, PgG1, IdA, PIB)
+    libamcl_wcc.WCC_Hq(HASH_TYPE_WCC, PbG2, PaG1, PgG1, IdA, PIB)
     if DEBUG:
         print "PIB: %s" % toHex(PIB)
 
     # Alice calculates AES Key
-    rtn = libwcc.WCC_SENDER_KEY(
+    rtn = libamcl_wcc.WCC_SENDER_KEY(
         HASH_TYPE_WCC,
         date,
         X,
@@ -483,11 +482,11 @@ if __name__ == "__main__":
         IdB,
         KEY1)
     if rtn != 0:
-        print "libwcc.WCC_SENDER_KEY(HASH_TYPE_WCC,date, X, PIA, PIB, PbG2, PgG1, AKeyG1, ATPG1, IdB, KEY1) Error %s" % rtn
+        print "libamcl_wcc.WCC_SENDER_KEY(HASH_TYPE_WCC,date, X, PIA, PIB, PbG2, PgG1, AKeyG1, ATPG1, IdB, KEY1) Error %s" % rtn
     print "{0}'s AES Key: {1}".format(alice_id, toHex(KEY1))
 
     # Bob calculates AES Key
-    rtn = libwcc.WCC_RECEIVER_KEY(
+    rtn = libamcl_wcc.WCC_RECEIVER_KEY(
         HASH_TYPE_WCC,
         date,
         Y,
@@ -501,7 +500,7 @@ if __name__ == "__main__":
         IdA,
         KEY2)
     if rtn != 0:
-        print "libwcc.WCC_RECEIVER_KEY(HASH_TYPE_WCC,date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2) Error %s" % rtn
+        print "libamcl_wcc.WCC_RECEIVER_KEY(HASH_TYPE_WCC,date, Y, W, PIA, PIB, PaG1, PgG1, BKeyG2, BTPG2, IdA, KEY2) Error %s" % rtn
     print "{0}'s AES Key: {1}".format(bob_id, toHex(KEY2))
 
-    libwcc.KILL_CSPRNG(RNG)
+    libamcl_core.KILL_CSPRNG(RNG)

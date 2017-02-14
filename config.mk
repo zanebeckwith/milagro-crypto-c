@@ -51,7 +51,7 @@ DEBUG_REDUCE:=OFF
 DEBUG_NORM:=OFF
 
 # Architecture
-CMAKE_C_FLAGS=-m64
+CMAKE_C_FLAGS=
 
 # Tool chain 
 # options: ../../resources/cmake/mingw64-cross.cmake
