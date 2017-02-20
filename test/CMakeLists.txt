@@ -96,6 +96,8 @@ target_link_libraries (test_aes_decrypt amcl_core)
 # hash tests
 add_test(NAME test_hash_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/256/SHA256ShortMsg.rsp sha256)
 set_tests_properties (test_hash_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+add_test(NAME test_hash_384 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/384/SHA384ShortMsg.rsp sha384)
+set_tests_properties (test_hash_384 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 add_test(NAME test_hash_512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/512/SHA512ShortMsg.rsp sha512)
 set_tests_properties (test_hash_512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
