@@ -251,6 +251,3 @@ change_randapi_declaration
 change_ecc_declaration
 change_rsa_declaration
 change_mpin_declaration
-
-
-(setq minibuffer-max-depth nil)
