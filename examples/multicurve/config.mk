@@ -4,7 +4,7 @@
 AMCL_CHUNK:=64
 
 # Current choice of Elliptic Curve (see amcl.h)
-AMCL_CHOICE:=BN254_CX
+AMCL_CHOICE:=BLS383
 
 # type of curve  (see amcl.h) 
 AMCL_CURVETYPE:=WEIERSTRASS
@@ -18,6 +18,9 @@ CMAKE_BUILD_TYPE:=Release
 
 # Install path
 CMAKE_INSTALL_PATH:=/opt/amcl
+
+# Run tests
+AMCL_TEST:=OFF
 
 # Build Shared Libraries ON/OFF
 AMCL_BUILD_SHARED_LIBS:=OFF

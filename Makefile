@@ -261,12 +261,18 @@ else
 	-DDEBUG_NORM=$(DEBUG_NORM) \
 	../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
-	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 
+
+ifeq ($(AMCL_TEST),ON)
+	cd target/default && \
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0
 endif
+
 ifeq ($(AMCL_BUILD_DOXYGEN),ON)
 	cd target/default && \
 	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0 
+endif
+
 endif
 
 # Format the source code
