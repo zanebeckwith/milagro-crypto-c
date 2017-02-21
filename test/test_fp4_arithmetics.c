@@ -42,7 +42,7 @@ void read_BIG(BIG A, char* string)
     BIG_zero(A);
     len = strlen(string)+1;
     amcl_hex2bin(string,support,len);
-    len = (len-1)/2;;
+    len = (len-1)/2;
     BIG_fromBytesLen(A,support,len);
     BIG_norm(A);
 }

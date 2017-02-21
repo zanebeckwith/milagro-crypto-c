@@ -30,23 +30,14 @@
 #include "amcl.h"
 #include "utils.h"
 
-extern int dup(int oldfd);
-extern int dup2(int oldfd, int newfd);
-extern int close(int fildes);
-extern int fileno(FILE *stream);
-
-
 #define LINE_LEN 1000
 
 void read_OCTET(octet* OCT, char* string)
 {
     int len;
-    char support[LINE_LEN];
-    len = strlen(string)+1;
-    amcl_hex2bin(string,support,len);
-    OCT_fromHex(OCT,support);
-    OCT_output(OCT);
-    exit(-1);
+    len = strlen(string);
+    amcl_hex2bin(string,OCT->val,len);
+    OCT->len = (len-1)/2;
 }
 
 int main(int argc, char** argv)
@@ -133,17 +124,6 @@ int main(int argc, char** argv)
     const char* CLIENT_SECRETline = "CLIENT_SECRET = ";
 
 
-    fpos_t pos;
-    int fd;
-    fgetpos(stdout, &pos);
-    fd = dup(fileno(stdout));
-
-    if(freopen("test.out", "w", stdout) == NULL)
-    {
-        printf("ERROR redirecting stdout\n");
-        exit(EXIT_FAILURE);
-    }
-
     fp = fopen(argv[1], "r");
     if (fp == NULL)
     {
@@ -174,6 +154,18 @@ int main(int argc, char** argv)
             len = strlen(SS1line);
             linePtr = line + len;
             read_OCTET(&SS1,linePtr);
+// Generate first server secret shares
+            rtn = MPIN_GET_SERVER_SECRET(&MS1,&internalSS1);
+            if (rtn != 0)
+            {
+                printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS1), %d\n", rtn);
+                exit(EXIT_FAILURE);
+            }
+            else if (!OCT_comp(&internalSS1,&SS1))
+            {
+                printf("ERROR unsexpected SERVER SECRET Error %d\n", rtn);
+                exit(EXIT_FAILURE);
+            }
         }
 // Read SS2
         if (!strncmp(line,SS2line, strlen(SS2line)))
@@ -181,6 +173,18 @@ int main(int argc, char** argv)
             len = strlen(SS2line);
             linePtr = line + len;
             read_OCTET(&SS2,linePtr);
+// Generate first server secret shares
+            rtn = MPIN_GET_SERVER_SECRET(&MS2,&internalSS2);
+            if (rtn != 0)
+            {
+                printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS2), %d\n", rtn);
+                exit(EXIT_FAILURE);
+            }
+            else if (!OCT_comp(&internalSS2,&SS2))
+            {
+                printf("ERROR unsexpected SERVER SECRET Error %d\n", rtn);
+                exit(EXIT_FAILURE);
+            }
         }
 // Read DATE
         if (!strncmp(line,DATEline, strlen(DATEline)))
@@ -322,87 +326,89 @@ int main(int argc, char** argv)
             linePtr = line + len;
             sscanf(linePtr,"%d\n",&SERVER_OUTPUT);
         }
-
-/* Generate server secret shares
-        rtn = MPIN_GET_SERVER_SECRET(&MS1,&internalSS1);
-        if (rtn != 0)
-        {
-            printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS1), %d\n", rtn);
-            exit(EXIT_FAILURE);
-        }
-        else if (!OCT_comp(&internalSS1,&SS1))
-        {
-            printf("ERROR unsexpected SERVER SECRET Error %d\n", rtn);
-            exit(EXIT_FAILURE);
-        }
-        rtn = MPIN_GET_SERVER_SECRET(&MS2,&internalSS2);
-        if (rtn != 0)
-        {
-            printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS2), %d\n", rtn);
-            exit(EXIT_FAILURE);
-        }
-        else if (!OCT_comp(&internalSS2,&SS2))
-        {
-            printf("ERROR unsexpected SERVER SECRET Error %d\n", rtn);
-            exit(EXIT_FAILURE);
-        }*/
-
-    printf("%s",MS1line);
-    OCT_output(&MS1);
-    printf("%s",MS2line);
-    OCT_output(&MS2);
-    printf("%s",SS1line);
-    OCT_output(&SS1);
-    printf("%s",SS2line);
-    OCT_output(&SS2);
-    printf("%s",CS1line);
-    OCT_output(&CS1);
-    printf("%s",CS2line);
-    OCT_output(&CS2);
-    printf("%s",TP1line);
-    OCT_output(&TP1);
-    printf("%s",TP2line);
-    OCT_output(&TP2);
-    printf("%s%d\n",DATEline,DATE);
-    printf("%s%d\n",PIN1line,PIN1);
-    printf("%s%d\n",PIN2line,PIN2);
-    printf("%s",SERVER_SECRETline);
-    OCT_output(&SERVER_SECRET);
-    printf("%s",SECline);
-    OCT_output(&SEC);
-    printf("%s",HASH_MPIN_ID_HEXline);
-    OCT_output(&HASH_MPIN_ID_HEX);
-    printf("%s",TIME_PERMITline);
-    OCT_output(&TIME_PERMIT);
-    printf("%s",MPIN_ID_HEXline);
-    OCT_output(&MPIN_ID_HEX);
-    printf("%s",TOKENline);
-    OCT_output(&TOKEN);
-    printf("%s%d\n",SERVER_OUTPUTline,SERVER_OUTPUT);
-    printf("%s",Uline);
-    OCT_output(&U);
-    printf("%s",Vline);
-    OCT_output(&V);
-    printf("%s",Xline);
-    OCT_output(&X);
-    printf("%s",Yline);
-    OCT_output(&Y);
-    printf("%s",UTline);
-    OCT_output(&UT);
-    printf("%s",CLIENT_SECRETline);
-    OCT_output(&CLIENT_SECRET);
-
     }
     fclose(fp);
-
-    // Restore stdout
-    fflush(stdout);
-    dup2(fd, fileno(stdout));
-    close(fd);
-    clearerr(stdout);
-    fsetpos(stdout, &pos);        /* for C9X */
 
     printf("SUCCESS TEST MPIN PASSED\n");
     exit(EXIT_SUCCESS);
 }
 
+
+
+/*
+
+    if (i % 24 == 0)
+    {
+        printf("\n%s%d\n",DATEline,DATE);
+        printf("%s%d\n",PIN1line,PIN1);
+        printf("%s%d\n",PIN2line,PIN2);
+        printf("%s",MS1line);
+        OCT_output(&MS1);
+        printf("%s",MS2line);
+        OCT_output(&MS2);
+        printf("%s",SS1line);
+        OCT_output(&SS1);
+        printf("%s",SS2line);
+        OCT_output(&SS2);
+        printf("%s",SERVER_SECRETline);
+        OCT_output(&SERVER_SECRET);
+        printf("%s",MPIN_ID_HEXline);
+        OCT_output(&MPIN_ID_HEX);
+        printf("%s",HASH_MPIN_ID_HEXline);
+        OCT_output(&HASH_MPIN_ID_HEX);
+        printf("%s",CS1line);
+        OCT_output(&CS1);
+        printf("%s",CS2line);
+        OCT_output(&CS2);
+        printf("%s",CLIENT_SECRETline);
+        OCT_output(&CLIENT_SECRET);
+        printf("%s",TP1line);
+        OCT_output(&TP1);
+        printf("%s",TP2line);
+        OCT_output(&TP2);
+        printf("%s",TIME_PERMITline);
+        OCT_output(&TIME_PERMIT);
+        printf("%s",TOKENline);
+        OCT_output(&TOKEN);
+        printf("%s",Xline);
+        OCT_output(&X);
+        printf("%s",Uline);
+        OCT_output(&U);
+        printf("%s",UTline);
+        OCT_output(&UT);
+        printf("%s",SECline);
+        OCT_output(&SEC);
+        printf("%s",Yline);
+        OCT_output(&Y);
+        printf("%s",Vline);
+        OCT_output(&V);
+        printf("%s%d\n",SERVER_OUTPUTline,SERVER_OUTPUT);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
