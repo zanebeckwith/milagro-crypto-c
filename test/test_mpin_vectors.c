@@ -129,12 +129,14 @@ int main(int argc, char** argv)
     char sec[2*PFS+1], rtsec[2*PFS+1];
     octet SEC= {0,sizeof(sec),sec}, rtSEC= {0,sizeof(rtsec),rtsec};
     const char* SECline = "SEC = ";
-    char hid[PFS], htid[PFS];
+    char hid[2*PFS+1], htid[2*PFS+1];
     octet HID= {0,sizeof(hid), hid}, HTID= {0,sizeof(htid),htid};
     char e[12*PFS];
     octet E= {0,sizeof(e),e};
     char f[12*PFS];
     octet F= {0,sizeof(f),f};
+
+    octet *pID;
 
     fp = fopen(argv[1], "r");
     if (fp == NULL)
@@ -453,7 +455,13 @@ int main(int argc, char** argv)
             linePtr = line + len;
             sscanf(linePtr,"%d\n",&SERVER_OUTPUT);
 // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
-            MPIN_SERVER_1(HASH_TYPE_MPIN,DATE,&MPIN_ID_HEX,&HID,&HTID);
+// When set only send hashed IDs to server
+#ifdef USE_ANONYMOUS
+    pID = &HASH_MPIN_ID_HEX;
+#else
+    pID = &MPIN_ID_HEX;
+#endif
+            MPIN_SERVER_1(HASH_TYPE_MPIN,DATE,pID,&HID,&HTID);
 // Client second pass
             rtn = MPIN_CLIENT_2(&X,&Y,&rtSEC);
             if (rtn != 0)
