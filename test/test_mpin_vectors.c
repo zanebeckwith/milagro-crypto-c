@@ -31,13 +31,27 @@
 #include "utils.h"
 
 #define LINE_LEN 1000
+#define DEBUG
+
+
+extern int dup(int oldfd);
+extern int dup2(int oldfd, int newfd);
+extern int close(int fildes);
+extern int fileno(FILE *stream);
 
 void read_OCTET(octet* OCT, char* string)
 {
-    int len;
-    len = strlen(string);
-    amcl_hex2bin(string,OCT->val,len);
-    OCT->len = (len-1)/2;
+    int len = strlen(string);
+    char buff[len];
+    strncpy(buff,string,len);
+    char *end = strchr(buff,',');
+    if (end == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    end[0] = '\0';
+    OCT_fromHex(OCT,buff);
 }
 
 int main(int argc, char** argv)
@@ -158,12 +172,16 @@ int main(int argc, char** argv)
             rtn = MPIN_GET_SERVER_SECRET(&MS1,&internalSS1);
             if (rtn != 0)
             {
-                printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS1), %d\n", rtn);
+                printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS1), %d, line %d\n", rtn,i);
                 exit(EXIT_FAILURE);
             }
             else if (!OCT_comp(&internalSS1,&SS1))
             {
-                printf("ERROR unsexpected SERVER SECRET Error %d\n", rtn);
+#ifdef DEBUG
+                OCT_output(&internalSS1);
+                OCT_output(&SS1);
+#endif
+                printf("ERROR generating server secret, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -173,16 +191,21 @@ int main(int argc, char** argv)
             len = strlen(SS2line);
             linePtr = line + len;
             read_OCTET(&SS2,linePtr);
-// Generate first server secret shares
+// Generate second server secret shares
             rtn = MPIN_GET_SERVER_SECRET(&MS2,&internalSS2);
             if (rtn != 0)
             {
-                printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS2), %d\n", rtn);
+                printf("ERROR MPIN_GET_SERVER_SECRET(&MS1,&SS2), %d, line %d\n", rtn,i);
                 exit(EXIT_FAILURE);
             }
             else if (!OCT_comp(&internalSS2,&SS2))
             {
-                printf("ERROR unsexpected SERVER SECRET Error %d\n", rtn);
+#ifdef DEBUG    
+                OCT_output(&MS2);
+                OCT_output(&internalSS2);
+                OCT_output(&SS2);
+#endif
+                printf("ERROR generating server secret, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
