@@ -42,7 +42,7 @@ void read_BIG(BIG A, char* string)
     BIG_zero(A);
     len = strlen(string)+1;
     amcl_hex2bin(string,support,len);
-    len = (len-1)/2;;
+    len = (len-1)/2;
     BIG_fromBytesLen(A,support,len);
     BIG_norm(A);
 }
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_fp2_arithmetics [path to test vector file]\n");
+        printf("usage: ./test_fp4_arithmetics [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -203,7 +203,7 @@ int main(int argc, char** argv)
     FP4_one(&FP4aux2);
 
 // Testing equal function and set one function
-    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isunity(&FP4aux1) || !FP4_isunity(&FP4aux2) || !FP4_isreal(&FP4aux1))
+    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isunity(&FP4aux1) || !FP4_isunity(&FP4aux2) || !FP4_isreal(&FP4aux1) || FP4_iszilch(&FP4aux1))
     {
         printf("ERROR comparing FP4s or setting FP4 to unity FP\n");
         exit(EXIT_FAILURE);

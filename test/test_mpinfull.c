@@ -32,6 +32,8 @@
 #include "mpin.h"
 #include "randapi.h"
 
+// #define DEBUG
+
 int main()
 {
     int i,PIN1,PIN2,rtn;
@@ -104,6 +106,17 @@ int main()
     octet T= {0,sizeof(t),t};
     octet SK= {0,sizeof(sk),sk};
     octet CK= {0,sizeof(ck),ck};
+
+    /* AES-GCM */
+    char raw[256], header[16], ciphertext[32], res[32], plaintext[32], tag[16], iv[16];
+    octet HEADER= {0,0,header}, Ciphertext= {0,sizeof(ciphertext),ciphertext};
+    octet Plaintext= {0,sizeof(plaintext),plaintext}, Res= {0,sizeof(res),res}, Tag= {0,sizeof(tag),tag}, IV= {0,sizeof(iv),iv};
+    csprng rng;
+
+    /* Fake random source */
+    RAND_clean(&rng);
+    for (i=0; i<256; i++) raw[i]=(char)i;
+    RAND_seed(&rng,256,raw);
 
     PIN1 = 1234;
     PIN2 = 1234;
@@ -325,6 +338,32 @@ int main()
         printf("FAILURE Keys are different\n");
         return 1;
     }
+
+for (i=0; i<10; i++)
+{
+	    /* Self test AES-GCM encyption/decryption */
+	    OCT_rand(&IV,&rng,16);
+	    OCT_rand(&Plaintext,&rng,32);
+	    OCT_copy(&Res,&Plaintext);
+#ifdef DEBUG
+	    printf("Plaintext = ");
+	    OCT_output(&Plaintext);
+	    printf("IV = ");
+	    OCT_output(&IV);
+#endif
+	    MPIN_AES_GCM_ENCRYPT(&CK,&IV,&HEADER,&Plaintext,&Ciphertext,&Tag);
+	    MPIN_AES_GCM_DECRYPT(&CK,&IV,&HEADER,&Ciphertext,&Plaintext,&Tag);
+#ifdef DEBUG
+	    printf("Ciphertext = ");
+	    OCT_output(&Ciphertext);
+#endif
+
+	    if (!OCT_comp(&Res,&Plaintext))
+	    {
+	        printf("FAILURE Encryption/Decryption with AES-GCM\n");
+	        return 1;
+	    }
+}
 
     printf("SUCCESS\n");
     return 0;
