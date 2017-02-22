@@ -22,10 +22,10 @@ under the License.
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "randapi.h"
 #include "mpin_build1.h"
-#include "randapi_build2.h"
-#include "mpin_build1.h"
-#include "randapi_build2.h"
+#include "mpin_build2.h"
+
 
 //#define PERMITS  /* for time permits ON or OFF */
 //#define PINERROR /* For PIN ERROR detection ON or OFF */
@@ -40,12 +40,12 @@ int mpin_build1(csprng *RNG)
 #else
     int date=0;
 #endif
-    char x[PGS],s[PGS],y[PGS],client_id[100],sst[4*PFS],token[2*PFS+1],sec[2*PFS+1],permit[2*PFS+1],xcid[2*PFS+1],xid[2*PFS+1],e[12*PFS],f[12*PFS];
-    char hcid[PFS],hsid[PFS],hid[2*PFS+1],htid[2*PFS+1],h[PGS];
+    char x[BUILD1_PGS],s[BUILD1_PGS],y[BUILD1_PGS],client_id[100],sst[4*BUILD1_PFS],token[2*BUILD1_PFS+1],sec[2*BUILD1_PFS+1],permit[2*BUILD1_PFS+1],xcid[2*BUILD1_PFS+1],xid[2*BUILD1_PFS+1],e[12*BUILD1_PFS],f[12*BUILD1_PFS];
+    char hcid[BUILD1_PFS],hsid[BUILD1_PFS],hid[2*BUILD1_PFS+1],htid[2*BUILD1_PFS+1],h[BUILD1_PGS];
 #ifdef FULL
-    char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
-    char g1[12*PFS],g2[12*PFS];
-    char ck[PAS],sk[PAS];
+    char r[BUILD1_PGS],z[2*BUILD1_PFS+1],w[BUILD1_PGS],t[2*BUILD1_PFS+1];
+    char g1[12*BUILD1_PFS],g2[12*BUILD1_PFS];
+    char ck[BUILD1_PAS],sk[BUILD1_PAS];
 #endif
     octet S= {0,sizeof(s),s};
     octet X= {0,sizeof(x),x};
@@ -84,7 +84,7 @@ int mpin_build1(csprng *RNG)
 
     /* Create Client Identity */
     OCT_jstring(&CLIENT_ID,"testUser@miracl.com");
-    BUILD1_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HCID);  /* Either Client or TA calculates Hash(ID) - you decide! */
+    BUILD1_MPIN_HASH_ID(BUILD1_HASH_TYPE_MPIN,&CLIENT_ID,&HCID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 
     printf("Client ID Hash= ");
     OCT_output(&HCID);
@@ -105,7 +105,7 @@ int mpin_build1(csprng *RNG)
     /* Client extracts PIN from secret to create Token */
     pin=1234;
     printf("Client extracts PIN= %d\n",pin);
-    BUILD1_MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&CLIENT_ID,pin,&TOKEN);
+    BUILD1_MPIN_EXTRACT_PIN(BUILD1_HASH_TYPE_MPIN,&CLIENT_ID,pin,&TOKEN);
     printf("Client Token= ");
     OCT_output(&TOKEN);
 
@@ -117,7 +117,7 @@ int mpin_build1(csprng *RNG)
     /* Client gets "Time Permit" from DTA */
     printf("Client gets Time Permit\n");
 
-    BUILD1_MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&S,&HCID,&PERMIT);
+    BUILD1_MPIN_GET_CLIENT_PERMIT(BUILD1_HASH_TYPE_MPIN,date,&S,&HCID,&PERMIT);
     printf("Time Permit= ");
     OCT_output(&PERMIT);
 
@@ -188,7 +188,7 @@ int mpin_build1(csprng *RNG)
     printf("MPIN Single Pass\n");
     timeValue = BUILD1_MPIN_GET_TIME();
 
-    rtn=BUILD1_MPIN_CLIENT(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
+    rtn=BUILD1_MPIN_CLIENT(BUILD1_HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
 
     if (rtn != 0)
     {
@@ -201,16 +201,16 @@ int mpin_build1(csprng *RNG)
 #endif
 
 
-    rtn=BUILD1_MPIN_SERVER(HASH_TYPE_MPIN,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue);
+    rtn=BUILD1_MPIN_SERVER(BUILD1_HASH_TYPE_MPIN,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue);
 
 #ifdef FULL
-    BUILD1_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID);  // new
+    BUILD1_MPIN_HASH_ID(BUILD1_HASH_TYPE_MPIN,&CLIENT_ID,&HSID);  // new
     BUILD1_MPIN_GET_G1_MULTIPLE(RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w  */
 #endif
 
 #else // SINGLE_PASS
     printf("MPIN Multi Pass\n");
-    if (BUILD1_MPIN_CLIENT_1(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT)!=0)
+    if (BUILD1_MPIN_CLIENT_1(BUILD1_HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT)!=0)
     {
         printf("Error from Client side - First Pass\n");
         return 0;
@@ -219,18 +219,18 @@ int mpin_build1(csprng *RNG)
     /* Send U=x.ID to server, and recreate secret from token and pin */
 
 #ifdef FULL
-    BUILD1_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HCID);
+    BUILD1_MPIN_HASH_ID(BUILD1_HASH_TYPE_MPIN,&CLIENT_ID,&HCID);
     BUILD1_MPIN_GET_G1_MULTIPLE(RNG,1,&R,&HCID,&Z);  /* Also Send Z=r.ID to Server, remember random r, DH component */
 #endif
 
     /* Server calculates H(ID) and H(ID)+H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-    BUILD1_MPIN_SERVER_1(HASH_TYPE_MPIN,date,pID,pHID,pHTID);
+    BUILD1_MPIN_SERVER_1(BUILD1_HASH_TYPE_MPIN,date,pID,pHID,pHTID);
 
     /* Server generates Random number Y and sends it to Client */
     BUILD1_MPIN_RANDOM_GENERATE(RNG,&Y);
 
 #ifdef FULL
-    BUILD1_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID); //new
+    BUILD1_MPIN_HASH_ID(BUILD1_HASH_TYPE_MPIN,&CLIENT_ID,&HSID); //new
     BUILD1_MPIN_GET_G1_MULTIPLE(RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w, DH component  */
 #endif
 
@@ -265,13 +265,13 @@ int mpin_build1(csprng *RNG)
     }
 
 #ifdef FULL
-    BUILD1_MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);  // new
-    BUILD1_MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,pin,&R,&X,&H,&T,&CK);      // new H
+    BUILD1_MPIN_HASH_ALL(BUILD1_HASH_TYPE_MPIN,&HCID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);  // new
+    BUILD1_MPIN_CLIENT_KEY(BUILD1_HASH_TYPE_MPIN,&G1,&G2,pin,&R,&X,&H,&T,&CK);      // new H
     printf("Client Key = ");
     OCT_output(&CK);
 
-    BUILD1_MPIN_HASH_ALL(HASH_TYPE_MPIN,&HSID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);
-    BUILD1_MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&SST,&W,&H,pHID,pxID,pxCID,&SK); // new H,pHID
+    BUILD1_MPIN_HASH_ALL(BUILD1_HASH_TYPE_MPIN,&HSID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);
+    BUILD1_MPIN_SERVER_KEY(BUILD1_HASH_TYPE_MPIN,&Z,&SST,&W,&H,pHID,pxID,pxCID,&SK); // new H,pHID
     printf("Server Key = ");
     OCT_output(&SK);
 #endif
@@ -286,12 +286,12 @@ int mpin_build2(csprng *RNG)
 #else
     int date=0;
 #endif
-    char x[PGS],s[PGS],y[PGS],client_id[100],sst[4*PFS],token[2*PFS+1],sec[2*PFS+1],permit[2*PFS+1],xcid[2*PFS+1],xid[2*PFS+1],e[12*PFS],f[12*PFS];
-    char hcid[PFS],hsid[PFS],hid[2*PFS+1],htid[2*PFS+1],h[PGS];
+    char x[BUILD2_PGS],s[BUILD2_PGS],y[BUILD2_PGS],client_id[100],sst[4*BUILD2_PFS],token[2*BUILD2_PFS+1],sec[2*BUILD2_PFS+1],permit[2*BUILD2_PFS+1],xcid[2*BUILD2_PFS+1],xid[2*BUILD2_PFS+1],e[12*BUILD2_PFS],f[12*BUILD2_PFS];
+    char hcid[BUILD2_PFS],hsid[BUILD2_PFS],hid[2*BUILD2_PFS+1],htid[2*BUILD2_PFS+1],h[BUILD2_PGS];
 #ifdef FULL
-    char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
-    char g1[12*PFS],g2[12*PFS];
-    char ck[PAS],sk[PAS];
+    char r[BUILD2_PGS],z[2*BUILD2_PFS+1],w[BUILD2_PGS],t[2*BUILD2_PFS+1];
+    char g1[12*BUILD2_PFS],g2[12*BUILD2_PFS];
+    char ck[BUILD2_PAS],sk[BUILD2_PAS];
 #endif
     octet S= {0,sizeof(s),s};
     octet X= {0,sizeof(x),x};
@@ -330,7 +330,7 @@ int mpin_build2(csprng *RNG)
 
     /* Create Client Identity */
     OCT_jstring(&CLIENT_ID,"testUser@miracl.com");
-    BUILD2_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HCID);  /* Either Client or TA calculates Hash(ID) - you decide! */
+    BUILD2_MPIN_HASH_ID(BUILD2_HASH_TYPE_MPIN,&CLIENT_ID,&HCID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 
     printf("Client ID Hash= ");
     OCT_output(&HCID);
@@ -351,7 +351,7 @@ int mpin_build2(csprng *RNG)
     /* Client extracts PIN from secret to create Token */
     pin=1234;
     printf("Client extracts PIN= %d\n",pin);
-    BUILD2_MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&CLIENT_ID,pin,&TOKEN);
+    BUILD2_MPIN_EXTRACT_PIN(BUILD2_HASH_TYPE_MPIN,&CLIENT_ID,pin,&TOKEN);
     printf("Client Token= ");
     OCT_output(&TOKEN);
 
@@ -363,7 +363,7 @@ int mpin_build2(csprng *RNG)
     /* Client gets "Time Permit" from DTA */
     printf("Client gets Time Permit\n");
 
-    BUILD2_MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&S,&HCID,&PERMIT);
+    BUILD2_MPIN_GET_CLIENT_PERMIT(BUILD2_HASH_TYPE_MPIN,date,&S,&HCID,&PERMIT);
     printf("Time Permit= ");
     OCT_output(&PERMIT);
 
@@ -434,7 +434,7 @@ int mpin_build2(csprng *RNG)
     printf("MPIN Single Pass\n");
     timeValue = BUILD2_MPIN_GET_TIME();
 
-    rtn=BUILD2_MPIN_CLIENT(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
+    rtn=BUILD2_MPIN_CLIENT(BUILD2_HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
 
     if (rtn != 0)
     {
@@ -447,16 +447,16 @@ int mpin_build2(csprng *RNG)
 #endif
 
 
-    rtn=BUILD2_MPIN_SERVER(HASH_TYPE_MPIN,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue);
+    rtn=BUILD2_MPIN_SERVER(BUILD2_HASH_TYPE_MPIN,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue);
 
 #ifdef FULL
-    BUILD2_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID);  // new
+    BUILD2_MPIN_HASH_ID(BUILD2_HASH_TYPE_MPIN,&CLIENT_ID,&HSID);  // new
     BUILD2_MPIN_GET_G1_MULTIPLE(RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w  */
 #endif
 
 #else // SINGLE_PASS
     printf("MPIN Multi Pass\n");
-    if (BUILD2_MPIN_CLIENT_1(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT)!=0)
+    if (BUILD2_MPIN_CLIENT_1(BUILD2_HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT)!=0)
     {
         printf("Error from Client side - First Pass\n");
         return 0;
@@ -465,18 +465,18 @@ int mpin_build2(csprng *RNG)
     /* Send U=x.ID to server, and recreate secret from token and pin */
 
 #ifdef FULL
-    BUILD2_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HCID);
+    BUILD2_MPIN_HASH_ID(BUILD2_HASH_TYPE_MPIN,&CLIENT_ID,&HCID);
     BUILD2_MPIN_GET_G1_MULTIPLE(RNG,1,&R,&HCID,&Z);  /* Also Send Z=r.ID to Server, remember random r, DH component */
 #endif
 
     /* Server calculates H(ID) and H(ID)+H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-    BUILD2_MPIN_SERVER_1(HASH_TYPE_MPIN,date,pID,pHID,pHTID);
+    BUILD2_MPIN_SERVER_1(BUILD2_HASH_TYPE_MPIN,date,pID,pHID,pHTID);
 
     /* Server generates Random number Y and sends it to Client */
     BUILD2_MPIN_RANDOM_GENERATE(RNG,&Y);
 
 #ifdef FULL
-    BUILD2_MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID); //new
+    BUILD2_MPIN_HASH_ID(BUILD2_HASH_TYPE_MPIN,&CLIENT_ID,&HSID); //new
     BUILD2_MPIN_GET_G1_MULTIPLE(RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w, DH component  */
 #endif
 
@@ -511,13 +511,13 @@ int mpin_build2(csprng *RNG)
     }
 
 #ifdef FULL
-    BUILD2_MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);  // new
-    BUILD2_MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,pin,&R,&X,&H,&T,&CK);      // new H
+    BUILD2_MPIN_HASH_ALL(BUILD2_HASH_TYPE_MPIN,&HCID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);  // new
+    BUILD2_MPIN_CLIENT_KEY(BUILD2_HASH_TYPE_MPIN,&G1,&G2,pin,&R,&X,&H,&T,&CK);      // new H
     printf("Client Key = ");
     OCT_output(&CK);
 
-    BUILD2_MPIN_HASH_ALL(HASH_TYPE_MPIN,&HSID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);
-    BUILD2_MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&SST,&W,&H,pHID,pxID,pxCID,&SK); // new H,pHID
+    BUILD2_MPIN_HASH_ALL(BUILD2_HASH_TYPE_MPIN,&HSID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);
+    BUILD2_MPIN_SERVER_KEY(BUILD2_HASH_TYPE_MPIN,&Z,&SST,&W,&H,pHID,pxID,pxCID,&SK); // new H,pHID
     printf("Server Key = ");
     OCT_output(&SK);
 #endif

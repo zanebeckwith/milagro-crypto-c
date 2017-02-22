@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Script to generate libraries and headers that support multiple curves
+#
+# usage: MODBYTES=48 ./build.sh
 
 BASE_DIR=$(pwd)
 
@@ -7,24 +10,14 @@ PROJ_DIR=$(pwd)/../..
 AMCL_CHOICE=$(sed -nr '/AMCL_CHOICE:=(.*)$/{s//\1/;p}' ./config.mk)
 AMCL_CURVETYPE=$(sed -nr '/AMCL_CURVETYPE:=(.*)$/{s//\1/;p}' ./config.mk)
 AMCL_FFLEN=$(sed -nr '/AMCL_FFLEN:=(.*)$/{s//\1/;p}' ./config.mk)
-echo "$AMCL_CHOICE"
-echo "$AMCL_CURVETYPE"
-echo "$AMCL_FFLEN"
-
 CT="$(echo $AMCL_CURVETYPE | head -c 1)"
-echo "$CT"
+
+# default MODBYTES value
+: ${MODBYTES:=32}
+
 
 BUILDNAME=${AMCL_CHOICE}_${CT}_$AMCL_FFLEN
 echo $BUILDNAME
-
-#rm -rf target
-#mkdir target
-#rm -rf lib
-#mkdir lib
-#rm -rf include
-#mkdir include
-#rm -rf obj
-#mkdir obj
 
 function build_lib {
   buildname=${BUILDNAME,,}
@@ -64,12 +57,11 @@ function build_lib {
   ranlib ./lib/libamcl_rsa_${buildname}.a
 
   echo "copy and rename headers"
-  cp ./target/${buildname}/include/amcl.h ./include/amcl_${buildname}.h
   cp ./target/${buildname}/include/mpin.h ./include/mpin_${buildname}.h
   cp ./target/${buildname}/include/ecdh.h ./include/ecdh_${buildname}.h
   cp ./target/${buildname}/include/rsa.h ./include/rsa_${buildname}.h
-  cp ./target/${buildname}/include/arch.h ./include/arch_${buildname}.h
-  cp ./target/${buildname}/include/randapi.h ./include/randapi_${buildname}.h
+  cp ./target/${buildname}/include/arch.h ./include/arch.h
+  cp ./target/${buildname}/include/randapi.h ./include/randapi.h
 }
 
 function change_libamcl_mpin {
@@ -174,47 +166,28 @@ function change_libamcl_ecc {
   objcopy --redefine-sym ${BUILDNAME}_OCT_xorbyte=OCT_xorbyte ./lib/${libname}
 }
 
-function change_amcl_declaration {
-  buildname=${BUILDNAME,,}
-  echo "prefix ${BUILDNAME}_ to function names"
-  sed -i "s/AMCL_H/${BUILDNAME}_AMCL_H/g" ./include/amcl_${buildname}.h
-  sed -i "s/arch.h/arch_${buildname}.h/g" ./include/amcl_${buildname}.h
-  sed -i "s/Modulus/${BUILDNAME}_Modulus/g" ./include/amcl_${buildname}.h
-  sed -i "s/MConst/${BUILDNAME}_MConst/g" ./include/amcl_${buildname}.h
-  sed -i "s/CURVE_/${BUILDNAME}_CURVE_/g" ./include/amcl_${buildname}.h
-  sed -i "s/ECP/${BUILDNAME}_ECP/g" ./include/amcl_${buildname}.h
-  sed -i "s/FP/${BUILDNAME}_FP/g" ./include/amcl_${buildname}.h
-  sed -i "s/BIG/${BUILDNAME}_BIG/g" ./include/amcl_${buildname}.h
-  sed -i "s/${BUILDNAME}_BIGBITS/BIGBITS/g" ./include/amcl_${buildname}.h
-  sed -i "s/D${BUILDNAME}_BIG/DBIG/g" ./include/amcl_${buildname}.h
-  sed -i "s/DBIG/${BUILDNAME}_DBIG/g" ./include/amcl_${buildname}.h
-  sed -i "s/rsa_public_key/${BUILDNAME}_rsa_public_key/g" ./include/amcl_${buildname}.h
-  sed -i "s/rsa_private_key/${BUILDNAME}_rsa_private_key/g" ./include/amcl_${buildname}.h
-  sed -i "s/muladd/${BUILDNAME}_muladd/g" ./include/amcl_${buildname}.h
-  sed -i "s/PAIR_/${BUILDNAME}_PAIR_/g" ./include/amcl_${buildname}.h
-  sed -i "s/FF_/${BUILDNAME}_FF_/g" ./include/amcl_${buildname}.h
-  sed -i "s/${BUILDNAME}_FF_BITS/FF_BITS/g" ./include/amcl_${buildname}.h
-}
-
-function change_randapi_declaration {
-  buildname=${BUILDNAME,,}
-  echo "prefix ${BUILDNAME}_ to randapi function names"
-  sed -i "s/amcl.h/amcl_${buildname}.h/g" ./include/randapi_${buildname}.h
-  sed -i "s/RANDOM_H/${BUILDNAME}_RANDOM_H/" ./include/randapi_${buildname}.h
-}
 
 function change_mpin_declaration {
   buildname=${BUILDNAME,,}
   echo "prefix ${BUILDNAME}_ to MPIN function names"
-  sed -i "s/amcl.h/amcl_${buildname}.h/g" ./include/mpin_${buildname}.h
+  echo "MODBYTES ${MODBYTES}"
   sed -i "s/MPIN_/${BUILDNAME}_MPIN_/" ./include/mpin_${buildname}.h
+  sed -i "s/MODBYTES/${MODBYTES}/" ./include/mpin_${buildname}.h
+  sed -i "s/PGS/${BUILDNAME}_PGS/" ./include/mpin_${buildname}.h
+  sed -i "s/PFS/${BUILDNAME}_PFS/" ./include/mpin_${buildname}.h
+  sed -i "s/PAS/${BUILDNAME}_PAS/" ./include/mpin_${buildname}.h
+  sed -i "s/MAXPIN/${BUILDNAME}_MAXPIN/" ./include/mpin_${buildname}.h
+  sed -i "s/PBLEN/${BUILDNAME}_PBLEN/" ./include/mpin_${buildname}.h
+  sed -i "s/TIME_SLOT_MINUTES/${BUILDNAME}_TIME_SLOT_MINUTES/" ./include/mpin_${buildname}.h
+  sed -i "s/HASH_TYPE_MPIN/${BUILDNAME}_HASH_TYPE_MPIN/" ./include/mpin_${buildname}.h
+  sed -i "s/MESSAGE_SIZE/${BUILDNAME}_MESSAGE_SIZE/" ./include/mpin_${buildname}.h
+  sed -i "s/M_SIZE/${BUILDNAME}_M_SIZE/" ./include/mpin_${buildname}.h
 }
 
 function change_ecc_declaration {
   buildname=${BUILDNAME,,}
   echo "prefix ${BUILDNAME}_ to ECC function names"
   sed -i "s/ECDH_/${BUILDNAME}_ECDH_/g" ./include/ecdh_${buildname}.h
-  sed -i "s/amcl.h/amcl_${buildname}.h/g" ./include/ecdh_${buildname}.h
   sed -i "s/HMAC/${BUILDNAME}_HMAC/g" ./include/ecdh_${buildname}.h
   sed -i "s/KDF2/${BUILDNAME}_KDF2/g" ./include/ecdh_${buildname}.h
   sed -i "s/PBKDF2/${BUILDNAME}_PBKDF2/g" ./include/ecdh_${buildname}.h
@@ -229,10 +202,7 @@ function change_rsa_declaration {
   buildname=${BUILDNAME,,}
   echo "prefix ${BUILDNAME}_ to RSA function names"
   sed -i "s/RSA_H/${BUILDNAME}_RSA_H/g" ./include/rsa_${buildname}.h
-  sed -i "s/amcl.h/amcl_${buildname}.h/g" ./include/rsa_${buildname}.h
   sed -i "s/RSA_KEY_PAIR/${BUILDNAME}_RSA_KEY_PAIR/g" ./include/rsa_${buildname}.h
-  sed -i "s/rsa_public_key/${BUILDNAME}_rsa_public_key/g" ./include/amcl_${buildname}.h
-  sed -i "s/rsa_private_key/${BUILDNAME}_rsa_private_key/g" ./include/amcl_${buildname}.h
   sed -i "s/PKCS15/${BUILDNAME}_PKCS15/g" ./include/rsa_${buildname}.h
   sed -i "s/OAEP_/${BUILDNAME}_OAEP_/g" ./include/rsa_${buildname}.h
   sed -i "s/RSA_ENCRYPT/${BUILDNAME}_RSA_ENCRYPT/g" ./include/rsa_${buildname}.h
@@ -246,8 +216,6 @@ change_libamcl_pairing
 change_libamcl_curve
 change_libamcl_rsa
 change_libamcl_ecc
-change_amcl_declaration
-change_randapi_declaration
 change_ecc_declaration
 change_rsa_declaration
 change_mpin_declaration

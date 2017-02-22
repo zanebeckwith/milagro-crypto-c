@@ -4,7 +4,7 @@
 AMCL_CHUNK:=64
 
 # Current choice of Elliptic Curve (see amcl.h)
-AMCL_CHOICE:=BN254_CX
+AMCL_CHOICE:=BLS383
 
 # type of curve  (see amcl.h) 
 AMCL_CURVETYPE:=WEIERSTRASS
