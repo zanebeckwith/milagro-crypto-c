@@ -12,3 +12,5 @@ ECPinf = Infinity
 ECPinfxyz = Infinity
 
 OCT = 091af20b03872f9dd6e6de726d7f220799883c6d6fccae803a264f
+
+HEX = 7ec2d70f9883b3ff1d7963d069ff7576f3e5d782511766854cd6d6eb1ad8863c
