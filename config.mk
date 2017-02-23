@@ -19,6 +19,9 @@ CMAKE_BUILD_TYPE:=Release
 # Install path
 CMAKE_INSTALL_PATH:=/opt/amcl
 
+# Run tests
+AMCL_TEST:=ON
+
 # Build Shared Libraries ON/OFF
 AMCL_BUILD_SHARED_LIBS:=ON
 
