@@ -420,6 +420,8 @@ int main(int argc, char** argv)
     octet oct = {0,sizeof(octbuf),octbuf};
     const char* OCTline = "OCT = ";
     //const char* OCTstringline = "OCTstring = ";
+    char bin[32];
+    const char* HEXline = "HEX = ";
 
     testVectFile = fopen(argv[1],"r");
     if (testVectFile == NULL)
@@ -562,6 +564,14 @@ int main(int argc, char** argv)
             //printf("%s",OCTstringline);
             //OCT_output_string(&oct);
             //printf("\n");
+        }
+        if (!strncmp(line,  HEXline, strlen(HEXline)))
+        {
+            len = strlen(OCTline);
+            linePtr = line + len;
+            amcl_hex2bin(linePtr, bin, 64);
+            printf("\n%s", HEXline);
+            amcl_print_hex(bin,32);
         }
     }
 
