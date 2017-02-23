@@ -92,19 +92,19 @@ extern int generateOTP(csprng*);
 """)
 
 if (platform.system() == 'Windows'):
-    libmpin = ffi.dlopen("libmpin.dll")
-    libmpin = ffi.dlopen("libamcl.dll")
+    libamcl_mpin = ffi.dlopen("libamcl_mpin.dll")
+    libamcl_core = ffi.dlopen("libamcl_core.dll")
 elif (platform.system() == 'Darwin'):
-    libmpin = ffi.dlopen("libmpin.dylib")
-    libmpin = ffi.dlopen("libamcl.dylib")
+    libamcl_mpin = ffi.dlopen("libamcl_mpin.dylib")
+    libamcl_core = ffi.dlopen("libamcl_core.dylib")
 else:
-    libmpin = ffi.dlopen("libmpin.so")
-    libamcl = ffi.dlopen("libamcl.so")
+    libamcl_mpin = ffi.dlopen("libamcl_mpin.so")
+    libamcl_core = ffi.dlopen("libamcl_core.so")
 
 # MPIN Group Size
-PGS = libmpin.MPIN_GS()
+PGS = libamcl_mpin.MPIN_GS()
 # MPIN Field Size
-PFS = libmpin.MPIN_FS()
+PFS = libamcl_mpin.MPIN_FS()
 G1 = 2 * PFS + 1
 G2 = 4 * PFS
 GT = 12 * PFS
@@ -190,7 +190,7 @@ def today():
     Raises:
 
     """
-    return libmpin.MPIN_today()
+    return libamcl_mpin.MPIN_today()
 
 
 def get_time():
@@ -207,7 +207,7 @@ def get_time():
     Raises:
 
     """
-    return libmpin.MPIN_GET_TIME()
+    return libamcl_mpin.MPIN_GET_TIME()
 
 
 def create_csprng(seed):
@@ -230,7 +230,7 @@ def create_csprng(seed):
 
     # random number generator
     rng = ffi.new('csprng*')
-    libamcl.CREATE_CSPRNG(rng, seed_oct)
+    libamcl_core.CREATE_CSPRNG(rng, seed_oct)
 
     return rng
 
@@ -251,7 +251,7 @@ def kill_csprng(rng):
     Raises:
 
     """
-    libamcl.KILL_CSPRNG(rng)
+    libamcl_core.KILL_CSPRNG(rng)
 
     return 0
 
@@ -275,7 +275,7 @@ def hash_id(hash_type, mpin_id):
     # Hash value of mpin_id
     mpin_id1, mpin_id1_val = make_octet(None, mpin_id)
     hash_mpin_id1, hash_mpin_id1_val = make_octet(PFS)
-    libmpin.MPIN_HASH_ID(hash_type, mpin_id1, hash_mpin_id1)
+    libamcl_mpin.MPIN_HASH_ID(hash_type, mpin_id1, hash_mpin_id1)
 
     hash_mpin_id_hex = to_hex(hash_mpin_id1)
     return hash_mpin_id_hex.decode("hex")
@@ -299,7 +299,7 @@ def random_generate(rng):
 
     """
     s1, s_val = make_octet(PGS)
-    error_code = libmpin.MPIN_RANDOM_GENERATE(rng, s1)
+    error_code = libamcl_mpin.MPIN_RANDOM_GENERATE(rng, s1)
 
     s_hex = to_hex(s1)
     return error_code, s_hex.decode("hex")
@@ -324,7 +324,8 @@ def get_server_secret(master_secret):
     """
     master_secret1, master_secret1_val = make_octet(None, master_secret)
     server_secret1, server_secret1_val = make_octet(G2)
-    error_code = libmpin.MPIN_GET_SERVER_SECRET(master_secret1, server_secret1)
+    error_code = libamcl_mpin.MPIN_GET_SERVER_SECRET(
+        master_secret1, server_secret1)
 
     server_secret_hex = to_hex(server_secret1)
     return error_code, server_secret_hex.decode("hex")
@@ -351,7 +352,7 @@ def recombine_G2(W1, W2):
     w11, w11_val = make_octet(None, W1)
     w21, w21_val = make_octet(None, W2)
     w1, w1_val = make_octet(G2)
-    error_code = libmpin.MPIN_RECOMBINE_G2(w11, w21, w1)
+    error_code = libamcl_mpin.MPIN_RECOMBINE_G2(w11, w21, w1)
 
     w_hex = to_hex(w1)
     return error_code, w_hex.decode("hex")
@@ -378,7 +379,7 @@ def get_client_secret(master_secret, hash_mpin_id):
     master_secret1, master_secret1_val = make_octet(None, master_secret)
     hash_mpin_id1, hash_mpin_id1_val = make_octet(None, hash_mpin_id)
     client_secret1, client_secret1_val = make_octet(G1)
-    error_code = libmpin.MPIN_GET_CLIENT_SECRET(
+    error_code = libamcl_mpin.MPIN_GET_CLIENT_SECRET(
         master_secret1, hash_mpin_id1, client_secret1)
 
     client_secret_hex = to_hex(client_secret1)
@@ -406,7 +407,7 @@ def recombine_G1(q1, q2):
     q11, q11_val = make_octet(None, q1)
     q21, q21_val = make_octet(None, q2)
     q1, q1_val = make_octet(G1)
-    error_code = libmpin.MPIN_RECOMBINE_G1(q11, q21, q1)
+    error_code = libamcl_mpin.MPIN_RECOMBINE_G1(q11, q21, q1)
 
     q_hex = to_hex(q1)
     return error_code, q_hex.decode("hex")
@@ -434,7 +435,7 @@ def get_client_permit(hash_type, epoch_date, master_secret, hash_mpin_id):
     master_secret1, master_secret1_val = make_octet(None, master_secret)
     hash_mpin_id1, hash_mpin_id1_val = make_octet(None, hash_mpin_id)
     time_permit1, time_permit1_val = make_octet(G1)
-    error_code = libmpin.MPIN_GET_CLIENT_PERMIT(
+    error_code = libamcl_mpin.MPIN_GET_CLIENT_PERMIT(
         hash_type,
         epoch_date,
         master_secret1,
@@ -467,7 +468,7 @@ def extract_pin(hash_type, mpin_id, pin, client_secret):
     mpin_id1, mpin_id1_val = make_octet(None, mpin_id)
     client_secret1, client_secret1_val = make_octet(None, client_secret)
 
-    error_code = libmpin.MPIN_EXTRACT_PIN(
+    error_code = libamcl_mpin.MPIN_EXTRACT_PIN(
         hash_type, mpin_id1, pin, client_secret1)
 
     client_secret_hex = to_hex(client_secret1)
@@ -497,7 +498,7 @@ def precompute(token, hash_mpin_id):
     hash_mpin_id1, hash_mpin_id1_val = make_octet(None, hash_mpin_id)
     pc11, pc11_val = make_octet(GT)
     pc21, pc21_val = make_octet(GT)
-    error_code = libmpin.MPIN_PRECOMPUTE(
+    error_code = libamcl_mpin.MPIN_PRECOMPUTE(
         token1, hash_mpin_id1, ffi.NULL, pc11, pc21)
 
     pc1_hex = to_hex(pc11)
@@ -549,7 +550,7 @@ def client_1(hash_type, epoch_date, mpin_id, rng, x, pin, token, time_permit):
     ut1, ut1_val = make_octet(G1)
     v1, v1_val = make_octet(G1)
 
-    error_code = libmpin.MPIN_CLIENT_1(
+    error_code = libamcl_mpin.MPIN_CLIENT_1(
         hash_type,
         epoch_date,
         mpin_id1,
@@ -592,7 +593,7 @@ def client_2(x, y, sec):
     x1, x1_val = make_octet(None, x)
     y1, y1_val = make_octet(None, y)
     sec1, sec1_val = make_octet(None, sec)
-    error_code = libmpin.MPIN_CLIENT_2(x1, y1, sec1)
+    error_code = libamcl_mpin.MPIN_CLIENT_2(x1, y1, sec1)
 
     sec_hex = to_hex(sec1)
     return error_code, sec_hex.decode("hex")
@@ -650,7 +651,7 @@ def client(hash_type, epoch_date, mpin_id, rng, x, pin, token,
     v1, v1_val = make_octet(G1)
     y1, y1_val = make_octet(PGS)
 
-    error_code = libmpin.MPIN_CLIENT(
+    error_code = libamcl_mpin.MPIN_CLIENT(
         hash_type,
         epoch_date,
         mpin_id1,
@@ -705,7 +706,7 @@ def get_G1_multiple(rng, type, x, P):
         x1, x1_val = make_octet(None, x)
     P1, P1_val = make_octet(None, P)
     W1, W1_val = make_octet(G1)
-    error_code = libmpin.MPIN_GET_G1_MULTIPLE(rng, type, x1, P1, W1)
+    error_code = libamcl_mpin.MPIN_GET_G1_MULTIPLE(rng, type, x1, P1, W1)
 
     x_hex = to_hex(x1)
     W_hex = to_hex(W1)
@@ -738,7 +739,7 @@ def server_1(hash_type, epoch_date, mpin_id):
     HTID1, HTID1_val = make_octet(G1)
     HID1, HID1_val = make_octet(G1)
 
-    libmpin.MPIN_SERVER_1(hash_type, epoch_date, mpin_id1, HID1, HTID1)
+    libamcl_mpin.MPIN_SERVER_1(hash_type, epoch_date, mpin_id1, HID1, HTID1)
 
     HID_hex = to_hex(HID1)
     HTID_hex = to_hex(HTID1)
@@ -785,7 +786,7 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
     e1, e1_val = make_octet(GT)
     f1, f1_val = make_octet(GT)
 
-    error_code = libmpin.MPIN_SERVER_2(
+    error_code = libamcl_mpin.MPIN_SERVER_2(
         epoch_date,
         HID1,
         HTID1,
@@ -852,7 +853,7 @@ def server(hash_type, epoch_date, server_secret,
     f1, f1_val = make_octet(GT)
     y1, y1_val = make_octet(PGS)
 
-    error_code = libmpin.MPIN_SERVER(
+    error_code = libamcl_mpin.MPIN_SERVER(
         hash_type,
         epoch_date,
         HID1,
@@ -896,7 +897,7 @@ def kangaroo(e, f):
     """
     e1, e1_val = make_octet(None, e)
     f1, f1_val = make_octet(None, f)
-    pin_error = libmpin.MPIN_KANGAROO(e1, f1)
+    pin_error = libamcl_mpin.MPIN_KANGAROO(e1, f1)
 
     return pin_error
 
@@ -935,8 +936,8 @@ def hash_all(hash_type, hash_mpin_id, u, ut, v, y, z, t):
     t1, w1_val = make_octet(None, t)
 
     hm1, hm1_val = make_octet(PFS)
-    libmpin.MPIN_HASH_ALL(hash_type, hash_mpin_id1,
-                          u1, ut1, v1, y1, z1, t1, hm1)
+    libamcl_mpin.MPIN_HASH_ALL(hash_type, hash_mpin_id1,
+                               u1, ut1, v1, y1, z1, t1, hm1)
 
     hm_hex = to_hex(hm1)
     return hm_hex.decode("hex")
@@ -972,7 +973,7 @@ def client_key(hash_type, pc1, pc2, pin, r, x, hm, t):
     hm1, hm1_val = make_octet(None, hm)
     t1, t1_val = make_octet(None, t)
     client_aes_key1, client_aes_key_val1 = make_octet(PAS)
-    error_code = libmpin.MPIN_CLIENT_KEY(
+    error_code = libamcl_mpin.MPIN_CLIENT_KEY(
         hash_type,
         pc11,
         pc21,
@@ -1023,7 +1024,7 @@ def server_key(hash_type, z, server_secret, w, hm, HID, u, ut):
     u1, u1_val = make_octet(None, u)
 
     server_aes_key1, server_aes_key1_val = make_octet(PAS)
-    error_code = libmpin.MPIN_SERVER_KEY(
+    error_code = libamcl_mpin.MPIN_SERVER_KEY(
         hash_type,
         z1,
         server_secret1,
@@ -1066,7 +1067,7 @@ def aes_gcm_encrypt(aes_key, iv, header, plaintext):
     tag1, tag1_val = make_octet(PAS)
     ciphertext1, ciphertext1_val = make_octet(len(plaintext))
 
-    libmpin.MPIN_AES_GCM_ENCRYPT(
+    libamcl_mpin.MPIN_AES_GCM_ENCRYPT(
         aes_key1,
         iv1,
         header1,
@@ -1106,7 +1107,7 @@ def aes_gcm_decrypt(aes_key, iv, header, ciphertext):
     tag1, tag1_val = make_octet(PAS)
     plaintext1, plaintext1_val = make_octet(len(ciphertext))
 
-    libmpin.MPIN_AES_GCM_DECRYPT(
+    libamcl_mpin.MPIN_AES_GCM_DECRYPT(
         aes_key1,
         iv1,
         header1,
@@ -1135,7 +1136,7 @@ def generate_otp(rng):
     Raises:
 
     """
-    OTP = libmpin.generateOTP(rng)
+    OTP = libamcl_mpin.generateOTP(rng)
 
     return OTP
 
@@ -1158,7 +1159,7 @@ def generate_random(rng, length):
 
     """
     random_value1, random_value1_val = make_octet(length)
-    libmpin.generateRandom(rng, random_value1)
+    libamcl_mpin.generateRandom(rng, random_value1)
 
     random_value_hex = to_hex(random_value1)
     return random_value_hex.decode("hex")

@@ -39,13 +39,13 @@
 typedef enum { false, true } bool;
 
 #define LINE_LEN 600
-// #define DEBUG
+//#define DEBUG
 
 int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        printf("usage: ./test_hash [path to test vector file] |sha256||sha512]\n");
+        printf("usage: ./test_hash [path to test vector file] [sha256||sha384||sha512]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -65,12 +65,17 @@ int main(int argc, char** argv)
     char * MD1 = NULL;
 
     hash256 sha256;
+    hash384 sha384;
     hash512 sha512;
 
     // Hash initialization
     if (!strcmp(argv[2], "sha512"))
     {
         HASH512_init(&sha512);
+    }
+    else if (!strcmp(argv[2], "sha384"))
+    {
+        HASH384_init(&sha384);
     }
     else
     {
@@ -139,6 +144,13 @@ int main(int argc, char** argv)
                 for (i=0; i<MsgLen; i++)
                     HASH512_process(&sha512,Msg[i]);
                 HASH512_hash(&sha512,MD);
+            }
+            else if (!strcmp(argv[2], "sha384"))
+            {
+                HASH384_init(&sha384);
+                for (i=0; i<MsgLen; i++)
+                    HASH384_process(&sha384,Msg[i]);
+                HASH384_hash(&sha384,MD);
             }
             else
             {

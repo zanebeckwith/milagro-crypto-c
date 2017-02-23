@@ -21,7 +21,7 @@ under the License.
 /* Demonstrate WCC with one TA and no time permits */
 
 /* Build executible after installation:
-   gcc -std=c99 -g testwcc.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lwcc -o testwcc */
+   gcc -std=c99 -g testwcc.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl_wcc -lamcl_pairing -lamcl_curve -lamcl_core -o testwcc */
 
 #include <stdio.h>
 #include <stdlib.h>

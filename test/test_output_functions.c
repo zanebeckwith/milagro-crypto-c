@@ -36,7 +36,7 @@ extern int dup2(int oldfd, int newfd);
 extern int close(int fildes);
 extern int fileno(FILE *stream);
 
-#define LINE_LEN 1000
+#define LINE_LEN 2000
 
 void read_BIG(BIG A, char* string)
 {
@@ -138,6 +138,138 @@ void read_FP4(FP4 *fp4, char* stringx1)
     FP2_from_BIGs(&y,y1,y2);
 
     FP4_from_FP2s(fp4,&x,&y);
+}
+
+// Read a structure of the type [[[ax1,ax2],[ay1,ay2]],[[bx1,bx2],[by1,by2]],[[cx1,cx2],[cy1,cy2]]]
+void read_FP12(FP12 *fp12, char *stringax1)
+{
+    char *stringax2, *stringay1, *stringay2, *stringbx1, *stringbx2, *stringby1, *stringby2, *stringcx1, *stringcx2, *stringcy1, *stringcy2, *end;
+    BIG ax1,ax2,ay1,ay2,bx1,bx2,by1,by2,cx1,cx2,cy1,cy2;
+    FP2 ax,ay,bx,by,cx,cy;
+    FP4 a,b,c;
+
+    stringax1 += 3;
+    stringax2 = strchr(stringax1,',');
+    if (stringax2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringax2[0] = '\0';
+    stringax2++;
+    stringay1 = strchr(stringax2,']');
+    if (stringay1 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringay1[0] = '\0';
+    stringay1 += 3;
+    stringay2 = strchr(stringay1,',');
+    if (stringay2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringay2[0] = '\0';
+    stringay2++;
+    stringbx1 = strchr(stringay2,']');
+    if (stringbx1 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringbx1[0] = '\0';
+    stringbx1 += 5;
+    stringbx2 = strchr(stringbx1,',');
+    if (stringbx2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringbx2[0] = '\0';
+    stringbx2++;
+    stringby1 = strchr(stringbx2,']');
+    if (stringay1 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringby1[0] = '\0';
+    stringby1 += 3;
+    stringby2 = strchr(stringby1,',');
+    if (stringay2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringby2[0] = '\0';
+    stringby2++;
+    stringcx1 = strchr(stringby2,']');
+    if (stringcx1 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringcx1[0] = '\0';
+    stringcx1 += 5;
+    stringcx2 = strchr(stringcx1,',');
+    if (stringcx2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringcx2[0] = '\0';
+    stringcx2++;
+    stringcy1 = strchr(stringcx2,']');
+    if (stringcy1 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringcy1[0] = '\0';
+    stringcy1 += 3;
+    stringcy2 = strchr(stringcy1,',');
+    if (stringay2 == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    stringcy2[0] = '\0';
+    stringcy2++;
+    end = strchr(stringcy2,']');
+    if (end == NULL)
+    {
+        printf("ERROR unexpected test vector\n");
+        exit(EXIT_FAILURE);
+    }
+    end[0] = '\0';
+
+    read_BIG(ax1,stringax1);
+    read_BIG(ax2,stringax2);
+    read_BIG(ay1,stringay1);
+    read_BIG(ay2,stringay2);
+    read_BIG(bx1,stringbx1);
+    read_BIG(bx2,stringbx2);
+    read_BIG(by1,stringby1);
+    read_BIG(by2,stringby2);
+    read_BIG(cx1,stringcx1);
+    read_BIG(cx2,stringcx2);
+    read_BIG(cy1,stringcy1);
+    read_BIG(cy2,stringcy2);
+
+    FP2_from_BIGs(&ax,ax1,ax2);
+    FP2_from_BIGs(&ay,ay1,ay2);
+    FP2_from_BIGs(&bx,bx1,bx2);
+    FP2_from_BIGs(&by,by1,by2);
+    FP2_from_BIGs(&cx,cx1,cx2);
+    FP2_from_BIGs(&cy,cy1,cy2);
+
+    FP4_from_FP2s(&a,&ax,&ay);
+    FP4_from_FP2s(&b,&bx,&by);
+    FP4_from_FP2s(&c,&cx,&cy);
+
+    FP12_from_FP4s(fp12,&a,&b,&c);
 }
 #endif
 
@@ -267,6 +399,8 @@ int main(int argc, char** argv)
     FP4 fp4;
     const char* FP4line = "FP4 = ";
     const char* FP4rawline = "FP4raw = ";
+    FP12 fp12;
+    const char* FP12line = "FP12 = ";
 #endif
     ECP ecp;
     ECP ecpinf;
@@ -286,6 +420,8 @@ int main(int argc, char** argv)
     octet oct = {0,sizeof(octbuf),octbuf};
     const char* OCTline = "OCT = ";
     //const char* OCTstringline = "OCTstring = ";
+    char bin[32];
+    const char* HEXline = "HEX = ";
 
     testVectFile = fopen(argv[1],"r");
     if (testVectFile == NULL)
@@ -367,6 +503,15 @@ int main(int argc, char** argv)
             FP4_rawoutput(&fp4);
             printf("\n\n");
         }
+        if (!strncmp(line,  FP12line, strlen(FP12line)))
+        {
+            len = strlen(FP12line);
+            linePtr = line + len;
+            read_FP12(&fp12,linePtr);
+            printf("%s",FP12line);
+            FP12_output(&fp12);
+            printf("\n\n");
+        }
 #endif
         if (!strncmp(line,  ECPline, strlen(ECPline)))
         {
@@ -419,6 +564,14 @@ int main(int argc, char** argv)
             //printf("%s",OCTstringline);
             //OCT_output_string(&oct);
             //printf("\n");
+        }
+        if (!strncmp(line,  HEXline, strlen(HEXline)))
+        {
+            len = strlen(OCTline);
+            linePtr = line + len;
+            amcl_hex2bin(linePtr, bin, 64);
+            printf("\n%s", HEXline);
+            amcl_print_hex(bin,32);
         }
     }
 

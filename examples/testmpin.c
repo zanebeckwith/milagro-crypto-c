@@ -22,7 +22,7 @@ under the License.
 
 /* Build executible after installation:
 
-  gcc -std=c99 -g ./testmpin.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lmpin -o testmpin
+  gcc -std=c99 -g ./testmpin.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl_mpin -lamcl_pairing -lamcl_curve -lamcl_core -o testmpin
 
 */
 
@@ -288,10 +288,10 @@ int mpin(csprng *RNG)
 
 int main()
 {
-  int i;
+    int i;
     unsigned long ran;
 
-	char raw[100];
+    char raw[100];
     octet RAW= {0,sizeof(raw),raw};
     csprng RNG;                /* Crypto Strong RNG */
 
@@ -306,8 +306,8 @@ int main()
 
     CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
-	mpin(&RNG);
+    mpin(&RNG);
 
-	KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
 }
 

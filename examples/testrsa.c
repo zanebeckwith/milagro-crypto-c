@@ -29,7 +29,7 @@ int rsa(csprng *RNG)
     char m[RFS],ml[RFS],c[RFS],e[RFS],s[RFS];
     rsa_public_key pub;
     rsa_private_key priv;
-    
+
     octet M= {0,sizeof(m),m};
     octet ML= {0,sizeof(ml),ml};
     octet C= {0,sizeof(c),c};
@@ -82,7 +82,7 @@ int main()
     int i;
     unsigned long ran;
 
-	char raw[100];
+    char raw[100];
     octet RAW= {0,sizeof(raw),raw};
     csprng RNG;                /* Crypto Strong RNG */
 
@@ -97,8 +97,8 @@ int main()
 
     CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
-	rsa(&RNG);
+    rsa(&RNG);
 
-	KILL_CSPRNG(&RNG);
+    KILL_CSPRNG(&RNG);
 }
 

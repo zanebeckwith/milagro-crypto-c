@@ -48,7 +48,7 @@ int main()
     octet D= {0,sizeof(d),d};
     octet C= {0,sizeof(c),c};
 
-printf("\nBechmark test RSA - ");
+    printf("\nBechmark test RSA - ");
 
 #if CHUNK==16
     printf("16-bit Build\n\n");

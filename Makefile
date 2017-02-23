@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all default format clean qa build_group build build_qa_item build_item buildx buildall dbuild pubdocs
+.PHONY: help all default format clean qa build_group build build_qa_item build_item buildx buildall dbuild pubdocs print-%
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -260,13 +260,16 @@ else
 	-DDEBUG_REDUCE=$(DEBUG_REDUCE) \
 	-DDEBUG_NORM=$(DEBUG_NORM) \
 	../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 
+ifeq ($(AMCL_TEST),ON)
+	cd target/default && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
-	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0
 endif
 ifeq ($(AMCL_BUILD_DOXYGEN),ON)
 	cd target/default && \
 	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0 
+endif
 endif
 
 # Format the source code
@@ -274,6 +277,8 @@ format:
 	astyle --style=allman --recursive --suffix=none 'include/*.h'
 	astyle --style=allman --recursive --suffix=none 'src/*.c'
 	astyle --style=allman --recursive --suffix=none 'test/*.c'
+	astyle --style=allman --recursive --suffix=none 'examples/*.c'
+	astyle --style=allman --recursive --suffix=none 'benchmark/*.c'
 	find ./wrappers/go -type f -name "*.go" -exec gofmt -s -w {} \;
 	find ./wrappers/go -type f -name "*.go.in" -exec gofmt -s -w {} \;
 	autopep8 --in-place --aggressive --aggressive ./wrappers/python/*.py
@@ -362,3 +367,6 @@ pubdocs:
 	git push origin master --force 
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
+
+# Print variables usage: make print-VARABLE
+print-%: ; @echo $* = $($*)

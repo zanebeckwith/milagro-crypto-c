@@ -21,7 +21,10 @@ under the License.
 /* Demonstrate WCC with time permits */
 
 /* Build executible after installation:
-   gcc -std=c99 -g testwcc_dta.c  -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lwcc -o testwcc_dta */
+
+  gcc -std=c99 -g testwcc_dta.c  -I/opt/amcl/include -L/opt/amcl/lib -lamcl_wcc  -lamcl_pairing -lamcl_curve -lamcl_core -o testwcc_dta
+
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
