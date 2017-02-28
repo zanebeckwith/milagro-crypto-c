@@ -37,21 +37,20 @@ var (
 
 func run(rng *mpin.MPinRNG) {
 
-	// // Assign the End-User an ID
+	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
 
 	// Epoch time in days
 	date := mpin.Today()
 
-	// // Epoch time in seconds
+	// Epoch time in seconds
 	timeValue := mpin.GetTime()
 
-	// // PIN variable to create token
+	// PIN variable to create token
 	PIN := 1111
 
-	// // Message to sign
-	// var MESSAGE []byte
+	// Message to sign
 	MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
@@ -60,7 +59,6 @@ func run(rng *mpin.MPinRNG) {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
 	}
-	// fmt.Printf("START %v; MS1: %x\n", x, MS1)
 
 	// Generate Master Secret Share 2
 	rtn, MS2 := mpin.RandomGenerate(rng)
@@ -69,17 +67,17 @@ func run(rng *mpin.MPinRNG) {
 		return
 	}
 
-	// // Either Client or TA calculates Hash(ID)
+	// Either Client or TA calculates Hash(ID)
 	HCID := mpin.HashId(HASH_TYPE_MPIN, ID)
 
-	// // Generate server secret share 1
+	// Generate server secret share 1
 	rtn, SS1 := mpin.GetServerSecret(MS1[:])
 	if rtn != 0 {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
 	}
 
-	// // Generate server secret share 2
+	// Generate server secret share 2
 	rtn, SS2 := mpin.GetServerSecret(MS2[:])
 	if rtn != 0 {
 		fmt.Println("GetServerSecret Error:", rtn)
@@ -122,7 +120,7 @@ func run(rng *mpin.MPinRNG) {
 		return
 	}
 
-	// // Generate time permit share 2
+	// Generate time permit share 2
 	rtn, TP2 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientPermit Error:", rtn)
@@ -141,8 +139,8 @@ func run(rng *mpin.MPinRNG) {
 		return
 	}
 
-	// //////   Client   //////
-	// // Send U, UT, V, timeValue and Message to server
+	// --- Client ---
+	// Send U, UT, V, timeValue and Message to server
 	var X [mpin.PGS]byte
 	rtn, _, _, SEC, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
@@ -150,7 +148,7 @@ func run(rng *mpin.MPinRNG) {
 		return
 	}
 
-	//////   Server   //////
+	// --- Server ---
 	rtn, _, _, _, E, F := mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)

@@ -339,31 +339,31 @@ int main()
         return 1;
     }
 
-for (i=0; i<10; i++)
-{
-	    /* Self test AES-GCM encyption/decryption */
-	    OCT_rand(&IV,&rng,16);
-	    OCT_rand(&Plaintext,&rng,32);
-	    OCT_copy(&Res,&Plaintext);
+    for (i=0; i<10; i++)
+    {
+        /* Self test AES-GCM encyption/decryption */
+        OCT_rand(&IV,&rng,16);
+        OCT_rand(&Plaintext,&rng,32);
+        OCT_copy(&Res,&Plaintext);
 #ifdef DEBUG
-	    printf("Plaintext = ");
-	    OCT_output(&Plaintext);
-	    printf("IV = ");
-	    OCT_output(&IV);
+        printf("Plaintext = ");
+        OCT_output(&Plaintext);
+        printf("IV = ");
+        OCT_output(&IV);
 #endif
-	    MPIN_AES_GCM_ENCRYPT(&CK,&IV,&HEADER,&Plaintext,&Ciphertext,&Tag);
-	    MPIN_AES_GCM_DECRYPT(&CK,&IV,&HEADER,&Ciphertext,&Plaintext,&Tag);
+        MPIN_AES_GCM_ENCRYPT(&CK,&IV,&HEADER,&Plaintext,&Ciphertext,&Tag);
+        MPIN_AES_GCM_DECRYPT(&CK,&IV,&HEADER,&Ciphertext,&Plaintext,&Tag);
 #ifdef DEBUG
-	    printf("Ciphertext = ");
-	    OCT_output(&Ciphertext);
+        printf("Ciphertext = ");
+        OCT_output(&Ciphertext);
 #endif
 
-	    if (!OCT_comp(&Res,&Plaintext))
-	    {
-	        printf("FAILURE Encryption/Decryption with AES-GCM\n");
-	        return 1;
-	    }
-}
+        if (!OCT_comp(&Res,&Plaintext))
+        {
+            printf("FAILURE Encryption/Decryption with AES-GCM\n");
+            return 1;
+        }
+    }
 
     printf("SUCCESS\n");
     return 0;

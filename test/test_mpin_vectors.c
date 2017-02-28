@@ -432,7 +432,7 @@ int main(int argc, char** argv)
             {
                 printf("ERROR performing CLIENT FIRST PASS, line %d\n",i);
                 exit(EXIT_FAILURE);
-            }  
+            }
         }
 // Read V
         if (!strncmp(line,Vline, strlen(Vline)))
@@ -457,9 +457,9 @@ int main(int argc, char** argv)
 // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
 // When set only send hashed IDs to server
 #ifdef USE_ANONYMOUS
-    pID = &HASH_MPIN_ID_HEX;
+            pID = &HASH_MPIN_ID_HEX;
 #else
-    pID = &MPIN_ID_HEX;
+            pID = &MPIN_ID_HEX;
 #endif
             MPIN_SERVER_1(HASH_TYPE_MPIN,DATE,pID,&HID,&HTID);
 // Client second pass
