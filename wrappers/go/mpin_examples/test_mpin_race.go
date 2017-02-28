@@ -178,9 +178,9 @@ func main() {
 	wg = sync.WaitGroup{}
 
 	fmt.Printf("Stating %v go routines...\n", numRoutines)
-	wg.Add(1000)
+	wg.Add(numRoutines)
 	t := time.Now()
-	for x := 0; x < 1000; x++ {
+	for x := 0; x < numRoutines; x++ {
 		go run(&rng)
 	}
 	wg.Wait()
