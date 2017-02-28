@@ -50,8 +50,10 @@ const SHA256 int = 32
 const SHA384 int = 48
 const SHA512 int = 64
 
+// MPinRNG is a type alias for C.csprng
 type MPinRNG C.csprng
 
+// csprng is an alias function for the C counterpart
 func (rng *MPinRNG) csprng() *C.csprng {
 	return (*C.csprng)(rng)
 }
