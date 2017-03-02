@@ -538,7 +538,10 @@ def client_1(hash_type, epoch_date, mpin_id, rng, x, pin, token, time_permit):
     """
     mpin_id1, mpin_id1_val = make_octet(None, mpin_id)
     token1, token1_val = make_octet(None, token)
-    time_permit1, time_permit1_val = make_octet(None, time_permit)
+    if time_permit:
+        time_permit1, time_permit1_val = make_octet(None, time_permit)
+    else:
+        time_permit1 = ffi.NULL
 
     if rng is None:
         x1, x1_val = make_octet(None, x)
@@ -1255,25 +1258,28 @@ if __name__ == "__main__":
         print "recombine_G1(cs1, cs2) Error %s" % rtn
     print "Client Secret: %s" % client_secret.encode("hex")
 
-    # Generate Time Permit shares
-    if DEBUG:
-        print "Date %s" % date
-    rtn, tp1 = get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id)
-    if rtn != 0:
-        print "get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id) Error %s" % rtn
-    rtn, tp2 = get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id)
-    if rtn != 0:
-        print "get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id) Error %s" % rtn
-    if DEBUG:
-        print "tp1: %s" % tp1.encode("hex")
-        print "tp2: %s" % tp2.encode("hex")
+    if TIME_PERMITS:
+        # Generate Time Permit shares
+        if DEBUG:
+            print "Date %s" % date
+        rtn, tp1 = get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id)
+        if rtn != 0:
+            print "get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id) Error %s" % rtn
+        rtn, tp2 = get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id)
+        if rtn != 0:
+            print "get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id) Error %s" % rtn
+        if DEBUG:
+            print "tp1: %s" % tp1.encode("hex")
+            print "tp2: %s" % tp2.encode("hex")
 
-    # Combine Time Permit shares
-    rtn, time_permit = recombine_G1(tp1, tp2)
-    if rtn != 0:
-        print "recombine_G1(tp1, tp2) Error %s" % rtn
-    if DEBUG:
-        print "time_permit: %s" % time_permit.encode("hex")
+        # Combine Time Permit shares
+        rtn, time_permit = recombine_G1(tp1, tp2)
+        if rtn != 0:
+            print "recombine_G1(tp1, tp2) Error %s" % rtn
+        if DEBUG:
+            print "time_permit: %s" % time_permit.encode("hex")
+    else:
+        time_permit = None
 
     # Client extracts PIN from secret to create Token
     if INPUT:

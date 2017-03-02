@@ -48,31 +48,25 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// Assign the End-User an ID
-	IDstr := "testUser@miracl.com"
-	ID := []byte(IDstr)
-
-	// Epoch time in days
-	date := 16673
-
-	// Epoch time in seconds
-	timeValue := 1440594584
-
+	date := 0
+	timeValue := 1488278706
 	SSHex := "07f8181687f42ce22ea0dee4ba9df3f2cea67ad2d79e59adc953142556d510831bbd59e9477ac479019887020579aed16af43dc7089ae8c14262e64b5d09740109917efd0618c557fbf7efaa68fb64e8d46b3766bb184dea9bef9638f23bbbeb03aedbc6e4eb9fbd658719aab26b849638690521723c0efb9c8622df2a8efa3c"
+	UHex := "041dcd4592280dd05b7eb256f91b4e79fe85b415390f3728d0ef126d5d32b939cc21dd0cedd6ba17dafa1b297e83f3238c2bbccf5b5e60f4c04b97e0fb08bd2acd"
+	UTHex := "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+	VHex := "042260824c0f70cc0cc7fc586fd70ec23c05db1ab7f7f3d5fbe506e8011b7e04cb06f85f733904a30dd905281252a6a3557b49de9c53b65082a145c8ee81e22167"
+	IDHex := "7465737455736572406d697261636c2e636f6d"
+
 	SS, _ := hex.DecodeString(SSHex)
-	UHex := "0403e76a28df08ea591912e0ff84ebf419e21aadf8ec5aed4b0f3cd0fc1cdea14a06f05a3be4f9f2d16530c6b4934da2e3439ea287796faac079d396f8cdb9f565"
 	U, _ := hex.DecodeString(UHex)
-	UTHex := "041012e53c991edc9514889de50fb7d893c406dc9bf4c89d46fec9ba408cc5f596226402e7c468c823a28b9003a3944c4600a1b797f10cf01060d3729729212932"
 	UT, _ := hex.DecodeString(UTHex)
-	SECHex := "04051b0d3e9dfdb2a378f0ac7056fb264a900d0867e39c334950527d8c460d76132346bf8ed8a419e2eab4ad52a8b7a51d8c09cbcfa4e80bc0487965ece72ab0ce"
-	SEC, _ := hex.DecodeString(SECHex)
+	V, _ := hex.DecodeString(VHex)
+	ID, _ := hex.DecodeString(IDHex)
 	var MESSAGE []byte
-	// MESSAGE := []byte("test sign message")
 
 	t0 := time.Now()
 	var rtn int
 	for i := 0; i < nIter; i++ {
-		rtn, _, _, _, _, _ = mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
+		rtn, _, _, _, _, _ = mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 	t1 := time.Now()
 	log.Printf("Number Iterations: %d Time: %v\n", nIter, t1.Sub(t0))
@@ -81,6 +75,6 @@ func main() {
 		log.Printf("Authentication failed Error Code %d\n", rtn)
 		return
 	} else {
-		log.Printf("Authenticated ID: %s \n", IDstr)
+		log.Printf("Authenticated Error Code %d\n", rtn)
 	}
 }

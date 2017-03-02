@@ -32,7 +32,6 @@ package mpin
 import "C"
 import (
 	"encoding/hex"
-	"fmt"
 	"unsafe"
 )
 
@@ -49,6 +48,14 @@ const GTS = 12 * PFS
 const SHA256 int = 32
 const SHA384 int = 48
 const SHA512 int = 64
+
+// MPinRNG is a type alias for C.csprng
+type MPinRNG C.csprng
+
+// csprng is an alias function for the C counterpart
+func (rng *MPinRNG) csprng() *C.csprng {
+	return (*C.csprng)(rng)
+}
 
 // OctetFree frees memory associated with an octet
 func OctetFree(valOctet *C.octet) {
@@ -171,14 +178,14 @@ Returns:
     RNG: Pointer to cryptographically secure pseudo-random number generator instance
 
 */
-func CreateCSPRNG(SEED []byte) C.csprng {
+func CreateCSPRNG(SEED []byte) MPinRNG {
 	// Form Octet
 	SEEDStr := string(SEED)
 	SEEDOct := GetOctet(SEEDStr)
 	defer OctetFree(&SEEDOct)
 	var RNG C.csprng
 	C.CREATE_CSPRNG(&RNG, &SEEDOct)
-	return RNG
+	return MPinRNG(RNG)
 }
 
 /*
@@ -226,12 +233,12 @@ Returns:
     s: random group element
 
 */
-func RandomGenerate(RNG *C.csprng) (errorCode int, S []byte) {
+func RandomGenerate(RNG *MPinRNG) (errorCode int, S []byte) {
 	// Form Octet
 	SOct := GetOctetZero(PGS)
 	defer OctetFree(&SOct)
 
-	rtn := C.MPIN_RANDOM_GENERATE(RNG, &SOct)
+	rtn := C.MPIN_RANDOM_GENERATE(RNG.csprng(), &SOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -477,7 +484,7 @@ Returns:
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled where is t is epoch time
 */
-func Client(hashType, epochDate int, mpinId []byte, RNG *C.csprng, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte) {
+func Client(hashType, epochDate int, mpinId []byte, RNG *MPinRNG, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte) {
 	// Form Octets
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)
@@ -504,7 +511,7 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *C.csprng, x []byte, PIN
 	yOct := GetOctetZero(PGS)
 	defer OctetFree(&yOct)
 
-	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG, &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, &UTOct, &timePermitOct, &messageOct, C.int(epochTime), &yOct)
+	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, &UTOct, &timePermitOct, &messageOct, C.int(epochTime), &yOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -582,7 +589,7 @@ Returns:
 Raises:
 
 */
-func GetG1Multiple(RNG *C.csprng, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte) {
+func GetG1Multiple(RNG *MPinRNG, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte) {
 	xStr := string(x)
 	xOct := GetOctet(xStr)
 	defer OctetFree(&xOct)
@@ -593,7 +600,7 @@ func GetG1Multiple(RNG *C.csprng, typ int, x []byte, G []byte) (errorCode int, x
 	WOct := GetOctetZero(G1S)
 	defer OctetFree(&WOct)
 
-	rtn := C.MPIN_GET_G1_MULTIPLE(RNG, C.int(typ), &xOct, &GOct, &WOct)
+	rtn := C.MPIN_GET_G1_MULTIPLE(RNG.csprng(), C.int(typ), &xOct, &GOct, &WOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -829,11 +836,11 @@ Returns:
     randomValue: Random value
 
 */
-func GenerateRandomByte(RNG *C.csprng, randomLen int) (randomValue []byte) {
+func GenerateRandomByte(RNG *MPinRNG, randomLen int) (randomValue []byte) {
 	randomOct := GetOctetZero(randomLen)
 	defer OctetFree(&randomOct)
 
-	C.generateRandom(RNG, &randomOct)
+	C.generateRandom(RNG.csprng(), &randomOct)
 
 	// Convert octet to bytes
 	randomValue = OctetToBytes(&randomOct)
@@ -854,8 +861,8 @@ Returns:
     otp: One time password
 
 */
-func GenerateOTP(RNG *C.csprng) int {
-	OTP := C.generateOTP(RNG)
+func GenerateOTP(RNG *MPinRNG) int {
+	OTP := C.generateOTP(RNG.csprng())
 	return int(OTP)
 }
 
@@ -949,14 +956,6 @@ func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte) {
 	T = OctetToBytes(&TOct)
 
 	return P, T
-}
-
-// PrintBinary print byte array as hex
-func PrintBinary(array []byte) {
-	for i := 0; i < len(array); i++ {
-		fmt.Printf("%02x", array[i])
-	}
-	fmt.Printf("\n")
 }
 
 /*
@@ -1089,7 +1088,7 @@ Returns:
     SEC: SEC = CS+TP, where CS is the reconstructed client secret and TP is the time permit
 
 */
-func Client1(hashType, epochDate int, mpinId []byte, RNG *C.csprng, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte) {
+func Client1(hashType, epochDate int, mpinId []byte, RNG *MPinRNG, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte) {
 	// Form Octets
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)
@@ -1114,7 +1113,7 @@ func Client1(hashType, epochDate int, mpinId []byte, RNG *C.csprng, x []byte, PI
 	UTOct := GetOctetZero(G1S)
 	defer OctetFree(&UTOct)
 
-	rtn := C.MPIN_CLIENT_1(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG, &xOct, C.int(PIN), &tokenOct, &SECOct, &UOct, &UTOct, &timePermitOct)
+	rtn := C.MPIN_CLIENT_1(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &SECOct, &UOct, &UTOct, &timePermitOct)
 
 	errorCode = int(rtn)
 	// Convert octet to bytes
