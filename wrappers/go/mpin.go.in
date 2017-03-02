@@ -32,7 +32,6 @@ package mpin
 import "C"
 import (
 	"encoding/hex"
-	"fmt"
 	"unsafe"
 )
 
@@ -957,14 +956,6 @@ func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte) {
 	T = OctetToBytes(&TOct)
 
 	return P, T
-}
-
-// PrintBinary print byte array as hex
-func PrintBinary(array []byte) {
-	for i := 0; i < len(array); i++ {
-		fmt.Printf("%02x", array[i])
-	}
-	fmt.Printf("\n")
 }
 
 /*

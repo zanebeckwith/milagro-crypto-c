@@ -23,9 +23,10 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	mathrand "math/rand"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var HASH_TYPE_MPIN = SHA256
@@ -1157,5 +1158,90 @@ func TestRandomTwoPass(t *testing.T) {
 		got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
 		assert.Equal(t, want, got, "Should be equal")
 
+	}
+}
+
+func TestOctets(t *testing.T) {
+	// Test bad hex
+	oct := GetOctetHex("zz")
+	assert.Equal(t, 0, int(oct.len), "Invalid hex should have len 0")
+	// Test good hex
+	oct = GetOctetHex("30")
+	assert.Equal(t, 1, int(oct.len), "Hex octed doesn't match")
+	oct = GetOctetHex("30")
+	assert.Equal(t, 48, int(*oct.val), "Hex octed doesn't match")
+
+	c := GetOctet(string([]byte{1, 2, 3}))
+	h := OctetToHex(&c)
+	assert.Equal(t, "010203", h, "Octet convertion should match")
+	s := OctetToString(&c)
+	assert.Equal(t, "\x01\x02\x03", s, "Octet convertion should match")
+}
+
+func TestGenerateRandomByte(t *testing.T) {
+	// Seed value for Random Number Generator (RNG)
+	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seed, err := hex.DecodeString(seedHex)
+	if err != nil {
+		fmt.Println("Error decoding seed value")
+		return
+	}
+	rng := CreateCSPRNG(seed)
+
+	b := GenerateRandomByte(&rng, 10)
+	assert.Equal(t, "57d662d39b1b245da469", fmt.Sprintf("%x", b), "Should be equal")
+}
+
+func TestGenerateOTP(t *testing.T) {
+	// Seed value for Random Number Generator (RNG)
+	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seed, err := hex.DecodeString(seedHex)
+	if err != nil {
+		fmt.Println("Error decoding seed value")
+		return
+	}
+	rng := CreateCSPRNG(seed)
+
+	otp := GenerateOTP(&rng)
+	assert.Equal(t, 715827, otp, "Should be equal")
+}
+
+func TestAesGcm(t *testing.T) {
+	testCases := []struct {
+		Key       string
+		IV        string
+		AAD       string
+		PlainText string
+		outC      string
+		outT      string
+	}{
+		{
+			Key:       "75eae8f5ec7a5c8882f4a389600da8cd",
+			IV:        "a231cd40fdb909ad11c457d9",
+			AAD:       "a50d3e45b23c77157cb0e01c2a679e6d99c038e4",
+			PlainText: "45cf12964fc824ab76616ae2f4bf0822",
+			outC:      "5df1c20786beb4dc24bab9caf2ad3a03",
+			outT:      "ba8036433389c88b79e277f49a4bc41d",
+		},
+	}
+
+	hexDecode := func(s string) []byte {
+		k, err := hex.DecodeString(s)
+		if err != nil {
+			t.Fatal("Decode hex error")
+		}
+		return k
+	}
+
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("Case %v", i), func(t *testing.T) {
+			C, T := AesGcmEncrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.PlainText))
+			assert.Equal(t, tc.outC, hex.EncodeToString(C), "Should be equal")
+			assert.Equal(t, tc.outT, hex.EncodeToString(T), "Should be equal")
+
+			dP, dT := AesGcmDecrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.outC))
+			assert.Equal(t, tc.PlainText, hex.EncodeToString(dP), "Should be equal")
+			assert.Equal(t, tc.outT, hex.EncodeToString(dT), "Should be equal")
+		})
 	}
 }
