@@ -84,8 +84,16 @@ The above packages can be installed in different ways, depending on the Operatin
 ##### Quick start
 
 A Makefile is present at the project root that reads the options defined in
-config.mk. Change these options and then type  ```make``` to build and test
+config.mk. Change these options and then type the following to build and test
 the library.
+
+    make
+
+If you are using GO then you must set the GOPATH first. Note that there can 
+only be one entry in the GOPATH 
+
+    export GOPATH=${HOME}/src
+    make
 
 If you have docker installed then type ```make dbuild``` to build and test
 the library in a docker container.
@@ -99,6 +107,7 @@ NOTE: The default build is for 64 bit machines
     mkdir -p target/build
     cd target/build
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl ../..
+    export GOPATH=${HOME}/src
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
     make
     make test

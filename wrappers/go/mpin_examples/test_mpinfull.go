@@ -33,8 +33,7 @@ func main() {
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
 	fmt.Printf("ID: ")
-	mpin.PrintBinary(ID)
-	fmt.Printf("\n")
+	fmt.Printf("%x\n\n", ID)
 
 	// Epoch time in days
 	date := mpin.Today()
@@ -69,7 +68,7 @@ func main() {
 		return
 	}
 	fmt.Printf("MS1: 0x")
-	mpin.PrintBinary(MS1[:])
+	fmt.Printf("%x\n", MS1[:])
 
 	// Generate Master Secret Share 2
 	rtn, MS2 := mpin.RandomGenerate(&rng)
@@ -78,7 +77,7 @@ func main() {
 		return
 	}
 	fmt.Printf("MS2: 0x")
-	mpin.PrintBinary(MS2[:])
+	fmt.Printf("%x\n", MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := mpin.HashId(HASH_TYPE_MPIN, ID)
@@ -90,7 +89,7 @@ func main() {
 		return
 	}
 	fmt.Printf("SS1: 0x")
-	mpin.PrintBinary(SS1[:])
+	fmt.Printf("%x\n", SS1[:])
 
 	// Generate server secret share 2
 	rtn, SS2 := mpin.GetServerSecret(MS2[:])
@@ -99,7 +98,7 @@ func main() {
 		return
 	}
 	fmt.Printf("SS2: 0x")
-	mpin.PrintBinary(SS2[:])
+	fmt.Printf("%x\n", SS2[:])
 
 	// Combine server secret shares
 	rtn, SS := mpin.RecombineG2(SS1[:], SS2[:])
@@ -108,7 +107,7 @@ func main() {
 		return
 	}
 	fmt.Printf("SS: 0x")
-	mpin.PrintBinary(SS[:])
+	fmt.Printf("%x\n", SS[:])
 
 	// Generate client secret share 1
 	rtn, CS1 := mpin.GetClientSecret(MS1[:], HCID)
@@ -117,7 +116,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Secret Share CS1: 0x")
-	mpin.PrintBinary(CS1[:])
+	fmt.Printf("%x\n", CS1[:])
 
 	// Generate client secret share 2
 	rtn, CS2 := mpin.GetClientSecret(MS2[:], HCID)
@@ -126,7 +125,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Secret Share CS2: 0x")
-	mpin.PrintBinary(CS2[:])
+	fmt.Printf("%x\n", CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, mpin.G1S)
@@ -136,7 +135,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Secret CS: 0x")
-	mpin.PrintBinary(CS[:])
+	fmt.Printf("%x\n", CS[:])
 
 	// Generate time permit share 1
 	rtn, TP1 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
@@ -145,7 +144,7 @@ func main() {
 		return
 	}
 	fmt.Printf("TP1: 0x")
-	mpin.PrintBinary(TP1[:])
+	fmt.Printf("%x\n", TP1[:])
 
 	// Generate time permit share 2
 	rtn, TP2 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
@@ -154,7 +153,7 @@ func main() {
 		return
 	}
 	fmt.Printf("TP2: 0x")
-	mpin.PrintBinary(TP2[:])
+	fmt.Printf("%x\n", TP2[:])
 
 	// Combine time permit shares
 	rtn, TP := mpin.RecombineG1(TP1[:], TP2[:])
@@ -175,7 +174,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Token TK: 0x")
-	mpin.PrintBinary(TOKEN[:])
+	fmt.Printf("%x\n", TOKEN[:])
 
 	//////   Client   //////
 
@@ -194,24 +193,24 @@ func main() {
 	// Send U, UT, V, timeValue and Message to server
 	var X [mpin.PGS]byte
 	fmt.Printf("X: 0x")
-	mpin.PrintBinary(X[:])
+	fmt.Printf("%x\n", X[:])
 	rtn, XOut, Y1, V, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
 		return
 	}
 	fmt.Printf("Y1: 0x")
-	mpin.PrintBinary(Y1[:])
+	fmt.Printf("%x\n", Y1[:])
 	fmt.Printf("XOut: 0x")
-	mpin.PrintBinary(XOut[:])
+	fmt.Printf("%x\n", XOut[:])
 
 	// Send Z=r.ID to Server
 	var R [mpin.PGS]byte
 	fmt.Printf("R: 0x")
-	mpin.PrintBinary(R[:])
+	fmt.Printf("%x\n", R[:])
 	rtn, ROut, Z := mpin.GetG1Multiple(&rng, 1, R[:], HCID[:])
 	fmt.Printf("ROut: 0x")
-	mpin.PrintBinary(ROut[:])
+	fmt.Printf("%x\n", ROut[:])
 
 	//////   Server   //////
 	rtn, HID, HTID, Y2, E, F := mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
@@ -219,11 +218,11 @@ func main() {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}
 	fmt.Printf("Y2: 0x")
-	mpin.PrintBinary(Y2[:])
+	fmt.Printf("%x\n", Y2[:])
 	fmt.Printf("HID: 0x")
-	mpin.PrintBinary(HID[:])
+	fmt.Printf("%x\n", HID[:])
 	fmt.Printf("HTID: 0x")
-	mpin.PrintBinary(HTID[:])
+	fmt.Printf("%x\n", HTID[:])
 
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)
@@ -239,57 +238,57 @@ func main() {
 	// send T=w.ID to client
 	var W [mpin.PGS]byte
 	fmt.Printf("W: 0x")
-	mpin.PrintBinary(W[:])
+	fmt.Printf("%x\n", W[:])
 	rtn, WOut, T := mpin.GetG1Multiple(&rng, 0, W[:], HTID[:])
 	fmt.Printf("WOut: 0x")
-	mpin.PrintBinary(WOut[:])
+	fmt.Printf("%x\n", WOut[:])
 	fmt.Printf("T: 0x")
-	mpin.PrintBinary(T[:])
+	fmt.Printf("%x\n", T[:])
 
 	// Hash all values
 	HM := mpin.HashAll(HASH_TYPE_MPIN, ID[:], U[:], UT[:], V[:], Y2[:], Z[:], T[:])
 
 	rtn, AES_KEY_SERVER := mpin.ServerKey(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
 	fmt.Printf("Server Key =  0x")
-	mpin.PrintBinary(AES_KEY_SERVER[:])
+	fmt.Printf("%x\n", AES_KEY_SERVER[:])
 
 	rtn, AES_KEY_CLIENT := mpin.ClientKey(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
 	fmt.Printf("Client Key =  0x")
-	mpin.PrintBinary(AES_KEY_CLIENT[:])
+	fmt.Printf("%x\n", AES_KEY_CLIENT[:])
 
 	//////   Server   //////
 
 	// Initialization vector
 	IV := mpin.GenerateRandomByte(&rng, 12)
 	fmt.Printf("IV: 0x")
-	mpin.PrintBinary(IV[:])
+	fmt.Printf("%x\n", IV[:])
 
 	// header
 	HEADER := mpin.GenerateRandomByte(&rng, 16)
 	fmt.Printf("HEADER: 0x")
-	mpin.PrintBinary(HEADER[:])
+	fmt.Printf("%x\n", HEADER[:])
 
 	// Input plaintext
 	plaintextStr := "A test message"
 	PLAINTEXT1 := []byte(plaintextStr)
 	fmt.Printf("String to encrypt: %s \n", plaintextStr)
 	fmt.Printf("PLAINTEXT1: 0x")
-	mpin.PrintBinary(PLAINTEXT1[:])
+	fmt.Printf("%x\n", PLAINTEXT1[:])
 
 	// AES-GCM Encryption
 	CIPHERTEXT, TAG1 := mpin.AesGcmEncrypt(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
 	fmt.Printf("CIPHERTEXT:  0x")
-	mpin.PrintBinary(CIPHERTEXT[:])
+	fmt.Printf("%x\n", CIPHERTEXT[:])
 	fmt.Printf("TAG1:  0x")
-	mpin.PrintBinary(TAG1[:])
+	fmt.Printf("%x\n", TAG1[:])
 
 	// Send IV, HEADER, CIPHERTEXT and TAG1 to client
 
 	// AES-GCM Decryption
 	PLAINTEXT2, TAG2 := mpin.AesGcmDecrypt(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
 	fmt.Printf("PLAINTEXT2:  0x")
-	mpin.PrintBinary(PLAINTEXT2[:])
+	fmt.Printf("%x\n", PLAINTEXT2[:])
 	fmt.Printf("TAG2:  0x")
-	mpin.PrintBinary(TAG2[:])
+	fmt.Printf("%x\n", TAG2[:])
 	fmt.Printf("Decrypted string: %s \n", string(PLAINTEXT2))
 }

@@ -22,35 +22,36 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"sync"
+	"time"
 
 	"github.com/miracl/amcl-go-wrapper"
 )
 
-var HASH_TYPE_MPIN = mpin.SHA256
+const numRoutines = 1000
 
-func runTest(rng *mpin.MPinRNG) {
+var (
+	HASH_TYPE_MPIN = mpin.SHA256
+	wg             sync.WaitGroup
+)
+
+func run(rng *mpin.MPinRNG) {
+
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
-	fmt.Printf("ID: ")
-	fmt.Printf("%x\n\n", ID)
 
 	// Epoch time in days
 	date := mpin.Today()
-	fmt.Println("date: ", date)
 
 	// Epoch time in seconds
 	timeValue := mpin.GetTime()
-	fmt.Println("timeValue: ", timeValue)
 
 	// PIN variable to create token
-	PIN1 := -1
-	// PIN variable to authenticate
-	PIN2 := -1
+	PIN := 1111
 
 	// Message to sign
-	var MESSAGE []byte
-	// MESSAGE := []byte("test sign message")
+	MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
 	rtn, MS1 := mpin.RandomGenerate(rng)
@@ -58,8 +59,6 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
 	}
-	fmt.Printf("MS1: 0x")
-	fmt.Printf("%x\n", MS1[:])
 
 	// Generate Master Secret Share 2
 	rtn, MS2 := mpin.RandomGenerate(rng)
@@ -67,8 +66,6 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
 	}
-	fmt.Printf("MS2: 0x")
-	fmt.Printf("%x\n", MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := mpin.HashId(HASH_TYPE_MPIN, ID)
@@ -79,8 +76,6 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
 	}
-	fmt.Printf("SS1: 0x")
-	fmt.Printf("%x\n", SS1[:])
 
 	// Generate server secret share 2
 	rtn, SS2 := mpin.GetServerSecret(MS2[:])
@@ -88,8 +83,6 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
 	}
-	fmt.Printf("SS2: 0x")
-	fmt.Printf("%x\n", SS2[:])
 
 	// Combine server secret shares
 	rtn, SS := mpin.RecombineG2(SS1[:], SS2[:])
@@ -97,8 +90,6 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("RecombineG2(SS1, SS2) Error:", rtn)
 		return
 	}
-	fmt.Printf("SS: 0x")
-	fmt.Printf("%x\n", SS[:])
 
 	// Generate client secret share 1
 	rtn, CS1 := mpin.GetClientSecret(MS1[:], HCID)
@@ -106,8 +97,6 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
 	}
-	fmt.Printf("Client Secret Share CS1: 0x")
-	fmt.Printf("%x\n", CS1[:])
 
 	// Generate client secret share 2
 	rtn, CS2 := mpin.GetClientSecret(MS2[:], HCID)
@@ -115,18 +104,14 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
 	}
-	fmt.Printf("Client Secret Share CS2: 0x")
-	fmt.Printf("%x\n", CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, mpin.G1S)
 	rtn, CS = mpin.RecombineG1(CS1[:], CS2[:])
 	if rtn != 0 {
-		fmt.Println("RecombineG1 Error:", rtn)
+		fmt.Println("RecombineG1 Error:", rtn, SS, CS)
 		return
 	}
-	fmt.Printf("Client Secret CS: 0x")
-	fmt.Printf("%x\n", CS[:])
 
 	// Generate time permit share 1
 	rtn, TP1 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
@@ -134,8 +119,6 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("GetClientPermit Error:", rtn)
 		return
 	}
-	fmt.Printf("TP1: 0x")
-	fmt.Printf("%x\n", TP1[:])
 
 	// Generate time permit share 2
 	rtn, TP2 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
@@ -143,65 +126,33 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Println("GetClientPermit Error:", rtn)
 		return
 	}
-	fmt.Printf("TP2: 0x")
-	fmt.Printf("%x\n", TP2[:])
 
 	// Combine time permit shares
 	rtn, TP := mpin.RecombineG1(TP1[:], TP2[:])
 	if rtn != 0 {
-		fmt.Println("RecombineG1(TP1, TP2) Error:", rtn)
+		fmt.Println("RecombineG1(TP1, TP2) Error:", rtn, TP)
 		return
 	}
-
-	// Client extracts PIN1 from secret to create Token
-	for PIN1 < 0 {
-		fmt.Printf("Please enter PIN to create token: ")
-		fmt.Scan(&PIN1)
-	}
-
-	rtn, TOKEN := mpin.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	rtn, TOKEN := mpin.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d\n", rtn)
 		return
 	}
-	fmt.Printf("Client Token TK: 0x")
-	fmt.Printf("%x\n", TOKEN[:])
 
-	//////   Client   //////
-
-	for PIN2 < 0 {
-		fmt.Printf("Please enter PIN to authenticate: ")
-		fmt.Scan(&PIN2)
-	}
-
+	// --- Client ---
 	// Send U, UT, V, timeValue and Message to server
 	var X [mpin.PGS]byte
-	fmt.Printf("X: 0x")
-	fmt.Printf("%x\n", X[:])
-	rtn, XOut, Y1, SEC, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	rtn, _, _, SEC, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
-		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
+		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn, SEC, U, UT)
 		return
 	}
-	fmt.Printf("Y1: 0x")
-	fmt.Printf("%x\n", Y1[:])
-	fmt.Printf("XOut: 0x")
-	fmt.Printf("%x\n", XOut[:])
-	fmt.Printf("V: 0x")
-	fmt.Printf("%x\n", SEC[:])
 
-	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
+	// --- Server ---
+	rtn, _, _, _, E, F := mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}
-	fmt.Printf("Y2: 0x")
-	fmt.Printf("%x\n", Y2[:])
-	fmt.Printf("HID: 0x")
-	fmt.Printf("%x\n", HID[:])
-	fmt.Printf("HTID: 0x")
-	fmt.Printf("%x\n", HTID[:])
-
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)
 		err := mpin.Kangaroo(E[:], F[:])
@@ -209,9 +160,9 @@ func runTest(rng *mpin.MPinRNG) {
 			fmt.Printf("PIN Error %d\n", err)
 		}
 		return
-	} else {
-		fmt.Printf("Authenticated ID: %s \n", IDstr)
 	}
+
+	wg.Done()
 }
 
 func main() {
@@ -224,5 +175,15 @@ func main() {
 	}
 	rng := mpin.CreateCSPRNG(seed)
 
-	runTest(&rng)
+	wg = sync.WaitGroup{}
+
+	fmt.Printf("Stating %v go routines...\n", numRoutines)
+	wg.Add(numRoutines)
+	t := time.Now()
+	for x := 0; x < numRoutines; x++ {
+		go run(&rng)
+	}
+	wg.Wait()
+
+	fmt.Printf("Done: %v \n", time.Now().Sub(t).Seconds())
 }

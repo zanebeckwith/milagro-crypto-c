@@ -33,8 +33,7 @@ func main() {
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
 	fmt.Printf("ID: ")
-	mpin.PrintBinary(ID)
-	fmt.Printf("\n")
+	fmt.Printf("%x\n\n", ID)
 
 	// Epoch time in days
 	date := mpin.Today()
@@ -60,7 +59,7 @@ func main() {
 		return
 	}
 	fmt.Printf("MS1: 0x")
-	mpin.PrintBinary(MS1[:])
+	fmt.Printf("%x\n", MS1[:])
 
 	// Generate Master Secret Share 2
 	rtn, MS2 := mpin.RandomGenerate(&rng)
@@ -69,7 +68,7 @@ func main() {
 		return
 	}
 	fmt.Printf("MS2: 0x")
-	mpin.PrintBinary(MS2[:])
+	fmt.Printf("%x\n", MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := mpin.HashId(HASH_TYPE_MPIN, ID)
@@ -81,7 +80,7 @@ func main() {
 		return
 	}
 	fmt.Printf("SS1: 0x")
-	mpin.PrintBinary(SS1[:])
+	fmt.Printf("%x\n", SS1[:])
 
 	// Generate server secret share 2
 	rtn, SS2 := mpin.GetServerSecret(MS2[:])
@@ -90,7 +89,7 @@ func main() {
 		return
 	}
 	fmt.Printf("SS2: 0x")
-	mpin.PrintBinary(SS2[:])
+	fmt.Printf("%x\n", SS2[:])
 
 	// Combine server secret shares
 	rtn, SS := mpin.RecombineG2(SS1[:], SS2[:])
@@ -99,7 +98,7 @@ func main() {
 		return
 	}
 	fmt.Printf("SS: 0x")
-	mpin.PrintBinary(SS[:])
+	fmt.Printf("%x\n", SS[:])
 
 	// Generate client secret share 1
 	rtn, CS1 := mpin.GetClientSecret(MS1[:], HCID)
@@ -108,7 +107,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Secret Share CS1: 0x")
-	mpin.PrintBinary(CS1[:])
+	fmt.Printf("%x\n", CS1[:])
 
 	// Generate client secret share 2
 	rtn, CS2 := mpin.GetClientSecret(MS2[:], HCID)
@@ -117,7 +116,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Secret Share CS2: 0x")
-	mpin.PrintBinary(CS2[:])
+	fmt.Printf("%x\n", CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, mpin.G1S)
@@ -127,7 +126,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Secret CS: 0x")
-	mpin.PrintBinary(CS[:])
+	fmt.Printf("%x\n", CS[:])
 
 	// Generate time permit share 1
 	rtn, TP1 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
@@ -136,7 +135,7 @@ func main() {
 		return
 	}
 	fmt.Printf("TP1: 0x")
-	mpin.PrintBinary(TP1[:])
+	fmt.Printf("%x\n", TP1[:])
 
 	// Generate time permit share 2
 	rtn, TP2 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
@@ -145,7 +144,7 @@ func main() {
 		return
 	}
 	fmt.Printf("TP2: 0x")
-	mpin.PrintBinary(TP2[:])
+	fmt.Printf("%x\n", TP2[:])
 
 	// Combine time permit shares
 	rtn, TP := mpin.RecombineG1(TP1[:], TP2[:])
@@ -166,7 +165,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Client Token TK: 0x")
-	mpin.PrintBinary(TOKEN[:])
+	fmt.Printf("%x\n", TOKEN[:])
 
 	//////   Client   //////
 
@@ -179,14 +178,14 @@ func main() {
 	// Send U and UT to server
 	var X [mpin.PGS]byte
 	fmt.Printf("X: 0x")
-	mpin.PrintBinary(X[:])
+	fmt.Printf("%x\n", X[:])
 	rtn, XOut, SEC, U, UT := mpin.Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
 		return
 	}
 	fmt.Printf("XOut: 0x")
-	mpin.PrintBinary(XOut[:])
+	fmt.Printf("%x\n", XOut[:])
 
 	//////   Server Pass 1  //////
 	/* Calculate H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
@@ -199,7 +198,7 @@ func main() {
 		return
 	}
 	fmt.Printf("Y: 0x")
-	mpin.PrintBinary(Y[:])
+	fmt.Printf("%x\n", Y[:])
 
 	/* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
 	rtn, V := mpin.Client2(XOut[:], Y[:], SEC[:])
@@ -214,9 +213,9 @@ func main() {
 		fmt.Printf("FAILURE: Server2 rtn: %d\n", rtn)
 	}
 	fmt.Printf("HID: 0x")
-	mpin.PrintBinary(HID[:])
+	fmt.Printf("%x\n", HID[:])
 	fmt.Printf("HTID: 0x")
-	mpin.PrintBinary(HTID[:])
+	fmt.Printf("%x\n", HTID[:])
 
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)

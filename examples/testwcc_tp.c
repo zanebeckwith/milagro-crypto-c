@@ -22,7 +22,7 @@ under the License.
 
 /* Build executible after installation:
 
-  gcc -std=c99 -g testwcc_dta.c  -I/opt/amcl/include -L/opt/amcl/lib -lamcl_wcc  -lamcl_pairing -lamcl_curve -lamcl_core -o testwcc_dta 
+  gcc -std=c99 -g testwcc_dta.c  -I/opt/amcl/include -L/opt/amcl/lib -lamcl_wcc  -lamcl_pairing -lamcl_curve -lamcl_core -o testwcc_dta
 
 */
 

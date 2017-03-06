@@ -32,8 +32,16 @@
 #include "mpin.h"
 #include "randapi.h"
 
-int main()
+// #define DEBUG
+
+int main(int argc, char** argv)
 {
+    if (argc != 2)
+    {
+        printf("usage: ./test_mpinfull [hash:sha256||sha384||sha512]\n");
+        exit(EXIT_FAILURE);
+    }
+
     int i,PIN1,PIN2,rtn;
 
     char id[256];
@@ -105,6 +113,31 @@ int main()
     octet SK= {0,sizeof(sk),sk};
     octet CK= {0,sizeof(ck),ck};
 
+    /* AES-GCM */
+    char raw[256], header[16], ciphertext[32], res[32], plaintext[32], tag[16], iv[16];
+    octet HEADER= {0,0,header}, Ciphertext= {0,sizeof(ciphertext),ciphertext};
+    octet Plaintext= {0,sizeof(plaintext),plaintext}, Res= {0,sizeof(res),res}, Tag= {0,sizeof(tag),tag}, IV= {0,sizeof(iv),iv};
+    csprng rng;
+
+    int hash;
+    if (!strcmp(argv[1], "sha256"))
+    {
+        hash = SHA256;
+    }
+    else if (!strcmp(argv[1], "sha384"))
+    {
+        hash = SHA384;
+    }
+    else
+    {
+        hash = SHA512;
+    }
+
+    /* Fake random source */
+    RAND_clean(&rng);
+    for (i=0; i<256; i++) raw[i]=(char)i;
+    RAND_seed(&rng,256,raw);
+
     PIN1 = 1234;
     PIN2 = 1234;
 
@@ -126,7 +159,7 @@ int main()
     CREATE_CSPRNG(&RNG,&SEED);
 
     /* Hash ID */
-    MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
+    MPIN_HASH_ID(hash,&ID,&HCID);
     OCT_output(&HCID);
 
     /* When set only send hashed IDs to server */
@@ -214,16 +247,16 @@ int main()
     /* Generate Time Permit shares */
     date = MPIN_today();
     printf("Date %d \n", date);
-    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
+    rtn = MPIN_GET_CLIENT_PERMIT(hash,date,&MS1,&HCID,&TP1);
     if (rtn != 0)
     {
-        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
+        printf("MPIN_GET_CLIENT_PERMIT(hash,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
         return 1;
     }
-    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
+    rtn = MPIN_GET_CLIENT_PERMIT(hash,date,&MS2,&HCID,&TP2);
     if (rtn != 0)
     {
-        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
+        printf("MPIN_GET_CLIENT_PERMIT(hash,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
         return 1;
     }
     printf("TP1 = 0x");
@@ -250,7 +283,7 @@ int main()
     OCT_output(&TP);
 
     /* Client extracts PIN1 from secret to create Token */
-    rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
+    rtn = MPIN_EXTRACT_PIN(hash,&ID, PIN1, &TOKEN);
     if (rtn != 0)
     {
         printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
@@ -263,7 +296,7 @@ int main()
     MPIN_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
 
     /* Client first pass */
-    rtn = MPIN_CLIENT_1(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
+    rtn = MPIN_CLIENT_1(hash,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT_1 ERROR %d\n", rtn);
@@ -274,7 +307,7 @@ int main()
     MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
 
     /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-    MPIN_SERVER_1(HASH_TYPE_MPIN,date,pID,&HID,&HTID);
+    MPIN_SERVER_1(hash,date,pID,&HID,&HTID);
 
     /* Server generates Random number Y and sends it to Client */
     rtn = MPIN_RANDOM_GENERATE(&RNG,&Y);
@@ -307,16 +340,16 @@ int main()
         printf("FAILURE Invalid Token Error Code %d\n", rtn);
     }
 
-    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
-    MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
+    MPIN_HASH_ALL(hash,&HCID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
+    MPIN_CLIENT_KEY(hash,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
     printf("Client Key = ");
     OCT_output(&CK);
 
     /* Server will use the hashed ID if anonymous connection required.
-    MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HSID);
+    MPIN_HASH_ID(hash,&ID,&HSID);
     MPIN_HASH_ALL(&HSID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
     */
-    MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
+    MPIN_SERVER_KEY(hash,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
     printf("Server Key = ");
     OCT_output(&SK);
 
@@ -324,6 +357,32 @@ int main()
     {
         printf("FAILURE Keys are different\n");
         return 1;
+    }
+
+    for (i=0; i<10; i++)
+    {
+        /* Self test AES-GCM encyption/decryption */
+        OCT_rand(&IV,&rng,16);
+        OCT_rand(&Plaintext,&rng,32);
+        OCT_copy(&Res,&Plaintext);
+#ifdef DEBUG
+        printf("Plaintext = ");
+        OCT_output(&Plaintext);
+        printf("IV = ");
+        OCT_output(&IV);
+#endif
+        MPIN_AES_GCM_ENCRYPT(&CK,&IV,&HEADER,&Plaintext,&Ciphertext,&Tag);
+        MPIN_AES_GCM_DECRYPT(&CK,&IV,&HEADER,&Ciphertext,&Plaintext,&Tag);
+#ifdef DEBUG
+        printf("Ciphertext = ");
+        OCT_output(&Ciphertext);
+#endif
+
+        if (!OCT_comp(&Res,&Plaintext))
+        {
+            printf("FAILURE Encryption/Decryption with AES-GCM\n");
+            return 1;
+        }
     }
 
     printf("SUCCESS\n");
