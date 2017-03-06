@@ -10,4 +10,4 @@ Change these file to select the curves you want to build then run;
 ```
 
 This will build a number of programs in the ./build directory
-that is created by this script.
+
