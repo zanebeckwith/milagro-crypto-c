@@ -272,6 +272,7 @@ ifeq ($(AMCL_BUILD_DOXYGEN),ON)
 endif
 endif
 
+
 # Format the source code
 format:
 	astyle --style=allman --recursive --suffix=none 'include/*.h'
