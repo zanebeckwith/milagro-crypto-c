@@ -36,12 +36,12 @@
 
 int main(int argc, char** argv)
 {
-	if (argc != 2)
+    if (argc != 2)
     {
         printf("usage: ./test_wcc [hash:sha256||sha384||sha512]\n");
         exit(EXIT_FAILURE);
     }
-    
+
     int i,rtn;
 
     /* Master secret */
