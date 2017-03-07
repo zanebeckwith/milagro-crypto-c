@@ -38,8 +38,6 @@
 #ifndef AMCL_H
 #define AMCL_H
 
-#define CMAKE /**< Turn on CMAKE build */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>

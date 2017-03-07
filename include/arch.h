@@ -34,8 +34,6 @@
 #ifndef ARCH_H
 #define ARCH_H
 
-#define CMAKE /**< Turn on CMAKE build */
-
 
 /*** START OF USER CONFIGURABLE SECTION - set architecture ***/
 
