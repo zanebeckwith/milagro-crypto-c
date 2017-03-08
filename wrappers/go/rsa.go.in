@@ -65,23 +65,103 @@ func RSACreateCSPRNG(SEED []byte) RsaRNG {
 }
 
 // generate an RSA key pair
-func RSA_KeyPair(RNG *RsaRNG, e int, P []byte, Q []byte) (C.rsa_private_key, C.rsa_public_key) {
+func RSA_KeyPair(RNG *RsaRNG, e int, P []byte, Q []byte) (RSA_PrivKey C.rsa_private_key, RSA_PubKey C.rsa_public_key) {
 	PStr := string(P)
 	POct := GetOctet(PStr)
 	defer OctetFree(&POct)
 	QStr := string(Q)
 	QOct := GetOctet(QStr)
 	defer OctetFree(&QOct)
-	RSA_PrivKey := C.rsa_private_key
-	RSA_PubKey := C.rsa_public_key
+	RSA_PrivKey = C.rsa_private_key
+	RSA_PubKey = C.rsa_public_key
+
 	C.RSA_KEY_PAIR(RNG.csprng(), e, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
 	return RSA_PrivKey, RSA_PubKey
 }
 
 // PKCS 1.5 padding of a message to be signed
-func RSA_PKCS15 int PKCS15(hashType int, M []byte) (int, C.octet) {
+func PKCS15 int PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
+	MStr := string(M)
+	MOct := GetOctet(MStr)
+	defer OctetFree(&MOct)
+	COct := GetOctetZero(RFS)
+	defer OctetFree(&COct)
 
-
+	rtn := C.PKCS15(C.int(hashType),&MOct,&COct);
+	errorCode = int(rtn)
+	C = OctetToBytes(&COct)
+	return errorCode, C[:]
 }
+
+// OAEP Message Encoding for Encryption
+func OAEP_ENCODE(hashType int, M []byte, RNG *RsaRNG, P []byte) (errorCode int, F []byte) {
+	MStr := string(M)
+	MOct := GetOctet(MStr)
+	defer OctetFree(&MOct)
+	PStr := string(P)
+	POct := GetOctet(PStr)
+	defer OctetFree(&POct)
+	FOct := GetOctetZero(RFS)
+	defer OctetFree(&FOct)
+
+	rtn := C.OAEP_ENCODE(hashType,&MOct,RNG.csprng(),&POct,&FOct);
+	errorCode = int(rtn)
+	F = OctetToBytes(&FOct)
+	return errorCode, F[:]
+}
+
+// OAEP Message Decoding for Decryption
+func OAEP_DECODE(hashType int, P []byte, F []byte) (errorCode int, F []byte) {
+	FStr := string(F)
+	FOct := GetOctet(FStr)
+	defer OctetFree(&FOct)
+	PStr := string(P)
+	POct := GetOctet(PStr)
+	defer OctetFree(&POct)
+
+	rtn := C.OAEP_DECODE(hashType,&POct,&POct,&FOct);
+	errorCode = int(rtn)
+	F = OctetToBytes(&FOct)
+	return errorCode, F[:]
+}
+
+// RSA encryption with the public key
+func RSA_ENCRYPT(RSA_PubKey *C.rsa_public_key,  F []byte) (G []byte) {
+	FStr := string(F)
+	FOct := GetOctet(FStr)
+	defer OctetFree(&FOct)
+	GOct := GetOctetZero(RFS)
+	defer OctetFree(&GOct)
+
+	C.RSA_ENCRYPT(RSA_PubKey, &FOct, &GOct);	
+	G = OctetToBytes(&GOct)
+	return G[:]
+}
+
+// RSA decryption with the private key
+func RSA_DECRYPT(RSA_PrivKey *C.rsa_private_key,  G []byte) (F []byte) {
+	GStr := string(G)
+	GOct := GetOctet(GStr)
+	defer OctetFree(&GOct)
+	FOct := GetOctetZero(RFS)
+	defer OctetFree(&FOct)
+
+	C.RSA_ENCRYPT(RSA_PrivKey, &GOct, &FOct);	
+	F = OctetToBytes(&FOct)
+	return F[:]
+}
+
+
+// Destroy an RSA private Key
+func RSA_PRIVATE_KEY_KILL(RSA_PrivKey *C.rsa_private_key) {
+	C.RSA_PRIVATE_KEY_KILL(RSA_PrivKey)
+}
+
+
+
+
+
+
+
 
 
