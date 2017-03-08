@@ -248,6 +248,12 @@ if (BUILD_GO AND BUILD_SHARED_LIBS)
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
 
     add_custom_command(
+                TARGET amcl_core
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+
+    add_custom_command(
                 TARGET amcl_curve
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_curve.so" "${PROJECT_BINARY_DIR}/wrappers/go/")

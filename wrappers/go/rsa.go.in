@@ -1,0 +1,87 @@
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
+
+package amcl
+
+/*
+#cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
+#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_rsa -lamcl_curve -lamcl_core
+#include <stdio.h>
+#include <stdlib.h>
+#include "amcl.h"
+#include "randapi.h"
+#include "rsa.h"
+#include "utils.h"
+*/
+import "C"
+import (
+	"encoding/hex"
+	"unsafe"
+)
+
+const MAX_RSA_BYTES int = int(C.MAX_RSA_BYTES) /**<  Maximum of 4096 */
+const HASH_TYPE_RSA int = int(C.HASH_TYPE_RSA) /**< Chosen Hash algorithm */
+const RFS int = int(C.RFS) /**< RSA Public Key Size in bytes */
+
+// RsaRNG is a type alias for C.csprng
+type RsaRNG C.csprng
+
+// csprng is an alias function for the C counterpart
+func (rng *RsaRNG) csprng() *C.csprng {
+	return (*C.csprng)(rng)
+}
+
+/*
+CreateCSPRNG makes a cryptographically secure pseudo-random number generator instance
+Args:
+    seed:   random seed value
+Returns:
+    RNG: Pointer to cryptographically secure pseudo-random number generator instance
+*/
+func RSACreateCSPRNG(SEED []byte) RsaRNG {
+	// Form Octet
+	SEEDStr := string(SEED)
+	SEEDOct := GetOctet(SEEDStr)
+	defer OctetFree(&SEEDOct)
+	var RNG C.csprng
+	C.CREATE_CSPRNG(&RNG, &SEEDOct)
+	return RsaRNG(RNG)
+}
+
+// generate an RSA key pair
+func RSA_KeyPair(RNG *RsaRNG, e int, P []byte, Q []byte) (C.rsa_private_key, C.rsa_public_key) {
+	PStr := string(P)
+	POct := GetOctet(PStr)
+	defer OctetFree(&POct)
+	QStr := string(Q)
+	QOct := GetOctet(QStr)
+	defer OctetFree(&QOct)
+	RSA_PrivKey := C.rsa_private_key
+	RSA_PubKey := C.rsa_public_key
+	C.RSA_KEY_PAIR(RNG.csprng(), e, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
+	return RSA_PrivKey, RSA_PubKey
+}
+
+// PKCS 1.5 padding of a message to be signed
+func RSA_PKCS15 int PKCS15(hashType int, M []byte) (int, C.octet) {
+
+
+}
+
+
