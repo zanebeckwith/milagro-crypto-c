@@ -1,27 +1,33 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+/**
+ * @file rsa.go
+ * @author Alessandro Budroni
+ * @brief Wrappers for RSA functions
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package amcl
 
 /*
 #cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_rsa -lamcl_curve -lamcl_core
+#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_rsa -lamcl_core -lamcl_curve
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
@@ -30,71 +36,39 @@ package amcl
 #include "utils.h"
 */
 import "C"
-import (
-	"encoding/hex"
-	"unsafe"
-)
-
-const MAX_RSA_BYTES int = int(C.MAX_RSA_BYTES) /**<  Maximum of 4096 */
-const HASH_TYPE_RSA int = int(C.HASH_TYPE_RSA) /**< Chosen Hash algorithm */
-const RFS int = int(C.RFS) /**< RSA Public Key Size in bytes */
-
-// RsaRNG is a type alias for C.csprng
-type RsaRNG C.csprng
-
-// csprng is an alias function for the C counterpart
-func (rng *RsaRNG) csprng() *C.csprng {
-	return (*C.csprng)(rng)
-}
-
-/*
-CreateCSPRNG makes a cryptographically secure pseudo-random number generator instance
-Args:
-    seed:   random seed value
-Returns:
-    RNG: Pointer to cryptographically secure pseudo-random number generator instance
-*/
-func RSACreateCSPRNG(SEED []byte) RsaRNG {
-	// Form Octet
-	SEEDStr := string(SEED)
-	SEEDOct := GetOctet(SEEDStr)
-	defer OctetFree(&SEEDOct)
-	var RNG C.csprng
-	C.CREATE_CSPRNG(&RNG, &SEEDOct)
-	return RsaRNG(RNG)
-}
 
 // generate an RSA key pair
-func RSA_KeyPair(RNG *RsaRNG, e int, P []byte, Q []byte) (RSA_PrivKey C.rsa_private_key, RSA_PubKey C.rsa_public_key) {
+func RSAKeyPair(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key, C.rsa_public_key) {
 	PStr := string(P)
 	POct := GetOctet(PStr)
 	defer OctetFree(&POct)
 	QStr := string(Q)
 	QOct := GetOctet(QStr)
 	defer OctetFree(&QOct)
-	RSA_PrivKey = C.rsa_private_key
-	RSA_PubKey = C.rsa_public_key
+	eVal := C.int32_t(e)
+	var RSA_PubKey C.rsa_public_key
+	var RSA_PrivKey C.rsa_private_key
 
-	C.RSA_KEY_PAIR(RNG.csprng(), e, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
+	C.RSA_KEY_PAIR(RNG.csprng(), eVal, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
 	return RSA_PrivKey, RSA_PubKey
 }
 
 // PKCS 1.5 padding of a message to be signed
-func PKCS15 int PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
+func PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
 	defer OctetFree(&MOct)
 	COct := GetOctetZero(RFS)
 	defer OctetFree(&COct)
 
-	rtn := C.PKCS15(C.int(hashType),&MOct,&COct);
+	rtn := C.PKCS15(C.int(hashType), &MOct, &COct)
 	errorCode = int(rtn)
 	C = OctetToBytes(&COct)
 	return errorCode, C[:]
 }
 
 // OAEP Message Encoding for Encryption
-func OAEP_ENCODE(hashType int, M []byte, RNG *RsaRNG, P []byte) (errorCode int, F []byte) {
+func OAEPencode(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, F []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
 	defer OctetFree(&MOct)
@@ -104,64 +78,54 @@ func OAEP_ENCODE(hashType int, M []byte, RNG *RsaRNG, P []byte) (errorCode int, 
 	FOct := GetOctetZero(RFS)
 	defer OctetFree(&FOct)
 
-	rtn := C.OAEP_ENCODE(hashType,&MOct,RNG.csprng(),&POct,&FOct);
+	rtn := C.OAEP_ENCODE(C.int(hashType), &MOct, RNG.csprng(), &POct, &FOct)
 	errorCode = int(rtn)
 	F = OctetToBytes(&FOct)
 	return errorCode, F[:]
 }
 
-// OAEP Message Decoding for Decryption
-func OAEP_DECODE(hashType int, P []byte, F []byte) (errorCode int, F []byte) {
-	FStr := string(F)
-	FOct := GetOctet(FStr)
-	defer OctetFree(&FOct)
+// OAEP Message Decoding after decryption, M is the message to be decoded, F is the decoded message
+func OAEPdecode(hashType int, P []byte, M []byte) (int, []byte) {
+	MStr := string(M)
+	MOct := GetOctet(MStr)
+	defer OctetFree(&MOct)
 	PStr := string(P)
 	POct := GetOctet(PStr)
 	defer OctetFree(&POct)
 
-	rtn := C.OAEP_DECODE(hashType,&POct,&POct,&FOct);
-	errorCode = int(rtn)
-	F = OctetToBytes(&FOct)
-	return errorCode, F[:]
+	rtn := C.OAEP_DECODE(C.int(hashType), &POct, &MOct)
+	errorCode := int(rtn)
+	M = OctetToBytes(&MOct)
+	return errorCode, M[:]
 }
 
 // RSA encryption with the public key
-func RSA_ENCRYPT(RSA_PubKey *C.rsa_public_key,  F []byte) (G []byte) {
+func RSA_ENCRYPT(RSA_PubKey *C.rsa_public_key, F []byte) (G []byte) {
 	FStr := string(F)
 	FOct := GetOctet(FStr)
 	defer OctetFree(&FOct)
 	GOct := GetOctetZero(RFS)
 	defer OctetFree(&GOct)
 
-	C.RSA_ENCRYPT(RSA_PubKey, &FOct, &GOct);	
+	C.RSA_ENCRYPT(RSA_PubKey, &FOct, &GOct)
 	G = OctetToBytes(&GOct)
 	return G[:]
 }
 
 // RSA decryption with the private key
-func RSA_DECRYPT(RSA_PrivKey *C.rsa_private_key,  G []byte) (F []byte) {
+func RSA_DECRYPT(RSA_PrivKey *C.rsa_private_key, G []byte) (F []byte) {
 	GStr := string(G)
 	GOct := GetOctet(GStr)
 	defer OctetFree(&GOct)
 	FOct := GetOctetZero(RFS)
 	defer OctetFree(&FOct)
 
-	C.RSA_ENCRYPT(RSA_PrivKey, &GOct, &FOct);	
+	C.RSA_DECRYPT(RSA_PrivKey, &GOct, &FOct)
 	F = OctetToBytes(&FOct)
 	return F[:]
 }
-
 
 // Destroy an RSA private Key
 func RSA_PRIVATE_KEY_KILL(RSA_PrivKey *C.rsa_private_key) {
 	C.RSA_PRIVATE_KEY_KILL(RSA_PrivKey)
 }
-
-
-
-
-
-
-
-
-

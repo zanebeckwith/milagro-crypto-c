@@ -248,7 +248,7 @@ if (BUILD_GO AND BUILD_SHARED_LIBS)
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
 
     add_custom_command(
-                TARGET amcl_core
+                TARGET amcl_rsa
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
 
@@ -289,6 +289,11 @@ if (BUILD_GO AND BUILD_SHARED_LIBS)
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
 
     add_custom_command(
+                TARGET amcl_rsa
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+    add_custom_command(
                 TARGET amcl_curve
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_curve.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
@@ -323,6 +328,11 @@ if (BUILD_GO AND BUILD_SHARED_LIBS)
                 TARGET amcl_core
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+    add_custom_command(
+                TARGET amcl_rsa
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
 
     add_custom_command(
                 TARGET amcl_curve
@@ -366,6 +376,11 @@ if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
                 TARGET amcl_core
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+
+    add_custom_command(
+                TARGET amcl_rsa
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
 
     add_custom_command(
                 TARGET amcl_curve

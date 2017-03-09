@@ -30,11 +30,8 @@ package amcl
 #include "utils.h"
 */
 import "C"
-import (
-	"encoding/hex"
-	"unsafe"
-)
 
+// ECC points constant
 const PAS int = int(C.PAS)
 const PGS int = int(C.PGS)
 const PFS int = int(C.PFS)
@@ -43,96 +40,6 @@ const IVS int = 12
 const G1S = 2*PFS + 1
 const G2S = 4 * PFS
 const GTS = 12 * PFS
-
-//  Hash function choice
-const SHA256 int = 32
-const SHA384 int = 48
-const SHA512 int = 64
-
-// MPinRNG is a type alias for C.csprng
-type MPinRNG C.csprng
-
-// csprng is an alias function for the C counterpart
-func (rng *MPinRNG) csprng() *C.csprng {
-	return (*C.csprng)(rng)
-}
-
-// OctetFree frees memory associated with an octet
-func OctetFree(valOctet *C.octet) {
-	C.free(unsafe.Pointer(valOctet.val))
-}
-
-// GetOctetZero forms an empty octet
-func GetOctetZero(lenStr int) C.octet {
-	valBytes := make([]byte, lenStr)
-	val := string(valBytes)
-	valCS := C.CString(val)
-	lenCS := C.int(lenStr)
-	octetVal := C.octet{lenCS, lenCS, valCS}
-	return octetVal
-}
-
-// GetOctet forms an octet from a string
-func GetOctet(valStr string) C.octet {
-	valCS := C.CString(valStr)
-	lenCS := C.int(len(valStr))
-	octetVal := C.octet{lenCS, lenCS, valCS}
-	return octetVal
-}
-
-// GetOctetHex forms an octet from a hex string
-func GetOctetHex(valHex string) C.octet {
-	valBytes, err := hex.DecodeString(valHex)
-	if err != nil {
-		octetVal := GetOctetZero(0)
-		return octetVal
-	}
-	valStr := string(valBytes)
-	octetVal := GetOctet(valStr)
-	return octetVal
-}
-
-// OctetLen gets length in bytes of an octet
-func OctetLen(valOctet *C.octet) int {
-	return int(valOctet.len)
-}
-
-// OctetToString convert an octet to a string
-func OctetToString(valOct *C.octet) string {
-	dstLen := OctetLen(valOct)
-	dstBytes := make([]byte, dstLen)
-	dstStr := string(dstBytes)
-	dst := C.CString(dstStr)
-	C.OCT_toStr(valOct, dst)
-	dstStr = C.GoStringN(dst, valOct.len)
-	C.free(unsafe.Pointer(dst))
-	return dstStr
-}
-
-// OctetToBytes convert an octet to bytes
-func OctetToBytes(valOct *C.octet) []byte {
-	dstLen := OctetLen(valOct)
-	dstBytes := make([]byte, dstLen)
-	dstStr := string(dstBytes)
-	dst := C.CString(dstStr)
-	C.OCT_toStr(valOct, dst)
-	dstStr = C.GoStringN(dst, valOct.len)
-	C.free(unsafe.Pointer(dst))
-	dstBytes = []byte(dstStr)
-	return dstBytes
-}
-
-// OctetToHex convert an octet to a hex string
-func OctetToHex(valOctet *C.octet) string {
-	dstLen := OctetLen(valOctet)
-	dstBytes := make([]byte, hex.EncodedLen(dstLen))
-	dstStr := string(dstBytes)
-	dst := C.CString(dstStr)
-	C.OCT_toHex(valOctet, dst)
-	dstStr = C.GoString(dst)
-	C.free(unsafe.Pointer(dst))
-	return dstStr
-}
 
 /*
 
@@ -163,29 +70,6 @@ Returns:
 func GetTime() int {
 	epochTime := C.MPIN_GET_TIME()
 	return int(epochTime)
-}
-
-/*
-
-CreateCSPRNG makes a cryptographically secure pseudo-random number generator instance
-
-Args:
-
-    seed:   random seed value
-
-Returns:
-
-    RNG: Pointer to cryptographically secure pseudo-random number generator instance
-
-*/
-func CreateCSPRNG(SEED []byte) MPinRNG {
-	// Form Octet
-	SEEDStr := string(SEED)
-	SEEDOct := GetOctet(SEEDStr)
-	defer OctetFree(&SEEDOct)
-	var RNG C.csprng
-	C.CREATE_CSPRNG(&RNG, &SEEDOct)
-	return MPinRNG(RNG)
 }
 
 /*
@@ -233,7 +117,7 @@ Returns:
     s: random group element
 
 */
-func RandomGenerate(RNG *MPinRNG) (errorCode int, S []byte) {
+func RandomGenerate(RNG *RandNG) (errorCode int, S []byte) {
 	// Form Octet
 	SOct := GetOctetZero(PGS)
 	defer OctetFree(&SOct)
@@ -484,7 +368,7 @@ Returns:
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled where is t is epoch time
 */
-func Client(hashType, epochDate int, mpinId []byte, RNG *MPinRNG, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte) {
+func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte) {
 	// Form Octets
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)
@@ -589,7 +473,7 @@ Returns:
 Raises:
 
 */
-func GetG1Multiple(RNG *MPinRNG, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte) {
+func GetG1Multiple(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte) {
 	xStr := string(x)
 	xOct := GetOctet(xStr)
 	defer OctetFree(&xOct)
@@ -836,7 +720,7 @@ Returns:
     randomValue: Random value
 
 */
-func GenerateRandomByte(RNG *MPinRNG, randomLen int) (randomValue []byte) {
+func GenerateRandomByte(RNG *RandNG, randomLen int) (randomValue []byte) {
 	randomOct := GetOctetZero(randomLen)
 	defer OctetFree(&randomOct)
 
@@ -861,7 +745,7 @@ Returns:
     otp: One time password
 
 */
-func GenerateOTP(RNG *MPinRNG) int {
+func GenerateOTP(RNG *RandNG) int {
 	OTP := C.generateOTP(RNG.csprng())
 	return int(OTP)
 }
@@ -1088,7 +972,7 @@ Returns:
     SEC: SEC = CS+TP, where CS is the reconstructed client secret and TP is the time permit
 
 */
-func Client1(hashType, epochDate int, mpinId []byte, RNG *MPinRNG, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte) {
+func Client1(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte) {
 	// Form Octets
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)

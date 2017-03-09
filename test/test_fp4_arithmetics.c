@@ -317,7 +317,7 @@ int main(int argc, char** argv)
             FP4_sub(&FP4aux1,&FP4aux1,&FP4aux2);
             FP4_reduce(&FP4aux1);
             FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4sub) != 0)
+            if(FP4_equals(&FP4aux1,&FP4sub) == 0)
             {
                 printf("ERROR subtraction between two FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
