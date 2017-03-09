@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package amcl
+/*package amcl
 
 import (
 	"crypto/rand"
@@ -29,3 +29,4 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+*/
