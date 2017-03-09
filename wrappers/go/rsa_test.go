@@ -61,12 +61,12 @@ func TestRSA(t *testing.T) {
 	G := RSA_ENCRYPT(&RSA_PubKey, F[:])
 
 	// decrypt encrypted MESSAGE
-    ML := RSA_DECRYPT(&RSA_PrivKey,G[:])
+    ML := RSA_DECRYPT(&RSA_PrivKey, G[:])
 
     // OAEP decode MESSAGE
     _, Fgot := OAEP_DECODE(HASH_TYPE_RSA, nil, ML[:])
 
-    assert.Equal(t, F, Fgot, "Should be equal")
+    assert.Equal(t, Fgot, MESSAGE, "Should be equal")
 }
 
 func TestRsaSign(t *testing.T) {

@@ -102,7 +102,7 @@ func OAEP_ENCODE(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, 
 }
 
 // OAEP Message Decoding after decryption, M is the message to be decoded, F is the decoded message
-func OAEP_DECODE(hashType int, P []byte, M []byte) (errorCode int, F []byte) {
+func OAEP_DECODE(hashType int, P []byte, M []byte) ( int, []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
 	defer OctetFree(&MOct)
@@ -111,9 +111,9 @@ func OAEP_DECODE(hashType int, P []byte, M []byte) (errorCode int, F []byte) {
 	defer OctetFree(&POct)
 
 	rtn := C.OAEP_DECODE(C.int(hashType),&POct,&MOct);
-	errorCode = int(rtn)
-	F = OctetToBytes(&MOct)
-	return errorCode, F[:]
+	errorCode := int(rtn)
+	M = OctetToBytes(&MOct)
+	return errorCode, M[:]
 }
 
 // RSA encryption with the public key
