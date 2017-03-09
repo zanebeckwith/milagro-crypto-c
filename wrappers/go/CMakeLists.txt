@@ -23,8 +23,8 @@ if(BUILD_MPIN)
   file(COPY rsa_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
   file(COPY mpin_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
 
-  add_test(NAME test_golang COMMAND go test -race -v)
-  set_tests_properties (test_golang PROPERTIES PASS_REGULAR_EXPRESSION PASS)
+  add_test(NAME test_golang_wrappers COMMAND go test -race -v)
+  set_tests_properties (test_golang_wrappers PROPERTIES PASS_REGULAR_EXPRESSION PASS)
 
   INSTALL(DIRECTORY DESTINATION "${GO_PATH}/src/github.com" DIRECTORY_PERMISSIONS
           OWNER_WRITE OWNER_READ OWNER_EXECUTE

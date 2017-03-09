@@ -69,5 +69,33 @@ func TestRSA(t *testing.T) {
     assert.Equal(t, F, Fgot, "Should be equal")
 }
 
+func TestRsaSign(t *testing.T) {
 
+	// Seed value for Random Number Generator (RNG)
+	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seed, err := hex.DecodeString(seedHex)
+	if err != nil {
+		fmt.Println("Error decoding seed value")
+		return
+	}
+
+	rng := RSACreateCSPRNG(seed)
+
+	// Generating public/private key pair
+    RSA_PrivKey, RSA_PubKey := RSA_KeyPair(&rng,65537,nil,nil);
+
+	// Message to encrypt
+	MESSAGEstr := "Hello World\n"
+	MESSAGE := []byte(MESSAGEstr)
+
+    // Signing message
+    _, C := PKCS15(HASH_TYPE_RSA,MESSAGE);
+
+    // create signature in S
+    S := RSA_DECRYPT(&RSA_PrivKey,C[:])
+
+    Cgot := RSA_ENCRYPT(&RSA_PubKey,S[:]);
+
+    assert.Equal(t, C, Cgot, "Should be equal")
+}
 
