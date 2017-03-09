@@ -159,13 +159,13 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
             FP2_cmove(&FP2aux1,&FP2_1,1);
-            if(!FP2_equals(&FP2aux1,&FP2_1) != 0)
+            if(FP2_equals(&FP2aux1,&FP2_1) != 1)
             {
                 printf("ERROR in conditional copy of FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
             FP2_from_FPs(&FP2aux1,FP2_1.a,FP2_1.b);
-            if(!FP2_equals(&FP2aux1,&FP2_1) != 0)
+            if(FP2_equals(&FP2aux1,&FP2_1) != 1)
             {
                 printf("ERROR in generating FP2 from two FPs, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -173,7 +173,7 @@ int main(int argc, char** argv)
             FP2_from_BIGs(&FP2aux1,FP2_1.a,FP2_1.b);
             FP_redc(FP2aux1.a);
             FP_redc(FP2aux1.b);
-            if(!FP2_equals(&FP2aux1,&FP2_1) != 0)
+            if(FP2_equals(&FP2aux1,&FP2_1) != 1)
             {
                 printf("ERROR in generating FP2 from two BIGs, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -181,7 +181,7 @@ int main(int argc, char** argv)
             FP2_from_FP(&FP2aux1,FP2_1.a);
             FP2_copy(&FP2aux2,&FP2_1);
             BIG_zero(FP2aux2.b);
-            if(!FP2_equals(&FP2aux1,&FP2aux2) != 0)
+            if(FP2_equals(&FP2aux1,&FP2aux2) != 1)
             {
                 printf("ERROR in generating FP2 from one FP, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -190,7 +190,7 @@ int main(int argc, char** argv)
             FP_redc(FP2aux1.a);
             FP2_copy(&FP2aux2,&FP2_1);
             BIG_zero(FP2aux2.b);
-            if(!FP2_equals(&FP2aux1,&FP2aux2) != 0)
+            if(FP2_equals(&FP2aux1,&FP2aux2) != 1)
             {
                 printf("ERROR in generating FP2 from one BIG, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -270,7 +270,7 @@ int main(int argc, char** argv)
             FP2_sub(&FP2aux1,&FP2aux1,&FP2aux2);
             FP2_reduce(&FP2aux1);
             FP2_norm(&FP2aux1);
-            if(!FP2_equals(&FP2aux1,&FP2sub) != 0)
+            if(FP2_equals(&FP2aux1,&FP2sub) == 0)
             {
                 printf("ERROR subtraction between two FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
