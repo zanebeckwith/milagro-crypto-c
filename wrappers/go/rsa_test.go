@@ -45,7 +45,7 @@ func TestRSA(t *testing.T) {
 		return
 	}
 
-	rng := RSACreateCSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Message to encrypt
 	MESSAGEstr := "Hello World\n"
@@ -66,6 +66,9 @@ func TestRSA(t *testing.T) {
     // OAEP decode MESSAGE
     _, Fgot := OAEP_DECODE(HASH_TYPE_RSA, nil, ML[:])
 
+    // destroy private key
+    RSA_PRIVATE_KEY_KILL(&RSA_PrivKey)
+
     assert.Equal(t, Fgot, MESSAGE, "Should be equal")
 }
 
@@ -79,7 +82,7 @@ func TestRsaSign(t *testing.T) {
 		return
 	}
 
-	rng := RSACreateCSPRNG(seed)
+	rng := CreateCSPRNG(seed)
 
 	// Generating public/private key pair
     RSA_PrivKey, RSA_PubKey := RSA_KeyPair(&rng,65537,nil,nil);
@@ -95,6 +98,9 @@ func TestRsaSign(t *testing.T) {
     S := RSA_DECRYPT(&RSA_PrivKey,C[:])
 
     Cgot := RSA_ENCRYPT(&RSA_PubKey,S[:]);
+
+    // destroy private key
+    RSA_PRIVATE_KEY_KILL(&RSA_PrivKey)
 
     assert.Equal(t, C, Cgot, "Should be equal")
 }

@@ -37,23 +37,6 @@ package amcl
 */
 import "C"
 
-/*
-CreateCSPRNG makes a cryptographically secure pseudo-random number generator instance
-Args:
-    seed:   random seed value
-Returns:
-    RNG: Pointer to cryptographically secure pseudo-random number generator instance
-*/
-func RSACreateCSPRNG(SEED []byte) RandNG {
-	// Form Octet
-	SEEDStr := string(SEED)
-	SEEDOct := GetOctet(SEEDStr)
-	defer OctetFree(&SEEDOct)
-	var RNG C.csprng
-	C.CREATE_CSPRNG(&RNG, &SEEDOct)
-	return RandNG(RNG)
-}
-
 // generate an RSA key pair
 func RSA_KeyPair(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key, C.rsa_public_key) {
 	PStr := string(P)
