@@ -1,7 +1,7 @@
 /**
  * @file rsa.go
  * @author Alessandro Budroni
- * @brief Test for aritmetics with FP
+ * @brief Wrappers for RSA functions
  *
  * LICENSE
  *
