@@ -11,6 +11,12 @@
     "${PROJECT_BINARY_DIR}/wrappers/go/rsa.go"
   )
 
+  # Configure go rsa wrapper
+  configure_file (
+    "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa.go.in"
+    "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa.go"
+  )
+
 if(BUILD_MPIN)
   # Configure go mpin wrapper
   configure_file (
