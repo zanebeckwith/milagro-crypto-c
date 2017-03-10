@@ -21,13 +21,12 @@ package amcl
 
 /*
 #cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_mpin -lamcl_pairing -lamcl_curve -lamcl_core
+#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_curve -lamcl_core
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
 #include "rsa.h"
 #include "randapi.h"
-#include "mpin.h"
 #include "utils.h"
 */
 import "C"
@@ -35,16 +34,6 @@ import (
 	"encoding/hex"
 	"unsafe"
 )
-
-// ECC points constant
-const PAS int = int(C.PAS)
-const PGS int = int(C.PGS)
-const PFS int = int(C.PFS)
-const hashBytes int = int(C.PFS)
-const IVS int = 12
-const G1S = 2*PFS + 1
-const G2S = 4 * PFS
-const GTS = 12 * PFS
 
 //  Hash function choice
 const SHA256 int = 32
