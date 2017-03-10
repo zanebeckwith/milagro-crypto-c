@@ -43,8 +43,8 @@ const SHA512 int = 64
 // RSA Constant
 const MAX_RSA_BYTES int = int(C.MAX_RSA_BYTES) /**<  Maximum of 4096 */
 const HASH_TYPE_RSA int = int(C.HASH_TYPE_RSA) /**< Chosen Hash algorithm */
-const RFS int = int(C.RFS) /**< RSA Public Key Size in bytes */
-const FFLEN int = int(C.FFLEN) /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
+const RFS int = int(C.RFS)                     /**< RSA Public Key Size in bytes */
+const FFLEN int = int(C.FFLEN)                 /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
 
 // RandNG is a type alias for C.csprng
 type RandNG C.csprng
@@ -153,5 +153,3 @@ func OctetToHex(valOctet *C.octet) string {
 	C.free(unsafe.Pointer(dst))
 	return dstStr
 }
-
-

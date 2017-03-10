@@ -61,7 +61,7 @@ func PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
 	COct := GetOctetZero(RFS)
 	defer OctetFree(&COct)
 
-	rtn := C.PKCS15(C.int(hashType),&MOct,&COct);
+	rtn := C.PKCS15(C.int(hashType), &MOct, &COct)
 	errorCode = int(rtn)
 	C = OctetToBytes(&COct)
 	return errorCode, C[:]
@@ -78,14 +78,14 @@ func OAEP_ENCODE(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, 
 	FOct := GetOctetZero(RFS)
 	defer OctetFree(&FOct)
 
-	rtn := C.OAEP_ENCODE(C.int(hashType),&MOct,RNG.csprng(),&POct,&FOct);
+	rtn := C.OAEP_ENCODE(C.int(hashType), &MOct, RNG.csprng(), &POct, &FOct)
 	errorCode = int(rtn)
 	F = OctetToBytes(&FOct)
 	return errorCode, F[:]
 }
 
 // OAEP Message Decoding after decryption, M is the message to be decoded, F is the decoded message
-func OAEP_DECODE(hashType int, P []byte, M []byte) ( int, []byte) {
+func OAEP_DECODE(hashType int, P []byte, M []byte) (int, []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
 	defer OctetFree(&MOct)
@@ -93,49 +93,39 @@ func OAEP_DECODE(hashType int, P []byte, M []byte) ( int, []byte) {
 	POct := GetOctet(PStr)
 	defer OctetFree(&POct)
 
-	rtn := C.OAEP_DECODE(C.int(hashType),&POct,&MOct);
+	rtn := C.OAEP_DECODE(C.int(hashType), &POct, &MOct)
 	errorCode := int(rtn)
 	M = OctetToBytes(&MOct)
 	return errorCode, M[:]
 }
 
 // RSA encryption with the public key
-func RSA_ENCRYPT(RSA_PubKey *C.rsa_public_key,  F []byte) (G []byte) {
+func RSA_ENCRYPT(RSA_PubKey *C.rsa_public_key, F []byte) (G []byte) {
 	FStr := string(F)
 	FOct := GetOctet(FStr)
 	defer OctetFree(&FOct)
 	GOct := GetOctetZero(RFS)
 	defer OctetFree(&GOct)
 
-	C.RSA_ENCRYPT(RSA_PubKey, &FOct, &GOct);	
+	C.RSA_ENCRYPT(RSA_PubKey, &FOct, &GOct)
 	G = OctetToBytes(&GOct)
 	return G[:]
 }
 
 // RSA decryption with the private key
-func RSA_DECRYPT(RSA_PrivKey *C.rsa_private_key,  G []byte) (F []byte) {
+func RSA_DECRYPT(RSA_PrivKey *C.rsa_private_key, G []byte) (F []byte) {
 	GStr := string(G)
 	GOct := GetOctet(GStr)
 	defer OctetFree(&GOct)
 	FOct := GetOctetZero(RFS)
 	defer OctetFree(&FOct)
 
-	C.RSA_DECRYPT(RSA_PrivKey, &GOct, &FOct);	
+	C.RSA_DECRYPT(RSA_PrivKey, &GOct, &FOct)
 	F = OctetToBytes(&FOct)
 	return F[:]
 }
-
 
 // Destroy an RSA private Key
 func RSA_PRIVATE_KEY_KILL(RSA_PrivKey *C.rsa_private_key) {
 	C.RSA_PRIVATE_KEY_KILL(RSA_PrivKey)
 }
-
-
-
-
-
-
-
-
-
