@@ -532,12 +532,12 @@ int main()
     /* Crypto Strong RNG */
     char raw[100];
     octet RAW= {0,sizeof(raw),raw};
-    csprng RNG;                
+    csprng RNG;
 
     time((time_t *)&ran);
 
     /* fake random seed source */
-    RAW.len=100;				
+    RAW.len=100;
     RAW.val[0]=ran;
     RAW.val[1]=ran>>8;
     RAW.val[2]=ran>>16;
@@ -545,7 +545,7 @@ int main()
     for (i=0; i<100; i++) RAW.val[i]=i+1;
 
     /* initialise strong RNG */
-    CREATE_CSPRNG(&RNG,&RAW);   
+    CREATE_CSPRNG(&RNG,&RAW);
 
     mpin_build1(&RNG);
     mpin_build2(&RNG);
