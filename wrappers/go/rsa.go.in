@@ -38,7 +38,7 @@ package amcl
 import "C"
 
 // generate an RSA key pair
-func RSA_KeyPair(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key, C.rsa_public_key) {
+func RSAKeyPair(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key, C.rsa_public_key) {
 	PStr := string(P)
 	POct := GetOctet(PStr)
 	defer OctetFree(&POct)
@@ -68,7 +68,7 @@ func PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
 }
 
 // OAEP Message Encoding for Encryption
-func OAEP_ENCODE(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, F []byte) {
+func OAEPencode(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, F []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
 	defer OctetFree(&MOct)
@@ -85,7 +85,7 @@ func OAEP_ENCODE(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, 
 }
 
 // OAEP Message Decoding after decryption, M is the message to be decoded, F is the decoded message
-func OAEP_DECODE(hashType int, P []byte, M []byte) (int, []byte) {
+func OAEPdecode(hashType int, P []byte, M []byte) (int, []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
 	defer OctetFree(&MOct)
