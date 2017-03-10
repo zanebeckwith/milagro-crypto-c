@@ -27,7 +27,7 @@ package amcl
 
 /*
 #cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_rsa -lamcl_core
+#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_rsa -lamcl_core -lamcl_curve
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
