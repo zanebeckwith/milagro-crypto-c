@@ -1,17 +1,31 @@
 
+# Configure go amcl wrapper
+  configure_file (
+    "${PROJECT_SOURCE_DIR}/wrappers/go/amcl.go.in"
+    "${PROJECT_BINARY_DIR}/wrappers/go/amcl.go"
+  )
+
+  # Configure go rsa wrapper
+  configure_file (
+    "${PROJECT_SOURCE_DIR}/wrappers/go/rsa.go.in"
+    "${PROJECT_BINARY_DIR}/wrappers/go/rsa.go"
+  )
 
 if(BUILD_MPIN)
-
   # Configure go mpin wrapper
   configure_file (
     "${PROJECT_SOURCE_DIR}/wrappers/go/mpin.go.in"
     "${PROJECT_BINARY_DIR}/wrappers/go/mpin.go"
   )
+endif(BUILD_MPIN)
 
+  file(COPY rsa_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+if(BUILD_MPIN)
   file(COPY mpin_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+endif(BUILD_MPIN)
 
-  add_test(NAME test_golang_mpin COMMAND go test -race -v)
-  set_tests_properties (test_golang_mpin PROPERTIES PASS_REGULAR_EXPRESSION PASS)
+  add_test(NAME test_golang_wrappers COMMAND go test -race -v)
+  set_tests_properties (test_golang_wrappers PROPERTIES PASS_REGULAR_EXPRESSION PASS)
 
   INSTALL(DIRECTORY DESTINATION "${GO_PATH}/src/github.com" DIRECTORY_PERMISSIONS
           OWNER_WRITE OWNER_READ OWNER_EXECUTE
@@ -28,10 +42,20 @@ if(BUILD_MPIN)
           GROUP_WRITE GROUP_READ
           WORLD_WRITE WORLD_READ WORLD_EXECUTE)
 
-  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin.go mpin_test.go  DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
           OWNER_WRITE OWNER_READ OWNER_EXECUTE
           GROUP_READ GROUP_EXECUTE
           WORLD_READ WORLD_EXECUTE)
 
+   INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/rsa.go rsa_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+          OWNER_WRITE OWNER_READ OWNER_EXECUTE
+          GROUP_READ GROUP_EXECUTE
+          WORLD_READ WORLD_EXECUTE)
+
+if(BUILD_MPIN)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin.go mpin_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+          OWNER_WRITE OWNER_READ OWNER_EXECUTE
+          GROUP_READ GROUP_EXECUTE
+          WORLD_READ WORLD_EXECUTE)
 endif(BUILD_MPIN)
 
