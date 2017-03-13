@@ -348,6 +348,31 @@ int main()
         return 1;
     }
 
+    /* clear memory */
+    OCT_clear(&MS);
+    OCT_clear(&AKeyG1);
+    OCT_clear(&BKeyG2);
+    OCT_clear(&HV);
+    OCT_clear(&IdA);
+    OCT_clear(&IdB);
+    OCT_clear(&X);
+    OCT_clear(&Y);
+    OCT_clear(&W);
+    OCT_clear(&PIA);
+    OCT_clear(&PIB);
+    OCT_clear(&PgG1);
+    OCT_clear(&PaG1);
+    OCT_clear(&PbG2);
+    OCT_clear(&SEED);
+    OCT_clear(&MESSAGE1);
+    OCT_clear(&T1);
+    OCT_clear(&T2);
+    OCT_clear(&K1);
+    OCT_clear(&K2);
+    OCT_clear(&IV);
+    OCT_clear(&C);
+    OCT_clear(&P);
+
     KILL_CSPRNG(&RNG);
 
     return 0;

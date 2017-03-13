@@ -21,7 +21,7 @@ under the License.
 /* Demonstrate WCC with two TAs and time permits */
 
 /* Build executible after installation:
-   gcc -std=c99 -g testwcc_dta.c  -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lwcc -o testwcc_dta */
+   gcc -std=c99 -g testwcc_dta.c  -I/opt/amcl/include -L/opt/amcl/lib -lamcl_wcc -lamcl_pairing -lamcl_curve -lamcl_core -o testwcc_dta */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -453,6 +453,38 @@ int main()
         printf("FAILURE TAG mismatch\n");
         return 1;
     }
+
+    /* clear memory */
+    OCT_clear(&MS1);
+    OCT_clear(&MS2);
+    OCT_clear(&A1KeyG1);
+    OCT_clear(&A2KeyG1);
+    OCT_clear(&AKeyG1);
+    OCT_clear(&B1KeyG2);
+    OCT_clear(&B2KeyG2);
+    OCT_clear(&BKeyG2);
+    OCT_clear(&AHV);
+    OCT_clear(&BHV);
+    OCT_clear(&IdA);
+    OCT_clear(&IdB);
+    OCT_clear(&X);
+    OCT_clear(&Y);
+    OCT_clear(&W);
+    OCT_clear(&PIA);
+    OCT_clear(&PIB);
+    OCT_clear(&PgG1);
+    OCT_clear(&PaG1);
+    OCT_clear(&PbG2);
+    OCT_clear(&SEED);
+    OCT_clear(&MESSAGE1);
+    OCT_clear(&MESSAGE2);
+    OCT_clear(&T1);
+    OCT_clear(&T2);
+    OCT_clear(&K1);
+    OCT_clear(&K2);
+    OCT_clear(&IV);
+    OCT_clear(&C);
+    OCT_clear(&P);
 
     KILL_CSPRNG(&RNG);
 
