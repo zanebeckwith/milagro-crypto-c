@@ -153,3 +153,15 @@ func OctetToHex(valOctet *C.octet) string {
 	C.free(unsafe.Pointer(dst))
 	return dstStr
 }
+
+// Compare two octet - only for testing
+func OctetComp(O1 []byte, O2 []byte) int {
+	O1Str := string(O1)
+	Oct1 := GetOctet(O1Str)
+	defer OctetFree(&Oct1)
+	O2Str := string(O2)
+	Oct2 := GetOctet(O2Str)
+	defer OctetFree(&Oct2)
+	rtn := C.OCT_comp(&Oct1,&Oct2)
+	return int(rtn)
+}
