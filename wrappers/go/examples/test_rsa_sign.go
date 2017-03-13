@@ -1,7 +1,7 @@
 /**
- * @file rsa_test.go
+ * @file test_rsa_sign.go
  * @author Alessandro Budroni
- * @brief RSA Wrappers tests
+ * @brief RSA signature test
  *
  * LICENSE
  *

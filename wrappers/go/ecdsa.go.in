@@ -1,7 +1,7 @@
 /**
- * @file ecdh.go
+ * @file ecdsa.go
  * @author Alessandro Budroni
- * @brief Wrappers for ECDH functions
+ * @brief Wrappers for ECDSA functions
  *
  * LICENSE
  *
@@ -40,17 +40,33 @@ const EGS int = int(C.EGS)                     /**< ECC Group Size in bytes */
 
 // Generate an ECC public/private key pair, S is provided as input if RNG is null
 func ECPKeyPairGeneate(RNG *RandNG, S []byte)(int, []byte, []byte){
-	SStr := string(S)
-	SOct := GetOctet(SStr)
-	defer OctetFree(&SOct)
 	WOct := GetOctetZero(2*EFS+1)
 	defer OctetFree(&WOct)
-
-	rtn := ECP_KEY_PAIR_GENERATE(RNG.csprng(), &SOct, &WOct);
+	var SOct C.octet
+	var rtn C.int
+	if RNG == nil {
+		SStr := string(S)
+		SOct = GetOctet(SStr)
+		defer OctetFree(&SOct)
+		rtn = C.ECP_KEY_PAIR_GENERATE(nil, &SOct, &WOct);
+	} else {
+		SOct = GetOctetZero(EGS)
+		defer OctetFree(&SOct)
+		rtn = C.ECP_KEY_PAIR_GENERATE(RNG.csprng(), &SOct, &WOct);
+	}
 	errorCode := int(rtn)
 	W := OctetToBytes(&WOct)
 	S = OctetToBytes(&SOct)
 	return  errorCode, S[:], W[:]
+}
+
+// Validate an ECC public key, if = 0 just does some simple checks, else tests that W is of the correct order, return 0 if ok, error code otherwise
+func ECPPublicKeyValidate(f int ,W []byte) int {
+	WStr := string(W)
+	WOct := GetOctet(WStr)
+	defer OctetFree(&WOct) 
+	rtn := C.ECP_PUBLIC_KEY_VALIDATE(C.int(f),&WOct)
+	return int(rtn)
 }
 
 // ECDSA Signature - K is used when RNG is null
@@ -69,7 +85,7 @@ func ECPSpDsa(hashType int, RNG *RandNG, K []byte, S []byte, M []byte)(errorCode
 	DOct := GetOctetZero(EGS)
 	defer OctetFree(&DOct)
 
-	rtn :=	ECPSP_DSA(hashType, RNG.csprng(), &KOct, &SOct, &MOct, &COct, &DOct)
+	rtn :=	C.ECPSP_DSA(C.int(hashType), RNG.csprng(), &KOct, &SOct, &MOct, &COct, &DOct)
 	errorCode = int(rtn)
 	C = OctetToBytes(&COct)
 	D = OctetToBytes(&DOct)
@@ -77,7 +93,7 @@ func ECPSpDsa(hashType int, RNG *RandNG, K []byte, S []byte, M []byte)(errorCode
 }
 
 // ECDSA Signature Verification
-func ECPVpDsa(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int){
+func ECPVpDsa(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int) {
 	WStr := string(W)
 	WOct := GetOctet(WStr)
 	defer OctetFree(&WOct)
@@ -91,11 +107,26 @@ func ECPVpDsa(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode i
 	DOct := GetOctet(DStr)
 	defer OctetFree(&DOct)
 
-	rtn := ECPVP_DSA(hashType, &WOct, &MOct, &COct, &DOct)
+	rtn := C.ECPVP_DSA(C.int(hashType), &WOct, &MOct, &COct, &DOct)
 	errorCode = int(rtn)
 	return errorCode
 } 
 
+// Password Based Key Derivation Function. Uses SHA256 internally
+func PBKDF2(hashType int, Pass []byte, Salt []byte, iter int, length int) (Key []byte) {
+	PassStr := string(Pass)
+	PassOct := GetOctet(PassStr)
+	defer OctetFree(&PassOct)
+	SaltStr := string(Salt)
+	SaltOct := GetOctet(SaltStr)
+	defer OctetFree(&SaltOct)
+	KeyOct := GetOctetZero(length)
+	defer OctetFree(&KeyOct)
+
+	C.PBKDF2(C.int(hashType), &PassOct, &SaltOct, C.int(iter), C.int(length), &KeyOct)
+	Key = OctetToBytes(&KeyOct)
+	return Key
+}
 
 
 

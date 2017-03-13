@@ -1,7 +1,7 @@
 /**
- * @file test_rsa.go
+ * @file test_dsa.go
  * @author Alessandro Budroni
- * @brief RSA test
+ * @brief ECDSA test
  *
  * LICENSE
  *
@@ -46,59 +46,49 @@ func main() {
 
 	rng := amcl.CreateCSPRNG(seed)
 
-	// Message to encrypt
-	MESSAGEstr := "Hello World"
-	MESSAGE := []byte(MESSAGEstr)
+	// Set PassPhrase
+	PassPhraseStr := "AlicePassPhrase"
+	PassPhrase := []byte(PassPhraseStr)
 
-	fmt.Printf("MESSAGE: ")
-	fmt.Printf("%s\n\n", MESSAGE[:])
+	fmt.Printf("PassPhrase: ")
+	fmt.Printf("%s\n\n", PassPhrase[:])
+
+	// Set Salt
+	SaltStr := "aabbccddee"
+	Salt := []byte(SaltStr)
+
+	fmt.Printf("Salt: ")
+	fmt.Printf("%s\n\n", Salt[:])
+
 
 	// Generating public/private key pair
 	fmt.Printf("Generating public/private key pair\n")
-	RSA_PrivKey, RSA_PubKey := amcl.RSAKeyPair(&rng, 65537, nil, nil)
 
-	// OAEP encode MESSAGE to e
-	rtn, F := amcl.OAEPencode(amcl.HASH_TYPE_RSA, MESSAGE, &rng, nil)
-	if rtn != 1 {
-		fmt.Println("OAEPencode Error:", rtn)
-		return
-	}
+	// Generate ECC Private Key
+	PrivKey := PBKDF2(SHA256, PassPhrase[:], Salt[:], 1000, EGS)
 
-	fmt.Printf("Encoded MESSAGE: 0x")
-	fmt.Printf("%x\n\n", F[:])
+	fmt.Printf("Private Key: 0x")
+	fmt.Printf("%x\n\n", PrivKey[:])
 
-	// encrypt encoded MESSAGE
-	G := amcl.RSA_ENCRYPT(&RSA_PubKey, F[:])
+	// Generate ECC Key Pair
+	rtn, PrivKey, PubKey := ECPKeyPairGeneate(nil, PrivKey)
+	assert.Equal(t, rtn, 0, "Error - Generating ECC Key Pair")
 
-	fmt.Printf("Encrypted MESSAGE: 0x")
-	fmt.Printf("%x\n\n", G[:])
+	fmt.Printf("Public Key: 0x")
+	fmt.Printf("%x\n\n", PubKey[:])
 
-	// decrypt encrypted MESSAGE
-	ML := amcl.RSA_DECRYPT(&RSA_PrivKey, G[:])
 
-	fmt.Printf("Decrypted MESSAGE: 0x")
-	fmt.Printf("%x\n\n", ML[:])
 
-	// OAEP decode MESSAGE
-	rtn, MESSAGEgot := amcl.OAEPdecode(amcl.HASH_TYPE_RSA, nil, ML[:])
-	if rtn != 1 {
-		fmt.Println("OAEPdecode Error:", rtn)
-		return
-	}
 
-	fmt.Printf("Decoded MESSAGE: ")
-	fmt.Printf("%s\n\n", MESSAGEgot[:])
+
+
 
 	// NOTE - use the following only for testing
-	rtn = int(amcl.OctetComp(MESSAGE,MESSAGEgot))
+	rtn = int(amcl.OctetComp(/**/,/**/))
 	if rtn != 1 {
-		fmt.Println("Error - Message doesn't correspond to the expected one:", rtn)
+		fmt.Println("Error - /**/:", rtn)
 		return
 	}
-
-	// destroy private key
-	fmt.Printf("Destroy private key\n\n")
-	amcl.RSA_PRIVATE_KEY_KILL(&RSA_PrivKey)
 
 
 }
