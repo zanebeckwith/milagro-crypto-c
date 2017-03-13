@@ -26,9 +26,9 @@ import (
 	"github.com/miracl/amcl-go-wrapper"
 )
 
-var HASH_TYPE_MPIN = mpin.SHA256
+var HASH_TYPE_MPIN = amcl.SHA256
 
-func runTest(rng *mpin.MPinRNG) {
+func runTest(rng *amcl.RandNG) {
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -36,11 +36,11 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n\n", ID)
 
 	// Epoch time in days
-	date := mpin.Today()
+	date := amcl.Today()
 	fmt.Println("date: ", date)
 
 	// Epoch time in seconds
-	timeValue := mpin.GetTime()
+	timeValue := amcl.GetTime()
 	fmt.Println("timeValue: ", timeValue)
 
 	// PIN variable to create token
@@ -53,7 +53,7 @@ func runTest(rng *mpin.MPinRNG) {
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := mpin.RandomGenerate(rng)
+	rtn, MS1 := amcl.RandomGenerate(rng)
 	if rtn != 0 {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
@@ -62,7 +62,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := mpin.RandomGenerate(rng)
+	rtn, MS2 := amcl.RandomGenerate(rng)
 	if rtn != 0 {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
@@ -71,10 +71,10 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := mpin.HashId(HASH_TYPE_MPIN, ID)
+	HCID := amcl.HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	rtn, SS1 := mpin.GetServerSecret(MS1[:])
+	rtn, SS1 := amcl.GetServerSecret(MS1[:])
 	if rtn != 0 {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
@@ -83,7 +83,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", SS1[:])
 
 	// Generate server secret share 2
-	rtn, SS2 := mpin.GetServerSecret(MS2[:])
+	rtn, SS2 := amcl.GetServerSecret(MS2[:])
 	if rtn != 0 {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
@@ -92,7 +92,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", SS2[:])
 
 	// Combine server secret shares
-	rtn, SS := mpin.RecombineG2(SS1[:], SS2[:])
+	rtn, SS := amcl.RecombineG2(SS1[:], SS2[:])
 	if rtn != 0 {
 		fmt.Println("RecombineG2(SS1, SS2) Error:", rtn)
 		return
@@ -101,7 +101,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", SS[:])
 
 	// Generate client secret share 1
-	rtn, CS1 := mpin.GetClientSecret(MS1[:], HCID)
+	rtn, CS1 := amcl.GetClientSecret(MS1[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
@@ -110,7 +110,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", CS1[:])
 
 	// Generate client secret share 2
-	rtn, CS2 := mpin.GetClientSecret(MS2[:], HCID)
+	rtn, CS2 := amcl.GetClientSecret(MS2[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
@@ -119,8 +119,8 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, mpin.G1S)
-	rtn, CS = mpin.RecombineG1(CS1[:], CS2[:])
+	CS := make([]byte, amcl.G1S)
+	rtn, CS = amcl.RecombineG1(CS1[:], CS2[:])
 	if rtn != 0 {
 		fmt.Println("RecombineG1 Error:", rtn)
 		return
@@ -129,7 +129,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", CS[:])
 
 	// Generate time permit share 1
-	rtn, TP1 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	rtn, TP1 := amcl.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientPermit Error:", rtn)
 		return
@@ -138,7 +138,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", TP1[:])
 
 	// Generate time permit share 2
-	rtn, TP2 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	rtn, TP2 := amcl.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientPermit Error:", rtn)
 		return
@@ -147,7 +147,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", TP2[:])
 
 	// Combine time permit shares
-	rtn, TP := mpin.RecombineG1(TP1[:], TP2[:])
+	rtn, TP := amcl.RecombineG1(TP1[:], TP2[:])
 	if rtn != 0 {
 		fmt.Println("RecombineG1(TP1, TP2) Error:", rtn)
 		return
@@ -159,7 +159,7 @@ func runTest(rng *mpin.MPinRNG) {
 		fmt.Scan(&PIN1)
 	}
 
-	rtn, TOKEN := mpin.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	rtn, TOKEN := amcl.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d\n", rtn)
 		return
@@ -175,10 +175,10 @@ func runTest(rng *mpin.MPinRNG) {
 	}
 
 	// Send U, UT, V, timeValue and Message to server
-	var X [mpin.PGS]byte
+	var X [amcl.PGS]byte
 	fmt.Printf("X: 0x")
 	fmt.Printf("%x\n", X[:])
-	rtn, XOut, Y1, SEC, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	rtn, XOut, Y1, SEC, U, UT := amcl.Client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
 		return
@@ -191,7 +191,7 @@ func runTest(rng *mpin.MPinRNG) {
 	fmt.Printf("%x\n", SEC[:])
 
 	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
+	rtn, HID, HTID, Y2, E, F := amcl.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}
@@ -204,7 +204,7 @@ func runTest(rng *mpin.MPinRNG) {
 
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)
-		err := mpin.Kangaroo(E[:], F[:])
+		err := amcl.Kangaroo(E[:], F[:])
 		if err != 0 {
 			fmt.Printf("PIN Error %d\n", err)
 		}
@@ -222,7 +222,7 @@ func main() {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := mpin.CreateCSPRNG(seed)
+	rng := amcl.CreateCSPRNG(seed)
 
 	runTest(&rng)
 }

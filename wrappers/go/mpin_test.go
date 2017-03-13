@@ -1173,6 +1173,10 @@ func TestOctets(t *testing.T) {
 
 	c := GetOctet(string([]byte{1, 2, 3}))
 	h := OctetToHex(&c)
+
+	rtn := int(OctetComp([]byte{1,2,3,4,5,6,7,8,9},[]byte{1,2,3,4,5,6,7,8,9}))
+	assert.Equal(t, rtn, 1, "Value should match 1")
+
 	assert.Equal(t, "010203", h, "Octet convertion should match")
 	s := OctetToString(&c)
 	assert.Equal(t, "\x01\x02\x03", s, "Octet convertion should match")
