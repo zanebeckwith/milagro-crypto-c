@@ -1,7 +1,7 @@
 /**
  * @file test_dsa.go
  * @author Alessandro Budroni
- * @brief ECDSA test
+ * @brief ECDSA test wit random private key
  *
  * LICENSE
  *
