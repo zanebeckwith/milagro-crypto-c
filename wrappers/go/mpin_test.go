@@ -56,7 +56,7 @@ func TestGoodPIN(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -179,7 +179,7 @@ func TestBadPIN(t *testing.T) {
 	PIN2 := 1235
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -302,7 +302,7 @@ func TestBadToken(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -550,7 +550,7 @@ func TestGoodSignature(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -673,7 +673,7 @@ func TestSignatureExpired(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -797,7 +797,7 @@ func TestBadSignature(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -916,7 +916,7 @@ func TestPINError(t *testing.T) {
 	PIN2 := 2235
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -1023,7 +1023,7 @@ func TestPINError(t *testing.T) {
 }
 
 func TestMPINFull(t *testing.T) {
-	want := "4e0317c9962dc2944c121ec41c800e16"
+	want := "eff944ed1595b7cb9511de39348df899"
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -1040,7 +1040,7 @@ func TestMPINFull(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -1218,7 +1218,7 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -1351,7 +1351,7 @@ func TestTwoPassBadPIN(t *testing.T) {
 	PIN2 := 1235
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -1487,7 +1487,7 @@ func TestTwoPassBadToken(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")

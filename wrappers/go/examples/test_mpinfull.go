@@ -49,7 +49,7 @@ func main() {
 	PIN2 := -1
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
