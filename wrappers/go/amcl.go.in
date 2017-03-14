@@ -171,3 +171,14 @@ func OctetComp(O1 []byte, O2 []byte) int {
 func OctetClear(valOctet *C.octet) {
 	C.OCT_clear(valOctet)
 }
+
+// Set memory of slice to zero
+func CleanMemory(arr []byte) {
+	if len(arr) == 0 {
+		return
+	}
+	arr[0] = 0
+	for i := 1; i < len(arr); i *= 2 {
+		copy(arr[i:], arr[:i])
+	}
+}

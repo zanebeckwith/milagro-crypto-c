@@ -23,7 +23,7 @@
  * under the License.
  */
 
- package main
+package main
 
 import (
 	"encoding/hex"
@@ -34,7 +34,7 @@ import (
 
 func main() {
 
-	var rtn int;
+	var rtn int
 
 	// Seed value for Random Number Generator (RNG)
 	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
@@ -55,6 +55,9 @@ func main() {
 		fmt.Println("Error - Generating ECC Key Pair!\n", rtn)
 		return
 	}
+
+	// Destroy Private Key
+	defer amcl.CleanMemory(PrivKey[:])
 
 	fmt.Printf("Private Key: 0x")
 	fmt.Printf("%x\n\n", PrivKey[:])
@@ -92,7 +95,6 @@ func main() {
 	rtn = amcl.ECPVpDsa(amcl.SHA256, PubKey[:], MESSAGE[:], C[:], D[:])
 	if rtn != 0 {
 		fmt.Println("Error - ECDSA Verification Failed!\n", rtn)
-		return
 	} else {
 		fmt.Println("ECDSA Signature Valid!\n")
 	}
