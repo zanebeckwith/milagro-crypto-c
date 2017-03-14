@@ -283,6 +283,36 @@ int mpin(csprng *RNG)
     printf("Server Key = ");
     OCT_output(&SK);
 #endif
+
+    /* clear memory */
+    OCT_clear(&S);
+    OCT_clear(&X);
+    OCT_clear(&Y);
+    OCT_clear(&H);
+    OCT_clear(&CLIENT_ID);
+    OCT_clear(&SST);
+    OCT_clear(&TOKEN);
+    OCT_clear(&SEC);
+    OCT_clear(&PERMIT);
+    OCT_clear(&xCID);
+    OCT_clear(&xID);
+    OCT_clear(&HCID);
+    OCT_clear(&HSID);
+    OCT_clear(&HID);
+    OCT_clear(&HTID);
+    OCT_clear(&E);
+    OCT_clear(&F);
+#ifdef FULL
+    OCT_clear(&R);
+    OCT_clear(&Z);
+    OCT_clear(&W);
+    OCT_clear(&T);
+    OCT_clear(&G1);
+    OCT_clear(&G2);
+    OCT_clear(&SK);
+    OCT_clear(&CK);
+#endif
+
     return 0;
 }
 
@@ -293,18 +323,21 @@ int main()
 
     char raw[100];
     octet RAW= {0,sizeof(raw),raw};
-    csprng RNG;                /* Crypto Strong RNG */
+    /* Crypto Strong RNG */
+    csprng RNG;                
 
     time((time_t *)&ran);
 
-    RAW.len=100;				/* fake random seed source */
+    /* fake random seed source */
+    RAW.len=100;				
     RAW.val[0]=ran;
     RAW.val[1]=ran>>8;
     RAW.val[2]=ran>>16;
     RAW.val[3]=ran>>24;
     for (i=0; i<100; i++) RAW.val[i]=i+1;
 
-    CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
+    /* initialise strong RNG */
+    CREATE_CSPRNG(&RNG,&RAW);   
 
     mpin(&RNG);
 

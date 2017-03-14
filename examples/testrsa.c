@@ -69,10 +69,12 @@ int rsa(csprng *RNG)
 
     RSA_PRIVATE_KEY_KILL(&priv);
 
+    /* clear memory */
     OCT_clear(&M);
-    OCT_clear(&ML);   /* clean up afterwards */
+    OCT_clear(&ML);   
     OCT_clear(&C);
     OCT_clear(&E);
+    OCT_clear(&S);
 
     return 0;
 }
