@@ -23,7 +23,7 @@
  * under the License.
  */
 
- package main
+package main
 
 import (
 	"encoding/hex"
@@ -34,7 +34,7 @@ import (
 
 func main() {
 
-	var rtn int;
+	var rtn int
 
 	// Seed value for Random Number Generator (RNG)
 	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
@@ -90,7 +90,7 @@ func main() {
 	fmt.Printf("%s\n\n", MESSAGEgot[:])
 
 	// NOTE - use the following only for testing
-	rtn = int(amcl.OctetComp(MESSAGE,MESSAGEgot))
+	rtn = int(amcl.OctetComp(MESSAGE, MESSAGEgot))
 	if rtn != 1 {
 		fmt.Println("Error - Message doesn't correspond to the expected one:", rtn)
 		return
@@ -99,6 +99,5 @@ func main() {
 	// destroy private key
 	fmt.Printf("Destroy private key\n\n")
 	amcl.RSA_PRIVATE_KEY_KILL(&RSA_PrivKey)
-
 
 }
