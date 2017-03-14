@@ -79,6 +79,7 @@ func CreateCSPRNG(SEED []byte) RandNG {
 
 // OctetFree frees memory associated with an octet
 func OctetFree(valOctet *C.octet) {
+	OctetClear(valOctet)
 	C.free(unsafe.Pointer(valOctet.val))
 }
 
@@ -164,4 +165,9 @@ func OctetComp(O1 []byte, O2 []byte) int {
 	defer OctetFree(&Oct2)
 	rtn := C.OCT_comp(&Oct1, &Oct2)
 	return int(rtn)
+}
+
+// Wipe clean an octet
+func OctetClear(valOctet *C.octet) {
+	C.OCT_clear(valOctet)
 }
