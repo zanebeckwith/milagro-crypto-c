@@ -46,40 +46,21 @@ func main() {
 
 	rng := amcl.CreateCSPRNG(seed)
 
-	// Set PassPhrase
-	PassPhraseStr := "AlicePassPhrase"
-	PassPhrase := []byte(PassPhraseStr)
-
-	fmt.Printf("PassPhrase: ")
-	fmt.Printf("%s\n\n", PassPhrase[:])
-
-	// Set Salt
-	SaltStr := "aabbccddee"
-	Salt := []byte(SaltStr)
-
-	fmt.Printf("Salt: ")
-	fmt.Printf("%s\n\n", Salt[:])
-
-
 	// Generating public/private key pair
 	fmt.Printf("Generating public/private key pair...\n\n")
 
-	// Generate ECC Private Key
-	PrivKey := amcl.PBKDF2(amcl.SHA256, PassPhrase[:], Salt[:], 1000, amcl.EGS)
-
-	fmt.Printf("Private Key: 0x")
-	fmt.Printf("%x\n\n", PrivKey[:])
-
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := amcl.ECPKeyPairGeneate(nil, PrivKey)
+	rtn, PrivKey, PubKey := amcl.ECPKeyPairGeneate(&rng, nil)
 	if rtn != 0 {
 		fmt.Println("Error - Generating ECC Key Pair!\n", rtn)
 		return
 	}
 
+	fmt.Printf("Private Key: 0x")
+	fmt.Printf("%x\n\n", PrivKey[:])
+
 	fmt.Printf("Public Key: 0x")
 	fmt.Printf("%x\n\n", PubKey[:])
-
 
 	// Validate ECC Public Key
 	rtn = amcl.ECPPublicKeyValidate(1, PubKey[:])
