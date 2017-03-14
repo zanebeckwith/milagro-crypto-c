@@ -162,6 +162,6 @@ func OctetComp(O1 []byte, O2 []byte) int {
 	O2Str := string(O2)
 	Oct2 := GetOctet(O2Str)
 	defer OctetFree(&Oct2)
-	rtn := C.OCT_comp(&Oct1,&Oct2)
+	rtn := C.OCT_comp(&Oct1, &Oct2)
 	return int(rtn)
 }

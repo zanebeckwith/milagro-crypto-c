@@ -71,7 +71,7 @@ int rsa(csprng *RNG)
 
     /* clear memory */
     OCT_clear(&M);
-    OCT_clear(&ML);   
+    OCT_clear(&ML);
     OCT_clear(&C);
     OCT_clear(&E);
     OCT_clear(&S);
