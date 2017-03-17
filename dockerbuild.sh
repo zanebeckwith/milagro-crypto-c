@@ -38,7 +38,7 @@ FROM ${DOCKERDEV}
 RUN mkdir -p ${PRJPATH}
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
-RUN GOPATH=/root go get github.com/stretchr/testify/assert && \
+RUN GOPATH=/root go get -u -v github.com/stretchr/testify/assert && \
 make ${MAKETARGET} || (echo \$? > target/make.exit)
 EOM
 
