@@ -46,7 +46,7 @@ func TestECDSARandom(t *testing.T) {
 	rng := CreateCSPRNG(seed)
 
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := ECPKeyPairGeneate(&rng, nil)
+	rtn, PrivKey, PubKey := ECPKeyPairGenerate(&rng, nil)
 	assert.Equal(t, rtn, 0, "Error - Generating ECC Key Pair")
 
 	// Destroy Private Key
@@ -95,7 +95,7 @@ func TestECDSA(t *testing.T) {
 	defer CleanMemory(PrivKey[:])
 
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := ECPKeyPairGeneate(nil, PrivKey)
+	rtn, PrivKey, PubKey := ECPKeyPairGenerate(nil, PrivKey)
 	assert.Equal(t, rtn, 0, "Error - Generating ECC Key Pair")
 
 	// Validate ECC Public Key
