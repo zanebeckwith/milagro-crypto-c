@@ -77,7 +77,7 @@ func main() {
 	fmt.Printf("%x\n\n", PrivKey[:])
 
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := amcl.ECPKeyPairGeneate(nil, PrivKey)
+	rtn, PrivKey, PubKey := amcl.ECPKeyPairGenerate(nil, PrivKey)
 	if rtn != 0 {
 		fmt.Println("Error - Generating ECC Key Pair!\n", rtn)
 		return

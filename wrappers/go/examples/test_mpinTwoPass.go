@@ -73,7 +73,7 @@ func main() {
 	fmt.Printf("MS2: 0x")
 	fmt.Printf("%x\n", MS2[:])
 
-	// Destroy
+	// Destroy MS2
 	defer amcl.CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
@@ -229,19 +229,10 @@ func main() {
 	defer amcl.CleanMemory(XOut[:])
 	// Destroy SEC
 	defer amcl.CleanMemory(SEC[:])
-	// Destroy U
-	defer amcl.CleanMemory(U[:])
-	// Destroy UT
-	defer amcl.CleanMemory(UT[:])
 
 	//////   Server Pass 1  //////
 	/* Calculate H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
 	HID, HTID := amcl.Server1(HASH_TYPE_MPIN, date, ID)
-
-	// Destroy HID
-	defer amcl.CleanMemory(HID[:])
-	// Destroy HTID
-	defer amcl.CleanMemory(HTID[:])
 
 	/* Send Y to Client */
 	rtn, Y := amcl.RandomGenerate(&rng)

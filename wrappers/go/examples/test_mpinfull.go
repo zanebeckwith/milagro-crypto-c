@@ -88,9 +88,6 @@ func main() {
 	// Either Client or TA calculates Hash(ID)
 	HCID := amcl.HashId(HASH_TYPE_MPIN, ID)
 
-	// Destroy HCID
-	defer amcl.CleanMemory(HCID[:])
-
 	// Generate server secret share 1
 	rtn, SS1 := amcl.GetServerSecret(MS1[:])
 	if rtn != 0 {
@@ -254,10 +251,6 @@ func main() {
 	defer amcl.CleanMemory(XOut[:])
 	// Destroy V
 	defer amcl.CleanMemory(V[:])
-	// Destroy U
-	defer amcl.CleanMemory(U[:])
-	// Destroy UT
-	defer amcl.CleanMemory(UT[:])
 
 	// Send Z=r.ID to Server
 	var R [amcl.PGS]byte
@@ -288,10 +281,6 @@ func main() {
 
 	// Destroy Y2
 	defer amcl.CleanMemory(Y2[:])
-	// Destroy HID
-	defer amcl.CleanMemory(HID[:])
-	// Destroy HTID
-	defer amcl.CleanMemory(HTID[:])
 	// Destroy E
 	defer amcl.CleanMemory(E[:])
 	// Destroy F

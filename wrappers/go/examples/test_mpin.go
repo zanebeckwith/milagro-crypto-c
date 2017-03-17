@@ -79,11 +79,6 @@ func runTest(rng *amcl.RandNG) {
 	// Either Client or TA calculates Hash(ID)
 	HCID := amcl.HashId(HASH_TYPE_MPIN, ID)
 
-	// Destroy ID
-	defer amcl.CleanMemory(ID[:])
-	// Destroy HCID
-	defer amcl.CleanMemory(HCID[:])
-
 	// Generate server secret share 1
 	rtn, SS1 := amcl.GetServerSecret(MS1[:])
 	if rtn != 0 {
@@ -237,10 +232,6 @@ func runTest(rng *amcl.RandNG) {
 	defer amcl.CleanMemory(XOut[:])
 	// Destroy SEC
 	defer amcl.CleanMemory(SEC[:])
-	// Destroy U
-	defer amcl.CleanMemory(U[:])
-	// Destroy UT
-	defer amcl.CleanMemory(UT[:])
 	// Destroy X
 	defer amcl.CleanMemory(X[:])
 
@@ -258,10 +249,6 @@ func runTest(rng *amcl.RandNG) {
 
 	// Destroy Y2
 	defer amcl.CleanMemory(Y2[:])
-	// Destroy HID
-	defer amcl.CleanMemory(HID[:])
-	// Destroy HTID
-	defer amcl.CleanMemory(HTID[:])
 	// Destroy E
 	defer amcl.CleanMemory(E[:])
 	// Destroy F

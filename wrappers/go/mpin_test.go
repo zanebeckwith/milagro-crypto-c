@@ -1023,7 +1023,6 @@ func TestPINError(t *testing.T) {
 }
 
 func TestMPINFull(t *testing.T) {
-	want := "eff944ed1595b7cb9511de39348df899"
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -1186,21 +1185,16 @@ func TestMPINFull(t *testing.T) {
 	defer CleanMemory(HM[:])
 
 	_, AES_KEY_SERVER := ServerKey(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
-	got := hex.EncodeToString(AES_KEY_SERVER[:])
-	if got != want {
-		t.Errorf("%s != %s", want, got)
-	}
 
 	// Destroy AES_KEY_SERVER
 	defer CleanMemory(AES_KEY_SERVER[:])
 
 	_, AES_KEY_CLIENT := ClientKey(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
-	got = hex.EncodeToString(AES_KEY_CLIENT[:])
 
 	// Destroy AES_KEY_CLIENT
 	defer CleanMemory(AES_KEY_CLIENT[:])
 
-	assert.Equal(t, want, got, "Should be equal")
+	assert.Equal(t, AES_KEY_SERVER, AES_KEY_CLIENT, "Should be equal")
 }
 
 func TestTwoPassGoodPIN(t *testing.T) {
