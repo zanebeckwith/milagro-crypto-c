@@ -46,8 +46,11 @@ func TestECDSARandom(t *testing.T) {
 	rng := CreateCSPRNG(seed)
 
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := ECPKeyPairGeneate(&rng, nil)
+	rtn, PrivKey, PubKey := ECPKeyPairGenerate(&rng, nil)
 	assert.Equal(t, rtn, 0, "Error - Generating ECC Key Pair")
+
+	// Destroy Private Key
+	defer CleanMemory(PrivKey[:])
 
 	// Validate ECC Public Key
 	rtn = ECPPublicKeyValidate(1, PubKey[:])
@@ -66,7 +69,6 @@ func TestECDSARandom(t *testing.T) {
 	assert.Equal(t, rtn, 0, "Error - ECDSA Verification Failed!")
 
 }
-
 
 func TestECDSA(t *testing.T) {
 
@@ -89,8 +91,11 @@ func TestECDSA(t *testing.T) {
 	// Generate ECC Private Key
 	PrivKey := PBKDF2(SHA256, PassPhrase[:], Salt[:], 1000, EGS)
 
+	// Destroy Private Key
+	defer CleanMemory(PrivKey[:])
+
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := ECPKeyPairGeneate(nil, PrivKey)
+	rtn, PrivKey, PubKey := ECPKeyPairGenerate(nil, PrivKey)
 	assert.Equal(t, rtn, 0, "Error - Generating ECC Key Pair")
 
 	// Validate ECC Public Key
@@ -110,6 +115,3 @@ func TestECDSA(t *testing.T) {
 	assert.Equal(t, rtn, 0, "Error - ECDSA Verification Failed!")
 
 }
-
-
-

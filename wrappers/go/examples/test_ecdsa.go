@@ -23,7 +23,7 @@
  * under the License.
  */
 
- package main
+package main
 
 import (
 	"encoding/hex"
@@ -34,7 +34,7 @@ import (
 
 func main() {
 
-	var rtn int;
+	var rtn int
 
 	// Seed value for Random Number Generator (RNG)
 	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
@@ -60,18 +60,24 @@ func main() {
 	fmt.Printf("Salt: ")
 	fmt.Printf("%s\n\n", Salt[:])
 
-
 	// Generating public/private key pair
 	fmt.Printf("Generating public/private key pair...\n\n")
 
 	// Generate ECC Private Key
 	PrivKey := amcl.PBKDF2(amcl.SHA256, PassPhrase[:], Salt[:], 1000, amcl.EGS)
 
+	// Destroy Private Key
+	defer amcl.CleanMemory(PrivKey[:])
+	// Destroy Salt
+	defer amcl.CleanMemory(Salt[:])
+	// Destroy Passphrase
+	defer amcl.CleanMemory(PassPhrase[:])
+
 	fmt.Printf("Private Key: 0x")
 	fmt.Printf("%x\n\n", PrivKey[:])
 
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := amcl.ECPKeyPairGeneate(nil, PrivKey)
+	rtn, PrivKey, PubKey := amcl.ECPKeyPairGenerate(nil, PrivKey)
 	if rtn != 0 {
 		fmt.Println("Error - Generating ECC Key Pair!\n", rtn)
 		return
@@ -79,7 +85,6 @@ func main() {
 
 	fmt.Printf("Public Key: 0x")
 	fmt.Printf("%x\n\n", PubKey[:])
-
 
 	// Validate ECC Public Key
 	rtn = amcl.ECPPublicKeyValidate(1, PubKey[:])
@@ -111,7 +116,6 @@ func main() {
 	rtn = amcl.ECPVpDsa(amcl.SHA256, PubKey[:], MESSAGE[:], C[:], D[:])
 	if rtn != 0 {
 		fmt.Println("Error - ECDSA Verification Failed!\n", rtn)
-		return
 	} else {
 		fmt.Println("ECDSA Signature Valid!\n")
 	}

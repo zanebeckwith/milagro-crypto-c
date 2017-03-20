@@ -59,6 +59,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
 	}
+	// Destroy MS1
+	defer amcl.CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
 	rtn, MS2 := amcl.RandomGenerate(rng)
@@ -66,6 +68,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
 	}
+	// Destroy MS2
+	defer amcl.CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := amcl.HashId(HASH_TYPE_MPIN, ID)
@@ -76,6 +80,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
 	}
+	// Destroy SS1
+	defer amcl.CleanMemory(SS1[:])
 
 	// Generate server secret share 2
 	rtn, SS2 := amcl.GetServerSecret(MS2[:])
@@ -83,6 +89,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
 	}
+	// Destroy SS2
+	defer amcl.CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	rtn, SS := amcl.RecombineG2(SS1[:], SS2[:])
@@ -90,6 +98,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("RecombineG2(SS1, SS2) Error:", rtn)
 		return
 	}
+	// Destroy SS
+	defer amcl.CleanMemory(SS[:])
 
 	// Generate client secret share 1
 	rtn, CS1 := amcl.GetClientSecret(MS1[:], HCID)
@@ -97,6 +107,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
 	}
+	// Destroy CS1
+	defer amcl.CleanMemory(CS1[:])
 
 	// Generate client secret share 2
 	rtn, CS2 := amcl.GetClientSecret(MS2[:], HCID)
@@ -104,6 +116,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
 	}
+	// Destroy CS2
+	defer amcl.CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, amcl.G1S)
@@ -112,6 +126,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("RecombineG1 Error:", rtn, SS, CS)
 		return
 	}
+	// Destroy CS
+	defer amcl.CleanMemory(CS[:])
 
 	// Generate time permit share 1
 	rtn, TP1 := amcl.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
@@ -119,6 +135,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("GetClientPermit Error:", rtn)
 		return
 	}
+	// Destroy TP1
+	defer amcl.CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	rtn, TP2 := amcl.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
@@ -126,6 +144,8 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("GetClientPermit Error:", rtn)
 		return
 	}
+	// Destroy TP2
+	defer amcl.CleanMemory(TP2[:])
 
 	// Combine time permit shares
 	rtn, TP := amcl.RecombineG1(TP1[:], TP2[:])
@@ -133,11 +153,16 @@ func run(rng *amcl.RandNG) {
 		fmt.Println("RecombineG1(TP1, TP2) Error:", rtn, TP)
 		return
 	}
+	// Destroy TP
+	defer amcl.CleanMemory(TP[:])
+
 	rtn, TOKEN := amcl.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d\n", rtn)
 		return
 	}
+	// Destroy TOKEN
+	defer amcl.CleanMemory(TOKEN[:])
 
 	// --- Client ---
 	// Send U, UT, V, timeValue and Message to server
@@ -167,7 +192,7 @@ func run(rng *amcl.RandNG) {
 
 func main() {
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")

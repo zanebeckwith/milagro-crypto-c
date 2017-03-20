@@ -56,7 +56,7 @@ func TestGoodPIN(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -71,8 +71,14 @@ func TestGoodPIN(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -80,37 +86,70 @@ func TestGoodPIN(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	if USE_ANONYMOUS {
 		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
@@ -140,7 +179,7 @@ func TestBadPIN(t *testing.T) {
 	PIN2 := 1235
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -155,8 +194,14 @@ func TestBadPIN(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -164,37 +209,70 @@ func TestBadPIN(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	if USE_ANONYMOUS {
 		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
@@ -224,7 +302,7 @@ func TestBadToken(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -239,8 +317,14 @@ func TestBadToken(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -248,37 +332,70 @@ func TestBadToken(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, _, _, _, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	// Send UT as V to model bad token
 	if USE_ANONYMOUS {
@@ -321,8 +438,14 @@ func TestRandom(t *testing.T) {
 		// Generate Master Secret Share 1
 		_, MS1 := RandomGenerate(&rng)
 
+		// Destroy MS1
+		defer CleanMemory(MS1[:])
+
 		// Generate Master Secret Share 2
 		_, MS2 := RandomGenerate(&rng)
+
+		// Destroy MS2
+		defer CleanMemory(MS2[:])
 
 		// Either Client or TA calculates Hash(ID)
 		HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -330,37 +453,70 @@ func TestRandom(t *testing.T) {
 		// Generate server secret share 1
 		_, SS1 := GetServerSecret(MS1[:])
 
+		// Destroy SS1
+		defer CleanMemory(SS1[:])
+
 		// Generate server secret share 2
 		_, SS2 := GetServerSecret(MS2[:])
+
+		// Destroy SS2
+		defer CleanMemory(SS2[:])
 
 		// Combine server secret shares
 		_, SS := RecombineG2(SS1[:], SS2[:])
 
+		// Destroy SS
+		defer CleanMemory(SS[:])
+
 		// Generate client secret share 1
 		_, CS1 := GetClientSecret(MS1[:], HCID)
 
+		// Destroy CS1
+		defer CleanMemory(CS1[:])
+
 		// Generate client secret share 2
 		_, CS2 := GetClientSecret(MS2[:], HCID)
+
+		// Destroy CS2
+		defer CleanMemory(CS2[:])
 
 		// Combine client secret shares
 		CS := make([]byte, G1S)
 		_, CS = RecombineG1(CS1[:], CS2[:])
 
+		// Destroy CS
+		defer CleanMemory(CS[:])
+
 		// Generate time permit share 1
 		_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+		// Destroy TP1
+		defer CleanMemory(TP1[:])
 
 		// Generate time permit share 2
 		_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+		// Destroy TP2
+		defer CleanMemory(TP2[:])
+
 		// Combine time permit shares
 		_, TP := RecombineG1(TP1[:], TP2[:])
+
+		// Destroy TP
+		defer CleanMemory(TP[:])
 
 		// Create token
 		_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+		// Destroy TOKEN
+		defer CleanMemory(TOKEN[:])
+
 		// Send U, UT, V, timeValue and Message to server
 		var X [PGS]byte
 		_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+		// Destroy X
+		defer CleanMemory(X[:])
 
 		if USE_ANONYMOUS {
 			got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
@@ -394,7 +550,7 @@ func TestGoodSignature(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -405,8 +561,14 @@ func TestGoodSignature(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -414,37 +576,70 @@ func TestGoodSignature(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	// Authenticate
 	if USE_ANONYMOUS {
@@ -478,7 +673,7 @@ func TestSignatureExpired(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -489,8 +684,14 @@ func TestSignatureExpired(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -498,37 +699,70 @@ func TestSignatureExpired(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	timeValue += 10
 	// Authenticate
@@ -563,7 +797,7 @@ func TestBadSignature(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -574,8 +808,14 @@ func TestBadSignature(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -583,37 +823,70 @@ func TestBadSignature(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	// Authenticate
 	MESSAGE[0] = 00
@@ -643,7 +916,7 @@ func TestPINError(t *testing.T) {
 	PIN2 := 2235
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -657,8 +930,14 @@ func TestPINError(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -666,37 +945,70 @@ func TestPINError(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	var E []byte
 	var F []byte
@@ -711,7 +1023,6 @@ func TestPINError(t *testing.T) {
 }
 
 func TestMPINFull(t *testing.T) {
-	want := "4e0317c9962dc2944c121ec41c800e16"
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -728,7 +1039,7 @@ func TestMPINFull(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -742,8 +1053,14 @@ func TestMPINFull(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -751,44 +1068,87 @@ func TestMPINFull(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Precomputation
 	_, G1, G2 := Precompute(TOKEN[:], HCID)
+
+	// Destroy G1
+	defer CleanMemory(G1[:])
+	// Destroy G2
+	defer CleanMemory(G2[:])
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
 	_, XOut, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 
+	// Destroy XOut
+	defer CleanMemory(XOut[:])
+
 	// Send Z=r.ID to Server
 	var R [PGS]byte
 	_, ROut, Z := GetG1Multiple(&rng, 1, R[:], HCID[:])
+
+	// Destroy ROut
+	defer CleanMemory(ROut[:])
+	// Destroy Z
+	defer CleanMemory(Z[:])
 
 	// Authenticate
 	var HID []byte
@@ -800,23 +1160,41 @@ func TestMPINFull(t *testing.T) {
 		_, HID, HTID, Y, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
 	}
 
+	// Destroy HID
+	defer CleanMemory(HID[:])
+	// Destroy HTID
+	defer CleanMemory(HTID[:])
+	// Destroy Y
+	defer CleanMemory(Y[:])
+
 	// send T=w.ID to client
 	var W [PGS]byte
 	_, WOut, T := GetG1Multiple(&rng, 0, W[:], HTID[:])
 
+	// Destroy W
+	defer CleanMemory(W[:])
+	// Destroy WOut
+	defer CleanMemory(WOut[:])
+	// Destroy T
+	defer CleanMemory(T[:])
+
 	// Hash all values
 	HM := HashAll(HASH_TYPE_MPIN, HCID[:], U[:], UT[:], Y[:], V[:], Z[:], T[:])
 
+	// Destroy HM
+	defer CleanMemory(HM[:])
+
 	_, AES_KEY_SERVER := ServerKey(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
-	got := hex.EncodeToString(AES_KEY_SERVER[:])
-	if got != want {
-		t.Errorf("%s != %s", want, got)
-	}
+
+	// Destroy AES_KEY_SERVER
+	defer CleanMemory(AES_KEY_SERVER[:])
 
 	_, AES_KEY_CLIENT := ClientKey(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
-	got = hex.EncodeToString(AES_KEY_CLIENT[:])
 
-	assert.Equal(t, want, got, "Should be equal")
+	// Destroy AES_KEY_CLIENT
+	defer CleanMemory(AES_KEY_CLIENT[:])
+
+	assert.Equal(t, AES_KEY_SERVER, AES_KEY_CLIENT, "Should be equal")
 }
 
 func TestTwoPassGoodPIN(t *testing.T) {
@@ -834,7 +1212,7 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -845,8 +1223,14 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -854,37 +1238,70 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Client Pass 1
 	var X [PGS]byte
 	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+
+	// Destroy X
+	defer CleanMemory(X[:])
 
 	// Server Pass 1
 	var HID []byte
@@ -896,11 +1313,20 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	}
 	_, Y := RandomGenerate(&rng)
 
+	// Destroy HID
+	defer CleanMemory(HID[:])
+	// Destroy HTID
+	defer CleanMemory(HTID[:])
+
 	// Client Pass 2
 	_, V := Client2(XOut[:], Y[:], SEC[:])
 
+	// Destroy V
+	defer CleanMemory(V[:])
+
 	// Server Pass 2
 	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -919,7 +1345,7 @@ func TestTwoPassBadPIN(t *testing.T) {
 	PIN2 := 1235
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -930,8 +1356,14 @@ func TestTwoPassBadPIN(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -939,37 +1371,72 @@ func TestTwoPassBadPIN(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Client Pass 1
 	var X [PGS]byte
 	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+
+	// Destroy XOut
+	defer CleanMemory(XOut[:])
+	// Destroy SEC
+	defer CleanMemory(SEC[:])
 
 	// Server Pass 1
 	var HID []byte
@@ -981,8 +1448,18 @@ func TestTwoPassBadPIN(t *testing.T) {
 	}
 	_, Y := RandomGenerate(&rng)
 
+	// Destroy HID
+	defer CleanMemory(HID[:])
+	// Destroy HTID
+	defer CleanMemory(HTID[:])
+	// Destroy Y
+	defer CleanMemory(Y[:])
+
 	// Client Pass 2
 	_, V := Client2(XOut[:], Y[:], SEC[:])
+
+	// Destroy V
+	defer CleanMemory(V[:])
 
 	// Server Pass 2
 	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
@@ -1004,7 +1481,7 @@ func TestTwoPassBadToken(t *testing.T) {
 	PIN2 := 1234
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
@@ -1015,8 +1492,14 @@ func TestTwoPassBadToken(t *testing.T) {
 	// Generate Master Secret Share 1
 	_, MS1 := RandomGenerate(&rng)
 
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
 	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -1024,37 +1507,72 @@ func TestTwoPassBadToken(t *testing.T) {
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret(MS1[:])
 
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
 	// Generate server secret share 2
 	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
 	_, SS := RecombineG2(SS1[:], SS2[:])
 
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
 	// Generate client secret share 1
 	_, CS1 := GetClientSecret(MS1[:], HCID)
 
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
 	// Generate client secret share 2
 	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
 	CS := make([]byte, G1S)
 	_, CS = RecombineG1(CS1[:], CS2[:])
 
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
 	// Generate time permit share 1
 	_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+	// Destroy TP1
+	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
 	_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+	// Destroy TP2
+	defer CleanMemory(TP2[:])
+
 	// Combine time permit shares
 	_, TP := RecombineG1(TP1[:], TP2[:])
+
+	// Destroy TP
+	defer CleanMemory(TP[:])
 
 	// Create token
 	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
 	// Client Pass 1
 	var X [PGS]byte
 	_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+
+	// Destroy XOut
+	defer CleanMemory(XOut[:])
+	// Destroy SEC
+	defer CleanMemory(SEC[:])
 
 	// Server Pass 1
 	var HID []byte
@@ -1065,6 +1583,13 @@ func TestTwoPassBadToken(t *testing.T) {
 		HID, HTID = Server1(HASH_TYPE_MPIN, date, ID)
 	}
 	_, Y := RandomGenerate(&rng)
+
+	// Destroy HID
+	defer CleanMemory(HID[:])
+	// Destroy HTID
+	defer CleanMemory(HTID[:])
+	// Destroy Y
+	defer CleanMemory(Y[:])
 
 	// Client Pass 2
 	_, _ = Client2(XOut[:], Y[:], SEC[:])
@@ -1100,8 +1625,14 @@ func TestRandomTwoPass(t *testing.T) {
 		// Generate Master Secret Share 1
 		_, MS1 := RandomGenerate(&rng)
 
+		// Destroy MS1
+		defer CleanMemory(MS1[:])
+
 		// Generate Master Secret Share 2
 		_, MS2 := RandomGenerate(&rng)
+
+		// Destroy MS2
+		defer CleanMemory(MS2[:])
 
 		// Either Client or TA calculates Hash(ID)
 		HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -1109,37 +1640,72 @@ func TestRandomTwoPass(t *testing.T) {
 		// Generate server secret share 1
 		_, SS1 := GetServerSecret(MS1[:])
 
+		// Destroy SS1
+		defer CleanMemory(SS1[:])
+
 		// Generate server secret share 2
 		_, SS2 := GetServerSecret(MS2[:])
+
+		// Destroy SS2
+		defer CleanMemory(SS2[:])
 
 		// Combine server secret shares
 		_, SS := RecombineG2(SS1[:], SS2[:])
 
+		// Destroy SS
+		defer CleanMemory(SS[:])
+
 		// Generate client secret share 1
 		_, CS1 := GetClientSecret(MS1[:], HCID)
 
+		// Destroy CS1
+		defer CleanMemory(CS1[:])
+
 		// Generate client secret share 2
 		_, CS2 := GetClientSecret(MS2[:], HCID)
+
+		// Destroy CS2
+		defer CleanMemory(CS2[:])
 
 		// Combine client secret shares
 		CS := make([]byte, G1S)
 		_, CS = RecombineG1(CS1[:], CS2[:])
 
+		// Destroy CS
+		defer CleanMemory(CS[:])
+
 		// Generate time permit share 1
 		_, TP1 := GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+		// Destroy TP1
+		defer CleanMemory(TP1[:])
 
 		// Generate time permit share 2
 		_, TP2 := GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
+		// Destroy TP2
+		defer CleanMemory(TP2[:])
+
 		// Combine time permit shares
 		_, TP := RecombineG1(TP1[:], TP2[:])
+
+		// Destroy TP
+		defer CleanMemory(TP[:])
 
 		// Create token
 		_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
+		// Destroy TOKEN
+		defer CleanMemory(TOKEN[:])
+
 		// Client Pass 1
 		var X [PGS]byte
 		_, XOut, SEC, U, UT := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
+
+		// Destroy XOut
+		defer CleanMemory(XOut[:])
+		// Destroy SEC
+		defer CleanMemory(SEC[:])
 
 		// Server Pass 1
 		var HID []byte
@@ -1151,8 +1717,14 @@ func TestRandomTwoPass(t *testing.T) {
 		}
 		_, Y := RandomGenerate(&rng)
 
+		// Destroy Y
+		defer CleanMemory(Y[:])
+
 		// Client Pass 2
 		_, V := Client2(XOut[:], Y[:], SEC[:])
+
+		// Destroy V
+		defer CleanMemory(V[:])
 
 		// Server Pass 2
 		got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
