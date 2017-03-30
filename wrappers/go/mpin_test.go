@@ -1811,13 +1811,66 @@ func TestAesGcm(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("Case %v", i), func(t *testing.T) {
-			C, T := AesGcmEncrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.PlainText))
+			C, T, err := AesGcmEncrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.PlainText))
+			if err != nil {
+				t.Fatal("Fatal error on AES Key length")
+			}
 			assert.Equal(t, tc.outC, hex.EncodeToString(C), "Should be equal")
 			assert.Equal(t, tc.outT, hex.EncodeToString(T), "Should be equal")
 
-			dP, dT := AesGcmDecrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.outC))
+			dP, dT, err := AesGcmDecrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.outC))
+			if err != nil {
+				t.Fatal("Fatal error on AES Key length")
+			}
 			assert.Equal(t, tc.PlainText, hex.EncodeToString(dP), "Should be equal")
 			assert.Equal(t, tc.outT, hex.EncodeToString(dT), "Should be equal")
+		})
+	}
+}
+
+func TestBadAesGcm(t *testing.T) {
+	testCases := []struct {
+		Key       string
+		IV        string
+		AAD       string
+		PlainText string
+		outC      string
+	}{
+		{
+			Key:       "75eae8f5ec7a5c88",
+			IV:        "a231cd40fdb909ad11c457d9",
+			AAD:       "a50d3e45b23c77157cb0e01c2a679e6d99c038e4",
+			PlainText: "45cf12964fc824ab76616ae2f4bf0822",
+			outC:      "5df1c20786beb4dc24bab9caf2ad3a03",
+		},
+		{
+			Key:       "75eae8f5ec7a5c8875eae8f5ec7a5c8875eae8f5ec7a5c88",
+			IV:        "a231cd40fdb909ad11c457d9",
+			AAD:       "a50d3e45b23c77157cb0e01c2a679e6d99c038e4",
+			PlainText: "45cf12964fc824ab76616ae2f4bf0822",
+			outC:      "5df1c20786beb4dc24bab9caf2ad3a03",
+		},
+	}
+
+	hexDecode := func(s string) []byte {
+		k, err := hex.DecodeString(s)
+		if err != nil {
+			t.Fatal("Decode hex error")
+		}
+		return k
+	}
+
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("Case %v", i), func(t *testing.T) {
+			_, _, err := AesGcmEncrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.PlainText))
+			if err == nil {
+				t.Fatal("Fatal error on AES Key length")
+			}
+
+			_, _, err = AesGcmDecrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.outC))
+			if err == nil {
+				t.Fatal("Fatal error on AES Key length")
+			}
 		})
 	}
 }

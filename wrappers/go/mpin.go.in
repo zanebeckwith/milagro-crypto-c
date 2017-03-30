@@ -30,6 +30,9 @@ package amcl
 #include "utils.h"
 */
 import "C"
+import (
+	"errors"
+)
 
 // ECC points constant
 const PAS int = int(C.PAS)
@@ -765,10 +768,18 @@ Returns:
 
     C: resultant ciphertext
     T: MAC
+	error: in case of a bad K
 
 */
-func AesGcmEncrypt(K, IV, H, P []byte) (C, T []byte) {
+func AesGcmEncrypt(K, IV, H, P []byte) (C, T []byte, err error) {
+
 	KStr := string(K)
+
+	if len(KStr) != 16 {
+		err = errors.New("Invalid Key.\n")
+		return nil, nil, err
+	}
+
 	KOct := GetOctet(KStr)
 	defer OctetFree(&KOct)
 	IVStr := string(IV)
@@ -793,7 +804,7 @@ func AesGcmEncrypt(K, IV, H, P []byte) (C, T []byte) {
 	C = OctetToBytes(&COct)
 	T = OctetToBytes(&TOct)
 
-	return C, T
+	return C, T, nil
 }
 
 /*
@@ -813,8 +824,14 @@ Returns:
     T: MAC
 
 */
-func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte) {
+func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte,err error) {
 	KStr := string(K)
+
+	if len(KStr) != 16 {
+		err = errors.New("Invalid Key.\n")
+		return nil, nil, err
+	}
+
 	KOct := GetOctet(KStr)
 	defer OctetFree(&KOct)
 	IVStr := string(IV)
@@ -839,7 +856,7 @@ func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte) {
 	P = OctetToBytes(&POct)
 	T = OctetToBytes(&TOct)
 
-	return P, T
+	return P, T, nil
 }
 
 /*
