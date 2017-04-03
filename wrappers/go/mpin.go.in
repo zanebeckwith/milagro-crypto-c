@@ -776,7 +776,7 @@ func AesGcmEncrypt(K, IV, H, P []byte) (C, T []byte, err error) {
 	KStr := string(K)
 
 	if len(KStr) != 16 {
-		err = errors.New("Invalid Key.\n")
+		err = errors.New("Invalid Key")
 		return nil, nil, err
 	}
 
@@ -828,7 +828,7 @@ func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte,err error) {
 	KStr := string(K)
 
 	if len(KStr) != 16 {
-		err = errors.New("Invalid Key.\n")
+		err = errors.New("Invalid Key")
 		return nil, nil, err
 	}
 
