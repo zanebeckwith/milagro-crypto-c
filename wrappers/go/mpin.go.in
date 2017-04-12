@@ -619,6 +619,7 @@ Returns:
 
 */
 func ServerKey(hashType int, Z, serverSecret, w, HM, HID, U, UT []byte) (errorCode int, serverAESKey []byte) {
+	var rtn C.int
 	ZStr := string(Z)
 	ZOct := GetOctet(ZStr)
 	defer OctetFree(&ZOct)
@@ -634,17 +635,24 @@ func ServerKey(hashType int, Z, serverSecret, w, HM, HID, U, UT []byte) (errorCo
 	HIDStr := string(HID)
 	HIDOct := GetOctet(HIDStr)
 	defer OctetFree(&HIDOct)
+	serverAESKeyOct := GetOctetZero(PAS)
+	defer OctetFree(&serverAESKeyOct)
 	UStr := string(U)
 	UOct := GetOctet(UStr)
 	defer OctetFree(&UOct)
-	UTStr := string(UT)
-	UTOct := GetOctet(UTStr)
-	defer OctetFree(&UTOct)
 
-	serverAESKeyOct := GetOctetZero(PAS)
-	defer OctetFree(&serverAESKeyOct)
+	if UT == nil {
+		UStr := string(U)
+		UOct := GetOctet(UStr)
+		defer OctetFree(&UOct)
+		rtn = C.MPIN_SERVER_KEY(C.int(hashType), &ZOct, &serverSecretOct, &wOct, &HMOct, &HIDOct, &UOct, nil, &serverAESKeyOct)
+	} else {
+		UTStr := string(UT)
+		UTOct := GetOctet(UTStr)
+		defer OctetFree(&UTOct)
+		rtn = C.MPIN_SERVER_KEY(C.int(hashType), &ZOct, &serverSecretOct, &wOct, &HMOct, &HIDOct, nil, &UTOct, &serverAESKeyOct)
+	}
 
-	rtn := C.MPIN_SERVER_KEY(C.int(hashType), &ZOct, &serverSecretOct, &wOct, &HMOct, &HIDOct, &UOct, &UTOct, &serverAESKeyOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
