@@ -1125,7 +1125,7 @@ func HashAll(hashType int, hashMPinId, U, UT, V, y, Z, T []byte) (HM []byte) {
 	defer OctetFree(&HMOct)
 
 	// Hash values
-	C.MPIN_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &VOct, &yOct, &ZOct, &TOct, &HMOct)
+	C.MPIN_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &yOct, &VOct, &ZOct, &TOct, &HMOct)
 
 	// Convert octet to bytes
 	HM = OctetToBytes(&HMOct)
