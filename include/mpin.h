@@ -305,13 +305,13 @@ int MPIN_GET_SERVER_SECRET(octet *S,octet *SS);
 /**	@brief Precompute values for use by the client side of M-Pin Full
  *
 	@param T is the input M-Pin token (the client secret with PIN portion removed)
-	@param ID is the input client identity
+	@param HCID is the hash of the client identity
 	@param CP is Public Key (or NULL)
 	@param g1 precomputed output
 	@param g2 precomputed output
 	@return 0 or an error code
  */
-int MPIN_PRECOMPUTE(octet *T,octet *ID,octet *CP,octet *g1,octet *g2);
+int MPIN_PRECOMPUTE(octet *T,octet *HCID,octet *CP,octet *g1,octet *g2);
 /**	@brief Calculate Key on Server side for M-Pin Full
  *
 	Uses UT internally for the key calculation, unless not available in which case U is used

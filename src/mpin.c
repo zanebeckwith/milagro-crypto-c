@@ -872,7 +872,7 @@ int MPIN_KANGAROO(octet *E,octet *F)
 
 /* Functions to support M-Pin Full */
 
-int MPIN_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
+int MPIN_PRECOMPUTE(octet *TOKEN,octet *HCID,octet *CP,octet *G1,octet *G2)
 {
     ECP P,T;
     ECP2 Q;
@@ -884,7 +884,7 @@ int MPIN_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
 
     if (res==0)
     {
-        mapit(CID,&P);
+        mapit(HCID,&P);
         if (CP!=NULL)
         {
             if (!ECP2_fromOctet(&Q,CP)) res=MPIN_INVALID_POINT;

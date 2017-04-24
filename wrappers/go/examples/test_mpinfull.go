@@ -279,7 +279,7 @@ func main() {
 	defer amcl.CleanMemory(T[:])
 
 	// Hash all values
-	HM := amcl.HashAll(HASH_TYPE_MPIN, ID[:], U[:], nil, V[:], Y2[:], Z[:], T[:])
+	HM := amcl.HashAll(HASH_TYPE_MPIN, HCID[:], U[:], nil, V[:], Y2[:], Z[:], T[:])
 
 	// Destroy HM
 	defer amcl.CleanMemory(HM[:])
