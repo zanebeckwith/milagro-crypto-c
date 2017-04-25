@@ -137,7 +137,7 @@ func main() {
 	defer amcl.CleanMemory(CS1[:])
 
 	// Generate client secret share 2
-	rtn, CS2CS2 := amcl.GetClientSecret(MS2[:], HCID)
+	rtn, CS2 := amcl.GetClientSecret(MS2[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
@@ -326,14 +326,14 @@ func main() {
 	fmt.Printf("Server Key =  0x")
 	fmt.Printf("%x\n", AES_KEY_SERVER[:])
 
-	// Destroy 
+	// Destroy
 	defer amcl.CleanMemory(AES_KEY_SERVER[:])
 
 	rtn, AES_KEY_CLIENT := amcl.ClientKey(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
 	fmt.Printf("Client Key =  0x")
 	fmt.Printf("%x\n", AES_KEY_CLIENT[:])
 
-	// Destroy 
+	// Destroy
 	defer amcl.CleanMemory(AES_KEY_CLIENT[:])
 
 	//////   Server   //////
@@ -343,8 +343,8 @@ func main() {
 	fmt.Printf("IV: 0x")
 	fmt.Printf("%x\n", IV[:])
 
-	// Destroy 
-	defer amcl.CleanMemory([:])
+	// Destroy
+	defer amcl.CleanMemory(IV[:])
 
 	// header
 	HEADER := amcl.GenerateRandomByte(&rng, 16)
@@ -365,7 +365,12 @@ func main() {
 	defer amcl.CleanMemory(PLAINTEXT1[:])
 
 	// AES-GCM Encryption
-	CIPHERTEXT, TAG1 := amcl.AesGcmEncrypt(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
+	CIPHERTEXT, TAG1, err := amcl.AesGcmEncrypt(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	fmt.Printf("CIPHERTEXT:  0x")
 	fmt.Printf("%x\n", CIPHERTEXT[:])
 	fmt.Printf("TAG1:  0x")
@@ -379,7 +384,12 @@ func main() {
 	// Send IV, HEADER, CIPHERTEXT and TAG1 to client
 
 	// AES-GCM Decryption
-	PLAINTEXT2, TAG2 := amcl.AesGcmDecrypt(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
+	PLAINTEXT2, TAG2, err := amcl.AesGcmDecrypt(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	fmt.Printf("PLAINTEXT2:  0x")
 	fmt.Printf("%x\n", PLAINTEXT2[:])
 	fmt.Printf("TAG2:  0x")
@@ -388,6 +398,6 @@ func main() {
 
 	// Destroy PLAINTEXT2
 	defer amcl.CleanMemory(PLAINTEXT2[:])
-	// Destroy 
+	// Destroy
 	defer amcl.CleanMemory(TAG2[:])
 }
