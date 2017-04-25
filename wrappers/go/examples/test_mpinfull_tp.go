@@ -363,7 +363,12 @@ func main() {
 	defer amcl.CleanMemory(PLAINTEXT1[:])
 
 	// AES-GCM Encryption
-	CIPHERTEXT, TAG1 := amcl.AesGcmEncrypt(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
+	CIPHERTEXT, TAG1, err := amcl.AesGcmEncrypt(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	fmt.Printf("CIPHERTEXT:  0x")
 	fmt.Printf("%x\n", CIPHERTEXT[:])
 	fmt.Printf("TAG1:  0x")
@@ -377,7 +382,12 @@ func main() {
 	// Send IV, HEADER, CIPHERTEXT and TAG1 to client
 
 	// AES-GCM Decryption
-	PLAINTEXT2, TAG2 := amcl.AesGcmDecrypt(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
+	PLAINTEXT2, TAG2, err := amcl.AesGcmDecrypt(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	fmt.Printf("PLAINTEXT2:  0x")
 	fmt.Printf("%x\n", PLAINTEXT2[:])
 	fmt.Printf("TAG2:  0x")
