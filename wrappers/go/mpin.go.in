@@ -832,7 +832,7 @@ Returns:
     T: MAC
 
 */
-func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte,err error) {
+func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte, err error) {
 	KStr := string(K)
 
 	if len(KStr) != 16 {
@@ -950,9 +950,6 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 	UStr := string(U)
 	UOct := GetOctet(UStr)
 	defer OctetFree(&UOct)
-	UTStr := string(UT)
-	UTOct := GetOctet(UTStr)
-	defer OctetFree(&UTOct)
 	VStr := string(V)
 	VOct := GetOctet(VStr)
 	defer OctetFree(&VOct)
@@ -961,7 +958,17 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 	defer OctetFree(&EOct)
 	FOct := GetOctetZero(GTS)
 	defer OctetFree(&FOct)
-	rtn := C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, &UTOct, &VOct, &EOct, &FOct)
+
+	var rtn C.int
+	if UT == nil {
+		rtn = C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, nil, &VOct, &EOct, &FOct)
+	} else {
+		UTStr := string(UT)
+		UTOct := GetOctet(UTStr)
+		defer OctetFree(&UTOct)
+
+		rtn = C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, &UTOct, &VOct, &EOct, &FOct)
+	}
 
 	errorCode = int(rtn)
 	E = OctetToBytes(&EOct)
@@ -1125,7 +1132,14 @@ func HashAll(hashType int, hashMPinId, U, UT, V, y, Z, T []byte) (HM []byte) {
 	defer OctetFree(&HMOct)
 
 	// Hash values
-	C.MPIN_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &yOct, &VOct, &ZOct, &TOct, &HMOct)
+	if UT == nil {
+		C.MPIN_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, nil, &yOct, &VOct, &ZOct, &TOct, &HMOct)
+	} else {
+		UTStr := string(UT)
+		UTOct := GetOctet(UTStr)
+		defer OctetFree(&UTOct)
+		C.MPIN_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &yOct, &VOct, &ZOct, &TOct, &HMOct)
+	}
 
 	// Convert octet to bytes
 	HM = OctetToBytes(&HMOct)
