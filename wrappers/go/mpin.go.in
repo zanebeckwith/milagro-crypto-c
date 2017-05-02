@@ -393,19 +393,29 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN i
 	defer OctetFree(&VOct)
 	UOct := GetOctetZero(G1S)
 	defer OctetFree(&UOct)
-	UTOct := GetOctetZero(G1S)
-	defer OctetFree(&UTOct)
+
 	yOct := GetOctetZero(PGS)
 	defer OctetFree(&yOct)
 
-	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, &UTOct, &timePermitOct, &messageOct, C.int(epochTime), &yOct)
+	var temp C.octet
+	defer OctetFree(&temp)
+	var UTOct *C.octet
+	if UT == nil {
+		UTOct = nil
+	} else {
+		UTStr := string(UT)
+		temp = GetOctet(UTStr)
+		UTOct = &temp
+	}
+
+	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, UTOct, &timePermitOct, &messageOct, C.int(epochTime), &yOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
 	xOut = OctetToBytes(&xOct)
 	V = OctetToBytes(&VOct)
 	U = OctetToBytes(&UOct)
-	UT = OctetToBytes(&UTOct)
+	UT = OctetToBytes(UTOct)
 	y = OctetToBytes(&yOct)
 
 	return errorCode, xOut[:], y[:], V[:], U[:], UT[:]
