@@ -509,13 +509,14 @@ Args:
 
     hashType: Hash function
     epoch_date: Date, in days since the epoch. Set to 0 if Time permits disabled
+    epochTime: Epoch time in seconds
     server_secret: Server secret
     U: U = x.H(ID)
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
     mpinId: M-Pin ID or hash of the M-Pin ID in anonymous mode
     message: message to be signed
-    epochTime: Epoch time in seconds
+    kangaroo, must be to true in case you want to perform Kangaroo, false otherwise
 
 Returns:
 
@@ -527,16 +528,13 @@ Returns:
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled used for debug
 
 */
-func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, message []byte) (errorCode int, HID, HTID, y, E, F []byte) {
+func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, message []byte, kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte) {
 	serverSecretStr := string(serverSecret)
 	serverSecretOct := GetOctet(serverSecretStr)
 	defer OctetFree(&serverSecretOct)
 	UStr := string(U)
 	UOct := GetOctet(UStr)
 	defer OctetFree(&UOct)
-	UTStr := string(UT)
-	UTOct := GetOctet(UTStr)
-	defer OctetFree(&UTOct)
 	VStr := string(V)
 	VOct := GetOctet(VStr)
 	defer OctetFree(&VOct)
@@ -553,22 +551,50 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 	defer OctetFree(&HTIDOct)
 	yOct := GetOctetZero(PGS)
 	defer OctetFree(&yOct)
-	EOct := GetOctetZero(GTS)
-	defer OctetFree(&EOct)
-	FOct := GetOctetZero(GTS)
-	defer OctetFree(&FOct)
 
-	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, &UTOct, &VOct, &EOct, &FOct, &mpinIdOct, &messageOct, C.int(epochTime))
+	var temp C.octet
+	defer OctetFree(&temp)
+	var temp1 C.octet
+	defer OctetFree(&temp1)
+	var temp2 C.octet
+	defer OctetFree(&temp2)
+
+	var EOct *C.octet
+	var FOct *C.octet
+	var UTOct *C.octet
+
+	if UT == nil {
+		UTOct = nil
+	} else {
+		UTStr := string(UT)
+		temp = GetOctet(UTStr)
+		UTOct = &temp
+	}
+	if !kangaroo {
+		EOct = nil
+		FOct = nil
+	} else {
+		temp1 = GetOctetZero(GTS)
+		EOct = &temp1
+		temp2 = GetOctetZero(GTS)
+		FOct = &temp2
+	}
+
+	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, &messageOct, C.int(epochTime))
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
 	HID = OctetToBytes(&HIDOct)
 	HTID = OctetToBytes(&HTIDOct)
 	y = OctetToBytes(&yOct)
-	E = OctetToBytes(&EOct)
-	F = OctetToBytes(&FOct)
 
-	return errorCode, HID[:], HTID[:], y[:], E[:], F[:]
+	if !kangaroo {
+		return errorCode, HID[:], HTID[:], y[:], nil, nil
+	} else {
+		E = OctetToBytes(EOct)
+		F = OctetToBytes(FOct)
+		return errorCode, HID[:], HTID[:], y[:], E[:], F[:]
+	}
 }
 
 /*
@@ -924,16 +950,17 @@ Args:
     server_secret: Server secret
     U: U = x.H(ID)
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
-    v: v = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
+    V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
+	kangaroo, must be to true in case you want to perform Kangaroo, false otherwise
 
 Returns:
 
     errorCode: error from the C function
-    E: value to help the Kangaroos to find the PIN error, or nil if not required
-    F: value to help the Kangaroos to find the PIN error, or nil if not required
+    E: value to help the Kangaroos to find the PIN error, or nil kangaroo is set to false
+    F: value to help the Kangaroos to find the PIN error, or nil kangaroo is set to false
 
 */
-func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte) (errorCode int, E, F []byte) {
+func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, kangaroo bool) (errorCode int, E []byte, F []byte) {
 	// Form Octets
 	HIDStr := string(HID)
 	HIDOct := GetOctet(HIDStr)
@@ -954,27 +981,45 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 	VOct := GetOctet(VStr)
 	defer OctetFree(&VOct)
 
-	EOct := GetOctetZero(GTS)
-	defer OctetFree(&EOct)
-	FOct := GetOctetZero(GTS)
-	defer OctetFree(&FOct)
+	var EOct *C.octet
+	var FOct *C.octet
+	var UTOct *C.octet
 
-	var rtn C.int
+	var temp C.octet
+	defer OctetFree(&temp)
+	var temp1 C.octet
+	defer OctetFree(&temp1)
+	var temp2 C.octet
+	defer OctetFree(&temp2)
+
 	if UT == nil {
-		rtn = C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, nil, &VOct, &EOct, &FOct)
+		UTOct = nil
 	} else {
 		UTStr := string(UT)
-		UTOct := GetOctet(UTStr)
-		defer OctetFree(&UTOct)
-
-		rtn = C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, &UTOct, &VOct, &EOct, &FOct)
+		temp = GetOctet(UTStr)
+		UTOct = &temp
+	}
+	if !kangaroo {
+		EOct = nil
+		FOct = nil
+	} else {
+		temp1 = GetOctetZero(GTS)
+		EOct = &temp1
+		temp2 = GetOctetZero(GTS)
+		FOct = &temp2
 	}
 
-	errorCode = int(rtn)
-	E = OctetToBytes(&EOct)
-	F = OctetToBytes(&FOct)
+	rtn := C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct)
 
-	return errorCode, E[:], F[:]
+	errorCode = int(rtn)
+
+	if !kangaroo {
+		return errorCode, nil, nil
+	} else {
+		E = OctetToBytes(EOct)
+		F = OctetToBytes(FOct)
+		return errorCode, E, F
+	}
 }
 
 /*
