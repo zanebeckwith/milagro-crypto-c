@@ -382,9 +382,6 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN i
 	tokenStr := string(token)
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
-	timePermitStr := string(timePermit)
-	timePermitOct := GetOctet(timePermitStr)
-	defer OctetFree(&timePermitOct)
 	messageStr := string(message)
 	messageOct := GetOctet(messageStr)
 	defer OctetFree(&messageOct)
@@ -400,25 +397,37 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN i
 	var temp C.octet
 	defer OctetFree(&temp)
 	var UTOct *C.octet
-	if UT == nil {
+
+	var temp1 C.octet
+	defer OctetFree(&temp1)
+	var timePermitOct *C.octet
+
+	if epochDate == 0 {
 		UTOct = nil
+		timePermitOct = nil
 	} else {
-		UTStr := string(UT)
-		temp = GetOctet(UTStr)
+		temp = GetOctetZero(G1S)
 		UTOct = &temp
+		TPStr := string(timePermit)
+		temp1 = GetOctet(TPStr)
+		timePermitOct = &temp1
 	}
 
-	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, UTOct, &timePermitOct, &messageOct, C.int(epochTime), &yOct)
+	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, UTOct, timePermitOct, &messageOct, C.int(epochTime), &yOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
 	xOut = OctetToBytes(&xOct)
 	V = OctetToBytes(&VOct)
 	U = OctetToBytes(&UOct)
-	UT = OctetToBytes(UTOct)
 	y = OctetToBytes(&yOct)
 
-	return errorCode, xOut[:], y[:], V[:], U[:], UT[:]
+	if epochDate == 0 {
+		return errorCode, xOut[:], y[:], V[:], U[:], nil
+	} else {
+		UT = OctetToBytes(UTOct)
+		return errorCode, xOut[:], y[:], V[:], U[:], UT[:]
+	}
 }
 
 /*
@@ -1073,27 +1082,44 @@ func Client1(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN 
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
 
-	timePermitStr := string(timePermit)
-	timePermitOct := GetOctet(timePermitStr)
-	defer OctetFree(&timePermitOct)
-
 	SECOct := GetOctetZero(G1S)
 	defer OctetFree(&SECOct)
 	UOct := GetOctetZero(G1S)
 	defer OctetFree(&UOct)
-	UTOct := GetOctetZero(G1S)
-	defer OctetFree(&UTOct)
 
-	rtn := C.MPIN_CLIENT_1(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &SECOct, &UOct, &UTOct, &timePermitOct)
+	var temp C.octet
+	defer OctetFree(&temp)
+	var UTOct *C.octet
+
+	var temp1 C.octet
+	defer OctetFree(&temp1)
+	var timePermitOct *C.octet
+
+	if epochDate == 0 {
+		timePermitOct = nil
+		UTOct = nil
+	} else {
+		temp1 = GetOctetZero(G1S)
+		UTOct = &temp1
+		TPStr := string(timePermit)
+		temp1 = GetOctet(TPStr)
+		timePermitOct = &temp1
+
+	}
+
+	rtn := C.MPIN_CLIENT_1(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &SECOct, &UOct, UTOct, timePermitOct)
 
 	errorCode = int(rtn)
 	// Convert octet to bytes
 	xOut = OctetToBytes(&xOct)
 	SEC = OctetToBytes(&SECOct)
 	U = OctetToBytes(&UOct)
-	UT = OctetToBytes(&UTOct)
-
-	return errorCode, xOut[:], SEC[:], U[:], UT[:]
+	if epochDate == 0 {
+		return errorCode, xOut[:], SEC[:], U[:], nil
+	} else {
+		UT = OctetToBytes(UTOct)
+		return errorCode, xOut[:], SEC[:], U[:], UT[:]
+	}
 }
 
 /*
