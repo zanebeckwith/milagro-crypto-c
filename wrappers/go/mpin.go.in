@@ -382,9 +382,6 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN i
 	tokenStr := string(token)
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
-	messageStr := string(message)
-	messageOct := GetOctet(messageStr)
-	defer OctetFree(&messageOct)
 
 	VOct := GetOctetZero(G1S)
 	defer OctetFree(&VOct)
@@ -401,6 +398,8 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN i
 	var temp1 C.octet
 	defer OctetFree(&temp1)
 	var timePermitOct *C.octet
+	var temp2 C.octet
+	var messageOct *C.octet
 
 	if epochDate == 0 {
 		UTOct = nil
@@ -412,8 +411,15 @@ func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN i
 		temp1 = GetOctet(TPStr)
 		timePermitOct = &temp1
 	}
+	if message == nil {
+		messageOct = nil
+	} else {
+		messageStr := string(message)
+		temp2 = GetOctet(messageStr)
+		messageOct = &temp2
+	}
 
-	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, UTOct, timePermitOct, &messageOct, C.int(epochTime), &yOct)
+	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, UTOct, timePermitOct, messageOct, C.int(epochTime), &yOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -560,9 +566,6 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)
 	defer OctetFree(&mpinIdOct)
-	messageStr := string(message)
-	messageOct := GetOctet(messageStr)
-	defer OctetFree(&messageOct)
 
 	HIDOct := GetOctetZero(G1S)
 	defer OctetFree(&HIDOct)
@@ -577,10 +580,13 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 	defer OctetFree(&temp1)
 	var temp2 C.octet
 	defer OctetFree(&temp2)
+	var temp3 C.octet
 
 	var EOct *C.octet
 	var FOct *C.octet
 	var UTOct *C.octet
+	var messageOct *C.octet
+
 
 	if UT == nil {
 		UTOct = nil
@@ -588,6 +594,13 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 		UTStr := string(UT)
 		temp = GetOctet(UTStr)
 		UTOct = &temp
+	}
+	if message == nil {
+		messageOct = nil
+	} else {
+		messageStr := string(message)
+		temp3 = GetOctet(messageStr)
+		messageOct = &temp3
 	}
 	if !kangaroo {
 		EOct = nil
@@ -599,7 +612,7 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 		FOct = &temp2
 	}
 
-	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, &messageOct, C.int(epochTime))
+	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, messageOct, C.int(epochTime))
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
