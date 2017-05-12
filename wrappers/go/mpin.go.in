@@ -567,7 +567,7 @@ Args:
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
     mpinId: M-Pin ID or hash of the M-Pin ID in anonymous mode
     message: message to be signed
-    kangaroo, must be to true in case you want to perform Kangaroo, false otherwise
+    kangaroo: Set to true to perform Kangaroo
 
 Returns:
 
@@ -613,7 +613,6 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 	var FOct *C.octet
 	var UTOct *C.octet
 	var messageOct *C.octet
-
 
 	if UT == nil {
 		UTOct = nil
@@ -1010,7 +1009,7 @@ Args:
     U: U = x.H(ID)
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
-	kangaroo, must be to true in case you want to perform Kangaroo, false otherwise
+    kangaroo: Set to true to perform Kangaroo
 
 Returns:
 
