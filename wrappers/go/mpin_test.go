@@ -45,6 +45,111 @@ func TestGoodPIN(t *testing.T) {
 	ID := []byte(IDstr)
 
 	// Epoch time in days
+	date := 0
+
+	// Epoch time in seconds
+	timeValue := 1439465203
+
+	// PIN variable to create token
+	PIN1 := 1234
+	// PIN variable to authenticate
+	PIN2 := 1234
+
+	// Seed value for Random Number Generator (RNG)
+	seedHex := "ac4509d6"
+	seed, err := hex.DecodeString(seedHex)
+	if err != nil {
+		fmt.Println("Error decoding seed value")
+		return
+	}
+
+	rng := CreateCSPRNG(seed)
+
+	// Message to sign
+	var MESSAGE []byte
+
+	// Generate Master Secret Share 1
+	_, MS1 := RandomGenerate(&rng)
+
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
+	// Generate Master Secret Share 2
+	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
+
+	// Either Client or TA calculates Hash(ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
+
+	// Generate server secret share 1
+	_, SS1 := GetServerSecret(MS1[:])
+
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
+	// Generate server secret share 2
+	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
+
+	// Combine server secret shares
+	_, SS := RecombineG2(SS1[:], SS2[:])
+
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
+	// Generate client secret share 1
+	_, CS1 := GetClientSecret(MS1[:], HCID)
+
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
+	// Generate client secret share 2
+	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
+
+	// Combine client secret shares
+	CS := make([]byte, G1S)
+	_, CS = RecombineG1(CS1[:], CS2[:])
+
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
+	// Create token
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
+	// Send U, UT, V, timeValue and Message to server
+	var X [PGS]byte
+	_, _, _, V, U, _ := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, MESSAGE[:], timeValue)
+
+	// Destroy X
+	defer CleanMemory(X[:])
+
+	if USE_ANONYMOUS {
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], HCID[:], MESSAGE[:], false)
+	} else {
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], MESSAGE[:], false)
+	}
+	assert.Equal(t, want, got, "Should be equal")
+}
+
+func TestTimePermitGoodPIN(t *testing.T) {
+	want := 0
+	var got int
+
+	// Assign the End-User an ID
+	IDstr := "testUser@miracl.com"
+	ID := []byte(IDstr)
+
+	// Epoch time in days
 	date := 16660
 
 	// Epoch time in seconds
@@ -152,9 +257,9 @@ func TestGoodPIN(t *testing.T) {
 	defer CleanMemory(X[:])
 
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], false)
 	} else {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -275,9 +380,9 @@ func TestBadPIN(t *testing.T) {
 	defer CleanMemory(X[:])
 
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], false)
 	} else {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -399,9 +504,9 @@ func TestBadToken(t *testing.T) {
 
 	// Send UT as V to model bad token
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], HCID[:], MESSAGE[:], false)
 	} else {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], UT[:], ID[:], MESSAGE[:], false)
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -519,9 +624,9 @@ func TestRandom(t *testing.T) {
 		defer CleanMemory(X[:])
 
 		if USE_ANONYMOUS {
-			got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+			got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], false)
 		} else {
-			got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+			got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 		}
 		assert.Equal(t, want, got, "Should be equal")
 	}
@@ -643,9 +748,9 @@ func TestGoodSignature(t *testing.T) {
 
 	// Authenticate
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], false)
 	} else {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -767,9 +872,9 @@ func TestSignatureExpired(t *testing.T) {
 	timeValue += 10
 	// Authenticate
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], false)
 	} else {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -891,9 +996,9 @@ func TestBadSignature(t *testing.T) {
 	// Authenticate
 	MESSAGE[0] = 00
 	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], false)
 	} else {
-		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		got, _, _, _, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -1013,9 +1118,9 @@ func TestPINError(t *testing.T) {
 	var E []byte
 	var F []byte
 	if USE_ANONYMOUS {
-		_, _, _, _, E, F = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		_, _, _, _, E, F = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], true)
 	} else {
-		_, _, _, _, E, F = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		_, _, _, _, E, F = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], true)
 	}
 
 	got := Kangaroo(E[:], F[:])
@@ -1155,9 +1260,9 @@ func TestMPINFull(t *testing.T) {
 	var HTID []byte
 	var Y []byte
 	if USE_ANONYMOUS {
-		_, HID, HTID, Y, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:])
+		_, HID, HTID, Y, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], MESSAGE[:], false)
 	} else {
-		_, HID, HTID, Y, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		_, HID, HTID, Y, _, _ = Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 
 	// Destroy HID
@@ -1198,6 +1303,121 @@ func TestMPINFull(t *testing.T) {
 }
 
 func TestTwoPassGoodPIN(t *testing.T) {
+	want := 0
+	// Assign the End-User an ID
+	IDstr := "testUser@miracl.com"
+	ID := []byte(IDstr)
+
+	// Epoch time in days
+	date := 0
+
+	// PIN variable to create token
+	PIN1 := 1234
+	// PIN variable to authenticate
+	PIN2 := 1234
+
+	// Seed value for Random Number Generator (RNG)
+	seedHex := "ac4509d6"
+	seed, err := hex.DecodeString(seedHex)
+	if err != nil {
+		fmt.Println("Error decoding seed value")
+		return
+	}
+	rng := CreateCSPRNG(seed)
+
+	// Generate Master Secret Share 1
+	_, MS1 := RandomGenerate(&rng)
+
+	// Destroy MS1
+	defer CleanMemory(MS1[:])
+
+	// Generate Master Secret Share 2
+	_, MS2 := RandomGenerate(&rng)
+
+	// Destroy MS2
+	defer CleanMemory(MS2[:])
+
+	// Either Client or TA calculates Hash(ID)
+	HCID := HashId(HASH_TYPE_MPIN, ID)
+
+	// Generate server secret share 1
+	_, SS1 := GetServerSecret(MS1[:])
+
+	// Destroy SS1
+	defer CleanMemory(SS1[:])
+
+	// Generate server secret share 2
+	_, SS2 := GetServerSecret(MS2[:])
+
+	// Destroy SS2
+	defer CleanMemory(SS2[:])
+
+	// Combine server secret shares
+	_, SS := RecombineG2(SS1[:], SS2[:])
+
+	// Destroy SS
+	defer CleanMemory(SS[:])
+
+	// Generate client secret share 1
+	_, CS1 := GetClientSecret(MS1[:], HCID)
+
+	// Destroy CS1
+	defer CleanMemory(CS1[:])
+
+	// Generate client secret share 2
+	_, CS2 := GetClientSecret(MS2[:], HCID)
+
+	// Destroy CS2
+	defer CleanMemory(CS2[:])
+
+	// Combine client secret shares
+	CS := make([]byte, G1S)
+	_, CS = RecombineG1(CS1[:], CS2[:])
+
+	// Destroy CS
+	defer CleanMemory(CS[:])
+
+	// Create token
+	_, TOKEN := ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+
+	// Destroy TOKEN
+	defer CleanMemory(TOKEN[:])
+
+	// Client Pass 1
+	var X [PGS]byte
+	_, XOut, SEC, U, _ := Client1(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], nil)
+
+	// Destroy X
+	defer CleanMemory(X[:])
+
+	// Server Pass 1
+	var HID []byte
+	var HTID []byte
+	if USE_ANONYMOUS {
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, HCID)
+	} else {
+		HID, HTID = Server1(HASH_TYPE_MPIN, date, ID)
+	}
+	_, Y := RandomGenerate(&rng)
+
+	// Destroy HID
+	defer CleanMemory(HID[:])
+	// Destroy HTID
+	defer CleanMemory(HTID[:])
+
+	// Client Pass 2
+	_, V := Client2(XOut[:], Y[:], SEC[:])
+
+	// Destroy V
+	defer CleanMemory(V[:])
+
+	// Server Pass 2
+	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], nil, V[:], false)
+
+	assert.Equal(t, want, got, "Should be equal")
+}
+
+func TestTwoPassTimePermitGoodPIN(t *testing.T) {
 	want := 0
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -1325,7 +1545,7 @@ func TestTwoPassGoodPIN(t *testing.T) {
 	defer CleanMemory(V[:])
 
 	// Server Pass 2
-	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], false)
 
 	assert.Equal(t, want, got, "Should be equal")
 }
@@ -1462,7 +1682,7 @@ func TestTwoPassBadPIN(t *testing.T) {
 	defer CleanMemory(V[:])
 
 	// Server Pass 2
-	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], false)
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -1596,7 +1816,7 @@ func TestTwoPassBadToken(t *testing.T) {
 
 	// Server Pass 2
 	// Send UT as V to model bad token
-	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], UT[:])
+	got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], UT[:], false)
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -1727,7 +1947,7 @@ func TestRandomTwoPass(t *testing.T) {
 		defer CleanMemory(V[:])
 
 		// Server Pass 2
-		got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+		got, _, _ := Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], false)
 		assert.Equal(t, want, got, "Should be equal")
 
 	}

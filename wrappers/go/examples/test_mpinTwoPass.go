@@ -257,7 +257,8 @@ func main() {
 
 	/* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
 	/* If PIN error not required, set E and F = null */
-	rtn, _, _ = amcl.Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:])
+
+	rtn, E, F := amcl.Server2(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], true)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: Server2 rtn: %d\n", rtn)
 	}
@@ -265,6 +266,15 @@ func main() {
 	fmt.Printf("%x\n", HID[:])
 	fmt.Printf("HTID: 0x")
 	fmt.Printf("%x\n", HTID[:])
+
+	if rtn != 0 {
+		fmt.Printf("Authentication failed Error Code %d\n", rtn)
+		err := amcl.Kangaroo(E[:], F[:])
+		if err != 0 {
+			fmt.Printf("PIN Error %d\n", err)
+		}
+		return
+	}
 
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)

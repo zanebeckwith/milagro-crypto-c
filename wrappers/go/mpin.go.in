@@ -356,6 +356,7 @@ Args:
     epochDate: Date, in days since the epoch. Set to 0 if Time permits disabled
     mpinId: M-Pin ID
     RNG: cryptographically secure random number generator
+    x: random number provided as input if RNG==nil, otherwise must be nil
     pin: PIN entered by user
     token: M-Pin token
     timePermit: M-Pin time permit
@@ -372,43 +373,81 @@ Returns:
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled where is t is epoch time
 */
 func Client(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte) {
-	// Form Octets
+
+	var UTOct *C.octet
+	var pUT C.octet
+	defer OctetFree(&pUT)
+
+	var messageOct *C.octet
+	var pmessage C.octet
+	defer OctetFree(&pmessage)
+
+	var timePermitOct *C.octet
+	var ptimePermit C.octet
+	defer OctetFree(&ptimePermit)
+
+	var xOct C.octet
+	defer OctetFree(&xOct)
+
+	var pRNG *C.csprng
+
+	if RNG == nil {
+		pRNG = nil
+		xStr := string(x)
+		xOct = GetOctet(xStr)
+	} else {
+		pRNG = RNG.csprng()
+		xOct = GetOctetZero(PGS)
+	}
+	if epochDate == 0 {
+		UTOct = nil
+		timePermitOct = nil
+	} else {
+		pUT = GetOctetZero(G1S)
+		UTOct = &pUT
+		TPStr := string(timePermit)
+		ptimePermit = GetOctet(TPStr)
+		timePermitOct = &ptimePermit
+	}
+	if message == nil {
+		messageOct = nil
+	} else {
+		messageStr := string(message)
+		pmessage = GetOctet(messageStr)
+		messageOct = &pmessage
+	}
+
+	// Form other Octets
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)
 	defer OctetFree(&mpinIdOct)
-	xStr := string(x)
-	xOct := GetOctet(xStr)
-	defer OctetFree(&xOct)
 	tokenStr := string(token)
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
-	timePermitStr := string(timePermit)
-	timePermitOct := GetOctet(timePermitStr)
-	defer OctetFree(&timePermitOct)
-	messageStr := string(message)
-	messageOct := GetOctet(messageStr)
-	defer OctetFree(&messageOct)
 
 	VOct := GetOctetZero(G1S)
 	defer OctetFree(&VOct)
 	UOct := GetOctetZero(G1S)
 	defer OctetFree(&UOct)
-	UTOct := GetOctetZero(G1S)
-	defer OctetFree(&UTOct)
+
 	yOct := GetOctetZero(PGS)
 	defer OctetFree(&yOct)
 
-	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, &UTOct, &timePermitOct, &messageOct, C.int(epochTime), &yOct)
+	rtn := C.MPIN_CLIENT(C.int(hashType), C.int(epochDate), &mpinIdOct, pRNG, &xOct, C.int(PIN), &tokenOct, &VOct, &UOct, UTOct, timePermitOct, messageOct, C.int(epochTime), &yOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
 	xOut = OctetToBytes(&xOct)
 	V = OctetToBytes(&VOct)
 	U = OctetToBytes(&UOct)
-	UT = OctetToBytes(&UTOct)
 	y = OctetToBytes(&yOct)
 
-	return errorCode, xOut[:], y[:], V[:], U[:], UT[:]
+	if epochDate == 0 {
+		return errorCode, xOut[:], y[:], V[:], U[:], nil
+	} else {
+		UT = OctetToBytes(UTOct)
+		return errorCode, xOut[:], y[:], V[:], U[:], UT[:]
+	}
 }
 
 /*
@@ -465,12 +504,13 @@ Args:
 
     RNG: Pointer to cryptographically secure pseudo-random number generator instance
     type: determines type of action to be taken
+    x: random number provided as input if RNG==nil, otherwise must be nil
     P: if type=0 a point in G1, else an octet to be mapped to G1
 
 Returns:
 
     error_code: error from the C function
-    x: an output internally randomly generated if RNG!=None, otherwise must be provided as an input
+    x: an output internally randomly generated if RNG!=nil, otherwise must be provided as an input
     W: W = x.P or W = x.M(P), where M(.) is a mapping when type = 0
 
 Raises:
@@ -487,7 +527,18 @@ func GetG1Multiple(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int, xOu
 	WOct := GetOctetZero(G1S)
 	defer OctetFree(&WOct)
 
-	rtn := C.MPIN_GET_G1_MULTIPLE(RNG.csprng(), C.int(typ), &xOct, &GOct, &WOct)
+	var pRNG *C.csprng
+
+	if RNG == nil {
+		pRNG = nil
+		xStr := string(x)
+		xOct = GetOctet(xStr)
+	} else {
+		pRNG = RNG.csprng()
+		xOct = GetOctetZero(PGS)
+	}
+
+	rtn := C.MPIN_GET_G1_MULTIPLE(pRNG, C.int(typ), &xOct, &GOct, &WOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -509,13 +560,14 @@ Args:
 
     hashType: Hash function
     epoch_date: Date, in days since the epoch. Set to 0 if Time permits disabled
+    epochTime: Epoch time in seconds
     server_secret: Server secret
     U: U = x.H(ID)
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
     mpinId: M-Pin ID or hash of the M-Pin ID in anonymous mode
     message: message to be signed
-    epochTime: Epoch time in seconds
+    kangaroo: Set to true to perform Kangaroo
 
 Returns:
 
@@ -527,25 +579,19 @@ Returns:
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled used for debug
 
 */
-func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, message []byte) (errorCode int, HID, HTID, y, E, F []byte) {
+func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, message []byte, kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte) {
 	serverSecretStr := string(serverSecret)
 	serverSecretOct := GetOctet(serverSecretStr)
 	defer OctetFree(&serverSecretOct)
 	UStr := string(U)
 	UOct := GetOctet(UStr)
 	defer OctetFree(&UOct)
-	UTStr := string(UT)
-	UTOct := GetOctet(UTStr)
-	defer OctetFree(&UTOct)
 	VStr := string(V)
 	VOct := GetOctet(VStr)
 	defer OctetFree(&VOct)
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)
 	defer OctetFree(&mpinIdOct)
-	messageStr := string(message)
-	messageOct := GetOctet(messageStr)
-	defer OctetFree(&messageOct)
 
 	HIDOct := GetOctetZero(G1S)
 	defer OctetFree(&HIDOct)
@@ -553,22 +599,60 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 	defer OctetFree(&HTIDOct)
 	yOct := GetOctetZero(PGS)
 	defer OctetFree(&yOct)
-	EOct := GetOctetZero(GTS)
-	defer OctetFree(&EOct)
-	FOct := GetOctetZero(GTS)
-	defer OctetFree(&FOct)
 
-	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, &UTOct, &VOct, &EOct, &FOct, &mpinIdOct, &messageOct, C.int(epochTime))
+	var pUT C.octet
+	defer OctetFree(&pUT)
+	var pmessage C.octet
+	defer OctetFree(&pmessage)
+	var pE C.octet
+	defer OctetFree(&pE)
+	var pF C.octet
+	defer OctetFree(&pF)
+
+	var EOct *C.octet
+	var FOct *C.octet
+	var UTOct *C.octet
+	var messageOct *C.octet
+
+	if UT == nil {
+		UTOct = nil
+	} else {
+		UTStr := string(UT)
+		pUT = GetOctet(UTStr)
+		UTOct = &pUT
+	}
+	if message == nil {
+		messageOct = nil
+	} else {
+		messageStr := string(message)
+		pmessage = GetOctet(messageStr)
+		messageOct = &pmessage
+	}
+	if !kangaroo {
+		EOct = nil
+		FOct = nil
+	} else {
+		pE = GetOctetZero(GTS)
+		EOct = &pE
+		pF = GetOctetZero(GTS)
+		FOct = &pF
+	}
+
+	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, messageOct, C.int(epochTime))
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
 	HID = OctetToBytes(&HIDOct)
 	HTID = OctetToBytes(&HTIDOct)
 	y = OctetToBytes(&yOct)
-	E = OctetToBytes(&EOct)
-	F = OctetToBytes(&FOct)
 
-	return errorCode, HID[:], HTID[:], y[:], E[:], F[:]
+	if !kangaroo {
+		return errorCode, HID[:], HTID[:], y[:], nil, nil
+	} else {
+		E = OctetToBytes(EOct)
+		F = OctetToBytes(FOct)
+		return errorCode, HID[:], HTID[:], y[:], E[:], F[:]
+	}
 }
 
 /*
@@ -924,16 +1008,17 @@ Args:
     server_secret: Server secret
     U: U = x.H(ID)
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
-    v: v = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
+    V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
+    kangaroo: Set to true to perform Kangaroo
 
 Returns:
 
     errorCode: error from the C function
-    E: value to help the Kangaroos to find the PIN error, or nil if not required
-    F: value to help the Kangaroos to find the PIN error, or nil if not required
+    E: value to help the Kangaroos to find the PIN error, or nil kangaroo is set to false
+    F: value to help the Kangaroos to find the PIN error, or nil kangaroo is set to false
 
 */
-func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte) (errorCode int, E, F []byte) {
+func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, kangaroo bool) (errorCode int, E []byte, F []byte) {
 	// Form Octets
 	HIDStr := string(HID)
 	HIDOct := GetOctet(HIDStr)
@@ -954,27 +1039,45 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 	VOct := GetOctet(VStr)
 	defer OctetFree(&VOct)
 
-	EOct := GetOctetZero(GTS)
-	defer OctetFree(&EOct)
-	FOct := GetOctetZero(GTS)
-	defer OctetFree(&FOct)
+	var EOct *C.octet
+	var FOct *C.octet
+	var UTOct *C.octet
 
-	var rtn C.int
+	var pUT C.octet
+	defer OctetFree(&pUT)
+	var pE C.octet
+	defer OctetFree(&pE)
+	var pF C.octet
+	defer OctetFree(&pF)
+
 	if UT == nil {
-		rtn = C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, nil, &VOct, &EOct, &FOct)
+		UTOct = nil
 	} else {
 		UTStr := string(UT)
-		UTOct := GetOctet(UTStr)
-		defer OctetFree(&UTOct)
-
-		rtn = C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, &UTOct, &VOct, &EOct, &FOct)
+		pUT = GetOctet(UTStr)
+		UTOct = &pUT
+	}
+	if !kangaroo {
+		EOct = nil
+		FOct = nil
+	} else {
+		pE = GetOctetZero(GTS)
+		EOct = &pE
+		pF = GetOctetZero(GTS)
+		FOct = &pF
 	}
 
-	errorCode = int(rtn)
-	E = OctetToBytes(&EOct)
-	F = OctetToBytes(&FOct)
+	rtn := C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct)
 
-	return errorCode, E[:], F[:]
+	errorCode = int(rtn)
+
+	if !kangaroo {
+		return errorCode, nil, nil
+	} else {
+		E = OctetToBytes(EOct)
+		F = OctetToBytes(FOct)
+		return errorCode, E, F
+	}
 }
 
 /*
@@ -991,6 +1094,7 @@ Args:
     epochDate: Date, in days since the epoch. Set to 0 if Time permits disabled
     mpinId: M-Pin ID
     RNG: cryptographically secure random number generator
+    x: random number provided as input if RNG==nil, otherwise must be nil
     PIN: PIN entered by user
     token: M-Pin token
     timePermit: M-Pin time permit
@@ -1010,35 +1114,60 @@ func Client1(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN 
 	mpinIdOct := GetOctet(mpinIdStr)
 	defer OctetFree(&mpinIdOct)
 
-	xStr := string(x)
-	xOct := GetOctet(xStr)
-	defer OctetFree(&xOct)
-
 	tokenStr := string(token)
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
-
-	timePermitStr := string(timePermit)
-	timePermitOct := GetOctet(timePermitStr)
-	defer OctetFree(&timePermitOct)
 
 	SECOct := GetOctetZero(G1S)
 	defer OctetFree(&SECOct)
 	UOct := GetOctetZero(G1S)
 	defer OctetFree(&UOct)
-	UTOct := GetOctetZero(G1S)
-	defer OctetFree(&UTOct)
 
-	rtn := C.MPIN_CLIENT_1(C.int(hashType), C.int(epochDate), &mpinIdOct, RNG.csprng(), &xOct, C.int(PIN), &tokenOct, &SECOct, &UOct, &UTOct, &timePermitOct)
+	var pUT C.octet
+	defer OctetFree(&pUT)
+	var pTP C.octet
+	defer OctetFree(&pTP)
+	var timePermitOct *C.octet
+	var UTOct *C.octet
+
+	var xOct C.octet
+	defer OctetFree(&xOct)
+
+	var pRNG *C.csprng
+
+	if RNG == nil {
+		pRNG = nil
+		xStr := string(x)
+		xOct = GetOctet(xStr)
+	} else {
+		pRNG = RNG.csprng()
+		xOct = GetOctetZero(PGS)
+	}
+	if epochDate == 0 {
+		timePermitOct = nil
+		UTOct = nil
+	} else {
+		pUT = GetOctetZero(G1S)
+		UTOct = &pUT
+		TPStr := string(timePermit)
+		pTP = GetOctet(TPStr)
+		timePermitOct = &pTP
+
+	}
+
+	rtn := C.MPIN_CLIENT_1(C.int(hashType), C.int(epochDate), &mpinIdOct, pRNG, &xOct, C.int(PIN), &tokenOct, &SECOct, &UOct, UTOct, timePermitOct)
 
 	errorCode = int(rtn)
 	// Convert octet to bytes
 	xOut = OctetToBytes(&xOct)
 	SEC = OctetToBytes(&SECOct)
 	U = OctetToBytes(&UOct)
-	UT = OctetToBytes(&UTOct)
-
-	return errorCode, xOut[:], SEC[:], U[:], UT[:]
+	if epochDate == 0 {
+		return errorCode, xOut[:], SEC[:], U[:], nil
+	} else {
+		UT = OctetToBytes(UTOct)
+		return errorCode, xOut[:], SEC[:], U[:], UT[:]
+	}
 }
 
 /*

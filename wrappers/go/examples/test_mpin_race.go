@@ -174,7 +174,7 @@ func run(rng *amcl.RandNG) {
 	}
 
 	// --- Server ---
-	rtn, _, _, _, E, F := amcl.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:])
+	rtn, _, _, _, E, F := amcl.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:], true)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}

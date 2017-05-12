@@ -66,7 +66,7 @@ func main() {
 	t0 := time.Now()
 	var rtn int
 	for i := 0; i < nIter; i++ {
-		rtn, _, _, _, _, _ = amcl.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		rtn, _, _, _, _, _ = amcl.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 	t1 := time.Now()
 	log.Printf("Number Iterations: %d Time: %v\n", nIter, t1.Sub(t0))
