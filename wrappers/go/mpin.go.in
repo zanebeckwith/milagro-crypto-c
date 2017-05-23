@@ -34,16 +34,6 @@ import (
 	"errors"
 )
 
-// ECC points constant
-const PAS int = int(C.PAS)
-const PGS int = int(C.PGS)
-const PFS int = int(C.PFS)
-const hashBytes int = int(C.PFS)
-const IVS int = 12
-const G1S = 2*PFS + 1
-const G2S = 4 * PFS
-const GTS = 12 * PFS
-
 /*
 
 Today returns today's date as days elapsed from the epoch. This function uses the system clock
