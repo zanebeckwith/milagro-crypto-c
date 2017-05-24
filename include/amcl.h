@@ -167,6 +167,14 @@
 #define MONTGOMERY_FRIENDLY 3  /**< Montgomery Friendly modulus of form $2^a(2^b-c)-1$  */
 #define GENERALISED_MERSENNE 2 /**< Generalised-mersenne modulus of form $2^n-2^m-1$, GOLDILOCKS only */
 
+#if CHOICE>=BN_CURVES
+#define PGS MODBYTES          /**< Group Size */
+#define PFS MODBYTES          /**< Field Size */
+#define PAS 16                /**< AES-GCM Symmetric Key Size */
+#define PIV 12                /**< AES-GCM Initialization Vector Size */
+#define PTAG 16               /**< AES-GCM MAC Size */
+#endif
+
 /* Built-in curves defined here */
 /* MIRACL check.cpp utility used to determine optimal choice for BASEBITS */
 
