@@ -522,7 +522,52 @@ int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     return res;
 }
 
+/* Generate a public key and the corresponding z for the key-escrow less scheme */
+/*
+    if R==NULL then Z is passed in 
+    if R!=NULL then Z is passed out
+    Pa=(z^-1).Q
+*/
+#ifdef USE_MPIN_KEL
+int MPIN_GET_CLIENT_PUBLIC_KEY(csprng *R,octet *Z,octet *Pa)
+{
+    BIG z,r;
+    FP2 qx,qy;
+    ECP2 Q;
+    int res=0;
 
+    BIG_rcopy(r,CURVE_Order);
+
+    if (R!=NULL)
+    {
+        BIG_randomnum(z,r,R);
+        Z->len=MODBYTES;
+        BIG_toBytes(Z->val,z);
+    }
+    else
+        BIG_fromBytes(z,Z->val);
+
+    BIG_invmodp(z,z,r);
+
+    BIG_rcopy(qx.a,CURVE_Pxa);
+    FP_nres(qx.a);
+    BIG_rcopy(qx.b,CURVE_Pxb);
+    FP_nres(qx.b);
+    BIG_rcopy(qy.a,CURVE_Pya);
+    FP_nres(qy.a);
+    BIG_rcopy(qy.b,CURVE_Pyb);
+    FP_nres(qy.b);
+    if (!ECP2_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+
+    if (res==0)
+    {
+        PAIR_G2mul(&Q,z);
+        ECP2_toOctet(Pa,&Q);
+    }
+
+    return res;
+}
+#endif
 
 /* Client secret CST=s*H(CID) where CID is client ID and s is master secret */
 /* CID is hashed externally */
@@ -689,7 +734,11 @@ void MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 }
 
 /* Implement M-Pin on server side */
-int MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
+int MPIN_SERVER_2(int date,octet *HID,octet *HTID,
+#ifdef USE_MPIN_KEL
+    octet *Pa,
+#endif
+    octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
 {
     BIG px,py,y;
     FP2 qx,qy;
@@ -707,7 +756,22 @@ int MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID
     BIG_rcopy(qy.b,CURVE_Pyb);
     FP_nres(qy.b);
 
-    if (!ECP2_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+    // key-escrow less scheme: use Pa instead of Q in pairing computation
+    // Q left for backward compatiblity
+#ifdef USE_MPIN_KEL
+    if (Pa!=NULL)
+    {
+        if (!ECP2_fromOctet(&Q, Pa)) res=MPIN_INVALID_POINT;
+    }
+    else
+#endif
+        if (!ECP2_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+
+    if (res==0)
+    {
+        if (!ECP2_fromOctet(&sQ,SST)) res=MPIN_INVALID_POINT;
+    }
+
 
     if (res==0)
     {
@@ -1081,7 +1145,11 @@ int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *T
 }
 
 /* One pass MPIN Server */
-int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue)
+int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,
+#ifdef USE_MPIN_KEL 
+    octet *Pa,
+#endif
+    octet *MESSAGE,int TimeValue)
 {
     int rtn=0;
     char m[M_SIZE];
@@ -1103,7 +1171,11 @@ int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet
 
     MPIN_GET_Y(sha,TimeValue,&M,Y);
 
-    rtn = MPIN_SERVER_2(date,HID,HTID,Y,sQ,U,UT,V,E,F);
+    rtn = MPIN_SERVER_2(date,HID,HTID,
+#ifdef USE_MPIN_KEL
+        Pa,
+#endif
+        Y,sQ,U,UT,V,E,F);
     if (rtn != 0)
         return rtn;
 

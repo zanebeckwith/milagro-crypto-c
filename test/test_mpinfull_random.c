@@ -339,7 +339,11 @@ int main()
         OCT_output(&SEC);
 
         /* Server second pass */
-        rtn = MPIN_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F);
+        rtn = MPIN_SERVER_2(date,&HID,&HTID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+            &Y,&ServerSecret,&U,&UT,&SEC,&E,&F);
         if (rtn != 0)
         {
             err=MPIN_KANGAROO(&E,&F);

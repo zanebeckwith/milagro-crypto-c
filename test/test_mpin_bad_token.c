@@ -264,7 +264,11 @@ int main()
 
     /* Server second pass */
     /* Set SEC to UT to simulate a bad token */
-    rtn = MPIN_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&UT,&E,&F);
+    rtn = MPIN_SERVER_2(date,&HID,&HTID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &Y,&ServerSecret,&U,&UT,&UT,&E,&F);
     if (rtn != 0)
     {
         err=MPIN_KANGAROO(&E,&F);

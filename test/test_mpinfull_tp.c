@@ -316,7 +316,11 @@ int main()
     OCT_output(&SEC);
 
     /* Server second pass */
-    rtn = MPIN_SERVER_2(date,NULL,&HTID,&Y,&ServerSecret,NULL,&UT,&SEC,&E,&F);
+    rtn = MPIN_SERVER_2(date,NULL,&HTID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &Y,&ServerSecret,NULL,&UT,&SEC,&E,&F);
     if (rtn != 0)
     {
         printf("FAILURE Invalid Token Error Code %d\n", rtn);

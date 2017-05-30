@@ -260,7 +260,11 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)
@@ -293,7 +297,11 @@ int main()
 
     /* Server  */
     TimeValue += 10;
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != -19)
@@ -328,7 +336,11 @@ int main()
     OCT_clear(&M);
     message = "bad message";
     OCT_jstring(&M,message);
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != -19)
@@ -396,7 +408,11 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)
@@ -431,7 +447,11 @@ int main()
 
     /* Server  */
     TimeValue += 10;
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != -19)
@@ -468,7 +488,11 @@ int main()
     OCT_clear(&M);
     message = "bad message";
     OCT_jstring(&M,message);
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
+#ifdef USE_MPIN_KEL
+        NULL,
+#endif
+        &M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != -19)

@@ -1,7 +1,7 @@
 /**
- * @file test_mpinfull_onepass.c
+ * @file test_mpin.c
  * @author Kealan McCusker
- * @brief Test M-Pin Full Single pass
+ * @brief Test good token and correct PIN with D-TA. Single pass
  *
  * LICENSE
  *
@@ -23,7 +23,7 @@
  * under the License.
  */
 
-/* Test M-Pin Full Single pass */
+/* Test good token and correct PIN with D-TA. Single pass */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +36,7 @@ int main()
 {
     int i,PIN1,PIN2,rtn;
 
-    char id[256];
+    char id[256+4*PFS];
     octet ID = {0,sizeof(id),id};
 
     char x[PGS],y1[PGS],y2[PGS];
@@ -49,13 +49,9 @@ int main()
     octet MS1= {0,sizeof(ms1),ms1};
     octet MS2= {0,sizeof(ms2),ms2};
 
-    /* Hash values of client ID */
+    /* Hash values of Client ID */
     char hcid[PFS];
     octet HCID= {0,sizeof(hcid), hcid};
-
-    /* Hash values of messages */
-    char hm[PFS];
-    octet HM= {0,sizeof(hm), hm};
 
     /* Client secret and shares */
     char cs1[2*PFS+1], cs2[2*PFS+1], sec[2*PFS+1];
@@ -63,68 +59,80 @@ int main()
     octet CS1= {0,sizeof(cs1), cs1};
     octet CS2= {0,sizeof(cs2), cs2};
 
+    /* Client Public Key and z */
+    char z1[PGS], z2[PGS], pa1[4*PFS], pa2[4*PFS];
+    octet Z1= {0,sizeof(z1),z1};
+    octet Z2= {0,sizeof(z2),z2};
+    octet Pa1= {0,sizeof(pa1),pa1};
+    octet Pa2= {0,sizeof(pa2),pa2};
+
     /* Server secret and shares */
     char ss1[4*PFS], ss2[4*PFS], serverSecret[4*PFS];
     octet ServerSecret= {0,sizeof(serverSecret),serverSecret};
     octet SS1= {0,sizeof(ss1),ss1};
     octet SS2= {0,sizeof(ss2),ss2};
 
-    /* Time Permit and shares */
-    char tp1[2*PFS+1], tp2[2*PFS+1], tp[2*PFS+1];
-    octet TP= {0,sizeof(tp),tp};
-    octet TP1= {0,sizeof(tp1),tp1};
-    octet TP2= {0,sizeof(tp2),tp2};
-
-    /* Token stored on device */
+    /* Token stored on computer */
     char token[2*PFS+1];
     octet TOKEN= {0,sizeof(token),token};
 
-    /* Precomputed values stored on device */
-    char g1[12*PFS],g2[12*PFS];
-    octet G1= {0,sizeof(g1),g1};
-    octet G2= {0,sizeof(g2),g2};
+    char u[2*PFS+1];
+    octet U= {0,sizeof(u),u};
 
-    char ut[2*PFS+1];
-    octet UT= {0,sizeof(ut),ut};
-
-    char hid[2*PFS+1],htid[2*PFS+1];
+    char hid[2*PFS+1];
     octet HID= {0,sizeof(hid),hid};
-    octet HTID= {0,sizeof(htid),htid};
-
-    char e[12*PFS], f[12*PFS];
-    octet E= {0,sizeof(e),e};
-    octet F= {0,sizeof(f),f};
-
-    char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
-    char ck[PAS],sk[PAS];
-    octet R= {0,sizeof(r),r};
-    octet Z= {0,sizeof(z),z};
-    octet W= {0,sizeof(w),w};
-    octet T= {0,sizeof(t),t};
-    octet SK= {0,sizeof(sk),sk};
-    octet CK= {0,sizeof(ck),ck};
 
     int TimeValue = 0;
 
     PIN1 = 1234;
     PIN2 = 1234;
 
+    printf("MPIN_FS %d\n", MPIN_FS());
+    printf("MPIN_GS %d\n", MPIN_GS());
+
     /* Assign the End-User an ID */
     char* user = "testuser@miracl.com";
     OCT_jstring(&ID,user);
     printf("CLIENT: ID %s\n", user);
 
-    int date = 0;
-    char seed[100] = {0};
+    char seed[32] = {0};
     octet SEED = {0,sizeof(seed),seed};
     csprng RNG;
 
     /* unrandom seed value! */
-    SEED.len=100;
-    for (i=0; i<100; i++) SEED.val[i]=i+1;
+    SEED.len=32;
+    for (i=0; i<32; i++) SEED.val[i]=i+1;
 
     /* initialise random number generator */
     CREATE_CSPRNG(&RNG,&SEED);
+
+    /* Generate random public key and z */
+    rtn = MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z1,&Pa1);
+    if (rtn!=0)
+    {
+        printf("MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z1,&Pa1) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Z1: 0x");
+    OCT_output(&Z1);
+    printf("Pa1: 0x");
+    OCT_output(&Pa1);
+
+    rtn = MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z2,&Pa2);
+    if (rtn!=0)
+    {
+        printf("MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z2,&Pa2) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Z2: 0x");
+    OCT_output(&Z2);
+    printf("Pa2: 0x");
+    OCT_output(&Pa2);
+
+    /* Append Pa to ID */
+    OCT_joctet(&ID,&Pa1);
+    printf("ID|Pa1: 0x");
+    OCT_output(&ID);
 
     /* Hash ID */
     MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
@@ -209,46 +217,18 @@ int main()
         printf("MPIN_RECOMBINE_G1(&CS1, &CS2, &TOKEN) Error %d\n", rtn);
         return 1;
     }
-    printf("Client Secret = 0x");
+    printf("Client Secret CS = 0x");
     OCT_output(&TOKEN);
 
-    /* Generate Time Permit shares */
-    date = MPIN_today();
-    printf("Date %d \n", date);
-    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
+    /* Compute client secret for key escrow less scheme z.CS */
+    rtn = MPIN_GET_G1_MULTIPLE(NULL,0,&Z2,&TOKEN,&TOKEN);
     if (rtn != 0)
     {
-        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
+        printf("MPIN_GET_G1_MULTIPLE(NULL,0,&Z,&CS,&CS) Error %d\n", rtn);
         return 1;
     }
-    rtn = MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
-    if (rtn != 0)
-    {
-        printf("MPIN_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
-        return 1;
-    }
-    printf("TP1 = 0x");
-    OCT_output(&TP1);
-    printf("TP2 = 0x");
-    OCT_output(&TP2);
-
-    /* Combine Time Permit shares */
-    rtn = MPIN_RECOMBINE_G1(&TP1, &TP2, &TP);
-    if (rtn != 0)
-    {
-        printf("MPIN_RECOMBINE_G1(&TP1, &TP2, &TP) Error %d\n", rtn);
-        return 1;
-    }
-    printf("Time Permit = 0x");
-    OCT_output(&TP);
-
-    /* This encoding makes Time permit look random */
-    if (MPIN_ENCODING(&RNG,&TP)!=0) printf("Encoding error\n");
-    printf("Encoded Time Permit= ");
-    OCT_output(&TP);
-    if (MPIN_DECODING(&TP)!=0) printf("Decoding error\n");
-    printf("Decoded Time Permit= ");
-    OCT_output(&TP);
+    printf("z2.CS: 0x");
+    OCT_output(&TOKEN);
 
     /* Client extracts PIN1 from secret to create Token */
     rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
@@ -260,13 +240,11 @@ int main()
     printf("Token = 0x");
     OCT_output(&TOKEN);
 
-    /* Client precomputation */
-    MPIN_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
-
+    /* Single pass MPIN protocol */
     /* Client  */
     TimeValue = MPIN_GET_TIME();
     printf("TimeValue %d \n", TimeValue);
-    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,NULL,TimeValue,&Y1);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,NULL,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT ERROR %d\n", rtn);
@@ -277,50 +255,42 @@ int main()
     printf("V = 0x");
     OCT_output(&SEC);
 
-    /* Client sends Z=r.ID to Server */
-    MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
-
     /* Server  */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
-        NULL,
-#endif
-        NULL,TimeValue);
-
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&Pa1,NULL,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)
     {
         printf("FAILURE Invalid Token Error Code %d\n", rtn);
-        return 1;
     }
     else
     {
-        printf("Authenticated Error Code %d\n", rtn);
+        printf("SUCCESS Error Code %d\n", rtn);
     }
 
-    /* Server sends T=w.ID to client */
-    MPIN_GET_G1_MULTIPLE(&RNG,0,&W,&HTID,&T);
-    printf("T = 0x");
-    OCT_output(&T);
+    /* clear memory */
+    OCT_clear(&ID);
+    OCT_clear(&X);
+    OCT_clear(&Y1);
+    OCT_clear(&Y2);
+    OCT_clear(&MS1);
+    OCT_clear(&MS2);
+    OCT_clear(&HCID);
+    OCT_clear(&SEC);
+    OCT_clear(&CS1);
+    OCT_clear(&CS2);
+    OCT_clear(&ServerSecret);
+    OCT_clear(&SS1);
+    OCT_clear(&SS2);
+    OCT_clear(&TOKEN);
+    OCT_clear(&U);
+    OCT_clear(&HID);
+    OCT_clear(&SEED);
+    OCT_clear(&Z1);
+    OCT_clear(&Z2);
+    OCT_clear(&Pa1);
+    OCT_clear(&Pa2);
 
-    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y1,&Z,&T,&HM);
-    MPIN_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
-    printf("Client Key = ");
-    OCT_output(&CK);
-
-    MPIN_HASH_ALL(HASH_TYPE_MPIN,&HCID,NULL,&UT,&SEC,&Y2,&Z,&T,&HM);
-    MPIN_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
-    printf("Server Key = ");
-    OCT_output(&SK);
-
-    if (!OCT_comp(&CK,&SK))
-    {
-        printf("FAILURE Keys are different\n");
-        return 1;
-    }
-
-    printf("SUCCESS\n");
+    KILL_CSPRNG(&RNG);
     return 0;
-
 }
