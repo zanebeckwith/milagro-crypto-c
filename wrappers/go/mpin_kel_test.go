@@ -30,19 +30,17 @@ import (
 )
 
 var (
-
 	HASH_TYPE_MPIN = SHA256
 
 	USE_ANONYMOUS = false
-
 )
 
 // Test with parameters for debug
 
 // var (
 
-// 	/* 
-// 	 * Parameters for two pass custom test 
+// 	/*
+// 	 * Parameters for two pass custom test
 // 	 * Any parameter marked as "Supposed" is only for debug purposes and can be
 // 	 * left empty, all the other ones are mandatory
 // 	 */
@@ -85,8 +83,8 @@ var (
 // 	// Supposed proof V from client
 // 	Vstr 	= "04036efa0400b322e0f39dade4fbd34d8540bdd7dbf6c468c6939a6d011b60f4a22081919fb153d12e275c0e2538a032f542d2f41712dd97610bda7adb1a0f3d86"
 
-// 	/* 
-// 	 * Additional parameters for signature test 
+// 	/*
+// 	 * Additional parameters for signature test
 // 	 * Any parameter marked as "Supposed" is only for debug purposes and can be
 // 	 * left empty, all the other ones are mandatory
 // 	 */
@@ -150,7 +148,7 @@ var (
 // 	// Destroy Z
 // 	defer CleanMemory(Z[:])
 
-// 	// Compute ID|Pa 
+// 	// Compute ID|Pa
 // 	ID = append(ID,Pa...)
 // 	fmt.Println("Supposed ID|Pa:",IDPAstr)
 // 	fmt.Println("Actual   ID|Pa:",hex.EncodeToString(ID))
@@ -276,8 +274,6 @@ var (
 // 	fmt.Println("H:",HsigStr)
 // 	fmt.Println("TS:",TS)
 
-
-
 // 	// Send U, UT, V, timeValue and Message to serve
 // 	_, _, Y, V, U, _ = Client(HASH_TYPE_MPIN, 0, ID[:], nil, X[:], PIN2, TOKEN[:], nil, H,  TS)
 
@@ -354,8 +350,8 @@ func TestKeyEscrowLess(t *testing.T) {
 	// Destroy Z
 	defer CleanMemory(Z[:])
 
-	// Compute ID|Pa 
-	ID = append(ID,Pa...)
+	// Compute ID|Pa
+	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -408,7 +404,7 @@ func TestKeyEscrowLess(t *testing.T) {
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
-	_, _, _, V, U, _ := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil,  timeValue)
+	_, _, _, V, U, _ := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
 
 	// Destroy X
 	defer CleanMemory(X[:])
@@ -468,8 +464,8 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 	// Destroy Z
 	defer CleanMemory(Z[:])
 
-	// Compute ID|Pa 
-	ID = append(ID,Pa...)
+	// Compute ID|Pa
+	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -522,7 +518,7 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
-	_, _, _, V, U, _ := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil,  timeValue)
+	_, _, _, V, U, _ := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
 
 	// Destroy X
 	defer CleanMemory(X[:])
@@ -577,14 +573,14 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 	defer CleanMemory(MS2[:])
 
 	// Generate wrong Public Key
-	_, Z, _  := GetClientPublicKey(&rng, nil)
+	_, Z, _ := GetClientPublicKey(&rng, nil)
 	_, _, Pa := GetClientPublicKey(&rng, nil)
 
 	// Destroy Z
 	defer CleanMemory(Z[:])
 
-	// Compute ID|Pa 
-	ID = append(ID,Pa...)
+	// Compute ID|Pa
+	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -655,7 +651,7 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS]byte
-	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], nil,  timeValue)
+	_, _, _, V, U, UT := Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], nil, timeValue)
 
 	// Destroy X
 	defer CleanMemory(X[:])
@@ -707,15 +703,15 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 	// Destroy MS2
 	defer CleanMemory(MS2[:])
 
-	// Generate wrong Public Key 
+	// Generate wrong Public Key
 	_, Z := RandomGenerate(&rng)
 	_, _, Pa := GetClientPublicKey(&rng, nil)
 
 	// Destroy Z
 	defer CleanMemory(Z[:])
 
-	// Compute ID|Pa 
-	ID = append(ID,Pa...)
+	// Compute ID|Pa
+	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)
@@ -843,8 +839,8 @@ func TestKeyEscrowLessTwoPass(t *testing.T) {
 	// Destroy Z
 	defer CleanMemory(Z[:])
 
-	// Compute ID|Pa 
-	ID = append(ID,Pa...)
+	// Compute ID|Pa
+	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
 	HCID := HashId(HASH_TYPE_MPIN, ID)

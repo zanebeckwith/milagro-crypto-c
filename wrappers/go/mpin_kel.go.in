@@ -595,9 +595,9 @@ func GetG1Multiple(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int, xOu
 
 /*
 
-Server performs server side of the one-pass version of the M-Pin protocol 
-with support for the key-escrow less scheme. If Time Permits are disabled, 
-set epoch_date = 0, and UT and HTID are not generated and can be set to nil. 
+Server performs server side of the one-pass version of the M-Pin protocol
+with support for the key-escrow less scheme. If Time Permits are disabled,
+set epoch_date = 0, and UT and HTID are not generated and can be set to nil.
 If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
 and PIN error detection is ON, U, UT, HID and HTID are all required.
@@ -1051,8 +1051,8 @@ func Server1(hashType, epochDate int, mpinId []byte) (HID, HTID []byte) {
 /*
 
 Server2 performs server side of the three-pass version of the M-Pin protocol, wiht
-support for the key-escrow less scheme.  If Time Permits are disabled, 
-set epoch_date = 0, and UT and HTID are not generated and can be set to nil. 
+support for the key-escrow less scheme.  If Time Permits are disabled,
+set epoch_date = 0, and UT and HTID are not generated and can be set to nil.
 If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
 and PIN error detection is ON, U, UT, HID and HTID are all required.
@@ -1109,7 +1109,7 @@ func Server2(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte,
 	defer OctetFree(&pE)
 	var pF C.octet
 	defer OctetFree(&pF)
-	var pPublicKey C.octet 
+	var pPublicKey C.octet
 	defer OctetFree(&pPublicKey)
 
 	if publicKey == nil {

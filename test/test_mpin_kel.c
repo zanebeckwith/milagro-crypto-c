@@ -39,6 +39,10 @@ int main()
     char id[256+4*PFS];
     octet ID = {0,sizeof(id),id};
 
+    // Message to sign
+    char m[256];
+    octet M= {0,sizeof(m),m};
+
     char x[PGS],y1[PGS],y2[PGS];
     octet X= {0, sizeof(x),x};
     octet Y1= {0,sizeof(y1),y1};
@@ -231,7 +235,9 @@ int main()
     /* Client  */
     TimeValue = MPIN_GET_TIME();
     printf("TimeValue %d \n", TimeValue);
-    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,NULL,TimeValue,&Y1);
+    char* message = "sign this message";
+    OCT_jstring(&M,message);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT ERROR %d\n", rtn);
@@ -243,12 +249,12 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&Pa,NULL,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&Pa,&M,TimeValue);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)
     {
-        printf("FAILURE Invalid Token Error Code %d\n", rtn);
+        printf("FAILURE Signature Verification %d\n", rtn);
     }
     else
     {

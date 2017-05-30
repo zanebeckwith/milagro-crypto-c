@@ -524,7 +524,7 @@ int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
 
 /* Generate a public key and the corresponding z for the key-escrow less scheme */
 /*
-    if R==NULL then Z is passed in 
+    if R==NULL then Z is passed in
     if R!=NULL then Z is passed out
     Pa=(z^-1).Q
 */
@@ -736,9 +736,9 @@ void MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 /* Implement M-Pin on server side */
 int MPIN_SERVER_2(int date,octet *HID,octet *HTID,
 #ifdef USE_MPIN_KEL
-    octet *Pa,
+                  octet *Pa,
 #endif
-    octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
+                  octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
 {
     BIG px,py,y;
     FP2 qx,qy;
@@ -1146,10 +1146,10 @@ int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *T
 
 /* One pass MPIN Server */
 int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,
-#ifdef USE_MPIN_KEL 
-    octet *Pa,
+#ifdef USE_MPIN_KEL
+                octet *Pa,
 #endif
-    octet *MESSAGE,int TimeValue)
+                octet *MESSAGE,int TimeValue)
 {
     int rtn=0;
     char m[M_SIZE];
@@ -1173,9 +1173,9 @@ int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet
 
     rtn = MPIN_SERVER_2(date,HID,HTID,
 #ifdef USE_MPIN_KEL
-        Pa,
+                        Pa,
 #endif
-        Y,sQ,U,UT,V,E,F);
+                        Y,sQ,U,UT,V,E,F);
     if (rtn != 0)
         return rtn;
 

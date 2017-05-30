@@ -292,7 +292,7 @@ void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,
 	@return 0 or an error code
  */
 int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
-/** @brief Generates a random public key for the client z.Q 
+/** @brief Generates a random public key for the client z.Q
  *
 	@param R is a pointer to a cryptographically secure random number generator
 	@param Z an output internally randomly generated if R!=NULL, otherwise it must be provided as an input

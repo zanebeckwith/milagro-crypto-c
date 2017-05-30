@@ -211,9 +211,9 @@ int mpin(csprng *RNG)
 
     rtn=MPIN_SERVER(HASH_TYPE_MPIN,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,
 #ifdef USE_MPIN_KEL
-        NULL,
+                    NULL,
 #endif
-        NULL,timeValue);
+                    NULL,timeValue);
 
 #ifdef FULL
     MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID);  // new
@@ -257,9 +257,9 @@ int mpin(csprng *RNG)
     /* If PIN error not required, set E and F = NULL */
     rtn=MPIN_SERVER_2(date,pHID,pHTID,
 #ifdef USE_MPIN_KEL
-        NULL,
+                      NULL,
 #endif
-        &Y,&SST,pxID,pxCID,&SEC,pE,pF);
+                      &Y,&SST,pxID,pxCID,&SEC,pE,pF);
 #endif // SINGLE_PASS
 
     if (rtn!=0)

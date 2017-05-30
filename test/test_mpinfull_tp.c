@@ -318,9 +318,9 @@ int main()
     /* Server second pass */
     rtn = MPIN_SERVER_2(date,NULL,&HTID,
 #ifdef USE_MPIN_KEL
-        NULL,
+                        NULL,
 #endif
-        &Y,&ServerSecret,NULL,&UT,&SEC,&E,&F);
+                        &Y,&ServerSecret,NULL,&UT,&SEC,&E,&F);
     if (rtn != 0)
     {
         printf("FAILURE Invalid Token Error Code %d\n", rtn);
