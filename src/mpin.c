@@ -528,7 +528,7 @@ int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     if R!=NULL then Z is passed out
     Pa=(z^-1).Q
 */
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
 int MPIN_GET_CLIENT_PUBLIC_KEY(csprng *R,octet *Z,octet *Pa)
 {
     BIG z,r;
@@ -735,7 +735,7 @@ void MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 
 /* Implement M-Pin on server side */
 int MPIN_SERVER_2(int date,octet *HID,octet *HTID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                   octet *Pa,
 #endif
                   octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
@@ -758,7 +758,7 @@ int MPIN_SERVER_2(int date,octet *HID,octet *HTID,
 
     // key-escrow less scheme: use Pa instead of Q in pairing computation
     // Q left for backward compatiblity
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
     if (Pa!=NULL)
     {
         if (!ECP2_fromOctet(&Q, Pa)) res=MPIN_INVALID_POINT;
@@ -1146,7 +1146,7 @@ int MPIN_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *T
 
 /* One pass MPIN Server */
 int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                 octet *Pa,
 #endif
                 octet *MESSAGE,int TimeValue)
@@ -1172,7 +1172,7 @@ int MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet
     MPIN_GET_Y(sha,TimeValue,&M,Y);
 
     rtn = MPIN_SERVER_2(date,HID,HTID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                         Pa,
 #endif
                         Y,sQ,U,UT,V,E,F);

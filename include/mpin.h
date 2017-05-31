@@ -150,7 +150,7 @@ int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
 	@return 0 or an error code
  */
 int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
-#ifndef USE_MPIN_KEL
+#ifndef USE_SIGNATURE
 /**	@brief Perform server side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not generated and can be set to NULL.
@@ -208,7 +208,7 @@ int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,o
 	@return 0 or an error code
  */
 void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
-#ifndef USE_MPIN_KEL
+#ifndef USE_SIGNATURE
 /**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not needed and can be set to NULL.
@@ -330,7 +330,7 @@ void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,
 	@return 0 or an error code
  */
 int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
 /** @brief Generates a random public key for the client z.Q
  *
 	@param R is a pointer to a cryptographically secure random number generator

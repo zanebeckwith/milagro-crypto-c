@@ -254,7 +254,7 @@ int main()
 
     /* Server  */
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                       NULL,
 #endif
                       NULL,TimeValue);

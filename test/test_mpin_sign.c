@@ -261,7 +261,7 @@ int main()
 
     /* Server  */
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                       NULL,
 #endif
                       &M,TimeValue);
@@ -298,7 +298,7 @@ int main()
     /* Server  */
     TimeValue += 10;
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                       NULL,
 #endif
                       &M,TimeValue);
@@ -337,7 +337,7 @@ int main()
     message = "bad message";
     OCT_jstring(&M,message);
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                       NULL,
 #endif
                       &M,TimeValue);
@@ -409,7 +409,7 @@ int main()
 
     /* Server  */
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                       NULL,
 #endif
                       &M,TimeValue);
@@ -448,7 +448,7 @@ int main()
     /* Server  */
     TimeValue += 10;
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                       NULL,
 #endif
                       &M,TimeValue);
@@ -489,7 +489,7 @@ int main()
     message = "bad message";
     OCT_jstring(&M,message);
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
-#ifdef USE_MPIN_KEL
+#ifdef USE_SIGNATURE
                       NULL,
 #endif
                       &M,TimeValue);
