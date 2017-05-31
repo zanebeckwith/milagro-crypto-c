@@ -267,7 +267,7 @@ int main()
     OCT_output(&Y2);
     if (rtn != 0)
     {
-        printf("FAILURE Signature Verification %d\n", rtn);
+        printf("FAILURE Signature Verification Error Code %d\n", rtn);
     }
     else
     {
