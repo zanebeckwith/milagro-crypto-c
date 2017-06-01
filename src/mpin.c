@@ -528,7 +528,6 @@ int MPIN_GET_G2_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     if R!=NULL then Z is passed out
     Pa=(z^-1).Q
 */
-#ifdef USE_SIGNATURE
 int MPIN_GET_CLIENT_PUBLIC_KEY(csprng *R,octet *Z,octet *Pa)
 {
     BIG z,r;
@@ -567,7 +566,6 @@ int MPIN_GET_CLIENT_PUBLIC_KEY(csprng *R,octet *Z,octet *Pa)
 
     return res;
 }
-#endif
 
 /* Client secret CST=s*H(CID) where CID is client ID and s is master secret */
 /* CID is hashed externally */
