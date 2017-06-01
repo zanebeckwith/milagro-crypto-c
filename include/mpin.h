@@ -330,7 +330,7 @@ void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,
 	@return 0 or an error code
  */
 int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
-#ifdef USE_SIGNATURE
+
 /** @brief Generates a random public key for the client z.Q
  *
 	@param R is a pointer to a cryptographically secure random number generator
@@ -338,7 +338,7 @@ int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
 	@param Pa the output public key for the client
  */
 int MPIN_GET_CLIENT_PUBLIC_KEY(csprng *R,octet *Z,octet *Pa);
-#endif
+
 /**	@brief Create a Time Permit in G1 from a master secret and the client ID
  *
   	@param h is the hash type
