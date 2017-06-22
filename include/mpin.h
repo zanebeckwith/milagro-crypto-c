@@ -150,7 +150,7 @@ int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
 	@return 0 or an error code
  */
 int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
-#ifndef USE_SIGNATURE
+#ifndef USE_DVS
 /**	@brief Perform server side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not generated and can be set to NULL.
@@ -208,7 +208,7 @@ int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,o
 	@return 0 or an error code
  */
 void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
-#ifndef USE_SIGNATURE
+#ifndef USE_DVS
 /**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not needed and can be set to NULL.
@@ -331,13 +331,6 @@ void MPIN_HASH_ALL(int h,octet *I,octet *U,octet *CU,octet *Y,octet *V,octet *R,
  */
 int MPIN_GET_CLIENT_SECRET(octet *S,octet *ID,octet *CS);
 
-/** @brief Generates a random public key for the client z.Q
- *
-	@param R is a pointer to a cryptographically secure random number generator
-	@param Z an output internally randomly generated if R!=NULL, otherwise it must be provided as an input
-	@param Pa the output public key for the client
- */
-int MPIN_GET_CLIENT_PUBLIC_KEY(csprng *R,octet *Z,octet *Pa);
 
 /**	@brief Create a Time Permit in G1 from a master secret and the client ID
  *
@@ -438,6 +431,14 @@ int MPIN_FS();
  * @return Group size
  */
 int MPIN_GS();
+
+/** @brief Generates a random public key for the client z.Q
+ *
+	@param R is a pointer to a cryptographically secure random number generator
+	@param Z an output internally randomly generated if R!=NULL, otherwise it must be provided as an input
+	@param Pa the output public key for the client
+ */
+int MPIN_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa);
 
 /**	@brief HMAC of message M using key K to create tag of length len in octet tag
  *

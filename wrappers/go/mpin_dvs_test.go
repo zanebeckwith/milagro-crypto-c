@@ -142,7 +142,7 @@ var (
 
 // 	// Generate Public Key
 // 	Z, _ := hex.DecodeString(Zstr)
-// 	_, _, Pa := GetClientPublicKey(nil, Z[:])
+// 	_, _, Pa := GetDVSKeyPair(nil, Z[:])
 // 	fmt.Println("Z:", Zstr, "\nPa:", hex.EncodeToString(Pa))
 
 // 	// Destroy Z
@@ -345,7 +345,7 @@ func TestKeyEscrowLess(t *testing.T) {
 
 	// Generate Public Key
 	_, Z := RandomGenerate(&rng)
-	_, _, Pa := GetClientPublicKey(nil, Z[:])
+	_, _, Pa := GetDVSKeyPair(nil, Z[:])
 
 	// Destroy Z
 	defer CleanMemory(Z[:])
@@ -459,7 +459,7 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 	defer CleanMemory(MS2[:])
 
 	// Generate Public Key
-	_, Z, Pa := GetClientPublicKey(&rng, nil)
+	_, Z, Pa := GetDVSKeyPair(&rng, nil)
 
 	// Destroy Z
 	defer CleanMemory(Z[:])
@@ -573,8 +573,8 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 	defer CleanMemory(MS2[:])
 
 	// Generate wrong Public Key
-	_, Z, _ := GetClientPublicKey(&rng, nil)
-	_, _, Pa := GetClientPublicKey(&rng, nil)
+	_, Z, _ := GetDVSKeyPair(&rng, nil)
+	_, _, Pa := GetDVSKeyPair(&rng, nil)
 
 	// Destroy Z
 	defer CleanMemory(Z[:])
@@ -705,7 +705,7 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 
 	// Generate wrong Public Key
 	_, Z := RandomGenerate(&rng)
-	_, _, Pa := GetClientPublicKey(&rng, nil)
+	_, _, Pa := GetDVSKeyPair(&rng, nil)
 
 	// Destroy Z
 	defer CleanMemory(Z[:])
@@ -834,7 +834,7 @@ func TestKeyEscrowLessTwoPass(t *testing.T) {
 
 	// Generate Public Key
 	_, Z := RandomGenerate(&rng)
-	_, _, Pa := GetClientPublicKey(nil, Z[:])
+	_, _, Pa := GetDVSKeyPair(nil, Z[:])
 
 	// Destroy Z
 	defer CleanMemory(Z[:])

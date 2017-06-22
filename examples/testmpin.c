@@ -210,7 +210,7 @@ int mpin(csprng *RNG)
 
 
     rtn=MPIN_SERVER(HASH_TYPE_MPIN,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,
-#ifdef USE_SIGNATURE
+#ifdef USE_DVS
                     NULL,
 #endif
                     NULL,timeValue);
@@ -256,7 +256,7 @@ int mpin(csprng *RNG)
     /* Server Second phase. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
     /* If PIN error not required, set E and F = NULL */
     rtn=MPIN_SERVER_2(date,pHID,pHTID,
-#ifdef USE_SIGNATURE
+#ifdef USE_DVS
                       NULL,
 #endif
                       &Y,&SST,pxID,pxCID,&SEC,pE,pF);

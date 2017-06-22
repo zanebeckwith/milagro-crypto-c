@@ -64,7 +64,7 @@ extern int MPIN_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
 extern int MPIN_CLIENT(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
 extern int MPIN_CLIENT_1(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
 extern int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
-extern int MPIN_GET_CLIENT_PUBLIC_KEY(csprng *R,octet *Z,octet *Pa);
+extern int MPIN_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa);
 extern int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 extern int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
 extern void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
@@ -317,7 +317,7 @@ def random_generate(rng):
     return error_code, s_hex.decode("hex")
 
 
-def get_client_public_key(rng): 
+def get_dvs_keypair(rng): 
     """Create a public key in G2 for thee client
 
     Create a public in G2 for the client
@@ -338,7 +338,7 @@ def get_client_public_key(rng):
     pa, pa_val = make_octet(G2)
     z, z_val  = make_octet(PFS)
 
-    error_code = libamcl_mpin.MPIN_GET_CLIENT_PUBLIC_KEY(rng, z, pa)
+    error_code = libamcl_mpin.MPIN_GET_DVS_KEYPAIR(rng, z, pa)
 
     pa_hex = to_hex(pa)
     z_hex  = to_hex(z) 

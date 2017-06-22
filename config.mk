@@ -43,8 +43,8 @@ AMCL_BUILD_DOXYGEN:=OFF
 # Anonymous authentication for M-Pin Full ON/OFF
 AMCL_USE_ANONYMOUS:=OFF
 
-# Key-escrow less scheme support for MPin ON/OFF
-AMCL_USE_SIGNATURE:=OFF
+# Key-escrow less DVS scheme support for MPin ON/OFF
+AMCL_USE_DVS:=OFF
 
 # Configure PIN 
 AMCL_MAXPIN:=10000

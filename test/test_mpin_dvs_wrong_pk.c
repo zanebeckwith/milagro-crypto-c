@@ -111,10 +111,10 @@ int main()
     CREATE_CSPRNG(&RNG,&SEED);
 
     /* Generate random public key and z */
-    rtn = MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z1,&Pa1);
+    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z1,&Pa1);
     if (rtn!=0)
     {
-        printf("MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z1,&Pa1) Error %d\n", rtn);
+        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z1,&Pa1) Error %d\n", rtn);
         return 1;
     }
     printf("Z1: 0x");
@@ -122,10 +122,10 @@ int main()
     printf("Pa1: 0x");
     OCT_output(&Pa1);
 
-    rtn = MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z2,&Pa2);
+    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z2,&Pa2);
     if (rtn!=0)
     {
-        printf("MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z2,&Pa2) Error %d\n", rtn);
+        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z2,&Pa2) Error %d\n", rtn);
         return 1;
     }
     printf("Z2: 0x");

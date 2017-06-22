@@ -317,7 +317,7 @@ int main()
 
     /* Server second pass */
     rtn = MPIN_SERVER_2(date,NULL,&HTID,
-#ifdef USE_SIGNATURE
+#ifdef USE_DVS
                         NULL,
 #endif
                         &Y,&ServerSecret,NULL,&UT,&SEC,&E,&F);

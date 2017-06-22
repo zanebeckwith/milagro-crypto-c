@@ -109,10 +109,10 @@ int main()
     CREATE_CSPRNG(&RNG,&SEED);
 
     /* Generate random public key and z */
-    rtn = MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z,&Pa);
+    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z,&Pa);
     if (rtn!=0)
     {
-        printf("MPIN_GET_CLIENT_PUBLIC_KEY(&RNG,&Z,&Pa) Error %d\n", rtn);
+        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z,&Pa) Error %d\n", rtn);
         return 1;
     }
     printf("Z: 0x");

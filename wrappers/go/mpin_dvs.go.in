@@ -272,7 +272,7 @@ func GetClientSecret(masterSecret []byte, hashMPinId []byte) (errorCode int, cli
 
 /*
 
-GetClientPublicKey randomly generates the public key in G2 for the key-escrow less scheme
+GetDVSKeyPair randomly generates the public key in G2 for the key-escrow less scheme
 
 Args:
 
@@ -286,7 +286,7 @@ Returns:
     publicKey: 		client public key: (z^-1).Q
 
 */
-func GetClientPublicKey(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publicKey []byte) {
+func GetDVSKeyPair(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publicKey []byte) {
 	// Form octets
 	publicKeyOct := GetOctetZero(G2S)
 	defer OctetFree(&publicKeyOct)
@@ -304,7 +304,7 @@ func GetClientPublicKey(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publ
 		zOct = GetOctetZero(PGS)
 	}
 
-	rtn := C.MPIN_GET_CLIENT_PUBLIC_KEY(pRNG, &zOct, &publicKeyOct)
+	rtn := C.MPIN_GET_DVS_KEYPAIR(pRNG, &zOct, &publicKeyOct)
 	errorCode = int(rtn)
 
 	// Convert octets to bytes
