@@ -46,16 +46,6 @@ const HASH_TYPE_RSA int = int(C.HASH_TYPE_RSA) // HASH_TYPE_RSA is the chosen Ha
 const RFS int = int(C.RFS)                     // RFS is the RSA Public Key Size in bytes
 const FFLEN int = int(C.FFLEN)                 // FFLEN consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
 
-// ECC points constants
-const PAS int = int(C.PAS)
-const PGS int = int(C.PGS)
-const PFS int = int(C.PFS)
-const hashBytes int = int(C.PFS)
-const IVS int = 12
-const G1S = 2*PFS + 1
-const G2S = 4 * PFS
-const GTS = 12 * PFS
-
 // RandNG is a type alias for C.csprng
 type RandNG C.csprng
 

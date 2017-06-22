@@ -281,7 +281,11 @@ int main()
     MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
 
     /* Server  */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,NULL,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,
+#ifdef USE_DVS
+                      NULL,
+#endif
+                      NULL,TimeValue);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);

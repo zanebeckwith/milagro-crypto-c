@@ -64,6 +64,7 @@ extern int MPIN_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
 extern int MPIN_CLIENT(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
 extern int MPIN_CLIENT_1(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
 extern int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
+extern int MPIN_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa);
 extern int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 extern int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
 extern void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
@@ -314,6 +315,39 @@ def random_generate(rng):
     libamcl_core.OCT_clear(s1)
 
     return error_code, s_hex.decode("hex")
+
+
+def get_dvs_keypair(rng): 
+    """Create a public key in G2 for thee client
+
+    Create a public in G2 for the client
+
+    Args::
+
+        rng: a random number generator
+
+    Returns::
+
+        error_code: error from the C function
+        z: private key
+        pa: public key
+
+    Raises:
+
+    """
+    pa, pa_val = make_octet(G2)
+    z, z_val  = make_octet(PFS)
+
+    error_code = libamcl_mpin.MPIN_GET_DVS_KEYPAIR(rng, z, pa)
+
+    pa_hex = to_hex(pa)
+    z_hex  = to_hex(z) 
+
+    # clear memory
+    libamcl_core.OCT_clear(z)
+    libamcl_core.OCT_clear(pa)
+
+    return error_code, z_hex.decode("hex"), pa_hex.decode("hex")
 
 
 def get_server_secret(master_secret):
@@ -791,11 +825,13 @@ def get_G1_multiple(rng, type, x, P):
     """
     if rng is not None:
         x1, x1_val = make_octet(PGS)
+        rng_in = rng
     else:
         x1, x1_val = make_octet(None, x)
+        rng_in = ffi.NULL
     P1, P1_val = make_octet(None, P)
     W1, W1_val = make_octet(G1)
-    error_code = libamcl_mpin.MPIN_GET_G1_MULTIPLE(rng, type, x1, P1, W1)
+    error_code = libamcl_mpin.MPIN_GET_G1_MULTIPLE(rng_in, type, x1, P1, W1)
 
     x_hex = to_hex(x1)
     W_hex = to_hex(W1)

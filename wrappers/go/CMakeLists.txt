@@ -19,16 +19,27 @@
   )
 
 if(BUILD_MPIN)
+if(USE_DVS)
   # Configure go mpin wrapper
+  configure_file (
+    "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_dvs.go.in"
+    "${PROJECT_BINARY_DIR}/wrappers/go/mpin.go"
+  )
+else(USE_DVS)
   configure_file (
     "${PROJECT_SOURCE_DIR}/wrappers/go/mpin.go.in"
     "${PROJECT_BINARY_DIR}/wrappers/go/mpin.go"
   )
+endif(USE_DVS)
 endif(BUILD_MPIN)
 
   file(COPY rsa_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go")
 if(BUILD_MPIN)
+if(USE_DVS)
+  file(COPY mpin_dvs_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go")
+else(USE_DVS)
   file(COPY mpin_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go")
+endif(USE_DVS)
 endif(BUILD_MPIN)
   file(COPY ecdsa_test.go DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go")
 
@@ -66,10 +77,17 @@ endif(BUILD_MPIN)
 	  WORLD_READ WORLD_EXECUTE)
 
 if(BUILD_MPIN)
+if(USE_DVS)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin.go mpin_dvs_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+          OWNER_WRITE OWNER_READ OWNER_EXECUTE
+          GROUP_READ GROUP_EXECUTE
+          WORLD_READ WORLD_EXECUTE)
+else(USE_DVS)
   INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin.go mpin_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
           OWNER_WRITE OWNER_READ OWNER_EXECUTE
           GROUP_READ GROUP_EXECUTE
           WORLD_READ WORLD_EXECUTE)
+endif(USE_DVS)
 endif(BUILD_MPIN)
 
 
