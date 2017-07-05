@@ -25,6 +25,12 @@
 
 /* Test Designated Verifier Signature (DVS) scheme */
 
+/* Build executible after installation:
+
+  gcc -std=c99 -g ./testdvs.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl_mpin -lamcl_pairing -lamcl_curve -lamcl_core -o testdvs
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -236,21 +242,23 @@ int main()
     printf("TimeValue %d \n", TimeValue);
     char* message = "sign this message";
     OCT_jstring(&M,message);
-    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&M,TimeValue,&Y1);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,pID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT ERROR %d\n", rtn);
         return 1;
     }
-    printf("Y1 = 0x");
-    OCT_output(&Y1);
-    printf("V = 0x");
+    printf("Send to server:\n");
+    printf("ID:");
+    OCT_output(pID);
+    printf("U:");
+    OCT_output(&U);
+    printf("V:");
     OCT_output(&SEC);
+    printf("TimeValue %d\n", TimeValue);
 
     /* Server: Verify message */
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&M,TimeValue,&Pa);
-    printf("Y2 = 0x");
-    OCT_output(&Y2);
     if (rtn != 0)
     {
         printf("FAILURE Signature Verification %d\n", rtn);

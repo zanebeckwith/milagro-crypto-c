@@ -19,7 +19,11 @@ endif(BUILD_X509)
 
 if(BUILD_MPIN)
   add_executable (testmpin testmpin.c)
-  target_link_libraries (testmpin amcl_mpin) 
+  target_link_libraries (testmpin amcl_mpin)
+if(USE_DVS)
+  add_executable (testdvs testdvs.c)
+  target_link_libraries (testdvs amcl_mpin)
+endif(USE_DVS) 
 endif(BUILD_MPIN)
 
 if(BUILD_WCC)

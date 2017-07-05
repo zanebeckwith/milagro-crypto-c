@@ -215,7 +215,7 @@ int mpin(csprng *RNG)
 #else
     rtn=MPIN_SERVER(HASH_TYPE_MPIN,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue);
 #endif
-                    
+
 
 #ifdef FULL
     MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID);  // new
