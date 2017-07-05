@@ -262,7 +262,7 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&Pa1,&M,TimeValue);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&M,TimeValue,&Pa1);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)

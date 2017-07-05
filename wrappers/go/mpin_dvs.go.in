@@ -695,7 +695,7 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 		FOct = &pF
 	}
 
-	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, publicKeyOct, messageOct, C.int(epochTime))
+	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, messageOct, C.int(epochTime), publicKeyOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
