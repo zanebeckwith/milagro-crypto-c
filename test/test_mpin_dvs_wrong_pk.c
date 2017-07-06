@@ -23,7 +23,7 @@
  * under the License.
  */
 
-/* Test good token and correct PIN with D-TA. Single pass */
+/* Test Designated Verifier Signature (DVS) scheme with incorrect PIN*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -244,8 +244,7 @@ int main()
     printf("Token = 0x");
     OCT_output(&TOKEN);
 
-    /* Single pass MPIN protocol */
-    /* Client  */
+    /* Client: Sign message */
     TimeValue = MPIN_GET_TIME();
     printf("TimeValue %d \n", TimeValue);
     char* message = "sign this message";
@@ -261,8 +260,8 @@ int main()
     printf("V = 0x");
     OCT_output(&SEC);
 
-    /* Server  */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&Pa1,&M,TimeValue);
+    /* Server: Verify message */
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&M,TimeValue,&Pa1);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)

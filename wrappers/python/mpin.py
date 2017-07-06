@@ -317,7 +317,7 @@ def random_generate(rng):
     return error_code, s_hex.decode("hex")
 
 
-def get_dvs_keypair(rng): 
+def get_dvs_keypair(rng):
     """Create a public key in G2 for thee client
 
     Create a public in G2 for the client
@@ -336,12 +336,12 @@ def get_dvs_keypair(rng):
 
     """
     pa, pa_val = make_octet(G2)
-    z, z_val  = make_octet(PFS)
+    z, z_val = make_octet(PFS)
 
     error_code = libamcl_mpin.MPIN_GET_DVS_KEYPAIR(rng, z, pa)
 
     pa_hex = to_hex(pa)
-    z_hex  = to_hex(z) 
+    z_hex = to_hex(z)
 
     # clear memory
     libamcl_core.OCT_clear(z)

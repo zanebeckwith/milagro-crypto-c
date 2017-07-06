@@ -133,6 +133,7 @@ class TestMPIN(unittest.TestCase):
                 date, HID, HTID, y, server_secret, u, ut, v)
             self.assertEqual(rtn, vector['SERVER_OUTPUT'])
 
+
 if __name__ == '__main__':
     # Run tests
     unittest.main()

@@ -150,7 +150,31 @@ int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
 	@return 0 or an error code
  */
 int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
-#ifndef USE_DVS
+#ifdef USE_DVS
+/**	@brief Perform server side of the one-pass version of the M-Pin protocol
+ *
+	If Time Permits are disabled, set d = 0, and UT and HTID are not generated and can be set to NULL.
+	If Time Permits are enabled, and PIN error detection is OFF, U and HID are not needed and can be set to NULL.
+	If Time Permits are enabled, and PIN error detection is ON, U, UT, HID and HTID are all required.
+ 	@param h is the hash type
+	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
+	@param HID is output H(ID), a hash of the client ID
+	@param HTID is output H(ID)+H(d|H(ID))
+	@param y is output H(t|U) or H(t|UT) if Time Permits enabled
+	@param SS is the input server secret
+	@param U is input from the client = x.H(ID)
+	@param UT is input from the client= x.(H(ID)+H(d|H(ID)))
+	@param V is an input from the client
+	@param E is an output to help the Kangaroos to find the PIN error, or NULL if not required
+	@param F is an output to help the Kangaroos to find the PIN error, or NULL if not required
+	@param ID is the input claimed client identity
+	@param MESSAGE is the message to be signed
+	@param t is input epoch time in seconds - a timestamp
+	@param Pa is input from the client z.Q or NULL if the key-escrow less scheme is not used
+	@return 0 or an error code
+ */
+int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t, octet *Pa);
+#else
 /**	@brief Perform server side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not generated and can be set to NULL.
@@ -173,30 +197,6 @@ int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 	@return 0 or an error code
  */
 int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
-#else
-/**	@brief Perform server side of the one-pass version of the M-Pin protocol
- *
-	If Time Permits are disabled, set d = 0, and UT and HTID are not generated and can be set to NULL.
-	If Time Permits are enabled, and PIN error detection is OFF, U and HID are not needed and can be set to NULL.
-	If Time Permits are enabled, and PIN error detection is ON, U, UT, HID and HTID are all required.
- 	@param h is the hash type
-	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
-	@param HID is output H(ID), a hash of the client ID
-	@param HTID is output H(ID)+H(d|H(ID))
-	@param y is output H(t|U) or H(t|UT) if Time Permits enabled
-	@param SS is the input server secret
-	@param U is input from the client = x.H(ID)
-	@param UT is input from the client= x.(H(ID)+H(d|H(ID)))
-	@param V is an input from the client
-	@param E is an output to help the Kangaroos to find the PIN error, or NULL if not required
-	@param F is an output to help the Kangaroos to find the PIN error, or NULL if not required
-	@param ID is the input claimed client identity
-	@param Pa is input from the client z.Q or NULL if the key-escrow less scheme is not used
-	@param MESSAGE is the message to be signed
-	@param t is input epoch time in seconds - a timestamp
-	@return 0 or an error code
- */
-int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *Pa,octet *MESSAGE, int t);
 #endif
 /**	@brief Perform first pass of the server side of the 3-pass version of the M-Pin protocol
  *
@@ -208,7 +208,27 @@ int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,o
 	@return 0 or an error code
  */
 void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
-#ifndef USE_DVS
+#ifdef USE_DVS
+/**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
+ *
+	If Time Permits are disabled, set d = 0, and UT and HTID are not needed and can be set to NULL.
+	If Time Permits are enabled, and PIN error detection is OFF, U and HID are not needed and can be set to NULL.
+	If Time Permits are enabled, and PIN error detection is ON, U, UT, HID and HTID are all required.
+	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
+	@param HID is input H(ID), a hash of the client ID
+	@param HTID is input H(ID)+H(d|H(ID))
+	@param y is the input server's randomly generated challenge
+	@param SS is the input server secret
+	@param U is input from the client = x.H(ID)
+	@param UT is input from the client= x.(H(ID)+H(d|H(ID)))
+	@param V is an input from the client
+	@param E is an output to help the Kangaroos to find the PIN error, or NULL if not required
+	@param F is an output to help the Kangaroos to find the PIN error, or NULL if not required
+	@param Pa is the input public key from the client, z.Q or NULL if the client uses regular mpin
+	@return 0 or an error code
+ */
+int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *Pa);
+#else
 /**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT and HTID are not needed and can be set to NULL.
@@ -227,26 +247,6 @@ void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
 	@return 0 or an error code
  */
 int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F);
-#else
-/**	@brief Perform third pass on the server side of the 3-pass version of the M-Pin protocol
- *
-	If Time Permits are disabled, set d = 0, and UT and HTID are not needed and can be set to NULL.
-	If Time Permits are enabled, and PIN error detection is OFF, U and HID are not needed and can be set to NULL.
-	If Time Permits are enabled, and PIN error detection is ON, U, UT, HID and HTID are all required.
-	@param d is input date, in days since the epoch. Set to 0 if Time permits disabled
-	@param HID is input H(ID), a hash of the client ID
-	@param HTID is input H(ID)+H(d|H(ID))
-	@param Pa is the input public key from the client, z.Q or NULL if the client uses regular mpin
-	@param y is the input server's randomly generated challenge
-	@param SS is the input server secret
-	@param U is input from the client = x.H(ID)
-	@param UT is input from the client= x.(H(ID)+H(d|H(ID)))
-	@param V is an input from the client
-	@param E is an output to help the Kangaroos to find the PIN error, or NULL if not required
-	@param F is an output to help the Kangaroos to find the PIN error, or NULL if not required
-	@return 0 or an error code
- */
-int MPIN_SERVER_2(int d,octet *HID,octet *HTID,octet *Pa,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F);
 #endif
 /**	@brief Add two members from the group G1
  *

@@ -23,10 +23,10 @@ CMAKE_INSTALL_PATH:=/opt/amcl
 AMCL_TEST:=ON
 
 # Build Shared Libraries ON/OFF
-AMCL_BUILD_SHARED_LIBS:=OFF
+AMCL_BUILD_SHARED_LIBS:=ON
 
 # Build Python wrapper ON/OFF
-AMCL_BUILD_PYTHON:=OFF
+AMCL_BUILD_PYTHON:=ON
 
 # Build Golang wrapper ON/OFF
 AMCL_BUILD_GO:=ON
@@ -35,16 +35,13 @@ AMCL_BUILD_GO:=ON
 AMCL_BUILD_MPIN:=ON
 
 # Build WCC ON/OFF
-AMCL_BUILD_WCC:=OFF
+AMCL_BUILD_WCC:=ON
 
 # Build Doxygen ON/OFF
-AMCL_BUILD_DOXYGEN:=OFF
+AMCL_BUILD_DOXYGEN:=ON
 
 # Anonymous authentication for M-Pin Full ON/OFF
 AMCL_USE_ANONYMOUS:=OFF
-
-# Key-escrow less DVS scheme support for MPin ON/OFF
-AMCL_USE_DVS:=OFF
 
 # Configure PIN 
 AMCL_MAXPIN:=10000

@@ -399,6 +399,7 @@ class TestMPIN(unittest.TestCase):
         self.assertNotEqual(tag1, tag2)
         self.assertEqual(plaintext1, plaintext2)
 
+
 if __name__ == '__main__':
     # Run tests
     unittest.main()
