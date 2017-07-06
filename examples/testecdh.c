@@ -175,6 +175,28 @@ int ecdh(csprng *RNG)
         printf("ECDSA Signature/Verification succeeded\n");
     }
 
+
+#endif
+
+    /* clear memory */
+    OCT_clear(&S0);
+    OCT_clear(&S1);
+    OCT_clear(&W0);
+    OCT_clear(&W1);
+    OCT_clear(&Z0);
+    OCT_clear(&Z1);
+    OCT_clear(&KEY);
+    OCT_clear(&SALT);
+    OCT_clear(&PW);
+#if CURVETYPE != MONTGOMERY
+    OCT_clear(&DS);
+    OCT_clear(&CS);
+    OCT_clear(&P1);
+    OCT_clear(&P2);
+    OCT_clear(&V);
+    OCT_clear(&M);
+    OCT_clear(&C);
+    OCT_clear(&T);
 #endif
 
     return 0;
@@ -187,18 +209,21 @@ int main()
 
     char raw[100];
     octet RAW= {0,sizeof(raw),raw};
-    csprng RNG;                /* Crypto Strong RNG */
+    /* Crypto Strong RNG */
+    csprng RNG;
 
     time((time_t *)&ran);
 
-    RAW.len=100;				/* fake random seed source */
+    /* fake random seed source */
+    RAW.len=100;
     RAW.val[0]=ran;
     RAW.val[1]=ran>>8;
     RAW.val[2]=ran>>16;
     RAW.val[3]=ran>>24;
     for (i=0; i<100; i++) RAW.val[i]=i+1;
 
-    CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
+    /* initialise strong RNG */
+    CREATE_CSPRNG(&RNG,&RAW);
 
     ecdh(&RNG);
 

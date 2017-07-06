@@ -475,7 +475,12 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
 // Server second pass
+#ifdef USE_DVS
+            rtn = MPIN_SERVER_2(DATE,&HID,&HTID,&Y,&SERVER_SECRET,&U,&UT,&V,&E,&F,NULL);
+#else
             rtn = MPIN_SERVER_2(DATE,&HID,&HTID,&Y,&SERVER_SECRET,&U,&UT,&V,&E,&F);
+#endif
+
             if (rtn != SERVER_OUTPUT)
             {
                 printf("ERROR performing SERVER SECOND PASS, line %d\n",i);

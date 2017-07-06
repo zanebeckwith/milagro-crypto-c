@@ -253,7 +253,12 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
+#ifdef USE_DVS
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,NULL,TimeValue,NULL);
+#else
     rtn = MPIN_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,NULL,TimeValue);
+#endif
+
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)
@@ -264,6 +269,32 @@ int main()
     {
         printf("SUCCESS Error Code %d\n", rtn);
     }
+
+    /* clear memory */
+    OCT_clear(&ID);
+    OCT_clear(&X);
+    OCT_clear(&Y1);
+    OCT_clear(&Y2);
+    OCT_clear(&MS1);
+    OCT_clear(&MS2);
+    OCT_clear(&HCID);
+    OCT_clear(&SEC);
+    OCT_clear(&CS1);
+    OCT_clear(&CS2);
+    OCT_clear(&ServerSecret);
+    OCT_clear(&SS1);
+    OCT_clear(&SS2);
+    OCT_clear(&TP);
+    OCT_clear(&TP1);
+    OCT_clear(&TP2);
+    OCT_clear(&TOKEN);
+    OCT_clear(&UT);
+    OCT_clear(&HID);
+    OCT_clear(&HTID);
+    OCT_clear(&E);
+    OCT_clear(&F);
+    OCT_clear(&SEED);
+
     KILL_CSPRNG(&RNG);
     return 0;
 }

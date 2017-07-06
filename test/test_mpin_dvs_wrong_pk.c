@@ -1,7 +1,7 @@
 /**
- * @file test_mpinfull.c
+ * @file test_mpin.c
  * @author Kealan McCusker
- * @brief Test M-pin Full
+ * @brief Test good token and correct PIN with D-TA. Single pass
  *
  * LICENSE
  *
@@ -23,45 +23,39 @@
  * under the License.
  */
 
-/* Test M-Pin Full */
+/* Test Designated Verifier Signature (DVS) scheme with incorrect PIN*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "mpin.h"
 #include "randapi.h"
 
-// #define DEBUG
-
-int main(int argc, char** argv)
+int main()
 {
-    if (argc != 2)
-    {
-        printf("usage: ./test_mpinfull [hash:sha256||sha384||sha512]\n");
-        exit(EXIT_FAILURE);
-    }
-
     int i,PIN1,PIN2,rtn;
 
-    char id[256];
+    char id[256+4*PFS];
     octet ID = {0,sizeof(id),id};
 
-    char x[PGS],y[PGS];
-    octet X= {0,sizeof(x),x};
-    octet Y= {0,sizeof(y),y};
+    // Message to sign
+    char m[256];
+    octet M= {0,sizeof(m),m};
+
+    char x[PGS],y1[PGS],y2[PGS];
+    octet X= {0, sizeof(x),x};
+    octet Y1= {0,sizeof(y1),y1};
+    octet Y2= {0,sizeof(y2),y2};
 
     /* Master secret shares */
     char ms1[PGS], ms2[PGS];
     octet MS1= {0,sizeof(ms1),ms1};
     octet MS2= {0,sizeof(ms2),ms2};
 
-    /* Hash values of client ID */
+    /* Hash values of Client ID */
     char hcid[PFS];
     octet HCID= {0,sizeof(hcid), hcid};
-
-    /* Hash values of messages */
-    char hm[PFS];
-    octet HM= {0,sizeof(hm), hm};
 
     /* Client secret and shares */
     char cs1[2*PFS+1], cs2[2*PFS+1], sec[2*PFS+1];
@@ -69,20 +63,22 @@ int main(int argc, char** argv)
     octet CS1= {0,sizeof(cs1), cs1};
     octet CS2= {0,sizeof(cs2), cs2};
 
+    /* Client Public Key and z */
+    char z1[PGS], z2[PGS], pa1[4*PFS], pa2[4*PFS];
+    octet Z1= {0,sizeof(z1),z1};
+    octet Z2= {0,sizeof(z2),z2};
+    octet Pa1= {0,sizeof(pa1),pa1};
+    octet Pa2= {0,sizeof(pa2),pa2};
+
     /* Server secret and shares */
     char ss1[4*PFS], ss2[4*PFS], serverSecret[4*PFS];
     octet ServerSecret= {0,sizeof(serverSecret),serverSecret};
     octet SS1= {0,sizeof(ss1),ss1};
     octet SS2= {0,sizeof(ss2),ss2};
 
-    /* Token stored on device */
+    /* Token stored on computer */
     char token[2*PFS+1];
     octet TOKEN= {0,sizeof(token),token};
-
-    /* Precomputed values stored on device */
-    char g1[12*PFS],g2[12*PFS];
-    octet G1= {0,sizeof(g1),g1};
-    octet G2= {0,sizeof(g2),g2};
 
     char u[2*PFS+1];
     octet U= {0,sizeof(u),u};
@@ -90,67 +86,60 @@ int main(int argc, char** argv)
     char hid[2*PFS+1];
     octet HID= {0,sizeof(hid),hid};
 
-    char e[12*PFS], f[12*PFS];
-    octet E= {0,sizeof(e),e};
-    octet F= {0,sizeof(f),f};
-
-    char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
-
-    char ck[PAS],sk[PAS];
-    octet R= {0,sizeof(r),r};
-    octet Z= {0,sizeof(z),z};
-    octet W= {0,sizeof(w),w};
-    octet T= {0,sizeof(t),t};
-    octet SK= {0,sizeof(sk),sk};
-    octet CK= {0,sizeof(ck),ck};
-
-    /* AES-GCM */
-    char raw[256], header[16], ciphertext[32], res[32], plaintext[32], tag[16], iv[16];
-    octet HEADER= {0,0,header}, Ciphertext= {0,sizeof(ciphertext),ciphertext};
-    octet Plaintext= {0,sizeof(plaintext),plaintext}, Res= {0,sizeof(res),res}, Tag= {0,sizeof(tag),tag}, IV= {0,sizeof(iv),iv};
-    csprng rng;
-
-    int hash;
-    if (!strcmp(argv[1], "sha256"))
-    {
-        hash = SHA256;
-    }
-    else if (!strcmp(argv[1], "sha384"))
-    {
-        hash = SHA384;
-    }
-    else
-    {
-        hash = SHA512;
-    }
-
-    /* Fake random source */
-    RAND_clean(&rng);
-    for (i=0; i<256; i++) raw[i]=(char)i;
-    RAND_seed(&rng,256,raw);
+    int TimeValue = 0;
 
     PIN1 = 1234;
     PIN2 = 1234;
+
+    printf("MPIN_FS %d\n", MPIN_FS());
+    printf("MPIN_GS %d\n", MPIN_GS());
 
     /* Assign the End-User an ID */
     char* user = "testuser@miracl.com";
     OCT_jstring(&ID,user);
     printf("CLIENT: ID %s\n", user);
 
-    int date = 0;
-    char seed[100] = {0};
+    char seed[32] = {0};
     octet SEED = {0,sizeof(seed),seed};
     csprng RNG;
 
     /* unrandom seed value! */
-    SEED.len=100;
-    for (i=0; i<100; i++) SEED.val[i]=i+1;
+    SEED.len=32;
+    for (i=0; i<32; i++) SEED.val[i]=i+1;
 
     /* initialise random number generator */
     CREATE_CSPRNG(&RNG,&SEED);
 
+    /* Generate random public key and z */
+    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z1,&Pa1);
+    if (rtn!=0)
+    {
+        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z1,&Pa1) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Z1: 0x");
+    OCT_output(&Z1);
+    printf("Pa1: 0x");
+    OCT_output(&Pa1);
+
+    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z2,&Pa2);
+    if (rtn!=0)
+    {
+        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z2,&Pa2) Error %d\n", rtn);
+        return 1;
+    }
+    printf("Z2: 0x");
+    OCT_output(&Z2);
+    printf("Pa2: 0x");
+    OCT_output(&Pa2);
+
+    /* Append Pa to ID */
+    OCT_joctet(&ID,&Pa1);
+    printf("ID|Pa1: 0x");
+    OCT_output(&ID);
+
     /* Hash ID */
-    MPIN_HASH_ID(hash,&ID,&HCID);
+    MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
     OCT_output(&HCID);
 
     /* When set only send hashed IDs to server */
@@ -232,11 +221,21 @@ int main(int argc, char** argv)
         printf("MPIN_RECOMBINE_G1(&CS1, &CS2, &TOKEN) Error %d\n", rtn);
         return 1;
     }
-    printf("Client Secret = 0x");
+    printf("Client Secret CS = 0x");
+    OCT_output(&TOKEN);
+
+    /* Compute client secret for key escrow less scheme z.CS */
+    rtn = MPIN_GET_G1_MULTIPLE(NULL,0,&Z2,&TOKEN,&TOKEN);
+    if (rtn != 0)
+    {
+        printf("MPIN_GET_G1_MULTIPLE(NULL,0,&Z,&CS,&CS) Error %d\n", rtn);
+        return 1;
+    }
+    printf("z2.CS: 0x");
     OCT_output(&TOKEN);
 
     /* Client extracts PIN1 from secret to create Token */
-    rtn = MPIN_EXTRACT_PIN(hash,&ID, PIN1, &TOKEN);
+    rtn = MPIN_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
     if (rtn != 0)
     {
         printf("MPIN_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
@@ -245,106 +244,58 @@ int main(int argc, char** argv)
     printf("Token = 0x");
     OCT_output(&TOKEN);
 
-    /* Client precomputation */
-    MPIN_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
-
-    /* Client first pass */
-    rtn = MPIN_CLIENT_1(hash,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL);
+    /* Client: Sign message */
+    TimeValue = MPIN_GET_TIME();
+    printf("TimeValue %d \n", TimeValue);
+    char* message = "sign this message";
+    OCT_jstring(&M,message);
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
-        printf("MPIN_CLIENT_1 ERROR %d\n", rtn);
+        printf("MPIN_CLIENT ERROR %d\n", rtn);
         return 1;
     }
-
-    /* Client sends Z=r.ID to Server */
-    MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
-
-    /* Server calculates H(ID) and maps them to points on the curve HID. */
-    MPIN_SERVER_1(hash,date,pID,&HID,NULL);
-
-    /* Server generates Random number Y and sends it to Client */
-    rtn = MPIN_RANDOM_GENERATE(&RNG,&Y);
-    if (rtn != 0)
-    {
-        printf("MPIN_RANDOM_GENERATE(&RNG,&Y) Error %d\n", rtn);
-        return 1;
-    }
-    printf("Y = 0x");
-    OCT_output(&Y);
-
-    /* Server sends T=w.ID to client */
-    MPIN_GET_G1_MULTIPLE(&RNG,0,&W,&HID,&T);
-    printf("T = 0x");
-    OCT_output(&T);
-
-    /* Client second pass */
-    rtn = MPIN_CLIENT_2(&X,&Y,&SEC);
-    if (rtn != 0)
-    {
-        printf("MPIN_CLIENT_2(&X,&Y,&SEC) Error %d\n", rtn);
-    }
+    printf("Y1 = 0x");
+    OCT_output(&Y1);
     printf("V = 0x");
     OCT_output(&SEC);
 
-    printf("date: %d\n",date);
-
-    /* Server second pass */
-#ifdef USE_DVS
-    rtn = MPIN_SERVER_2(date,&HID,NULL,&Y,&ServerSecret,&U,NULL,&SEC,&E,&F,NULL);
-#else
-    rtn = MPIN_SERVER_2(date,&HID,NULL,&Y,&ServerSecret,&U,NULL,&SEC,&E,&F);
-#endif
-
+    /* Server: Verify message */
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&M,TimeValue,&Pa1);
+    printf("Y2 = 0x");
+    OCT_output(&Y2);
     if (rtn != 0)
     {
-        printf("FAILURE Invalid Token Error Code %d\n", rtn);
+        printf("FAILURE Signature Verification Error Code %d\n", rtn);
     }
-
-    MPIN_HASH_ALL(hash,&HCID,&U,NULL,&SEC,&Y,&Z,&T,&HM);
-    MPIN_CLIENT_KEY(hash,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
-    printf("Client Key = ");
-    OCT_output(&CK);
-
-    /* Server will use the hashed ID if anonymous connection required.
-    MPIN_HASH_ID(hash,&ID,&HSID);
-    MPIN_HASH_ALL(&HSID,&U,NULL,&SEC,&Y,&Z,&T,&HM);
-    */
-    MPIN_SERVER_KEY(hash,&Z,&ServerSecret,&W,&HM,&HID,&U,NULL,&SK);
-    printf("Server Key = ");
-    OCT_output(&SK);
-
-    if (!OCT_comp(&CK,&SK))
+    else
     {
-        printf("FAILURE Keys are different\n");
-        return 1;
+        printf("SUCCESS Error Code %d\n", rtn);
     }
 
-    for (i=0; i<10; i++)
-    {
-        /* Self test AES-GCM encyption/decryption */
-        OCT_rand(&IV,&rng,16);
-        OCT_rand(&Plaintext,&rng,32);
-        OCT_copy(&Res,&Plaintext);
-#ifdef DEBUG
-        printf("Plaintext = ");
-        OCT_output(&Plaintext);
-        printf("IV = ");
-        OCT_output(&IV);
-#endif
-        MPIN_AES_GCM_ENCRYPT(&CK,&IV,&HEADER,&Plaintext,&Ciphertext,&Tag);
-        MPIN_AES_GCM_DECRYPT(&CK,&IV,&HEADER,&Ciphertext,&Plaintext,&Tag);
-#ifdef DEBUG
-        printf("Ciphertext = ");
-        OCT_output(&Ciphertext);
-#endif
+    /* clear memory */
+    OCT_clear(&ID);
+    OCT_clear(&X);
+    OCT_clear(&Y1);
+    OCT_clear(&Y2);
+    OCT_clear(&MS1);
+    OCT_clear(&MS2);
+    OCT_clear(&HCID);
+    OCT_clear(&SEC);
+    OCT_clear(&CS1);
+    OCT_clear(&CS2);
+    OCT_clear(&ServerSecret);
+    OCT_clear(&SS1);
+    OCT_clear(&SS2);
+    OCT_clear(&TOKEN);
+    OCT_clear(&U);
+    OCT_clear(&HID);
+    OCT_clear(&SEED);
+    OCT_clear(&Z1);
+    OCT_clear(&Z2);
+    OCT_clear(&Pa1);
+    OCT_clear(&Pa2);
 
-        if (!OCT_comp(&Res,&Plaintext))
-        {
-            printf("FAILURE Encryption/Decryption with AES-GCM\n");
-            return 1;
-        }
-    }
-
-    printf("SUCCESS\n");
+    KILL_CSPRNG(&RNG);
     return 0;
 }

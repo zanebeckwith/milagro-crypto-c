@@ -272,6 +272,51 @@ func GetClientSecret(masterSecret []byte, hashMPinId []byte) (errorCode int, cli
 
 /*
 
+GetDVSKeyPair randomly generates the public key in G2 for the key-escrow less scheme
+
+Args:
+
+    RNG:	cryptographically secure random number generator
+	z: 		input octet pointer to a value for z in RNG==nil, nil otherwise
+
+Returns:
+
+    errorCode: 		error from the C function
+    zOut: 			output randomly generated private key if RNG!=nil, z otherwise
+    publicKey: 		client public key: (z^-1).Q
+
+*/
+func GetDVSKeyPair(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publicKey []byte) {
+	// Form octets
+	publicKeyOct := GetOctetZero(G2S)
+	defer OctetFree(&publicKeyOct)
+	zStr := string(z)
+	zOct := GetOctet(zStr)
+	defer OctetFree(&zOct)
+
+	var pRNG *C.csprng
+
+	if RNG == nil {
+		pRNG = nil
+		zOct = GetOctet(zStr)
+	} else {
+		pRNG = RNG.csprng()
+		zOct = GetOctetZero(PGS)
+	}
+
+	rtn := C.MPIN_GET_DVS_KEYPAIR(pRNG, &zOct, &publicKeyOct)
+	errorCode = int(rtn)
+
+	// Convert octets to bytes
+	publicKey = OctetToBytes(&publicKeyOct)
+	zOut = OctetToBytes(&zOct)
+
+	return errorCode, zOut, publicKey[:]
+
+}
+
+/*
+
 GetClientPermit creates a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
 
 Args:
@@ -550,9 +595,10 @@ func GetG1Multiple(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int, xOu
 
 /*
 
-Server performs server side of the one-pass version of the M-Pin protocol. If Time
-Permits are disabled, set epoch_date = 0, and UT and HTID are not generated and can
-be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
+Server performs server side of the one-pass version of the M-Pin protocol
+with support for the key-escrow less scheme. If Time Permits are disabled,
+set epoch_date = 0, and UT and HTID are not generated and can be set to nil.
+If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
 and PIN error detection is ON, U, UT, HID and HTID are all required.
 
@@ -565,7 +611,8 @@ Args:
     U: U = x.H(ID)
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
-    mpinId: M-Pin ID or hash of the M-Pin ID in anonymous mode
+    mpinId: M-Pin ID, or hash of the M-Pin ID in anonymous mode, or M-Pin ID | publicKey in key-escrow less scheme
+    publicKey: client public key in key-escrow less version, or nil otherwise
     message: message to be signed
     kangaroo: Set to true to perform Kangaroo
 
@@ -579,7 +626,7 @@ Returns:
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled used for debug
 
 */
-func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, message []byte, kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte) {
+func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, publicKey, message []byte, kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte) {
 	serverSecretStr := string(serverSecret)
 	serverSecretOct := GetOctet(serverSecretStr)
 	defer OctetFree(&serverSecretOct)
@@ -608,12 +655,22 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 	defer OctetFree(&pE)
 	var pF C.octet
 	defer OctetFree(&pF)
+	var pPublicKey C.octet
+	defer OctetFree(&pPublicKey)
 
 	var EOct *C.octet
 	var FOct *C.octet
 	var UTOct *C.octet
 	var messageOct *C.octet
+	var publicKeyOct *C.octet
 
+	if publicKey == nil {
+		publicKeyOct = nil
+	} else {
+		publicKeyStr := string(publicKey)
+		pPublicKey = GetOctet(publicKeyStr)
+		publicKeyOct = &pPublicKey
+	}
 	if UT == nil {
 		UTOct = nil
 	} else {
@@ -638,7 +695,7 @@ func Server(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, 
 		FOct = &pF
 	}
 
-	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, messageOct, C.int(epochTime))
+	rtn := C.MPIN_SERVER(C.int(hashType), C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, &mpinIdOct, messageOct, C.int(epochTime), publicKeyOct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -993,9 +1050,10 @@ func Server1(hashType, epochDate int, mpinId []byte) (HID, HTID []byte) {
 
 /*
 
-Server2 performs server side of the three-pass version of the M-Pin protocol. If Time
-Permits are disabled, set epoch_date = 0, and UT and HTID are not generated and can
-be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
+Server2 performs server side of the three-pass version of the M-Pin protocol, wiht
+support for the key-escrow less scheme.  If Time Permits are disabled,
+set epoch_date = 0, and UT and HTID are not generated and can be set to nil.
+If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
 and PIN error detection is ON, U, UT, HID and HTID are all required.
 
@@ -1005,6 +1063,7 @@ Args:
     HID:  H(mpin_id). H is a map to a point on the curve
     HTID: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
     y: locally generated random number
+    publicKey: client public key in key-escrow less scheme, nil otherwise
     server_secret: Server secret
     U: U = x.H(ID)
     UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
@@ -1018,7 +1077,7 @@ Returns:
     F: value to help the Kangaroos to find the PIN error, or nil kangaroo is set to false
 
 */
-func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, kangaroo bool) (errorCode int, E []byte, F []byte) {
+func Server2(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, kangaroo bool) (errorCode int, E []byte, F []byte) {
 	// Form Octets
 	HIDStr := string(HID)
 	HIDOct := GetOctet(HIDStr)
@@ -1042,6 +1101,7 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 	var EOct *C.octet
 	var FOct *C.octet
 	var UTOct *C.octet
+	var publicKeyOct *C.octet
 
 	var pUT C.octet
 	defer OctetFree(&pUT)
@@ -1049,7 +1109,16 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 	defer OctetFree(&pE)
 	var pF C.octet
 	defer OctetFree(&pF)
+	var pPublicKey C.octet
+	defer OctetFree(&pPublicKey)
 
+	if publicKey == nil {
+		publicKeyOct = nil
+	} else {
+		publicKeyStr := string(publicKey)
+		pPublicKey = GetOctet(publicKeyStr)
+		publicKeyOct = &pPublicKey
+	}
 	if UT == nil {
 		UTOct = nil
 	} else {
@@ -1067,7 +1136,7 @@ func Server2(epochDate int, HID []byte, HTID []byte, y []byte, serverSecret []by
 		FOct = &pF
 	}
 
-	rtn := C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct)
+	rtn := C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, publicKeyOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct)
 
 	errorCode = int(rtn)
 

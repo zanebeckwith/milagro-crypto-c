@@ -269,7 +269,12 @@ int main()
         OCT_output(&SEC);
 
         /* Server second pass */
+#ifdef USE_DVS
+        rtn = MPIN_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F,NULL);
+#else
         rtn = MPIN_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F);
+#endif
+
         if (rtn != 0)
         {
             err=MPIN_KANGAROO(&E,&F);

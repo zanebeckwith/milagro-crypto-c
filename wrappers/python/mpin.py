@@ -53,6 +53,7 @@ typedef struct
 
 extern void CREATE_CSPRNG(csprng *R,octet *S);
 extern void KILL_CSPRNG(csprng *R);
+extern void OCT_clear(octet *O);
 
 extern unsigned int MPIN_FS(void);
 extern unsigned int MPIN_GS(void);
@@ -63,6 +64,7 @@ extern int MPIN_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
 extern int MPIN_CLIENT(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
 extern int MPIN_CLIENT_1(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *S,octet *U,octet *UT,octet *TP);
 extern int MPIN_RANDOM_GENERATE(csprng *R,octet *S);
+extern int MPIN_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa);
 extern int MPIN_CLIENT_2(octet *x,octet *y,octet *V);
 extern int MPIN_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
 extern void MPIN_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
@@ -231,6 +233,7 @@ def create_csprng(seed):
     # random number generator
     rng = ffi.new('csprng*')
     libamcl_core.CREATE_CSPRNG(rng, seed_oct)
+    libamcl_core.OCT_clear(seed_oct)
 
     return rng
 
@@ -278,6 +281,11 @@ def hash_id(hash_type, mpin_id):
     libamcl_mpin.MPIN_HASH_ID(hash_type, mpin_id1, hash_mpin_id1)
 
     hash_mpin_id_hex = to_hex(hash_mpin_id1)
+
+    # clear memory
+    libamcl_core.OCT_clear(mpin_id1)
+    libamcl_core.OCT_clear(hash_mpin_id1)
+
     return hash_mpin_id_hex.decode("hex")
 
 
@@ -302,7 +310,44 @@ def random_generate(rng):
     error_code = libamcl_mpin.MPIN_RANDOM_GENERATE(rng, s1)
 
     s_hex = to_hex(s1)
+
+    # clear memory
+    libamcl_core.OCT_clear(s1)
+
     return error_code, s_hex.decode("hex")
+
+
+def get_dvs_keypair(rng):
+    """Create a public key in G2 for thee client
+
+    Create a public in G2 for the client
+
+    Args::
+
+        rng: a random number generator
+
+    Returns::
+
+        error_code: error from the C function
+        z: private key
+        pa: public key
+
+    Raises:
+
+    """
+    pa, pa_val = make_octet(G2)
+    z, z_val = make_octet(PFS)
+
+    error_code = libamcl_mpin.MPIN_GET_DVS_KEYPAIR(rng, z, pa)
+
+    pa_hex = to_hex(pa)
+    z_hex = to_hex(z)
+
+    # clear memory
+    libamcl_core.OCT_clear(z)
+    libamcl_core.OCT_clear(pa)
+
+    return error_code, z_hex.decode("hex"), pa_hex.decode("hex")
 
 
 def get_server_secret(master_secret):
@@ -328,6 +373,11 @@ def get_server_secret(master_secret):
         master_secret1, server_secret1)
 
     server_secret_hex = to_hex(server_secret1)
+
+    # clear memory
+    libamcl_core.OCT_clear(master_secret1)
+    libamcl_core.OCT_clear(server_secret1)
+
     return error_code, server_secret_hex.decode("hex")
 
 
@@ -355,6 +405,12 @@ def recombine_G2(W1, W2):
     error_code = libamcl_mpin.MPIN_RECOMBINE_G2(w11, w21, w1)
 
     w_hex = to_hex(w1)
+
+    # clear memory
+    libamcl_core.OCT_clear(w11)
+    libamcl_core.OCT_clear(w21)
+    libamcl_core.OCT_clear(w1)
+
     return error_code, w_hex.decode("hex")
 
 
@@ -383,6 +439,12 @@ def get_client_secret(master_secret, hash_mpin_id):
         master_secret1, hash_mpin_id1, client_secret1)
 
     client_secret_hex = to_hex(client_secret1)
+
+    # clear memory
+    libamcl_core.OCT_clear(master_secret1)
+    libamcl_core.OCT_clear(hash_mpin_id1)
+    libamcl_core.OCT_clear(client_secret1)
+
     return error_code, client_secret_hex.decode("hex")
 
 
@@ -410,6 +472,12 @@ def recombine_G1(q1, q2):
     error_code = libamcl_mpin.MPIN_RECOMBINE_G1(q11, q21, q1)
 
     q_hex = to_hex(q1)
+
+    # clear memory
+    libamcl_core.OCT_clear(q11)
+    libamcl_core.OCT_clear(q21)
+    libamcl_core.OCT_clear(q1)
+
     return error_code, q_hex.decode("hex")
 
 
@@ -443,6 +511,12 @@ def get_client_permit(hash_type, epoch_date, master_secret, hash_mpin_id):
         time_permit1)
 
     time_permit_hex = to_hex(time_permit1)
+
+    # clear memory
+    libamcl_core.OCT_clear(master_secret1)
+    libamcl_core.OCT_clear(hash_mpin_id1)
+    libamcl_core.OCT_clear(time_permit1)
+
     return error_code, time_permit_hex.decode("hex")
 
 
@@ -472,6 +546,11 @@ def extract_pin(hash_type, mpin_id, pin, client_secret):
         hash_type, mpin_id1, pin, client_secret1)
 
     client_secret_hex = to_hex(client_secret1)
+
+    # clear memory
+    libamcl_core.OCT_clear(mpin_id1)
+    libamcl_core.OCT_clear(client_secret1)
+
     return error_code, client_secret_hex.decode("hex")
 
 
@@ -503,6 +582,13 @@ def precompute(token, hash_mpin_id):
 
     pc1_hex = to_hex(pc11)
     pc2_hex = to_hex(pc21)
+
+    # clear memory
+    libamcl_core.OCT_clear(token1)
+    libamcl_core.OCT_clear(hash_mpin_id1)
+    libamcl_core.OCT_clear(pc11)
+    libamcl_core.OCT_clear(pc21)
+
     return error_code, pc1_hex.decode("hex"), pc2_hex.decode("hex")
 
 
@@ -570,6 +656,17 @@ def client_1(hash_type, epoch_date, mpin_id, rng, x, pin, token, time_permit):
     u_hex = to_hex(u1)
     ut_hex = to_hex(ut1)
     v_hex = to_hex(v1)
+
+    # clear memory
+    if time_permit:
+        libamcl_core.OCT_clear(time_permit1)
+    libamcl_core.OCT_clear(mpin_id1)
+    libamcl_core.OCT_clear(token1)
+    libamcl_core.OCT_clear(x1)
+    libamcl_core.OCT_clear(u1)
+    libamcl_core.OCT_clear(ut1)
+    libamcl_core.OCT_clear(v1)
+
     return error_code, x_hex.decode("hex"), u_hex.decode(
         "hex"), ut_hex.decode("hex"), v_hex.decode("hex")
 
@@ -599,6 +696,12 @@ def client_2(x, y, sec):
     error_code = libamcl_mpin.MPIN_CLIENT_2(x1, y1, sec1)
 
     sec_hex = to_hex(sec1)
+
+    # clear memory
+    libamcl_core.OCT_clear(x1)
+    libamcl_core.OCT_clear(y1)
+    libamcl_core.OCT_clear(sec1)
+
     return error_code, sec_hex.decode("hex")
 
 
@@ -637,7 +740,10 @@ def client(hash_type, epoch_date, mpin_id, rng, x, pin, token,
     """
     mpin_id1, mpin_id1_val = make_octet(None, mpin_id)
     token1, token1_val = make_octet(None, token)
-    time_permit1, time_permit1_val = make_octet(None, time_permit)
+    if time_permit:
+        time_permit1, time_permit1_val = make_octet(None, time_permit)
+    else:
+        time_permit1 = ffi.NULL
 
     if rng is not None:
         x1, x1_val = make_octet(PGS)
@@ -675,6 +781,20 @@ def client(hash_type, epoch_date, mpin_id, rng, x, pin, token,
     ut_hex = to_hex(ut1)
     v_hex = to_hex(v1)
     y_hex = to_hex(y1)
+
+    # clear memory
+    if time_permit:
+        libamcl_core.OCT_clear(time_permit1)
+    if message:
+        libamcl_core.OCT_clear(message1)
+    libamcl_core.OCT_clear(mpin_id1)
+    libamcl_core.OCT_clear(token1)
+    libamcl_core.OCT_clear(x1)
+    libamcl_core.OCT_clear(u1)
+    libamcl_core.OCT_clear(ut1)
+    libamcl_core.OCT_clear(v1)
+    libamcl_core.OCT_clear(y1)
+
     return error_code, x_hex.decode("hex"), u_hex.decode(
         "hex"), ut_hex.decode("hex"), v_hex.decode("hex"), y_hex.decode("hex")
 
@@ -705,14 +825,22 @@ def get_G1_multiple(rng, type, x, P):
     """
     if rng is not None:
         x1, x1_val = make_octet(PGS)
+        rng_in = rng
     else:
         x1, x1_val = make_octet(None, x)
+        rng_in = ffi.NULL
     P1, P1_val = make_octet(None, P)
     W1, W1_val = make_octet(G1)
-    error_code = libamcl_mpin.MPIN_GET_G1_MULTIPLE(rng, type, x1, P1, W1)
+    error_code = libamcl_mpin.MPIN_GET_G1_MULTIPLE(rng_in, type, x1, P1, W1)
 
     x_hex = to_hex(x1)
     W_hex = to_hex(W1)
+
+    # clear memory
+    libamcl_core.OCT_clear(x1)
+    libamcl_core.OCT_clear(P1)
+    libamcl_core.OCT_clear(W1)
+
     return error_code, x_hex.decode("hex"), W_hex.decode("hex")
 
 
@@ -746,6 +874,12 @@ def server_1(hash_type, epoch_date, mpin_id):
 
     HID_hex = to_hex(HID1)
     HTID_hex = to_hex(HTID1)
+
+    # clear memory
+    libamcl_core.OCT_clear(mpin_id1)
+    libamcl_core.OCT_clear(HTID1)
+    libamcl_core.OCT_clear(HID1)
+
     return HID_hex.decode("hex"), HTID_hex.decode("hex")
 
 
@@ -803,6 +937,18 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
 
     e_hex = to_hex(e1)
     f_hex = to_hex(f1)
+
+    # clear memory
+    libamcl_core.OCT_clear(HID1)
+    libamcl_core.OCT_clear(HTID1)
+    libamcl_core.OCT_clear(y1)
+    libamcl_core.OCT_clear(server_secret1)
+    libamcl_core.OCT_clear(u1)
+    libamcl_core.OCT_clear(ut1)
+    libamcl_core.OCT_clear(v1)
+    libamcl_core.OCT_clear(e1)
+    libamcl_core.OCT_clear(f1)
+
     return error_code, e_hex.decode("hex"), f_hex.decode("hex")
 
 
@@ -877,6 +1023,21 @@ def server(hash_type, epoch_date, server_secret,
     e_hex = to_hex(e1)
     f_hex = to_hex(f1)
     y_hex = to_hex(y1)
+
+    # clear memory
+    if message:
+        libamcl_core.OCT_clear(message1)
+    libamcl_core.OCT_clear(server_secret1)
+    libamcl_core.OCT_clear(u1)
+    libamcl_core.OCT_clear(ut1)
+    libamcl_core.OCT_clear(mpin_id1)
+    libamcl_core.OCT_clear(v1)
+    libamcl_core.OCT_clear(HID1)
+    libamcl_core.OCT_clear(HTID1)
+    libamcl_core.OCT_clear(e1)
+    libamcl_core.OCT_clear(f1)
+    libamcl_core.OCT_clear(y1)
+
     return error_code, HID_hex.decode("hex"), HTID_hex.decode(
         "hex"), e_hex.decode("hex"), f_hex.decode("hex"), y_hex.decode("hex")
 
@@ -900,6 +1061,11 @@ def kangaroo(e, f):
     """
     e1, e1_val = make_octet(None, e)
     f1, f1_val = make_octet(None, f)
+
+    # clear memory
+    libamcl_core.OCT_clear(e1)
+    libamcl_core.OCT_clear(f1)
+
     pin_error = libamcl_mpin.MPIN_KANGAROO(e1, f1)
 
     return pin_error
@@ -943,6 +1109,17 @@ def hash_all(hash_type, hash_mpin_id, u, ut, v, y, z, t):
                                u1, ut1, v1, y1, z1, t1, hm1)
 
     hm_hex = to_hex(hm1)
+
+    # clear memory
+    if ut:
+        libamcl_core.OCT_clear(ut1)
+    libamcl_core.OCT_clear(hash_mpin_id1)
+    libamcl_core.OCT_clear(u1)
+    libamcl_core.OCT_clear(v1)
+    libamcl_core.OCT_clear(y1)
+    libamcl_core.OCT_clear(z1)
+    libamcl_core.OCT_clear(t1)
+
     return hm_hex.decode("hex")
 
 
@@ -988,6 +1165,16 @@ def client_key(hash_type, pc1, pc2, pin, r, x, hm, t):
         client_aes_key1)
 
     client_aes_key_hex = to_hex(client_aes_key1)
+
+    # clear memory
+    libamcl_core.OCT_clear(pc11)
+    libamcl_core.OCT_clear(pc21)
+    libamcl_core.OCT_clear(r1)
+    libamcl_core.OCT_clear(x1)
+    libamcl_core.OCT_clear(hm1)
+    libamcl_core.OCT_clear(t1)
+    libamcl_core.OCT_clear(client_aes_key1)
+
     return error_code, client_aes_key_hex.decode("hex")
 
 
@@ -1039,6 +1226,18 @@ def server_key(hash_type, z, server_secret, w, hm, HID, u, ut):
         server_aes_key1)
 
     server_aes_key_hex = to_hex(server_aes_key1)
+
+    # clear memory
+    if ut:
+        libamcl_core.OCT_clear(ut1)
+    libamcl_core.OCT_clear(z1)
+    libamcl_core.OCT_clear(server_secret1)
+    libamcl_core.OCT_clear(w1)
+    libamcl_core.OCT_clear(hm1)
+    libamcl_core.OCT_clear(HID1)
+    libamcl_core.OCT_clear(u1)
+    libamcl_core.OCT_clear(server_aes_key1)
+
     return error_code, server_aes_key_hex.decode("hex")
 
 
@@ -1080,6 +1279,14 @@ def aes_gcm_encrypt(aes_key, iv, header, plaintext):
     tag = to_hex(tag1)
     ciphertext = to_hex(ciphertext1)
 
+    # clear memory
+    libamcl_core.OCT_clear(aes_key1)
+    libamcl_core.OCT_clear(iv1)
+    libamcl_core.OCT_clear(header1)
+    libamcl_core.OCT_clear(plaintext1)
+    libamcl_core.OCT_clear(tag1)
+    libamcl_core.OCT_clear(ciphertext1)
+
     return ciphertext.decode("hex"), tag.decode("hex")
 
 
@@ -1117,8 +1324,17 @@ def aes_gcm_decrypt(aes_key, iv, header, ciphertext):
         ciphertext1,
         plaintext1,
         tag1)
+
     tag = to_hex(tag1)
     plaintext = to_hex(plaintext1)
+
+    # clear memory
+    libamcl_core.OCT_clear(aes_key1)
+    libamcl_core.OCT_clear(iv1)
+    libamcl_core.OCT_clear(header1)
+    libamcl_core.OCT_clear(plaintext1)
+    libamcl_core.OCT_clear(tag1)
+    libamcl_core.OCT_clear(ciphertext1)
 
     return plaintext.decode("hex"), tag.decode("hex")
 
@@ -1165,12 +1381,16 @@ def generate_random(rng, length):
     libamcl_mpin.generateRandom(rng, random_value1)
 
     random_value_hex = to_hex(random_value1)
+
+    # clear memory
+    libamcl_core.OCT_clear(random_value1)
+
     return random_value_hex.decode("hex")
 
 
 if __name__ == "__main__":
     # Print hex values
-    DEBUG = False
+    DEBUG = True
 
     # Require user input
     INPUT = True
@@ -1449,5 +1669,48 @@ if __name__ == "__main__":
             server_aes_key, iv, header, ciphertext)
         print "decrypted message: ", plaintext2
         print "tag2 ", tag2.encode("hex")
+
+    # Clear memory
+    del seed
+    del mpin_id
+    del hash_mpin_id
+    del pID
+    del ms1
+    del ms2
+    del ss1
+    del ss2
+    del server_secret
+    del cs1
+    del cs2
+    del client_secret
+    del token
+    del pc1
+    del pc2
+    del x
+    del u
+    del ut
+    del v
+    del y
+    del HID
+    del HTID
+    if PIN_ERROR:
+        del E
+        del F
+    if ONE_PASS:
+        del y2
+    else:
+        del sec
+    if TIME_PERMITS:
+        del tp1
+        del tp2
+        del time_permit
+    if MPIN_FULL:
+        del r
+        del Z
+        del w
+        del T
+        del HM
+        del client_aes_key
+        del server_aes_key
 
     kill_csprng(rng)

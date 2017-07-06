@@ -35,6 +35,7 @@ def time_func(stmt, n=10, setup='from __main__ import *'):
     iter_per_sec = n / total_time
     print "func:%s nIter:%s total_time:%s iter_time:%s iter_per_sec: %s" % (stmt, n, total_time, iter_time, iter_per_sec)
 
+
 nIter = 100
 
 HASH_TYPE_MPIN = mpin.SHA256

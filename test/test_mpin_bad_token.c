@@ -264,7 +264,12 @@ int main()
 
     /* Server second pass */
     /* Set SEC to UT to simulate a bad token */
+#ifdef USE_DVS
+    rtn = MPIN_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&UT,&E,&F,NULL);
+#else
     rtn = MPIN_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&UT,&E,&F);
+#endif
+
     if (rtn != 0)
     {
         err=MPIN_KANGAROO(&E,&F);

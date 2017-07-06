@@ -50,6 +50,7 @@
 #define OS "@OS@"                               /**< Operative system */
 #cmakedefine USE_PATENTS   /**< Use Patents */
 #cmakedefine USE_ANONYMOUS /**< Use Anonymous Configuration in MPin */
+#cmakedefine USE_DVS /**< Use Key-escrow less Scheme Configuration in MPin  */
 #endif
 
 /* Curve types */

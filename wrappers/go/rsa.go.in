@@ -37,7 +37,7 @@ package amcl
 */
 import "C"
 
-// generate an RSA key pair
+// RSAKeyPair generates an RSA key pair
 func RSAKeyPair(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key, C.rsa_public_key) {
 	PStr := string(P)
 	POct := GetOctet(PStr)
@@ -53,7 +53,7 @@ func RSAKeyPair(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key, C.
 	return RSA_PrivKey, RSA_PubKey
 }
 
-// PKCS 1.5 padding of a message to be signed
+// PKCS15 (PKCS 1.5) - padding of a message to be signed
 func PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
@@ -67,7 +67,7 @@ func PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
 	return errorCode, C[:]
 }
 
-// OAEP Message Encoding for Encryption
+// OAEPencode encodes the message for encryption
 func OAEPencode(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, F []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
@@ -84,7 +84,7 @@ func OAEPencode(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, F
 	return errorCode, F[:]
 }
 
-// OAEP Message Decoding after decryption, M is the message to be decoded, F is the decoded message
+// OAEPdecode decodes message M after decryption, F is the decoded message
 func OAEPdecode(hashType int, P []byte, M []byte) (int, []byte) {
 	MStr := string(M)
 	MOct := GetOctet(MStr)
@@ -99,7 +99,7 @@ func OAEPdecode(hashType int, P []byte, M []byte) (int, []byte) {
 	return errorCode, M[:]
 }
 
-// RSA encryption with the public key
+// RSA_ENCRYPT encrypts F with the public key
 func RSA_ENCRYPT(RSA_PubKey *C.rsa_public_key, F []byte) (G []byte) {
 	FStr := string(F)
 	FOct := GetOctet(FStr)
@@ -112,7 +112,7 @@ func RSA_ENCRYPT(RSA_PubKey *C.rsa_public_key, F []byte) (G []byte) {
 	return G[:]
 }
 
-// RSA decryption with the private key
+// RSA_DECRYPT decrypts G with the private key
 func RSA_DECRYPT(RSA_PrivKey *C.rsa_private_key, G []byte) (F []byte) {
 	GStr := string(G)
 	GOct := GetOctet(GStr)
@@ -125,7 +125,7 @@ func RSA_DECRYPT(RSA_PrivKey *C.rsa_private_key, G []byte) (F []byte) {
 	return F[:]
 }
 
-// Destroy an RSA private Key
+// RSA_PRIVATE_KEY_KILL destroys an RSA private Key
 func RSA_PRIVATE_KEY_KILL(RSA_PrivKey *C.rsa_private_key) {
 	C.RSA_PRIVATE_KEY_KILL(RSA_PrivKey)
 }

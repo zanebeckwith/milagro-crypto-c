@@ -23,10 +23,10 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/miracl/amcl-go-wrapper"
+	amcl "github.com/miracl/amcl-go-wrapper"
 )
 
-var HASH_TYPE_MPIN = mpin.SHA256
+var HASH_TYPE_MPIN = amcl.SHA256
 
 func main() {
 	// Assign the End-User an ID
@@ -36,33 +36,33 @@ func main() {
 	fmt.Printf("%x\n\n", ID)
 
 	// Epoch time in days
-	date := mpin.Today()
+	date := 0
 	fmt.Println("date: ", date)
 
 	// Epoch time in seconds
-	timeValue := mpin.GetTime()
+	timeValue := amcl.GetTime()
 	fmt.Println("timeValue: ", timeValue)
 
 	// PIN variable to create token
-	PIN1 := -1
+	PIN1 := 0
 	// PIN variable to authenticate
-	PIN2 := -1
+	PIN2 := 0
 
 	// Seed value for Random Number Generator (RNG)
-	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
 	if err != nil {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := mpin.CreateCSPRNG(seed)
+	rng := amcl.CreateCSPRNG(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := mpin.RandomGenerate(&rng)
+	rtn, MS1 := amcl.RandomGenerate(&rng)
 	if rtn != 0 {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
@@ -70,8 +70,11 @@ func main() {
 	fmt.Printf("MS1: 0x")
 	fmt.Printf("%x\n", MS1[:])
 
+	// Destroy MS1
+	defer amcl.CleanMemory(MS1[:])
+
 	// Generate Master Secret Share 2
-	rtn, MS2 := mpin.RandomGenerate(&rng)
+	rtn, MS2 := amcl.RandomGenerate(&rng)
 	if rtn != 0 {
 		fmt.Println("RandomGenerate Error:", rtn)
 		return
@@ -79,11 +82,14 @@ func main() {
 	fmt.Printf("MS2: 0x")
 	fmt.Printf("%x\n", MS2[:])
 
+	// Destroy MS2
+	defer amcl.CleanMemory(MS2[:])
+
 	// Either Client or TA calculates Hash(ID)
-	HCID := mpin.HashId(HASH_TYPE_MPIN, ID)
+	HCID := amcl.HashId(HASH_TYPE_MPIN, ID)
 
 	// Generate server secret share 1
-	rtn, SS1 := mpin.GetServerSecret(MS1[:])
+	rtn, SS1 := amcl.GetServerSecret(MS1[:])
 	if rtn != 0 {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
@@ -91,8 +97,11 @@ func main() {
 	fmt.Printf("SS1: 0x")
 	fmt.Printf("%x\n", SS1[:])
 
+	// Destroy SS1
+	defer amcl.CleanMemory(SS1[:])
+
 	// Generate server secret share 2
-	rtn, SS2 := mpin.GetServerSecret(MS2[:])
+	rtn, SS2 := amcl.GetServerSecret(MS2[:])
 	if rtn != 0 {
 		fmt.Println("GetServerSecret Error:", rtn)
 		return
@@ -100,8 +109,11 @@ func main() {
 	fmt.Printf("SS2: 0x")
 	fmt.Printf("%x\n", SS2[:])
 
+	// Destroy SS2
+	defer amcl.CleanMemory(SS2[:])
+
 	// Combine server secret shares
-	rtn, SS := mpin.RecombineG2(SS1[:], SS2[:])
+	rtn, SS := amcl.RecombineG2(SS1[:], SS2[:])
 	if rtn != 0 {
 		fmt.Println("RecombineG2(SS1, SS2) Error:", rtn)
 		return
@@ -109,8 +121,11 @@ func main() {
 	fmt.Printf("SS: 0x")
 	fmt.Printf("%x\n", SS[:])
 
+	// Destroy SS
+	defer amcl.CleanMemory(SS[:])
+
 	// Generate client secret share 1
-	rtn, CS1 := mpin.GetClientSecret(MS1[:], HCID)
+	rtn, CS1 := amcl.GetClientSecret(MS1[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
@@ -118,8 +133,11 @@ func main() {
 	fmt.Printf("Client Secret Share CS1: 0x")
 	fmt.Printf("%x\n", CS1[:])
 
+	// Destroy CS1
+	defer amcl.CleanMemory(CS1[:])
+
 	// Generate client secret share 2
-	rtn, CS2 := mpin.GetClientSecret(MS2[:], HCID)
+	rtn, CS2 := amcl.GetClientSecret(MS2[:], HCID)
 	if rtn != 0 {
 		fmt.Println("GetClientSecret Error:", rtn)
 		return
@@ -127,9 +145,12 @@ func main() {
 	fmt.Printf("Client Secret Share CS2: 0x")
 	fmt.Printf("%x\n", CS2[:])
 
+	// Destroy CS2
+	defer amcl.CleanMemory(CS2[:])
+
 	// Combine client secret shares
-	CS := make([]byte, mpin.G1S)
-	rtn, CS = mpin.RecombineG1(CS1[:], CS2[:])
+	CS := make([]byte, amcl.G1S)
+	rtn, CS = amcl.RecombineG1(CS1[:], CS2[:])
 	if rtn != 0 {
 		fmt.Println("RecombineG1 Error:", rtn)
 		return
@@ -137,30 +158,8 @@ func main() {
 	fmt.Printf("Client Secret CS: 0x")
 	fmt.Printf("%x\n", CS[:])
 
-	// Generate time permit share 1
-	rtn, TP1 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
-	if rtn != 0 {
-		fmt.Println("GetClientPermit Error:", rtn)
-		return
-	}
-	fmt.Printf("TP1: 0x")
-	fmt.Printf("%x\n", TP1[:])
-
-	// Generate time permit share 2
-	rtn, TP2 := mpin.GetClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
-	if rtn != 0 {
-		fmt.Println("GetClientPermit Error:", rtn)
-		return
-	}
-	fmt.Printf("TP2: 0x")
-	fmt.Printf("%x\n", TP2[:])
-
-	// Combine time permit shares
-	rtn, TP := mpin.RecombineG1(TP1[:], TP2[:])
-	if rtn != 0 {
-		fmt.Println("RecombineG1(TP1, TP2) Error:", rtn)
-		return
-	}
+	// Destroy CS
+	defer amcl.CleanMemory(CS[:])
 
 	// Client extracts PIN1 from secret to create Token
 	for PIN1 < 0 {
@@ -168,7 +167,7 @@ func main() {
 		fmt.Scan(&PIN1)
 	}
 
-	rtn, TOKEN := mpin.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+	rtn, TOKEN := amcl.ExtractPIN(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d\n", rtn)
 		return
@@ -176,25 +175,33 @@ func main() {
 	fmt.Printf("Client Token TK: 0x")
 	fmt.Printf("%x\n", TOKEN[:])
 
+	// Destroy TOKEN
+	defer amcl.CleanMemory(TOKEN[:])
+
 	//////   Client   //////
 
 	// Precomputation
-	rtn, G1, G2 := mpin.Precompute(TOKEN[:], HCID)
+	rtn, G1, G2 := amcl.Precompute(TOKEN[:], HCID)
 	if rtn != 0 {
 		fmt.Println("Precompute(TOKEN[:], HCID) Error:", rtn)
 		return
 	}
+
+	// Destroy G2
+	defer amcl.CleanMemory(G2[:])
+	// Destroy G1
+	defer amcl.CleanMemory(G1[:])
 
 	for PIN2 < 0 {
 		fmt.Printf("Please enter PIN to authenticate: ")
 		fmt.Scan(&PIN2)
 	}
 
-	// Send U, UT, V, timeValue and Message to server
-	var X [mpin.PGS]byte
+	// Send U, V, timeValue and Message to server
+	var X [amcl.PGS]byte
 	fmt.Printf("X: 0x")
 	fmt.Printf("%x\n", X[:])
-	rtn, XOut, Y1, V, U, UT := mpin.Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	rtn, XOut, Y1, V, U, _ := amcl.Client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, MESSAGE[:], timeValue)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT rtn: %d\n", rtn)
 		return
@@ -204,16 +211,30 @@ func main() {
 	fmt.Printf("XOut: 0x")
 	fmt.Printf("%x\n", XOut[:])
 
+	// Destroy Y1
+	defer amcl.CleanMemory(Y1[:])
+	// Destroy XOut
+	defer amcl.CleanMemory(XOut[:])
+	// Destroy V
+	defer amcl.CleanMemory(V[:])
+
 	// Send Z=r.ID to Server
-	var R [mpin.PGS]byte
+	var R [amcl.PGS]byte
 	fmt.Printf("R: 0x")
 	fmt.Printf("%x\n", R[:])
-	rtn, ROut, Z := mpin.GetG1Multiple(&rng, 1, R[:], HCID[:])
+	rtn, ROut, Z := amcl.GetG1Multiple(&rng, 1, R[:], HCID[:])
 	fmt.Printf("ROut: 0x")
 	fmt.Printf("%x\n", ROut[:])
 
+	// Destroy R
+	defer amcl.CleanMemory(R[:])
+	// Destroy ROut
+	defer amcl.CleanMemory(ROut[:])
+	// Destroy Z
+	defer amcl.CleanMemory(Z[:])
+
 	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+	rtn, HID, _, Y2, E, F := amcl.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], MESSAGE[:], true)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}
@@ -221,12 +242,17 @@ func main() {
 	fmt.Printf("%x\n", Y2[:])
 	fmt.Printf("HID: 0x")
 	fmt.Printf("%x\n", HID[:])
-	fmt.Printf("HTID: 0x")
-	fmt.Printf("%x\n", HTID[:])
+
+	// Destroy Y2
+	defer amcl.CleanMemory(Y2[:])
+	// Destroy E
+	defer amcl.CleanMemory(E[:])
+	// Destroy F
+	defer amcl.CleanMemory(F[:])
 
 	if rtn != 0 {
 		fmt.Printf("Authentication failed Error Code %d\n", rtn)
-		err := mpin.Kangaroo(E[:], F[:])
+		err := amcl.Kangaroo(E[:], F[:])
 		if err != 0 {
 			fmt.Printf("PIN Error %d\n", err)
 		}
@@ -236,37 +262,58 @@ func main() {
 	}
 
 	// send T=w.ID to client
-	var W [mpin.PGS]byte
+	var W [amcl.PGS]byte
 	fmt.Printf("W: 0x")
 	fmt.Printf("%x\n", W[:])
-	rtn, WOut, T := mpin.GetG1Multiple(&rng, 0, W[:], HTID[:])
+	rtn, WOut, T := amcl.GetG1Multiple(&rng, 0, W[:], HID[:])
 	fmt.Printf("WOut: 0x")
 	fmt.Printf("%x\n", WOut[:])
 	fmt.Printf("T: 0x")
 	fmt.Printf("%x\n", T[:])
 
+	// Destroy W
+	defer amcl.CleanMemory(W[:])
+	// Destroy WOut
+	defer amcl.CleanMemory(WOut[:])
+	// Destroy T
+	defer amcl.CleanMemory(T[:])
+
 	// Hash all values
-	HM := mpin.HashAll(HASH_TYPE_MPIN, ID[:], U[:], UT[:], V[:], Y2[:], Z[:], T[:])
+	HM := amcl.HashAll(HASH_TYPE_MPIN, HCID[:], U[:], nil, V[:], Y2[:], Z[:], T[:])
 
-	rtn, AES_KEY_SERVER := mpin.ServerKey(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
-	fmt.Printf("Server Key =  0x")
-	fmt.Printf("%x\n", AES_KEY_SERVER[:])
+	// Destroy HM
+	defer amcl.CleanMemory(HM[:])
 
-	rtn, AES_KEY_CLIENT := mpin.ClientKey(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
+	rtn, AES_KEY_SERVER := amcl.ServerKey(HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], nil)
+	fmt.Printf("RTN = %v Server Key =  %x\n", rtn, AES_KEY_SERVER[:])
+
+	// Destroy AES_KEY_SERVER
+	defer amcl.CleanMemory(AES_KEY_SERVER[:])
+
+	rtn, AES_KEY_CLIENT := amcl.ClientKey(HASH_TYPE_MPIN, PIN2, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
 	fmt.Printf("Client Key =  0x")
 	fmt.Printf("%x\n", AES_KEY_CLIENT[:])
+
+	// Destroy AES_KEY_CLIENT
+	defer amcl.CleanMemory(AES_KEY_CLIENT[:])
 
 	//////   Server   //////
 
 	// Initialization vector
-	IV := mpin.GenerateRandomByte(&rng, 12)
+	IV := amcl.GenerateRandomByte(&rng, 12)
 	fmt.Printf("IV: 0x")
 	fmt.Printf("%x\n", IV[:])
 
+	// Destroy IV
+	defer amcl.CleanMemory(IV[:])
+
 	// header
-	HEADER := mpin.GenerateRandomByte(&rng, 16)
+	HEADER := amcl.GenerateRandomByte(&rng, 16)
 	fmt.Printf("HEADER: 0x")
 	fmt.Printf("%x\n", HEADER[:])
+
+	// Destroy HEADER
+	defer amcl.CleanMemory(HEADER[:])
 
 	// Input plaintext
 	plaintextStr := "A test message"
@@ -275,20 +322,42 @@ func main() {
 	fmt.Printf("PLAINTEXT1: 0x")
 	fmt.Printf("%x\n", PLAINTEXT1[:])
 
+	// Destroy PLAINTEXT1
+	defer amcl.CleanMemory(PLAINTEXT1[:])
+
 	// AES-GCM Encryption
-	CIPHERTEXT, TAG1 := mpin.AesGcmEncrypt(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
+	CIPHERTEXT, TAG1, err := amcl.AesGcmEncrypt(AES_KEY_SERVER[:], IV[:], HEADER[:], PLAINTEXT1[:])
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 	fmt.Printf("CIPHERTEXT:  0x")
 	fmt.Printf("%x\n", CIPHERTEXT[:])
 	fmt.Printf("TAG1:  0x")
 	fmt.Printf("%x\n", TAG1[:])
 
+	// Destroy CIPHERTEXT
+	defer amcl.CleanMemory(CIPHERTEXT[:])
+	// Destroy TAG1
+	defer amcl.CleanMemory(TAG1[:])
+
 	// Send IV, HEADER, CIPHERTEXT and TAG1 to client
 
 	// AES-GCM Decryption
-	PLAINTEXT2, TAG2 := mpin.AesGcmDecrypt(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
+	PLAINTEXT2, TAG2, err := amcl.AesGcmDecrypt(AES_KEY_CLIENT[:], IV[:], HEADER[:], CIPHERTEXT[:])
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	fmt.Printf("PLAINTEXT2:  0x")
 	fmt.Printf("%x\n", PLAINTEXT2[:])
 	fmt.Printf("TAG2:  0x")
 	fmt.Printf("%x\n", TAG2[:])
 	fmt.Printf("Decrypted string: %s \n", string(PLAINTEXT2))
+
+	// Destroy PLAINTEXT2
+	defer amcl.CleanMemory(PLAINTEXT2[:])
+	// Destroy TAG2
+	defer amcl.CleanMemory(TAG2[:])
 }

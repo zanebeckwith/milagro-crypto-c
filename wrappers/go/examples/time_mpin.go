@@ -33,7 +33,7 @@ import (
 // Number of iterations to time functions
 const nIter int = 1000
 
-var HASH_TYPE_MPIN = mpin.SHA256
+var HASH_TYPE_MPIN = amcl.SHA256
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
@@ -66,7 +66,7 @@ func main() {
 	t0 := time.Now()
 	var rtn int
 	for i := 0; i < nIter; i++ {
-		rtn, _, _, _, _, _ = mpin.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:])
+		rtn, _, _, _, _, _ = amcl.Server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], false)
 	}
 	t1 := time.Now()
 	log.Printf("Number Iterations: %d Time: %v\n", nIter, t1.Sub(t0))
