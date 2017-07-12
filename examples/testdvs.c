@@ -49,6 +49,10 @@ int main()
     char m[256];
     octet M= {0,sizeof(m),m};
 
+    /* Hash of the message */
+    char hm[PFS];
+    octet HM= {0,sizeof(hm), hm};
+
     char x[PGS],y1[PGS],y2[PGS];
     octet X= {0, sizeof(x),x};
     octet Y1= {0,sizeof(y1),y1};
@@ -133,6 +137,7 @@ int main()
 
     /* Hash ID */
     MPIN_HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
+    printf("HCID: 0x");
     OCT_output(&HCID);
 
     /* When set only send hashed IDs to server */
@@ -242,7 +247,11 @@ int main()
     printf("TimeValue %d \n", TimeValue);
     char* message = "sign this message";
     OCT_jstring(&M,message);
-    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,pID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&M,TimeValue,&Y1);
+    MPIN_HASH_ID(HASH_TYPE_MPIN,&M,&HM);
+    printf("HM: 0x");
+    OCT_output(&HM);
+
+    rtn = MPIN_CLIENT(HASH_TYPE_MPIN,0,pID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&HM,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_CLIENT ERROR %d\n", rtn);
@@ -258,7 +267,7 @@ int main()
     printf("TimeValue %d\n", TimeValue);
 
     /* Server: Verify message */
-    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&M,TimeValue,&Pa);
+    rtn = MPIN_SERVER(HASH_TYPE_MPIN,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&HM,TimeValue,&Pa);
     if (rtn != 0)
     {
         printf("FAILURE Signature Verification %d\n", rtn);
