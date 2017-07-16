@@ -1,4 +1,8 @@
 # Tests
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # Add the binary tree directory to the search path for linking and include files
 link_directories (${PROJECT_BINARY_DIR}/src)
@@ -12,6 +16,7 @@ macro (do_test arg result)
     )
 endmacro ()
 
+# create a smoke test
 function(SMOKE_TEST test_name test_file dependencies expected_response)
   add_executable (${test_name} ${CMAKE_CURRENT_BINARY_DIR}/${test_file})
   # Link the executable to the libraries
@@ -20,13 +25,14 @@ function(SMOKE_TEST test_name test_file dependencies expected_response)
   do_test (${test_name} ${expected_response})
 endfunction(SMOKE_TEST)
 
-function(TV_TEST test_name test_file dependencies expected_response test_vector)
+# create a test with testVectors
+function(TV_TEST test_name test_file dependencies expected_response test_vector parameter)
   # set test
   add_executable (${test_name} ${CMAKE_CURRENT_BINARY_DIR}/${test_file})
   # Link the executable to the libraries
   target_link_libraries (${test_name} ${dependencies})
   # test
-  add_test(NAME ${test_name} COMMAND ${TARGET_SYSTEM_EMULATOR} ${test_name} ${test_vector})
+  add_test(NAME ${test_name} COMMAND ${TARGET_SYSTEM_EMULATOR} ${test_name} ${test_vector} ${parameter})
   set_tests_properties (${test_name} PROPERTIES PASS_REGULAR_EXPRESSION ${expected_response})
 endfunction(TV_TEST)
 
@@ -38,25 +44,79 @@ SMOKE_TEST ( test_octet_consistency test_octet_consistency.c amcl_core "SUCCESS"
 file (COPY test_version.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 # SMOKE_TEST ( test_version test_version.c amcl_core "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
 
+# Test hash functions
+file (COPY test_hash.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+TV_TEST (test_hash_256 test_hash.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/sha/256/SHA256ShortMsg.rsp" "sha256")
+TV_TEST (test_hash_384 test_hash.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/sha/384/SHA384ShortMsg.rsp" "sha384")
+TV_TEST (test_hash_512 test_hash.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/sha/512/SHA512ShortMsg.rsp" "sha512")
+
+# Test AES-GCM
+file (COPY test_aes_encrypt.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file (COPY test_aes_decrypt.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file (COPY test_gcm_encrypt.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file (COPY test_gcm_decrypt.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+TV_TEST (test_gcm_encrypt_128 test_gcm_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmEncryptExtIV128.rsp" "")
+TV_TEST (test_gcm_encrypt_256 test_gcm_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmEncryptExtIV256.rsp" "")
+TV_TEST (test_gcm_decrypt_128 test_gcm_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmDecrypt128.rsp" "")
+TV_TEST (test_gcm_decrypt_256 test_gcm_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmDecrypt256.rsp" "")
+TV_TEST (test_aes_encrypt_ECB_128 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT128.rsp" "ECB")
+TV_TEST (test_aes_encrypt_ECB_256 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT256.rsp" "ECB")
+TV_TEST (test_aes_encrypt_CBC_128 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT128.rsp" "CBC")
+TV_TEST (test_aes_encrypt_CFB1_128 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT128.rsp" "CFB1")
+TV_TEST (test_aes_encrypt_CBC_256 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT256.rsp" "CBC")
+TV_TEST (test_aes_encrypt_CTR_128 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL128.rsp" "CTR")
+TV_TEST (test_aes_encrypt_CTR_256 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL256.rsp" "CTR")
+TV_TEST (test_aes_encrypt_CFB1_256 test_aes_encrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT256.rsp" "CFB1")
+TV_TEST (test_aes_decrypt_ECB_128 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT128.rsp" "ECB")
+TV_TEST (test_aes_decrypt_ECB_256 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT256.rsp" "ECB")
+TV_TEST (test_aes_decrypt_CBC_128 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT128.rsp" "CBC")
+TV_TEST (test_aes_decrypt_CFB1_128 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT128.rsp" "CFB1")
+TV_TEST (test_aes_decrypt_CBC_256 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT256.rsp" "CBC")
+TV_TEST (test_aes_decrypt_CTR_128 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL128.rsp" "CTR")
+TV_TEST (test_aes_decrypt_CTR_256 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL256.rsp" "CTR")
+TV_TEST (test_aes_decrypt_CFB1_256 test_aes_decrypt.c amcl_core "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT256.rsp" "CFB1")
+
 # create new file replacing curve dependant parameters
 function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
   set(bd "${tb}_${base}")
 
   # test BIG arithmetics
-  set(fnamec "test_big_arithmetics_${bd}.c")
   file(READ "test_big_arithmetics_XXX.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-  TV_TEST ("test_big_arithmetics_${bd}" "test_big_arithmetics_${bd}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c" "${tempc}")
+  TV_TEST ("test_big_arithmetics_${bd}" "test_big_arithmetics_${bd}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt" "")
 
   # test BIG consistency
-  set(fnamec "test_big_consistency_${bd}.c")
   file(READ "test_big_consistency_XXX.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_consistency_${bd}.c" "${tempc}")
   SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_curve_${tc}" "SUCCESS")
 
+# Arithmetics test fp
+  # file(READ "test_fp_arithmetics_YYY.c" tempc)
+  # string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+  # string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+  # file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c" "${tempc}")
+  # TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt" "")
+
 endfunction(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
+
+function(RSA_TESTS_SET tb tff nb base ml)
+  set(bd "${tb}_${base}")
+
+  # test BIG arithmetics
+  file(READ "test_big_arithmetics_XXX.c" tempc)
+  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c" "${tempc}")
+  TV_TEST ("test_big_arithmetics_${bd}" "test_big_arithmetics_${bd}.c" "amcl_rsa_${tff}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt" "")
+
+  # test BIG consistency
+  file(READ "test_big_consistency_XXX.c" tempc)
+  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_consistency_${bd}.c" "${tempc}")
+  SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_rsa_${tff}" "SUCCESS")
+
+endfunction(RSA_TESTS_SET tb tff nb base ml)
 
 string(REGEX REPLACE "," ";" AMCL_CURVE ${AMCL_CURVE})
 string(REGEX REPLACE "," ";" AMCL_RSA ${AMCL_RSA})
@@ -145,14 +205,15 @@ foreach(CURVE ${AMCL_CURVE})
   endif(AMCL_CHUNK STREQUAL "64")
 endforeach(CURVE)
 
-# # Arithmetics tests big
-# message(STATUS "Run ${AMCL_CHOICE} Arithmetics Tests")
-# add_executable (test_big_arithmetics test_big_arithmetics.c)
-# # Link the executable to the libraries
-# target_link_libraries (test_big_arithmetics amcl_curve)
-# # test
-# add_test(NAME test_big_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_big_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt)
-# set_tests_properties (test_big_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+foreach(RSA ${AMCL_RSA})
+  if(RSA STREQUAL "2048")
+    RSA_TESTS_SET("1024" "2048" "128" "58" "2")
+  elseif(RSA STREQUAL "3072")
+    RSA_TESTS_SET("384" "3072" "48" "56" "8")
+  elseif(RSA STREQUAL "4096")
+    RSA_TESTS_SET("512" "4096" "64" "60" "8")
+  endif(RSA STREQUAL "2048")
+endforeach(RSA)
 
 # # Arithmetics test fp
 # add_executable (test_fp_arithmetics test_fp_arithmetics.c)
@@ -194,71 +255,6 @@ endforeach(CURVE)
 # set_tests_properties (test_output_functions PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 # endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND (AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS"))
 
-# # curve independent tests
-# add_executable (test_hash test_hash.c)
-# add_executable (test_gcm_encrypt test_gcm_encrypt.c)
-# add_executable (test_gcm_decrypt test_gcm_decrypt.c)
-# add_executable (test_aes_encrypt test_aes_encrypt.c)
-# add_executable (test_aes_decrypt test_aes_decrypt.c)
-# # Link the executable to the libraries
-# target_link_libraries (test_hash amcl_core) 
-# target_link_libraries (test_gcm_encrypt amcl_core) 
-# target_link_libraries (test_gcm_decrypt amcl_core) 
-# target_link_libraries (test_aes_encrypt amcl_core) 
-# target_link_libraries (test_aes_decrypt amcl_core)
- 
-# # hash tests
-# add_test(NAME test_hash_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/256/SHA256ShortMsg.rsp sha256)
-# set_tests_properties (test_hash_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_hash_384 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/384/SHA384ShortMsg.rsp sha384)
-# set_tests_properties (test_hash_384 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_hash_512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_hash ${PROJECT_SOURCE_DIR}/testVectors/sha/512/SHA512ShortMsg.rsp sha512)
-# set_tests_properties (test_hash_512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-
-# # AES-GCM tests
-# add_test(NAME test_gcm_encrypt_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_gcm_encrypt ${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmEncryptExtIV128.rsp)
-# set_tests_properties (test_gcm_encrypt_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_gcm_encrypt_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_gcm_encrypt ${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmEncryptExtIV256.rsp)
-# set_tests_properties (test_gcm_encrypt_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_gcm_decrypt_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_gcm_decrypt ${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmDecrypt128.rsp)
-# set_tests_properties (test_gcm_decrypt_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_gcm_decrypt_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_gcm_decrypt ${PROJECT_SOURCE_DIR}/testVectors/gcm/gcmDecrypt256.rsp)
-# set_tests_properties (test_gcm_decrypt_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-
-# # AES tests
-# add_test(NAME test_aes_encrypt_ECB_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT128.rsp  ECB)
-# set_tests_properties (test_aes_encrypt_ECB_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_encrypt_ECB_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT256.rsp  ECB)
-# set_tests_properties (test_aes_encrypt_ECB_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_encrypt_CBC_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT128.rsp  CBC)
-# set_tests_properties (test_aes_encrypt_CBC_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_encrypt_CFB1_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT128.rsp  CFB1)
-# set_tests_properties (test_aes_encrypt_CFB1_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_encrypt_CBC_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT256.rsp  CBC)
-# set_tests_properties (test_aes_encrypt_CBC_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_encrypt_CTR_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL128.rsp  CTR)
-# set_tests_properties (test_aes_encrypt_CTR_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_encrypt_CTR_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL256.rsp  CTR)
-# set_tests_properties (test_aes_encrypt_CTR_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_encrypt_CFB1_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_encrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT256.rsp  CFB1)
-# set_tests_properties (test_aes_encrypt_CFB1_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-
-# add_test(NAME test_aes_decrypt_ECB_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT128.rsp  ECB)
-# set_tests_properties (test_aes_decrypt_ECB_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_decrypt_ECB_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/ECBMMT256.rsp  ECB)
-# set_tests_properties (test_aes_decrypt_ECB_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_decrypt_CBC_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT128.rsp  CBC)
-# set_tests_properties (test_aes_decrypt_CBC_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_decrypt_CFB1_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT128.rsp  CFB1)
-# set_tests_properties (test_aes_decrypt_CFB1_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_decrypt_CBC_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CBCMMT256.rsp  CBC)
-# set_tests_properties (test_aes_decrypt_CBC_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_decrypt_CTR_128 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL128.rsp  CTR)
-# set_tests_properties (test_aes_decrypt_CTR_128 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_decrypt_CTR_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/amcl_CTRMCL256.rsp  CTR)
-# set_tests_properties (test_aes_decrypt_CTR_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# add_test(NAME test_aes_decrypt_CFB1_256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_aes_decrypt ${PROJECT_SOURCE_DIR}/testVectors/aes/CFB8MMT256.rsp  CFB1)
-# set_tests_properties (test_aes_decrypt_CFB1_256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
 # if(BUILD_MPIN)
 #   add_executable (test_mpin test_mpin.c)

@@ -1,5 +1,9 @@
 # Create AMCL library
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
 # Add the binary tree directory to the search path for linking and include files
 link_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR}/include )
@@ -7,42 +11,38 @@ include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR}/include )
 # create new file replacing curve dependant parameters
 function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
   set(bd "${tb}_${base}")
-             
-  set(fnamec "big_${bd}.c")
+
   file(READ "big_XXX.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c" "${tempc}")
   set(SOURCES_CURVE_${tc}
-    ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    ${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c)
 
-  set(fnamec "fp_${tf}.c")
   file(READ "fp_YYY.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.c" "${tempc}")
   file(COPY "rom_field_${tf}.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   set(SOURCES_CURVE_${tc} ${SOURCES_CURVE_${tc}}
-    ${CMAKE_CURRENT_BINARY_DIR}/${fnamec}
+    ${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.c
     ${CMAKE_CURRENT_BINARY_DIR}/rom_field_${tf}.c)
 
-  set(fnamec "ecp_${tc}.c")
   file(READ "ecp_ZZZ.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
   string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ecp_${tc}.c" "${tempc}")
   set(SOURCES_CURVE_${tc} ${SOURCES_CURVE_${tc}}
-    ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    ${CMAKE_CURRENT_BINARY_DIR}/ecp_${tc}.c)
 
-  set(fnamec "ecdh_${tc}.c")
   file(READ "ecdh_ZZZ.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
   string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ecdh_${tc}.c" "${tempc}")
   file(COPY "rom_curve_${tc}.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   set(SOURCES_CURVE_${tc} ${SOURCES_CURVE_${tc}}
-    ${CMAKE_CURRENT_BINARY_DIR}/${fnamec}
+    ${CMAKE_CURRENT_BINARY_DIR}/ecdh_${tc}.c
     ${CMAKE_CURRENT_BINARY_DIR}/rom_curve_${tc}.c)
 
   message(STATUS "Build libamcl_curve_${tc}")
@@ -51,56 +51,50 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
   if(NOT(${pf} STREQUAL "NOT") AND (BUILD_MPIN))
 
-    set(fnamec "fp2_${tc}.c")
     file(READ "fp2_YYY.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-    set(SOURCES_PAIRING_${tc}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp2_${tc}.c" "${tempc}")
+    set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+      ${CMAKE_CURRENT_BINARY_DIR}/fp2_${tc}.c)
 
-    set(fnamec "fp4_${tc}.c")
     file(READ "fp4_YYY.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-    set(SOURCES_PAIRING_${tc}
-    ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp4_${tc}.c" "${tempc}")
+    set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+    ${CMAKE_CURRENT_BINARY_DIR}/fp4_${tc}.c)
 
-    set(fnamec "fp12_${tc}.c")
     file(READ "fp12_YYY.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-    set(SOURCES_PAIRING_${tc}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp12_${tc}.c" "${tempc}")
+    set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+      ${CMAKE_CURRENT_BINARY_DIR}/fp12_${tc}.c)
 
-    set(fnamec "ecp2_${tc}.c")
     file(READ "ecp2_ZZZ.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-    set(SOURCES_PAIRING_${tc}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.c" "${tempc}")
+    set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+      ${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.c)
 
-    set(fnamec "pair_${tc}.c")
     file(READ "pair_ZZZ.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-    set(SOURCES_PAIRING_${tc}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.c" "${tempc}")
+    set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+      ${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.c)
 
-    set(fnamec "mpin_${tc}.c")
     file(READ "mpin_ZZZ.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-    set(SOURCES_PAIRING_${tc}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c" "${tempc}")
+    set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+      ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c)
 
     message(STATUS "Build libamcl_pairing_${tc}")
     add_library(amcl_pairing_${tc} ${LIB_TYPE} ${SOURCES_PAIRING_${tc}})
@@ -112,27 +106,26 @@ endfunction(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 function(RSA_SRC_SET tb tff nb base ml)
   
   set(bd "${tb}_${base}")
-  set(fnamec "big_${bd}.c")
+
   file(READ "big_XXX.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-  set(SOURCES_RSA_${tff}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c" "${tempc}")
+  set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
+      ${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c)
 
-  set(fnamec "ff_${tff}.c")
   file(READ "ff_WWW.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-  set(SOURCES_RSA_${tff}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+  string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.c" "${tempc}")
+  set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
+      ${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.c)
 
-  set(fnamec "rsa_${tff}.c")
   file(READ "rsa_WWW.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnamec}" "${tempc}")
-  set(SOURCES_RSA_${tff}
-      ${CMAKE_CURRENT_BINARY_DIR}/${fnamec})
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.c" "${tempc}")
+  set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
+      ${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.c)
 
   message(STATUS "Build libamcl_rsa_${tff}")
   add_library(amcl_rsa_${tff} ${LIB_TYPE} ${SOURCES_RSA_${tff}})

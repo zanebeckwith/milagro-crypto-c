@@ -151,6 +151,7 @@ add_subdirectory(src)
 # add_subdirectory(examples)
 add_subdirectory(test)
 # add_subdirectory(benchmark)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # Only build Python for shared libs
 # if (NOT BUILD_SHARED_LIBS)
