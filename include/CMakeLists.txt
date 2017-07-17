@@ -58,7 +58,9 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
 
-  if(NOT(${pf} STREQUAL "NOT") AND (BUILD_MPIN))
+  file(COPY ecdh_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+  if(NOT(${pf} STREQUAL "NOT"))
 
     set(fnameh "fp2_${tc}.h")
     file(READ "fp2_YYY.h" temph)
@@ -92,13 +94,17 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
     string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
 
-    set(fnameh "mpin_${tc}.h")
-    file(READ "mpin_ZZZ.h" temph)
-    string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
-    string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
-    string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
-  endif(NOT(${pf} STREQUAL "NOT") AND (BUILD_MPIN))
+    if(BUILD_MPIN)
+      set(fnameh "mpin_${tc}.h")
+      file(READ "mpin_ZZZ.h" temph)
+      string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
+      string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
+      string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
+
+      file(COPY mpin_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+      endif(BUILD_MPIN)
+  endif(NOT(${pf} STREQUAL "NOT"))
 
 endfunction(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
 
@@ -136,15 +142,15 @@ function(RSA_HEADERS_SET tb tff nb base ml)
   string(REGEX REPLACE "WWW" ${tff} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
 
+  file(COPY rsa_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 endfunction(RSA_HEADERS_SET tb tff nb base ml)
 
 set(COMMON_HEADERS
 	amcl.h
   utils.h
   randapi.h
-  ecdh_support.h
-  rsa_support.h
-  mpin_support.h)
+  )
   #x509.h)
 
 # Copy common header files to binary include directory

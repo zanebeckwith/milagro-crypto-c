@@ -45,11 +45,15 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     ${CMAKE_CURRENT_BINARY_DIR}/ecdh_${tc}.c
     ${CMAKE_CURRENT_BINARY_DIR}/rom_curve_${tc}.c)
 
+  file(COPY "ecdh_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  set(SOURCES_CURVE_${tc} ${SOURCES_CURVE_${tc}}
+      ${CMAKE_CURRENT_BINARY_DIR}/ecdh_support.c)
+
   message(STATUS "Build libamcl_curve_${tc}")
   add_library(amcl_curve_${tc} ${LIB_TYPE} ${SOURCES_CURVE_${tc}})
   target_link_libraries (amcl_curve_${tc} amcl_core)
 
-  if(NOT(${pf} STREQUAL "NOT") AND (BUILD_MPIN))
+  if(NOT(${pf} STREQUAL "NOT"))
 
     file(READ "fp2_YYY.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
@@ -88,18 +92,25 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
       ${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.c)
 
-    file(READ "mpin_ZZZ.c" tempc)
-    string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-    string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-    string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c" "${tempc}")
-    set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
-      ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c)
+    if(BUILD_MPIN)
+      file(READ "mpin_ZZZ.c" tempc)
+      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c" "${tempc}")
+      set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+        ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c)
+
+      file(COPY "mpin_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+      set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+      ${CMAKE_CURRENT_BINARY_DIR}/mpin_support.c)
+
+    endif(BUILD_MPIN)
 
     message(STATUS "Build libamcl_pairing_${tc}")
     add_library(amcl_pairing_${tc} ${LIB_TYPE} ${SOURCES_PAIRING_${tc}})
     target_link_libraries (amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
-  endif(NOT(${pf} STREQUAL "NOT") AND (BUILD_MPIN))
+  endif(NOT(${pf} STREQUAL "NOT"))
 
 endfunction(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
@@ -127,6 +138,10 @@ function(RSA_SRC_SET tb tff nb base ml)
   set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
       ${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.c)
 
+  file(COPY "rsa_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
+      ${CMAKE_CURRENT_BINARY_DIR}/rsa_support.c)
+
   message(STATUS "Build libamcl_rsa_${tff}")
   add_library(amcl_rsa_${tff} ${LIB_TYPE} ${SOURCES_RSA_${tff}})
   target_link_libraries (amcl_rsa_${tff} amcl_core)
@@ -141,9 +156,7 @@ aes.c
 gcm.c
 oct.c
 utils.c
-ecdh_support.c
-rsa_support.c)
-# mpin_support (if MPIN_BUILD)
+)
 # version.c)
 
 # Copy common header files to binary include directory
