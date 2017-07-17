@@ -1,7 +1,7 @@
 /**
- * @file test_fp_arithmetics.c
+ * @file test_fp4_arithmetics_YYY.c
  * @author Alessandro Budroni
- * @brief Test for aritmetics with FP
+ * @brief Test for aritmetics with FP4_YYY
  *
  * LICENSE
  *
@@ -23,34 +23,33 @@
  * under the License.
  */
 
-
-#include "arch.h"
-#include "amcl.h"
-#include "utils.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "arch.h"
+#include "amcl.h"
+#include "utils.h"
+#include "fp4_YYY.h"
 
 #define LINE_LEN 10000
 #define MAX_STRING 300
 
-
-void read_BIG(BIG A, char* string)
+void read_BIG_XXX(BIG_XXX A, char* string)
 {
     int len;
     char support[LINE_LEN];
-    BIG_zero(A);
+    BIG_XXX_zero(A);
     len = strlen(string)+1;
     amcl_hex2bin(string,support,len);
     len = (len-1)/2;
-    BIG_fromBytesLen(A,support,len);
-    BIG_norm(A);
+    BIG_XXX_fromBytesLen(A,support,len);
+    BIG_XXX_norm(A);
 }
 
-void read_FP2(FP2 *fp2, char* stringx)
+void read_FP2_YYY(FP2_YYY *fp2, char* stringx)
 {
     char *stringy, *end;
-    BIG x,y;
+    BIG_XXX x,y;
 
     stringx++;
     stringy = strchr(stringx,',');
@@ -69,17 +68,17 @@ void read_FP2(FP2 *fp2, char* stringx)
     }
     end[0] = '\0';
 
-    read_BIG(x,stringx);
-    read_BIG(y,stringy);
+    read_BIG_XXX(x,stringx);
+    read_BIG_XXX(y,stringy);
 
-    FP2_from_BIGs(fp2,x,y);
+    FP2_YYY_from_BIGs(fp2,x,y);
 }
 
-void read_FP4(FP4 *fp4, char* stringx1)
+void read_FP4_YYY(FP4_YYY *fp4, char* stringx1)
 {
     char *stringx2, *stringy1, *stringy2, *end;
-    BIG x1,x2,y1,y2;
-    FP2 x,y;
+    BIG_XXX x1,x2,y1,y2;
+    FP2_YYY x,y;
 
     stringx1 += 2;
     stringx2 = strchr(stringx1,',');
@@ -114,15 +113,15 @@ void read_FP4(FP4 *fp4, char* stringx1)
     }
     end[0] = '\0';
 
-    read_BIG(x1,stringx1);
-    read_BIG(x2,stringx2);
-    read_BIG(y1,stringy1);
-    read_BIG(y2,stringy2);
+    read_BIG_XXX(x1,stringx1);
+    read_BIG_XXX(x2,stringx2);
+    read_BIG_XXX(y1,stringy1);
+    read_BIG_XXX(y2,stringy2);
 
-    FP2_from_BIGs(&x,x1,x2);
-    FP2_from_BIGs(&y,y1,y2);
+    FP2_YYY_from_BIGs(&x,x1,x2);
+    FP2_YYY_from_BIGs(&y,y1,y2);
 
-    FP4_from_FP2s(fp4,&x,&y);
+    FP4_YYY_from_FP2s(fp4,&x,&y);
 }
 
 int main(int argc, char** argv)
@@ -139,71 +138,62 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    BIG M, Fr_a, Fr_b;
-    FP2 Frob;
-    FP4 FP4aux1, FP4aux2, FP4aux3, FP4aux4;
+    FP4_YYY FP4aux1, FP4aux2, FP4aux3, FP4aux4;
 
-    FP4 FP4_1;
+    FP4_YYY FP4_1;
     const char* FP4_1line = "FP4_1 = ";
-    FP4 FP4_2;
+    FP4_YYY FP4_2;
     const char* FP4_2line = "FP4_2 = ";
-    FP4 FP4add;
+    FP4_YYY FP4add;
     const char* FP4addline = "FP4add = ";
-    FP4 FP4neg;
+    FP4_YYY FP4neg;
     const char* FP4negline = "FP4neg = ";
-    FP4 FP4sub;
+    FP4_YYY FP4sub;
     const char* FP4subline = "FP4sub = ";
-    FP4 FP4conj;
+    FP4_YYY FP4conj;
     const char* FP4conjline = "FP4conj = ";
-    FP4 FP4nconj;
+    FP4_YYY FP4nconj;
     const char* FP4nconjline = "FP4nconj = ";
-    FP2 FP2sc;
+    FP2_YYY FP2sc;
     const char* FP2scline = "FP2sc = ";
-    FP4 FP4pmul;
+    FP4_YYY FP4pmul;
     const char* FP4pmulline = "FP4pmul = ";
-    FP4 FP4imul;
+    FP4_YYY FP4imul;
     const char* FP4imulline = "FP4imul = ";
-    FP4 FP4sqr;
+    FP4_YYY FP4sqr;
     const char* FP4sqrline = "FP4sqr = ";
-    FP4 FP4mul;
+    FP4_YYY FP4mul;
     const char* FP4mulline = "FP4mul = ";
-    FP4 FP4inv;
+    FP4_YYY FP4inv;
     const char* FP4invline = "FP4inv = ";
-    FP4 FP4mulj;
+    FP4_YYY FP4mulj;
     const char* FP4muljline = "FP4mulj = ";
-    BIG BIGsc;
+    BIG_XXX BIGsc;
     const char* BIGscline = "BIGsc = ";
-    FP4 FP4pow;
+    FP4_YYY FP4pow;
     const char* FP4powline = "FP4pow = ";
-    FP4 FP4frob;
-    const char* FP4frobline = "FP4frob = ";
-    FP4 FP4_xtrA;
+    FP4_YYY FP4_xtrA;
     const char* FP4_xtrAline = "FP4_xtrA = ";
-    FP4 FP4_xtrD;
+    FP4_YYY FP4_xtrD;
     const char* FP4_xtrDline = "FP4_xtrD = ";
 
-    BIG_rcopy(M,Modulus);
-    BIG_rcopy(Fr_a,CURVE_Fra);
-    BIG_rcopy(Fr_b,CURVE_Frb);
-    FP2_from_BIGs(&Frob,Fr_a,Fr_b);
-
 // Set to zero
-    FP4_zero(&FP4aux1);
-    FP4_zero(&FP4aux2);
+    FP4_YYY_zero(&FP4aux1);
+    FP4_YYY_zero(&FP4aux2);
 
 // Testing equal function and set zero function
-    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_iszilch(&FP4aux1) || !FP4_iszilch(&FP4aux2) || !FP4_isreal(&FP4aux1))
+    if(!FP4_YYY_equals(&FP4aux1,&FP4aux2) || !FP4_YYY_iszilch(&FP4aux1) || !FP4_YYY_iszilch(&FP4aux2) || !FP4_YYY_isreal(&FP4aux1))
     {
         printf("ERROR comparing FP4s or setting FP4 to zero FP\n");
         exit(EXIT_FAILURE);
     }
 
 // Set to one
-    FP4_one(&FP4aux1);
-    FP4_one(&FP4aux2);
+    FP4_YYY_one(&FP4aux1);
+    FP4_YYY_one(&FP4aux2);
 
 // Testing equal function and set one function
-    if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isunity(&FP4aux1) || !FP4_isunity(&FP4aux2) || !FP4_isreal(&FP4aux1) || FP4_iszilch(&FP4aux1))
+    if(!FP4_YYY_equals(&FP4aux1,&FP4aux2) || !FP4_YYY_isunity(&FP4aux1) || !FP4_YYY_isunity(&FP4aux2) || !FP4_YYY_isreal(&FP4aux1) || FP4_YYY_iszilch(&FP4aux1))
     {
         printf("ERROR comparing FP4s or setting FP4 to unity FP\n");
         exit(EXIT_FAILURE);
@@ -225,19 +215,19 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4_1line);
             linePtr = line + len;
-            read_FP4(&FP4_1,linePtr);
+            read_FP4_YYY(&FP4_1,linePtr);
 // test FP4_from_FP2s
-            FP4_from_FP2s(&FP4aux1,&FP4_1.a,&FP4_1.b);
-            if(!FP4_equals(&FP4aux1,&FP4_1))
+            FP4_YYY_from_FP2s(&FP4aux1,&FP4_1.a,&FP4_1.b);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4_1))
             {
                 printf("ERROR in generating FP4 from two FP2s, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
 // test FP4_from_FP2 and FP4_isreal
-            FP4_from_FP2(&FP4aux1,&FP4_1.a);
-            FP4_copy(&FP4aux2,&FP4_1);
-            FP2_zero(&FP4aux2.b);
-            if(!FP4_equals(&FP4aux1,&FP4aux2) || !FP4_isreal(&FP4aux1))
+            FP4_YYY_from_FP2(&FP4aux1,&FP4_1.a);
+            FP4_YYY_copy(&FP4aux2,&FP4_1);
+            FP2_YYY_zero(&FP4aux2.b);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4aux2) || !FP4_YYY_isreal(&FP4aux1))
             {
                 printf("ERROR in generating FP4 from one FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -248,43 +238,43 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4_2line);
             linePtr = line + len;
-            read_FP4(&FP4_2,linePtr);
+            read_FP4_YYY(&FP4_2,linePtr);
         }
 // Addition test
         if (!strncmp(line,FP4addline, strlen(FP4addline)))
         {
             len = strlen(FP4addline);
             linePtr = line + len;
-            read_FP4(&FP4add,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_copy(&FP4aux2,&FP4_2);
-            FP4_add(&FP4aux1,&FP4aux1,&FP4aux2);
+            read_FP4_YYY(&FP4add,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_copy(&FP4aux2,&FP4_2);
+            FP4_YYY_add(&FP4aux1,&FP4aux1,&FP4aux2);
 // test commutativity P+Q = Q+P
-            FP4_copy(&FP4aux3,&FP4_1);
-            FP4_add(&FP4aux2,&FP4aux2,&FP4aux3);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            FP4_reduce(&FP4aux2);
-            FP4_norm(&FP4aux2);
-            if(!FP4_equals(&FP4aux1,&FP4add) || !FP4_equals(&FP4aux2,&FP4add))
+            FP4_YYY_copy(&FP4aux3,&FP4_1);
+            FP4_YYY_add(&FP4aux2,&FP4aux2,&FP4aux3);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            FP4_YYY_reduce(&FP4aux2);
+            FP4_YYY_norm(&FP4aux2);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4add) || !FP4_YYY_equals(&FP4aux2,&FP4add))
             {
                 printf("ERROR adding two FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
 // test associativity (P+Q)+R = P+(Q+R)
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_copy(&FP4aux3,&FP4_1);
-            FP4_copy(&FP4aux2,&FP4_2);
-            FP4_copy(&FP4aux4,&FP4add);
-            FP4_add(&FP4aux1,&FP4aux1,&FP4aux2);
-            FP4_add(&FP4aux1,&FP4aux1,&FP4aux4);
-            FP4_add(&FP4aux2,&FP4aux2,&FP4aux4);
-            FP4_add(&FP4aux2,&FP4aux2,&FP4aux3);
-            FP4_reduce(&FP4aux1);
-            FP4_reduce(&FP4aux2);
-            FP4_norm(&FP4aux1);
-            FP4_norm(&FP4aux2);
-            if(!FP4_equals(&FP4aux1,&FP4aux2))
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_copy(&FP4aux3,&FP4_1);
+            FP4_YYY_copy(&FP4aux2,&FP4_2);
+            FP4_YYY_copy(&FP4aux4,&FP4add);
+            FP4_YYY_add(&FP4aux1,&FP4aux1,&FP4aux2);
+            FP4_YYY_add(&FP4aux1,&FP4aux1,&FP4aux4);
+            FP4_YYY_add(&FP4aux2,&FP4aux2,&FP4aux4);
+            FP4_YYY_add(&FP4aux2,&FP4aux2,&FP4aux3);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_reduce(&FP4aux2);
+            FP4_YYY_norm(&FP4aux1);
+            FP4_YYY_norm(&FP4aux2);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4aux2))
             {
                 printf("ERROR testing associativity between three FP4s, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -295,12 +285,12 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4negline);
             linePtr = line + len;
-            read_FP4(&FP4neg,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_neg(&FP4aux1,&FP4aux1);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4neg))
+            read_FP4_YYY(&FP4neg,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_neg(&FP4aux1,&FP4aux1);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4neg))
             {
                 printf("ERROR in computing negative of FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -311,13 +301,13 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4subline);
             linePtr = line + len;
-            read_FP4(&FP4sub,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_copy(&FP4aux2,&FP4_2);
-            FP4_sub(&FP4aux1,&FP4aux1,&FP4aux2);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(FP4_equals(&FP4aux1,&FP4sub) == 0)
+            read_FP4_YYY(&FP4sub,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_copy(&FP4aux2,&FP4_2);
+            FP4_YYY_sub(&FP4aux1,&FP4aux1,&FP4aux2);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(FP4_YYY_equals(&FP4aux1,&FP4sub) == 0)
             {
                 printf("ERROR subtraction between two FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -328,12 +318,12 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4conjline);
             linePtr = line + len;
-            read_FP4(&FP4conj,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_conj(&FP4aux1,&FP4aux1);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4conj))
+            read_FP4_YYY(&FP4conj,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_conj(&FP4aux1,&FP4aux1);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4conj))
             {
                 printf("ERROR computing conjugate of FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -344,12 +334,12 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4nconjline);
             linePtr = line + len;
-            read_FP4(&FP4nconj,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_nconj(&FP4aux1,&FP4aux1);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4nconj))
+            read_FP4_YYY(&FP4nconj,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_nconj(&FP4aux1,&FP4aux1);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4nconj))
             {
                 printf("ERROR computing negative conjugate of FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -360,18 +350,18 @@ int main(int argc, char** argv)
         {
             len = strlen(FP2scline);
             linePtr = line + len;
-            read_FP2(&FP2sc,linePtr);
+            read_FP2_YYY(&FP2sc,linePtr);
         }
 // Multiplication by FP2
         if (!strncmp(line,FP4pmulline, strlen(FP4pmulline)))
         {
             len = strlen(FP4pmulline);
             linePtr = line + len;
-            read_FP4(&FP4pmul,linePtr);
-            FP4_pmul(&FP4aux1,&FP4_1,&FP2sc);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4pmul))
+            read_FP4_YYY(&FP4pmul,linePtr);
+            FP4_YYY_pmul(&FP4aux1,&FP4_1,&FP2sc);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4pmul))
             {
                 printf("ERROR in multiplication by FP2, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -382,12 +372,12 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4imulline);
             linePtr = line + len;
-            read_FP4(&FP4imul,linePtr);
-            FP4_imul(&FP4aux1,&FP4_1,j);
+            read_FP4_YYY(&FP4imul,linePtr);
+            FP4_YYY_imul(&FP4aux1,&FP4_1,j);
             j++;
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4imul))
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4imul))
             {
                 printf("ERROR in multiplication by small integer, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -398,12 +388,12 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4sqrline);
             linePtr = line + len;
-            read_FP4(&FP4sqr,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_sqr(&FP4aux1,&FP4aux1);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4sqr))
+            read_FP4_YYY(&FP4sqr,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_sqr(&FP4aux1,&FP4aux1);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4sqr))
             {
                 printf("ERROR in squaring FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -414,11 +404,11 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4mulline);
             linePtr = line + len;
-            read_FP4(&FP4mul,linePtr);
-            FP4_mul(&FP4aux1,&FP4_1,&FP4_2);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4mul))
+            read_FP4_YYY(&FP4mul,linePtr);
+            FP4_YYY_mul(&FP4aux1,&FP4_1,&FP4_2);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4mul))
             {
                 printf("ERROR in multiplication between two FP4s, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -429,12 +419,12 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4invline);
             linePtr = line + len;
-            read_FP4(&FP4inv,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_inv(&FP4aux1,&FP4aux1);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4inv))
+            read_FP4_YYY(&FP4inv,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_inv(&FP4aux1,&FP4aux1);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4inv))
             {
                 printf("ERROR in computing inverse of FP4, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -445,12 +435,12 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4muljline);
             linePtr = line + len;
-            read_FP4(&FP4mulj,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_times_i(&FP4aux1);
-            FP4_reduce(&FP4aux1);
-            FP4_norm(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4mulj))
+            read_FP4_YYY(&FP4mulj,linePtr);
+            FP4_YYY_copy(&FP4aux1,&FP4_1);
+            FP4_YYY_times_i(&FP4aux1);
+            FP4_YYY_reduce(&FP4aux1);
+            FP4_YYY_norm(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4mulj))
             {
                 printf("ERROR in  multiplication of an FP4 instance by sqrt(1+sqrt(-1)), line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -461,34 +451,19 @@ int main(int argc, char** argv)
         {
             len = strlen(BIGscline);
             linePtr = line + len;
-            read_BIG(BIGsc,linePtr);
+            read_BIG_XXX(BIGsc,linePtr);
         }
 // Raise FP4 by BIG power
         if (!strncmp(line,FP4powline, strlen(FP4powline)))
         {
             len = strlen(FP4powline);
             linePtr = line + len;
-            read_FP4(&FP4pow,linePtr);
-            FP4_pow(&FP4aux1,&FP4_1,BIGsc);
-            FP4_reduce(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4pow))
+            read_FP4_YYY(&FP4pow,linePtr);
+            FP4_YYY_pow(&FP4aux1,&FP4_1,BIGsc);
+            FP4_YYY_reduce(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4pow))
             {
                 printf("ERROR in raising FP4 by BIG power, line %d\n",i);
-                exit(EXIT_FAILURE);
-            }
-        }
-// Raises an FP4 to the power of the internal modulus p, using the Frobenius constant f
-        if (!strncmp(line,FP4frobline, strlen(FP4frobline)))
-        {
-            len = strlen(FP4frobline);
-            linePtr = line + len;
-            read_FP4(&FP4frob,linePtr);
-            FP4_copy(&FP4aux1,&FP4_1);
-            FP4_frob(&FP4aux1,&Frob);
-            FP4_reduce(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4frob))
-            {
-                printf("ERROR in raising FP4 by an internal modulus p, using the Frobenius constant f, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -497,10 +472,10 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4_xtrAline);
             linePtr = line + len;
-            read_FP4(&FP4_xtrA,linePtr);
-            FP4_xtr_A(&FP4aux1,&FP4_1,&FP4_2,&FP4add,&FP4sub);
-            FP4_reduce(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4_xtrA))
+            read_FP4_YYY(&FP4_xtrA,linePtr);
+            FP4_YYY_xtr_A(&FP4aux1,&FP4_1,&FP4_2,&FP4add,&FP4sub);
+            FP4_YYY_reduce(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4_xtrA))
             {
                 printf("ERROR in testing the XTR addition function r=w*x-conj(x)*y+z, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -511,10 +486,10 @@ int main(int argc, char** argv)
         {
             len = strlen(FP4_xtrDline);
             linePtr = line + len;
-            read_FP4(&FP4_xtrD,linePtr);
-            FP4_xtr_D(&FP4aux1,&FP4_1);
-            FP4_reduce(&FP4aux1);
-            if(!FP4_equals(&FP4aux1,&FP4_xtrD))
+            read_FP4_YYY(&FP4_xtrD,linePtr);
+            FP4_YYY_xtr_D(&FP4aux1,&FP4_1);
+            FP4_YYY_reduce(&FP4aux1);
+            if(!FP4_YYY_equals(&FP4aux1,&FP4_xtrD))
             {
                 printf("ERROR in testing the XTR doubling function r=x^2-2*conj(x), line %d\n",i);
                 exit(EXIT_FAILURE);

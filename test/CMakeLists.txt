@@ -110,16 +110,25 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_ecp_arithmetics_${tc}.c" "${tempc}")
   TV_TEST ("test_ecp_arithmetics_${tc}" "test_ecp_arithmetics_${tc}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tc}.txt" "")
 
+  if(NOT(${pf} STREQUAL "NOT") AND (BUILD_MPIN))
+  
+	  # Arithmetics test fp2 for pairing-friendly curves
+	  file(READ "test_fp2_arithmetics_YYY.c" tempc)
+	  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+	  string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+	  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp2_arithmetics_${tf}.c" "${tempc}")
+	  TV_TEST ("test_fp2_arithmetics_${tf}" "test_fp2_arithmetics_${tf}.c" "amcl_pairing_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp2/test_vector_${tc}.txt" "")
 
+	  # Arithmetics test fp4 for pairing-friendly curves
+	  file(READ "test_fp4_arithmetics_YYY.c" tempc)
+	  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+	  string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+	  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp4_arithmetics_${tf}.c" "${tempc}")
+	  TV_TEST ("test_fp4_arithmetics_${tf}" "test_fp4_arithmetics_${tf}.c" "amcl_pairing_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp4/test_vector_${tc}.txt" "")
 
-
-# # Aritmetics test for ecp 
-# add_executable (test_ecp_arithmetics test_ecp_arithmetics.c)
-# add_test(NAME test_ecp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/ecp/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
-# target_link_libraries (test_ecp_arithmetics amcl_curve)
-# set_tests_properties (test_ecp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-
-
+  endif(NOT(${pf} STREQUAL "NOT") AND (BUILD_MPIN))
 
 endfunction(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
 

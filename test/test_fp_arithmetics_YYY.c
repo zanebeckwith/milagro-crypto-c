@@ -1,5 +1,5 @@
 /**
- * @file test_fp_arithmetics.c
+ * @file test_fp_arithmetics_YYY.c
  * @author Alessandro Budroni
  * @brief Test for aritmetics with FP_YYY
  *
