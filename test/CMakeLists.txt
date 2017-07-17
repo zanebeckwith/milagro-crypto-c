@@ -1,4 +1,5 @@
 # Tests
+
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
@@ -80,41 +81,64 @@ TV_TEST (test_aes_decrypt_CFB1_256 test_aes_decrypt.c amcl_core "SUCCESS" "${PRO
 function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
   set(bd "${tb}_${base}")
 
-  # test BIG arithmetics
-  file(READ "test_big_arithmetics_XXX.c" tempc)
-  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c" "${tempc}")
-  TV_TEST ("test_big_arithmetics_${bd}" "test_big_arithmetics_${bd}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt" "")
+  if(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c"))
+	  # test BIG arithmetics
+	  file(READ "test_big_arithmetics_XXX.c" tempc)
+	  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+	  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c" "${tempc}")
+	  TV_TEST ("test_big_arithmetics_${bd}" "test_big_arithmetics_${bd}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt" "")
 
-  # test BIG consistency
-  file(READ "test_big_consistency_XXX.c" tempc)
-  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_consistency_${bd}.c" "${tempc}")
-  SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_curve_${tc}" "SUCCESS")
+	  # test BIG consistency
+	  file(READ "test_big_consistency_XXX.c" tempc)
+	  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+	  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_consistency_${bd}.c" "${tempc}")
+	  SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_curve_${tc}" "SUCCESS")
+  endif()
 
-# Arithmetics test fp
-  # file(READ "test_fp_arithmetics_YYY.c" tempc)
-  # string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  # string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-  # file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c" "${tempc}")
-  # TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt" "")
+  # Arithmetics test fp
+  file(READ "test_fp_arithmetics_YYY.c" tempc)
+  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+  string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c" "${tempc}")
+  TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tc}.txt" "")
+
+  # Arithmetics test ecp
+  file(READ "test_ecp_arithmetics_ZZZ.c" tempc)
+  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+  string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_ecp_arithmetics_${tc}.c" "${tempc}")
+  TV_TEST ("test_ecp_arithmetics_${tc}" "test_ecp_arithmetics_${tc}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tc}.txt" "")
+
+
+
+
+# # Aritmetics test for ecp 
+# add_executable (test_ecp_arithmetics test_ecp_arithmetics.c)
+# add_test(NAME test_ecp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/ecp/test_vector_${AMCL_CHOICE}_${AMCL_CURVETYPE}.txt)
+# target_link_libraries (test_ecp_arithmetics amcl_curve)
+# set_tests_properties (test_ecp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
+
+
 
 endfunction(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
 
 function(RSA_TESTS_SET tb tff nb base ml)
   set(bd "${tb}_${base}")
 
-  # test BIG arithmetics
-  file(READ "test_big_arithmetics_XXX.c" tempc)
-  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c" "${tempc}")
-  TV_TEST ("test_big_arithmetics_${bd}" "test_big_arithmetics_${bd}.c" "amcl_rsa_${tff}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt" "")
+  if(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c"))
+	  # test BIG arithmetics
+	  file(READ "test_big_arithmetics_XXX.c" tempc)
+	  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+	  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_arithmetics_${bd}.c" "${tempc}")
+	  TV_TEST ("test_big_arithmetics_${bd}" "test_big_arithmetics_${bd}.c" "amcl_rsa_${tff}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/big/test_vector_big.txt" "")
 
-  # test BIG consistency
-  file(READ "test_big_consistency_XXX.c" tempc)
-  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_consistency_${bd}.c" "${tempc}")
-  SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_rsa_${tff}" "SUCCESS")
+	  # test BIG consistency
+	  file(READ "test_big_consistency_XXX.c" tempc)
+	  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+	  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_consistency_${bd}.c" "${tempc}")
+	  SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_rsa_${tff}" "SUCCESS")
+  endif()
 
 endfunction(RSA_TESTS_SET tb tff nb base ml)
 
@@ -214,12 +238,6 @@ foreach(RSA ${AMCL_RSA})
     RSA_TESTS_SET("512" "4096" "64" "60" "8")
   endif(RSA STREQUAL "2048")
 endforeach(RSA)
-
-# # Arithmetics test fp
-# add_executable (test_fp_arithmetics test_fp_arithmetics.c)
-# add_test(NAME test_fp_arithmetics COMMAND ${TARGET_SYSTEM_EMULATOR} test_fp_arithmetics ${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${AMCL_CHOICE}.txt)
-# target_link_libraries (test_fp_arithmetics amcl_curve)
-# set_tests_properties (test_fp_arithmetics PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
 
 # # Arithmetics test fp2 and fp4 for pairing-friendly curves
 # if(AMCL_CHOICE MATCHES "BN" OR AMCL_CHOICE MATCHES "BLS")
