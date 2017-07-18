@@ -45,7 +45,7 @@ int main()
 
     char t1[PTAG];  // Tag
     char t2[PTAG];  // Tag
-    char k[PAS];   // AES Key
+    char k[PAS_ZZZ];   // AES Key
     char h[64];   // Header - to be included in Authentication, but not encrypted
     char iv[100]; // IV - Initialisation vector
     char m[100];  // Plaintext to be encrypted/authenticated

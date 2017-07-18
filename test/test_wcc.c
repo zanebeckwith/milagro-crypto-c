@@ -45,41 +45,41 @@ int main(int argc, char** argv)
     int i,rtn;
 
     /* Master secret */
-    char ms[PGS];
+    char ms[PGS_ZZZ];
     octet MS= {sizeof(ms),sizeof(ms),ms};
 
     // sender key
-    char akeyG1[2*PFS+1];
+    char akeyG1[2*PFS_ZZZ+1];
     octet AKeyG1= {0,sizeof(akeyG1), akeyG1};
 
     // receiver key
-    char bkeyG2[4*PFS];
+    char bkeyG2[4*PFS_ZZZ];
     octet BKeyG2= {0,sizeof(bkeyG2), bkeyG2};
 
-    char hv[PFS],alice_id[256],bob_id[256];
+    char hv[PFS_ZZZ],alice_id[256],bob_id[256];
     octet HV= {0,sizeof(hv),hv};
 
     octet IdA= {0,sizeof(alice_id),alice_id};
     octet IdB= {0,sizeof(bob_id),bob_id};
 
-    char x[PGS];
+    char x[PGS_ZZZ];
     octet X= {0,sizeof(x),x};
-    char y[PGS];
+    char y[PGS_ZZZ];
     octet Y= {0,sizeof(y),y};
-    char w[PGS];
+    char w[PGS_ZZZ];
     octet W= {0,sizeof(w),w};
-    char pia[PGS];
+    char pia[PGS_ZZZ];
     octet PIA= {0,sizeof(pia),pia};
-    char pib[PGS];
+    char pib[PGS_ZZZ];
     octet PIB= {0,sizeof(pib),pib};
 
-    char pgg1[2*PFS+1];
+    char pgg1[2*PFS_ZZZ+1];
     octet PgG1= {0,sizeof(pgg1), pgg1};
 
-    char pag1[2*PFS+1];
+    char pag1[2*PFS_ZZZ+1];
     octet PaG1= {0,sizeof(pag1), pag1};
 
-    char pbg2[4*PFS];
+    char pbg2[4*PFS_ZZZ];
     octet PbG2= {0,sizeof(pbg2), pbg2};
 
     char seed[32] = {0};
@@ -90,8 +90,8 @@ int main(int argc, char** argv)
     octet MESSAGE1 = {0, sizeof(message1), message1};
     OCT_jstring(&MESSAGE1,"Hello Bob");
 
-    char k1[PAS];  // AES Key
-    char k2[PAS];  // AES Key
+    char k1[PAS_ZZZ];  // AES Key
+    char k2[PAS_ZZZ];  // AES Key
     octet K1= {0,sizeof(k1),k1};
     octet K2= {0,sizeof(k2),k2};
 

@@ -1,5 +1,5 @@
 /**
- * @file test_ecp_consistency.c
+ * @file test_ecp_arithmetics_ZZZ.c
  * @author Alessandro Budroni
  * @brief Test for aritmetics with ECP_ZZZ
  *
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_ecp_arithmetics [path to test vector file]\n");
+        printf("usage: ./test_ecp_arithmetics_ZZZ [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
 

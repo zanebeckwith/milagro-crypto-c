@@ -92,24 +92,28 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
       ${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.c)
 
+    message(STATUS "Build libamcl_pairing_${tc}")
+    add_library(amcl_pairing_${tc} ${LIB_TYPE} ${SOURCES_PAIRING_${tc}})
+    target_link_libraries (amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
+
     if(BUILD_MPIN)
+
+      file(COPY "mpin_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+      set(SOURCES_MPIN_${tc}
+        ${CMAKE_CURRENT_BINARY_DIR}/mpin_support.c)
       file(READ "mpin_ZZZ.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
       string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c" "${tempc}")
-      set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
+      set(SOURCES_MPIN_${tc} ${SOURCES_MPIN_${tc}}
         ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.c)
 
-      file(COPY "mpin_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-      set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
-      ${CMAKE_CURRENT_BINARY_DIR}/mpin_support.c)
+      message(STATUS "Build libamcl_mpin_${tc}")
+      add_library(amcl_mpin_${tc} ${LIB_TYPE} ${SOURCES_MPIN_${tc}})
+      target_link_libraries (amcl_mpin_${tc} amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
 
     endif(BUILD_MPIN)
-
-    message(STATUS "Build libamcl_pairing_${tc}")
-    add_library(amcl_pairing_${tc} ${LIB_TYPE} ${SOURCES_PAIRING_${tc}})
-    target_link_libraries (amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
   endif(NOT(${pf} STREQUAL "NOT"))
 
 endfunction(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
@@ -170,10 +174,7 @@ ${CMAKE_CURRENT_BINARY_DIR}/aes.c
 ${CMAKE_CURRENT_BINARY_DIR}/gcm.c
 ${CMAKE_CURRENT_BINARY_DIR}/oct.c
 ${CMAKE_CURRENT_BINARY_DIR}/utils.c
-${CMAKE_CURRENT_BINARY_DIR}/ecdh_support.c
-${CMAKE_CURRENT_BINARY_DIR}/rsa_support.c
 )
-# mpin_support (if MPIN_BUILD)
 # version.c
 
 message(STATUS "Build libamcl_core")

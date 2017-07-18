@@ -29,7 +29,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "config.h"
 #include "wcc.h"
 #include "randapi.h"
 
@@ -55,63 +54,63 @@ int main()
     int i,rtn,iter;
 
     /* Master secret shares */
-    char ms1[PGS], ms2[PGS];
+    char ms1[PGS_ZZZ], ms2[PGS_ZZZ];
     octet MS1= {0,sizeof(ms1),ms1};
     octet MS2= {0,sizeof(ms2),ms2};
 
     // Sender keys
-    char a1keyG1[2*PFS+1], a2keyG1[2*PFS+1];
+    char a1keyG1[2*PFS_ZZZ+1], a2keyG1[2*PFS_ZZZ+1];
     octet A1KeyG1= {0,sizeof(a1keyG1), a1keyG1};
     octet A2KeyG1= {0,sizeof(a2keyG1), a2keyG1};
-    char akeyG1[2*PFS+1];
+    char akeyG1[2*PFS_ZZZ+1];
     octet AKeyG1= {0,sizeof(akeyG1), akeyG1};
 
     // Sender time permits
-    char a1TPG1[2*PFS+1], a2TPG1[2*PFS+1];
+    char a1TPG1[2*PFS_ZZZ+1], a2TPG1[2*PFS_ZZZ+1];
     octet A1TPG1= {0,sizeof(a1TPG1), a1TPG1};
     octet A2TPG1= {0,sizeof(a2TPG1), a2TPG1};
-    char aTPG1[2*PFS+1];
+    char aTPG1[2*PFS_ZZZ+1];
     octet ATPG1= {0,sizeof(aTPG1), aTPG1};
 
     // Receiver keys
-    char b1keyG2[4*PFS], b2keyG2[4*PFS];
+    char b1keyG2[4*PFS_ZZZ], b2keyG2[4*PFS_ZZZ];
     octet B1KeyG2= {0,sizeof(b1keyG2), b1keyG2};
     octet B2KeyG2= {0,sizeof(b2keyG2), b2keyG2};
-    char bkeyG2[4*PFS];
+    char bkeyG2[4*PFS_ZZZ];
     octet BKeyG2= {0,sizeof(bkeyG2), bkeyG2};
 
     // Receiver time permits
-    char b1TPG2[4*PFS], b2TPG2[4*PFS];
+    char b1TPG2[4*PFS_ZZZ], b2TPG2[4*PFS_ZZZ];
     octet B1TPG2= {0,sizeof(b1TPG2), b1TPG2};
     octet B2TPG2= {0,sizeof(b2TPG2), b2TPG2};
-    char bTPG2[4*PFS];
+    char bTPG2[4*PFS_ZZZ];
     octet BTPG2= {0,sizeof(bTPG2), bTPG2};
 
-    char ahv[PFS],alice_id[256],bhv[PFS],bob_id[256];
+    char ahv[PFS_ZZZ],alice_id[256],bhv[PFS_ZZZ],bob_id[256];
     octet AHV= {0,sizeof(ahv),ahv};
     octet BHV= {0,sizeof(bhv),bhv};
 
     octet IdA= {0,sizeof(alice_id),alice_id};
     octet IdB= {0,sizeof(bob_id),bob_id};
 
-    char x[PGS];
+    char x[PGS_ZZZ];
     octet X= {0,sizeof(x),x};
-    char y[PGS];
+    char y[PGS_ZZZ];
     octet Y= {0,sizeof(y),y};
-    char w[PGS];
+    char w[PGS_ZZZ];
     octet W= {0,sizeof(w),w};
-    char pia[PGS];
+    char pia[PGS_ZZZ];
     octet PIA= {0,sizeof(pia),pia};
-    char pib[PGS];
+    char pib[PGS_ZZZ];
     octet PIB= {0,sizeof(pib),pib};
 
-    char pgg1[2*PFS+1];
+    char pgg1[2*PFS_ZZZ+1];
     octet PgG1= {0,sizeof(pgg1), pgg1};
 
-    char pag1[2*PFS+1];
+    char pag1[2*PFS_ZZZ+1];
     octet PaG1= {0,sizeof(pag1), pag1};
 
-    char pbg2[4*PFS];
+    char pbg2[4*PFS_ZZZ];
     octet PbG2= {0,sizeof(pbg2), pbg2};
 
     char message1[256];
@@ -121,8 +120,8 @@ int main()
 
     char t1[PTAG];  // Tag
     char t2[PTAG];  // Tag
-    char k1[PAS];  // AES Key
-    char k2[PAS];  // AES Key
+    char k1[PAS_ZZZ];  // AES Key
+    char k2[PAS_ZZZ];  // AES Key
     char iv[PIV]; // IV - Initialisation vector
     char c[100];  // Ciphertext
     char p[100];  // Recovered Plaintext

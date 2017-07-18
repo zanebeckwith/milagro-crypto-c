@@ -23,7 +23,7 @@
  * under the License.
  */
 
-/* Test Designated Verifier Signature (DVS) scheme with incorrect PIN*/
+/* Test Designated Verifier Signature (DVS) scheme */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,11 +69,9 @@ int main()
     octet CS2= {0,sizeof(cs2), cs2};
 
     /* Client Public Key and z */
-    char z1[PGS_ZZZ], z2[PGS_ZZZ], pa1[4*PFS_ZZZ], pa2[4*PFS_ZZZ];
-    octet Z1= {0,sizeof(z1),z1};
-    octet Z2= {0,sizeof(z2),z2};
-    octet Pa1= {0,sizeof(pa1),pa1};
-    octet Pa2= {0,sizeof(pa2),pa2};
+    char z[PGS_ZZZ], pa[4*PFS_ZZZ];
+    octet Z= {0,sizeof(z),z};
+    octet Pa= {0,sizeof(pa),pa};
 
     /* Server secret and shares */
     char ss1[4*PFS_ZZZ], ss2[4*PFS_ZZZ], serverSecret[4*PFS_ZZZ];
@@ -116,31 +114,20 @@ int main()
     CREATE_CSPRNG(&RNG,&SEED);
 
     /* Generate random public key and z */
-    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z1,&Pa1);
+    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z,&Pa);
     if (rtn!=0)
     {
-        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z1,&Pa1) Error %d\n", rtn);
+        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z,&Pa) Error %d\n", rtn);
         return 1;
     }
-    printf("Z1: 0x");
-    OCT_output(&Z1);
-    printf("Pa1: 0x");
-    OCT_output(&Pa1);
-
-    rtn = MPIN_GET_DVS_KEYPAIR(&RNG,&Z2,&Pa2);
-    if (rtn!=0)
-    {
-        printf("MPIN_GET_DVS_KEYPAIR(&RNG,&Z2,&Pa2) Error %d\n", rtn);
-        return 1;
-    }
-    printf("Z2: 0x");
-    OCT_output(&Z2);
-    printf("Pa2: 0x");
-    OCT_output(&Pa2);
+    printf("Z: 0x");
+    OCT_output(&Z);
+    printf("Pa: 0x");
+    OCT_output(&Pa);
 
     /* Append Pa to ID */
-    OCT_joctet(&ID,&Pa1);
-    printf("ID|Pa1: 0x");
+    OCT_joctet(&ID,&Pa);
+    printf("ID|Pa: 0x");
     OCT_output(&ID);
 
     /* Hash ID */
@@ -230,13 +217,13 @@ int main()
     OCT_output(&TOKEN);
 
     /* Compute client secret for key escrow less scheme z.CS */
-    rtn = MPIN_ZZZ_GET_G1_MULTIPLE(NULL,0,&Z2,&TOKEN,&TOKEN);
+    rtn = MPIN_ZZZ_GET_G1_MULTIPLE(NULL,0,&Z,&TOKEN,&TOKEN);
     if (rtn != 0)
     {
         printf("MPIN_ZZZ_GET_G1_MULTIPLE(NULL,0,&Z,&CS,&CS) Error %d\n", rtn);
         return 1;
     }
-    printf("z2.CS: 0x");
+    printf("z.CS: 0x");
     OCT_output(&TOKEN);
 
     /* Client extracts PIN1 from secret to create Token */
@@ -270,12 +257,12 @@ int main()
     OCT_output(&SEC);
 
     /* Server: Verify message */
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&HM,TimeValue,&Pa1);
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&HM,TimeValue,&Pa);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)
     {
-        printf("FAILURE Signature Verification Error Code %d\n", rtn);
+        printf("FAILURE Signature Verification %d\n", rtn);
     }
     else
     {
@@ -300,10 +287,8 @@ int main()
     OCT_clear(&U);
     OCT_clear(&HID);
     OCT_clear(&SEED);
-    OCT_clear(&Z1);
-    OCT_clear(&Z2);
-    OCT_clear(&Pa1);
-    OCT_clear(&Pa2);
+    OCT_clear(&Z);
+    OCT_clear(&Pa);
 
     KILL_CSPRNG(&RNG);
     return 0;
