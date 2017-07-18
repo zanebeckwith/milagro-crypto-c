@@ -92,9 +92,6 @@ int main()
     PIN1 = 1234;
     PIN2 = 1234;
 
-    printf("MPIN_FS_ZZZ %d\n", MPIN_FS_ZZZ());
-    printf("MPIN_GS_ZZZ %d\n", MPIN_GS_ZZZ());
-
     /* Assign the End-User an ID */
     char* user = "testuser@miracl.com";
     OCT_jstring(&ID,user);
@@ -240,7 +237,7 @@ int main()
 
     /* Single PAS_ZZZs MPIN protocol */
     /* Client  */
-    TimeValue = MPIN_GET_TIME();
+    TimeValue = GET_TIME();
     printf("TimeValue %d \n", TimeValue);
     rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,NULL,TimeValue,&Y1);
     if (rtn != 0)

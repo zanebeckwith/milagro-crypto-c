@@ -935,7 +935,7 @@ void MPIN_ZZZ_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
 }
 
 /* One pass MPIN Client */
-int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,/*octet *MESSAGE,*/int TimeValue,octet *Y)
+int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,octet *MESSAGE,int TimeValue,octet *Y)
 {
     int rtn=0;
     char m[2*PFS_ZZZ+1];
@@ -952,11 +952,14 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
         return rtn;
 
     OCT_joctet(&M,pID);
-//    if (MESSAGE!=NULL)
-//    {
-//        OCT_joctet(&M,MESSAGE);
-//    }
 
+   if (MESSAGE!=NULL)
+   {
+       OCT_joctet(&M,MESSAGE);
+   }
+    printf("good message = ");
+    OCT_output(MESSAGE);printf("\nagain ");
+    OCT_output(&M);
     MPIN_ZZZ_GET_Y(sha,TimeValue,&M,Y);
 
     rtn = MPIN_ZZZ_CLIENT_2(X,Y,V);
@@ -967,7 +970,7 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
 }
 
 /* One pass MPIN Server */
-int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,/*octet *MESSAGE,*/int TimeValue)
+int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue)
 {
     int rtn=0;
     char m[2*PFS_ZZZ+1];
@@ -982,11 +985,14 @@ int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,o
     MPIN_ZZZ_SERVER_1(sha,date,ID,HID,HTID);
 
     OCT_joctet(&M,pU);
-//    if (MESSAGE!=NULL)
-//    {
-//        OCT_joctet(&M,MESSAGE);
-//    }
-
+    if (MESSAGE!=NULL)
+    {
+       printf("AAAA\n");
+       OCT_joctet(&M,MESSAGE);
+    }
+    printf("bad message = ");
+    OCT_output(MESSAGE);printf("\nagain ");
+    OCT_output(&M);
     MPIN_ZZZ_GET_Y(sha,TimeValue,&M,Y);
 
     rtn = MPIN_ZZZ_SERVER_2(date,HID,HTID,Y,sQ,U,UT,V,E,F);

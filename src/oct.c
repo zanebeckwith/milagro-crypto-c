@@ -127,6 +127,11 @@ void OCT_jbytes(octet *y,char *b,int len)
 /* SU= 8 */
 void OCT_joctet(octet *y,octet *x)
 {
+    printf("y = ");
+    OCT_output(y);
+    printf("x ");
+    OCT_output(x);
+
     /* y=y || x */
     int i,j;
     if (x==NULL) return;

@@ -94,9 +94,6 @@ int main()
     PIN1 = 1234;
     PIN2 = 1234;
 
-    printf("MPIN_FS_ZZZ %d\n", MPIN_FS_ZZZ());
-    printf("MPIN_GS_ZZZ %d\n", MPIN_GS_ZZZ());
-
     /* Assign the End-User an ID */
     char* user = "testuser@miracl.com";
     OCT_jstring(&ID,user);
@@ -237,7 +234,7 @@ int main()
     OCT_output(&TOKEN);
 
     /* Client: Sign message */
-    TimeValue = MPIN_GET_TIME();
+    TimeValue = GET_TIME();
     printf("TimeValue %d \n", TimeValue);
     char* message = "sign this message";
     OCT_jstring(&M,message);

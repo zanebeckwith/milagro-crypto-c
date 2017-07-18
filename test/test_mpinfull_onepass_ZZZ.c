@@ -265,7 +265,7 @@ int main()
     MPIN_ZZZ_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
 
     /* Client  */
-    TimeValue = MPIN_GET_TIME();
+    TimeValue = GET_TIME();
     printf("TimeValue %d \n", TimeValue);
     rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,NULL,TimeValue,&Y1);
     if (rtn != 0)

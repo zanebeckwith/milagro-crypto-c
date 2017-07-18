@@ -41,8 +41,9 @@ int main()
     octet ID = {0,sizeof(id),id};
 
     // Message to sign
-    char m[256];
+    char m[256], m1[256];
     octet M= {0,sizeof(m),m};
+    octet M1= {0,sizeof(m1),m1};
 
     char x[PGS_ZZZ],y1[PGS_ZZZ],y2[PGS_ZZZ];
     octet X= {0,sizeof(x),x};
@@ -324,6 +325,7 @@ int main()
     OCT_clear(&M);
     message = "sign this message";
     OCT_jstring(&M,message);
+    OCT_clear(&Y1);
     rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
     if (rtn != 0)
     {
@@ -336,13 +338,14 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-    OCT_clear(&M);
+    OCT_clear(&M1);
     message = "bad message";
-    OCT_jstring(&M,message);
+    OCT_jstring(&M1,message);
+    OCT_clear(&Y2);
 #ifdef USE_DVS
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue,NULL);
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M1,TimeValue,NULL);
 #else
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M1,TimeValue);
 #endif
 
     printf("Y2 = 0x");
@@ -362,7 +365,7 @@ int main()
 
     date = today();
     printf("Date %d \n", date);
-    TimeValue = MPIN_GET_TIME();
+    TimeValue = GET_TIME();
     printf("TimeValue %d \n", TimeValue);
 
     /* Generate Time Permit shares */
@@ -437,7 +440,7 @@ int main()
     OCT_clear(&M);
     message = "sign this message";
     OCT_jstring(&M,message);
-    TimeValue = MPIN_GET_TIME();
+    TimeValue = GET_TIME();
     printf("TimeValue %d \n", TimeValue);
     rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
     if (rtn != 0)
@@ -477,7 +480,7 @@ int main()
     OCT_clear(&M);
     message = "sign this message";
     OCT_jstring(&M,message);
-    TimeValue = MPIN_GET_TIME();
+    TimeValue = GET_TIME();
     printf("TimeValue %d \n", TimeValue);
     rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,&M,TimeValue,&Y1);
     if (rtn != 0)

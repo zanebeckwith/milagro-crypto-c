@@ -34,6 +34,8 @@
 #include "mpin_support.h"
 #include "randapi.h"
 
+#define nTimePermitTests 10
+
 int main()
 {
     int i,PIN1,PIN2,rtn,err,iter;

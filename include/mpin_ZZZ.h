@@ -86,7 +86,7 @@ int MPIN_ZZZ_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
 	@param y is output H(t|U) or H(t|UT) if Time Permits enabled
 	@return 0 or an error code
  */
-int MPIN_ZZZ_CLIENT(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, /*octet* MESSAGE,*/ int t, octet *y);
+int MPIN_ZZZ_CLIENT(int h,int d,octet *ID,csprng *R,octet *x,int pin,octet *T,octet *V,octet *U,octet *UT,octet *TP, octet* MESSAGE, int t, octet *y);
 /**	@brief Perform first pass of the client side of the 3-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
@@ -142,7 +142,7 @@ int MPIN_ZZZ_CLIENT_2(octet *x,octet *y,octet *V);
 	@param t is input epoch time in seconds - a timestamp
 	@return 0 or an error code
  */
-int MPIN_ZZZ_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,/*octet *MESSAGE,*/ int t);
+int MPIN_ZZZ_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
 /**	@brief Perform first pass of the server side of the 3-pass version of the M-Pin protocol
  *
  	@param h is the hash type
