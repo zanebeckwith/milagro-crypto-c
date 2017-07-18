@@ -322,10 +322,10 @@ void FP_YYY_imul(FP_YYY *r,FP_YYY *a,int c)
 {
 #if MODTYPE_YYY==PSEUDO_MERSENNE || MODTYPE_YYY==GENERALISED_MERSENNE
     DBIG_XXX d;
-#endif
+#else
 	BIG_XXX k;
 	FP_YYY f;
- 
+#endif
     int s=0;
    
     if (c<0)

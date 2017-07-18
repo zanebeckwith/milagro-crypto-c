@@ -18,13 +18,13 @@ message(STATUS "Generator - ${CMAKE_GENERATOR}")
 
 # Add options for build
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
-option (BUILD_PYTHON "Build Python" OFF)
-option (BUILD_GO "Build Golang" OFF)
+#option (BUILD_PYTHON "Build Python" OFF)
+#option (BUILD_GO "Build Golang" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
-option (BUILD_WCC "Build WCC" ON)
-option (BUILD_DOXYGEN "Build Doxygen" ON)
+#option (BUILD_WCC "Build WCC" ON)
+#option (BUILD_DOXYGEN "Build Doxygen" ON)
 option (USE_PATENTS "Use patents for G1 and G2 multiplication" OFF)
-option (USE_ANONYMOUS "Anonymous authentication for M-Pin Full" OFF)
+#option (USE_ANONYMOUS "Anonymous authentication for M-Pin Full" OFF)
 option (USE_DVS "Add support for key-escrow less DVS scheme" OFF)
 option (DEBUG_REDUCE "Print debug message for field reduction" OFF)
 option (DEBUG_NORM "Detect digit overflow" OFF)
@@ -98,19 +98,19 @@ message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
 set(AMCL_CURVE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h for explanation")
-set(Curves_values "NIST256;C25519;BRAINPOOL;ANSSI;MF254;MS255;MF256;MS256;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN454;BN646;BN254;BN254_CX;BN254_T;BN254_T2;BLS455;BLS383")
+set(Curves_values "NIST256;C25519;BRAINPOOL;ANSSI;NUMS384E;NUMS384W;NUMS256E;NUMS256W;NUMS512E;NUMS512W;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN254;BN254_CX;BLS383")
 set_property(CACHE AMCL_CURVE PROPERTY STRINGS ${Curves_values})
 message(STATUS "AMCL_CURVE='${AMCL_CURVE}'")
 
 # Select RSA security level
-set(AMCL_RSA "2048" CACHE STRING "RSA level of security supported. See ./include/rsa.h for explanation")
-set(rsa_values "2048;3072;2096")
+set(AMCL_RSA "2048" CACHE STRING "RSA level of security supported. See ./include/rsa_WWW.h for explanation")
+set(rsa_values "2048;3072;4096")
 set_property(CACHE AMCL_RSA PROPERTY STRINGS ${rsa_values})
 message(STATUS "AMCL_RSA='${AMCL_RSA}'")
 
 # Configure PIN
-set(AMCL_MAXPIN 10000 CACHE STRING "Maximum PIN value. See ./include/mpin.h for explanation")
-set(AMCL_PBLEN 14 CACHE STRING "Maximum PIN value in bits. See ./include/mpin.h for explanation")
+set(AMCL_MAXPIN 10000 CACHE STRING "Maximum PIN value. See ./include/mpin_ZZZ.h for explanation")
+set(AMCL_PBLEN 14 CACHE STRING "Maximum PIN value in bits. See ./include/mpin_ZZZ.h for explanation")
 message(STATUS "AMCL_MAXPIN=${AMCL_MAXPIN}")
 
 # # Build libx509
@@ -151,7 +151,6 @@ add_subdirectory(src)
 # add_subdirectory(examples)
 add_subdirectory(test)
 # add_subdirectory(benchmark)
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # Only build Python for shared libs
 # if (NOT BUILD_SHARED_LIBS)

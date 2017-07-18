@@ -615,6 +615,8 @@ int main(int argc, char** argv)
     fclose(writtenFile);
     fclose(testVectFile);
 
+    remove(argv[2]);
+
     printf("SUCCESS TEST OUTPUT FUNCTIONS PASSED\n");
     exit(EXIT_SUCCESS);
 }

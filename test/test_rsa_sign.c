@@ -30,7 +30,7 @@
 */
 
 #include "rsa.h"
-#include "ecdh.h"
+#include "ecdh_ZZZ.h"
 #include "x509.h"
 #include "utils.h"
 #include <stdio.h>

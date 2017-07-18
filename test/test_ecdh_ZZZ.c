@@ -1,5 +1,5 @@
 /**
- * @file test_ecdh.c
+ * @file test_ecdh_ZZZ.c
  * @author Kealan McCusker
  * @brief Test function for ECDH
  *
@@ -29,7 +29,7 @@
 
 */
 
-#include "ecdh.h"
+#include "ecdh_ZZZ.h"
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_ecdh [path to test vector file]\n");
+        printf("usage: ./test_ecdh_ZZZ [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
     int rc;
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     char * linePtr = NULL;
     int l1=0, l2=0, i=0;
 
-    char raw[256], key[EAS], ciphertext[EAS*2], res[EAS*2], plaintext[EAS*2];
+    char raw[256], key[EAS_ZZZ], ciphertext[EAS_ZZZ*2], res[EAS_ZZZ*2], plaintext[EAS_ZZZ*2];
     octet Key= {0,sizeof(key),key}, Ciphertext= {0,sizeof(ciphertext),ciphertext}, Plaintext= {0,sizeof(plaintext),plaintext}, Res= {0,sizeof(res),res};
     csprng rng;
 
@@ -63,37 +63,37 @@ int main(int argc, char** argv)
     RAND_seed(&rng,256,raw);
 
 
-    char QCAVSx[EGS];
+    char QCAVSx[EGS_ZZZ];
     const char* QCAVSxStr = "QCAVSx = ";
-    octet QCAVSxOct = {EGS,EGS,QCAVSx};
+    octet QCAVSxOct = {EGS_ZZZ,EGS_ZZZ,QCAVSx};
 
-#if CURVETYPE!=MONTGOMERY
-    char QCAVSy[EGS];
+#if CURVETYPE_ZZZ!=MONTGOMERY
+    char QCAVSy[EGS_ZZZ];
     const char* QCAVSyStr = "QCAVSy = ";
-    octet QCAVSyOct = {EGS,EGS,QCAVSy};
+    octet QCAVSyOct = {EGS_ZZZ,EGS_ZZZ,QCAVSy};
 #endif
 
     char * dIUT = NULL;
     const char* dIUTStr = "dIUT = ";
     octet dIUTOct;
 
-    char QIUTx[EGS];
+    char QIUTx[EGS_ZZZ];
     const char* QIUTxStr = "QIUTx = ";
-    octet QIUTxOct = {EGS,EGS,QIUTx};
+    octet QIUTxOct = {EGS_ZZZ,EGS_ZZZ,QIUTx};
 
-#if CURVETYPE!=MONTGOMERY
-    char QIUTy[EGS];
+#if CURVETYPE_ZZZ!=MONTGOMERY
+    char QIUTy[EGS_ZZZ];
     const char* QIUTyStr = "QIUTy = ";
-    octet QIUTyOct = {EGS,EGS,QIUTy};
+    octet QIUTyOct = {EGS_ZZZ,EGS_ZZZ,QIUTy};
 #endif
 
     char * ZIUT = NULL;
     const char* ZIUTStr = "ZIUT = ";
     octet ZIUTOct;
 
-    char q[2*EFS+1];
+    char q[2*EFS_ZZZ+1];
     octet QOct= {0,sizeof(q),q};
-    char z[EFS];
+    char z[EFS_ZZZ];
     octet ZOct= {0,sizeof(z),z};
 
     fp = fopen(argv[1], "r");
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
             amcl_hex2bin(linePtr, QCAVSx, l1);
         }
 
-#if CURVETYPE!=MONTGOMERY
+#if CURVETYPE_ZZZ!=MONTGOMERY
         if (!strncmp(line, QCAVSyStr, strlen(QCAVSyStr)))
         {
 #ifdef DEBUG
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
             amcl_hex2bin(linePtr, QIUTx, l1);
         }
 
-#if CURVETYPE!=MONTGOMERY
+#if CURVETYPE_ZZZ!=MONTGOMERY
         if (!strncmp(line, QIUTyStr, strlen(QIUTyStr)))
         {
 #ifdef DEBUG
@@ -218,9 +218,9 @@ int main(int argc, char** argv)
             ZIUTOct.val=ZIUT;
 
             // Assign QIUT
-            char q1[2*EFS+1];
+            char q1[2*EFS_ZZZ+1];
             octet QIUTOct= {0,sizeof(q1),q1};
-#if CURVETYPE!=MONTGOMERY
+#if CURVETYPE_ZZZ!=MONTGOMERY
             QIUTOct.val[0]=4;
             QIUTOct.len=1;
             OCT_joctet(&QIUTOct,&QIUTxOct);
@@ -232,9 +232,9 @@ int main(int argc, char** argv)
 #endif
 
             // Assign QCAVS
-            char q2[2*EFS+1];
+            char q2[2*EFS_ZZZ+1];
             octet QCAVSOct= {0,sizeof(q2),q2};
-#if CURVETYPE!=MONTGOMERY
+#if CURVETYPE_ZZZ!=MONTGOMERY
             QCAVSOct.val[0]=4;
             QCAVSOct.len=1;
             OCT_joctet(&QCAVSOct,&QCAVSxOct);
@@ -245,7 +245,7 @@ int main(int argc, char** argv)
             OCT_joctet(&QCAVSOct,&QCAVSxOct);
 #endif
             // Check correct public key generated
-            ECP_KEY_PAIR_GENERATE(NULL,&dIUTOct,&QOct);
+            ECP_ZZZ_KEY_PAIR_GENERATE(NULL,&dIUTOct,&QOct);
             rc = OCT_comp(&QOct,&QIUTOct);
             if (!rc)
             {
@@ -261,7 +261,7 @@ int main(int argc, char** argv)
             }
 
             // Check correct shared value generated
-            ECPSVDP_DH(&dIUTOct,&QCAVSOct,&ZOct);
+            ECP_ZZZ_SVDP_DH(&dIUTOct,&QCAVSOct,&ZOct);
             rc = OCT_comp(&ZOct,&ZIUTOct);
             if (!rc)
             {
@@ -292,8 +292,8 @@ int main(int argc, char** argv)
 // Self test AES-CBC
     for(i=0; i<20; i++)
     {
-        OCT_rand(&Key,&rng,EAS*2);
-        OCT_rand(&Plaintext,&rng,EAS);
+        OCT_rand(&Key,&rng,EAS_ZZZ*2);
+        OCT_rand(&Plaintext,&rng,EAS_ZZZ);
         OCT_copy(&Res,&Plaintext);
 
         AES_CBC_IV0_ENCRYPT(&Key,&Plaintext,&Ciphertext);

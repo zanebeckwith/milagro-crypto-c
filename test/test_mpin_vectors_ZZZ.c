@@ -1,7 +1,7 @@
 /**
  * @file test_mpin_vectors_ZZZ.c
  * @author Alessandro Budroni
- * @brief Test for aritmetics with FP
+ * @brief Test mpin with test vectors
  *
  * LICENSE
  *
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_mpin_vectors [path to test vector file]\n");
+        printf("usage: ./test_mpin_vectors_ZZZ [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -178,6 +178,10 @@ int main(int argc, char** argv)
             }
             else if (!OCT_comp(&rtSS1,&SS1))
             {
+            	printf("rtSS1: 0x");
+            	OCT_output(&rtSS1);
+            	printf("  SS1: 0x");
+            	OCT_output(&SS1);
                 printf("ERROR generating server secret, line %d\n",i);
                 exit(EXIT_FAILURE);
             }

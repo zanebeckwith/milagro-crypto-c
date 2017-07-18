@@ -1,7 +1,7 @@
 /**
- * @file test_ecdsa_verify.c
+ * @file test_ecdsa_sign_ZZZ.c
  * @author Kealan McCusker
- * @brief Test function for ECDSA verification,
+ * @brief Test function for ECDSA signature,
  *
  * LICENSE
  *
@@ -25,11 +25,11 @@
 
 /* Build executible after installation:
 
-  gcc -std=c99 -g ./test_ecdsa_verify.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lecdh -o test_ecdsa_verify
+  gcc -std=c99 -g ./test_ecdsa_sign.c -I/opt/amcl/include -L/opt/amcl/lib -lamcl -lecdh -o test_ecdsa_sign
 
 */
 
-#include "ecdh.h"
+#include "ecdh_ZZZ.h"
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
@@ -38,17 +38,16 @@
 typedef enum { false, true } bool;
 
 #define LINE_LEN 300
-// #define DEBUG
+//#define DEBUG
 
 int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        printf("usage: ./test_ecdsa_sign [path to test vector file] [hash type: sha256||sha512] \n");
+        printf("usage: ./test_ecdsa_sign_ZZZ_256/512 [path to test vector file] [hash type-sha256||sha384||sha512] \n");
         exit(EXIT_FAILURE);
     }
     int rc;
-    bool pass;
     FILE * fp = NULL;
     char line[LINE_LEN];
     char * linePtr = NULL;
@@ -57,19 +56,28 @@ int main(int argc, char** argv)
     char * Msg = NULL;
     const char* MsgStr = "Msg = ";
     octet MsgOct;
-    char Qx[EGS];
+    char * d = NULL;
+    const char* dStr = "d = ";
+    octet dOct;
+    char Qx[EGS_ZZZ];
     const char* QxStr = "Qx = ";
-    octet QxOct = {EGS,EGS,Qx};
-    char Qy[EGS];
+    octet QxOct = {EGS_ZZZ,EGS_ZZZ,Qx};
+    char Qy[EGS_ZZZ];
     const char* QyStr = "Qy = ";
-    octet QyOct = {EGS,EGS,Qy};
+    octet QyOct = {EGS_ZZZ,EGS_ZZZ,Qy};
+    char * k = NULL;
+    const char* kStr = "k = ";
+    octet kOct;
     char * R = NULL;
     const char* RStr = "R = ";
     octet ROct;
     char * S = NULL;
     const char* SStr = "S = ";
     octet SOct;
-    const char* ResultStr = "Result = ";
+
+    char r2[EGS_ZZZ],s2[EGS_ZZZ];
+    octet R2Oct= {0,sizeof(r2),r2};
+    octet S2Oct= {0,sizeof(s2),s2};
 
     // Assign hash type
     int hash_type;
@@ -98,7 +106,6 @@ int main(int argc, char** argv)
     }
 
     bool readLine = false;
-
     int i=0;
     while (fgets(line, LINE_LEN, fp) != NULL)
     {
@@ -125,6 +132,29 @@ int main(int argc, char** argv)
             MsgOct.len=l2;
             MsgOct.max=l2;
             MsgOct.val=Msg;
+        }
+
+        if (!strncmp(line, dStr, strlen(dStr)))
+        {
+#ifdef DEBUG
+            printf("line %d %s\n", i,line);
+#endif
+            // Find hex value in string
+            linePtr = line + strlen(dStr);
+
+            // Allocate memory
+            l1 = strlen(linePtr)-1;
+            l2 = l1/2;
+            d = (char*) malloc (l2);
+            if (d==NULL)
+                exit(EXIT_FAILURE);
+
+            // d binary value
+            amcl_hex2bin(linePtr, d, l1);
+
+            dOct.len=l2;
+            dOct.max=l2;
+            dOct.val=d;
         }
 
         if (!strncmp(line, QxStr, strlen(QxStr)))
@@ -155,6 +185,29 @@ int main(int argc, char** argv)
 
             // Qy binary value
             amcl_hex2bin(linePtr, Qy, l1);
+        }
+
+        if (!strncmp(line, kStr, strlen(kStr)))
+        {
+#ifdef DEBUG
+            printf("line %d %s\n", i,line);
+#endif
+            // Find hex value in string
+            linePtr = line + strlen(kStr);
+
+            // Allocate memory
+            l1 = strlen(linePtr)-1;
+            l2 = l1/2;
+            k = (char*) malloc (l2);
+            if (k==NULL)
+                exit(EXIT_FAILURE);
+
+            // k binary value
+            amcl_hex2bin(linePtr, k, l1);
+
+            kOct.len=l2;
+            kOct.max=l2;
+            kOct.val=k;
         }
 
         if (!strncmp(line, RStr, strlen(RStr)))
@@ -201,53 +254,66 @@ int main(int argc, char** argv)
             SOct.len=l2;
             SOct.max=l2;
             SOct.val=S;
-        }
 
-        if (!strncmp(line, ResultStr, strlen(ResultStr)))
-        {
-#ifdef DEBUG
-            printf("line %d %s\n", i,line);
-#endif
-            linePtr = line + strlen(ResultStr);
-            char r1[1];
-            char r2[1] = {"P"};
-            strncpy(r1,linePtr,1);
-            if (r1[0] == r2[0])
-            {
-                pass = true;
-            }
-            else
-            {
-                pass = false;
-            }
-
-            // Assign Public Key to EC
-            BIG qx, qy;
-            char q[2*EFS+1];
-            BIG_fromBytes(qx,QxOct.val);
-            BIG_fromBytes(qy,QyOct.val);
+            // Assign Public Key
+            BIG_XXX qx,qy;
+            char q[2*EFS_ZZZ+1];
+            BIG_XXX_fromBytes(qx,QxOct.val);
+            BIG_XXX_fromBytes(qy,QyOct.val);
             octet QOct= {sizeof(q),sizeof(q),q};
             QOct.val[0]=4;
-            BIG_toBytes(&(QOct.val[1]),qx);
-            BIG_toBytes(&(QOct.val[EFS+1]),qy);
+            BIG_XXX_toBytes(&(QOct.val[1]),qx);
+            BIG_XXX_toBytes(&(QOct.val[EFS_ZZZ+1]),qy);
 
-            rc = ECPVP_DSA(hash_type,&QOct,&MsgOct,&ROct,&SOct);
-            // Test expected to pass. rc is true for fail
-            if ( pass && rc )
+#ifdef DEBUG
+            printf("hash_type %d\n",hash_type);
+            printf("kOct: ");
+            OCT_output(&kOct);
+            printf("dOct: ");
+            OCT_output(&dOct);
+            printf("MsgOct: ");
+            OCT_output(&MsgOct);
+            printf("\n");
+#endif
+
+            ECP_ZZZ_SP_DSA(hash_type,NULL,&kOct,&dOct,&MsgOct,&R2Oct,&S2Oct);
+
+            rc = OCT_comp(&ROct,&R2Oct);
+            if (!rc)
             {
-                printf("TEST ECDSA VERIFY FAILED LINE %d pass %d rc %d\n",i,pass,rc);
+                printf("TEST ECDSA SIGN FAILED COMPARE R LINE %d\n",i);
+#ifdef DEBUG
+                printf("ROct: ");
+                OCT_output(&ROct);
+                printf("\n");
+                printf("R2Oct: ");
+                OCT_output(&R2Oct);
+                printf("\n");
+#endif
                 exit(EXIT_FAILURE);
             }
 
-            // Test expected to fail
-            if ( !pass && !rc )
+            rc = OCT_comp(&SOct,&S2Oct);
+            if (!rc)
             {
-                printf("TEST ECDSA VERIFY FAILED LINE %d pass %d rc %d\n",i,pass,rc);
+                printf("TEST ECDSA SIGN FAILED COMPARE S LINE %d\n",i);
+#ifdef DEBUG
+                printf("SOct: ");
+                OCT_output(&SOct);
+                printf("\n");
+                printf("S2Oct: ");
+                OCT_output(&S2Oct);
+                printf("\n");
+#endif
                 exit(EXIT_FAILURE);
             }
 
             free(Msg);
             Msg = NULL;
+            free(d);
+            d = NULL;
+            free(k);
+            k = NULL;
             free(R);
             R = NULL;
             free(S);
@@ -260,6 +326,6 @@ int main(int argc, char** argv)
         printf("ERROR Empty test vector file\n");
         exit(EXIT_FAILURE);
     }
-    printf("SUCCESS TEST ECDSA %s VERIFY PASSED\n", argv[2]);
+    printf("SUCCESS TEST ECDSA %s SIGN PASSED\n", argv[2]);
     exit(EXIT_SUCCESS);
 }

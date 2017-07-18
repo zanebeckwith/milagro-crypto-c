@@ -1,5 +1,5 @@
 /**
- * @file test_ecdsa_keypair.c
+ * @file test_ecdsa_keypair_ZZZ.c
  * @author Kealan McCusker
  * @brief Test function for ECDSA keypair,
  *
@@ -29,7 +29,7 @@
 
 */
 
-#include "ecdh.h"
+#include "ecdh_ZZZ.h"
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_ecdsa_sign [path to test vector file]\n");
+        printf("usage: ./test_ecdsa_sign_ZZZ [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
     int rc;
@@ -56,14 +56,14 @@ int main(int argc, char** argv)
     char * d = NULL;
     const char* dStr = "d = ";
     octet dOct;
-    char Qx[EGS];
+    char Qx[EGS_ZZZ];
     const char* QxStr = "Qx = ";
-    octet QxOct = {EGS,EGS,Qx};
-    char Qy[EGS];
+    octet QxOct = {EGS_ZZZ,EGS_ZZZ,Qx};
+    char Qy[EGS_ZZZ];
     const char* QyStr = "Qy = ";
-    octet QyOct = {EGS,EGS,Qy};
+    octet QyOct = {EGS_ZZZ,EGS_ZZZ,Qy};
 
-    char q2[2*EFS+1];
+    char q2[2*EFS_ZZZ+1];
     octet Q2Oct= {0,sizeof(q2),q2};
 
     fp = fopen(argv[1], "r");
@@ -132,17 +132,17 @@ int main(int argc, char** argv)
             amcl_hex2bin(linePtr, Qy, l1);
 
             // Assign Public Key
-            BIG qx, qy;
-            char q[2*EFS+1];
-            BIG_fromBytes(qx,QxOct.val);
-            BIG_fromBytes(qy,QyOct.val);
+            BIG_XXX qx, qy;
+            char q[2*EFS_ZZZ+1];
+            BIG_XXX_fromBytes(qx,QxOct.val);
+            BIG_XXX_fromBytes(qy,QyOct.val);
             octet QOct= {sizeof(q),sizeof(q),q};
             QOct.val[0]=4;
-            BIG_toBytes(&(QOct.val[1]),qx);
-            BIG_toBytes(&(QOct.val[EFS+1]),qy);
+            BIG_XXX_toBytes(&(QOct.val[1]),qx);
+            BIG_XXX_toBytes(&(QOct.val[EFS_ZZZ+1]),qy);
 
             // Generate Key pair
-            ECP_KEY_PAIR_GENERATE(NULL,&dOct,&Q2Oct);
+            ECP_ZZZ_KEY_PAIR_GENERATE(NULL,&dOct,&Q2Oct);
 
 #ifdef DEBUG
             printf("QOct: ");

@@ -24,7 +24,7 @@
  */
 
 #include "rsa.h"
-#include "ecdh.h"
+#include "ecdh_ZZZ.h"
 #include "x509.h"
 #include "utils.h"
 #include <stdio.h>
@@ -631,7 +631,7 @@ int main(int argc, char** argv)
                     printf("TEST X509 ERROR CURVE IS NOT SUPPORTED LINE %d\n",i);
                     exit(EXIT_FAILURE);
                 }
-                int res=ECP_PUBLIC_KEY_VALIDATE(1,&CAKEY);
+                int res=ECP_ZZZ_PUBLIC_KEY_VALIDATE(1,&CAKEY);
                 if (res!=0)
                 {
                     printf("TEST X509 ERROR PUBLIC KEY IS INVALID LINE %d\n",i);
@@ -648,7 +648,7 @@ int main(int argc, char** argv)
                     exit(EXIT_FAILURE);
                 }
 
-                if (ECPVP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
+                if (ECP_ZZZ_VP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
                 {
                     printf("X509 ERROR ECDSA VERIFICATION FAILED LINE %d\n",i);
                     exit(EXIT_FAILURE);
@@ -993,7 +993,7 @@ int main(int argc, char** argv)
                     printf("TEST X509 ERROR CURVE IS NOT SUPPORTED LINE %d\n",i);
                     exit(EXIT_FAILURE);
                 }
-                int res=ECP_PUBLIC_KEY_VALIDATE(1,&CAKEY);
+                int res=ECP_ZZZ_PUBLIC_KEY_VALIDATE(1,&CAKEY);
                 if (res!=0)
                 {
                     printf("TEST X509 ERROR PUBLIC KEY IS INVALID LINE %d\n",i);
@@ -1010,7 +1010,7 @@ int main(int argc, char** argv)
                     exit(EXIT_FAILURE);
                 }
 
-                if (ECPVP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
+                if (ECP_ZZZ_VP_DSA(sha,&CAKEY,&H,&R,&S)!=0)
                 {
                     printf("X509 ERROR ECDSA VERIFICATION FAILED LINE %d\n",i);
                     exit(EXIT_FAILURE);
