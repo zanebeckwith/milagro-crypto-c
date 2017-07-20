@@ -1136,7 +1136,7 @@ func Server2(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte,
 		FOct = &pF
 	}
 
-	rtn := C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, publicKeyOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct)
+	rtn := C.MPIN_SERVER_2(C.int(epochDate), &HIDOct, &HTIDOct, &yOct, &serverSecretOct, &UOct, UTOct, &VOct, EOct, FOct, publicKeyOct)
 
 	errorCode = int(rtn)
 
