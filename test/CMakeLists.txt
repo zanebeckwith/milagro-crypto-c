@@ -316,7 +316,7 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
 	      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
 	      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
 	      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpin_dvs_wrong_pk_${tc}.c" "${tempc}")
-	      SMOKE_TEST ("test_mpin_dvs_wrong_pk_${tf}" "test_mpin_dvs_wrong_pk_${tc}.c" "amcl_mpin_${tc}" "FAILURE Invalid Token Error Code -19")
+	      SMOKE_TEST ("test_mpin_dvs_wrong_pk_${tf}" "test_mpin_dvs_wrong_pk_${tc}.c" "amcl_mpin_${tc}" "FAILURE Signature Verification Error Code -19")
       endif(USE_DVS)
 
        # test mpin random

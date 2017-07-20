@@ -147,9 +147,8 @@ function(RSA_HEADERS_SET tb tff nb base ml)
 endfunction(RSA_HEADERS_SET tb tff nb base ml)
 
 set(COMMON_HEADERS
-	amcl.h
-  utils.h
-  randapi.h
+  	utils.h
+    randapi.h
   )
   #x509.h)
 
@@ -157,11 +156,15 @@ set(COMMON_HEADERS
 file(COPY ${COMMON_HEADERS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Copy arch.h
-set(fnameh "ecp2_${tc}.h")
 file(READ "arch.h" temph)
 string(REGEX REPLACE "@WL@" ${AMCL_CHUNK} temph "${temph}")
 string(CONFIGURE "${temph}" temph)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/arch.h" "${temph}")
+
+# Copy amcl.h
+file(READ "amcl.h" temph)
+string(CONFIGURE "${temph}" temph)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/amcl.h" "${temph}")
 
 string(REGEX REPLACE "," ";" AMCL_CURVE ${AMCL_CURVE})
 string(REGEX REPLACE "," ";" AMCL_RSA ${AMCL_RSA})
