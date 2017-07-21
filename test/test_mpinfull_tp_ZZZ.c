@@ -30,7 +30,7 @@
 #include <string.h>
 #include <time.h>
 #include "mpin_ZZZ.h"
-#include "mpin_support.h"
+#include "pbc_support.h"
 #include "randapi.h"
 
 // #define DEBUG

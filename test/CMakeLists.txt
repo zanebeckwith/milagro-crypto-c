@@ -334,21 +334,7 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
       string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpinfull_${tc}.c" "${tempc}")
       TV_TEST ("test_mpinfull_sha256_${tc}" "test_mpinfull_${tc}.c" "amcl_mpin_${tc}" "SUCCESS" "sha256" "")
-
-      # test mpin full with sha384
-      file(READ "test_mpinfull_ZZZ.c" tempc)
-      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpinfull_${tc}.c" "${tempc}")
       TV_TEST ("test_mpinfull_sha384_${tc}" "test_mpinfull_${tc}.c" "amcl_mpin_${tc}" "SUCCESS" "sha384" "")
-
-      # test mpin full with sha512
-      file(READ "test_mpinfull_ZZZ.c" tempc)
-      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpinfull_${tc}.c" "${tempc}")
       TV_TEST ("test_mpinfull_sha512_${tc}" "test_mpinfull_${tc}.c" "amcl_mpin_${tc}" "SUCCESS" "sha512" "")
 
       # test mpin full with time permit
@@ -386,28 +372,26 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
       # endif(${tf} STREQUAL "BN254CX")
     endif(BUILD_MPIN)
 
-# if(BUILD_WCC)
-#   add_executable (test_wcc_gcm test_wcc_gcm.c)
-#   add_executable (test_wcc_sha256 test_wcc.c)
-#   add_executable (test_wcc_sha384 test_wcc.c)
-#   add_executable (test_wcc_sha512 test_wcc.c)
-#   add_executable (test_wcc_random test_wcc_random.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_wcc_gcm amcl_wcc) 
-#   target_link_libraries (test_wcc_sha256 amcl_wcc)
-#   target_link_libraries (test_wcc_sha384 amcl_wcc) 
-#   target_link_libraries (test_wcc_sha512 amcl_wcc) 
-#   target_link_libraries (test_wcc_random amcl_wcc) 
-#   # tests  
-#   add_test(NAME test_wcc_sha256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_wcc_sha256 sha256)
-#   set_tests_properties (test_wcc_sha256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-#   add_test(NAME test_wcc_sha384 COMMAND ${TARGET_SYSTEM_EMULATOR} test_wcc_sha384 sha384)
-#   set_tests_properties (test_wcc_sha384 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-#   add_test(NAME test_wcc_sha512 COMMAND ${TARGET_SYSTEM_EMULATOR} test_wcc_sha512 sha512)
-#   set_tests_properties (test_wcc_sha512 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-#   do_test (test_wcc_gcm "SUCCESS")
-#   do_test (test_wcc_random "SUCCESS")
-# endif(BUILD_WCC)  
+    if(BUILD_WCC)
+
+      # test wcc
+      file(READ "test_wcc_ZZZ.c" tempc)
+      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_wcc_${tc}.c" "${tempc}")
+      TV_TEST ("test_wcc_sha256_${tc}" "test_wcc_${tc}.c" "amcl_wcc_${tc}" "SUCCESS" "sha256" "")
+      TV_TEST ("test_wcc_sha384_${tc}" "test_wcc_${tc}.c" "amcl_wcc_${tc}" "SUCCESS" "sha384" "")
+      TV_TEST ("test_wcc_sha512_${tc}" "test_wcc_${tc}.c" "amcl_wcc_${tc}" "SUCCESS" "sha512" "")
+
+      # test mpin random
+      file(READ "test_wcc_random_ZZZ.c" tempc)
+      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_wcc_random_${tc}.c" "${tempc}")
+      SMOKE_TEST ("test_wcc_random_${tc}" "test_wcc_random_${tc}.c" "amcl_wcc_${tc}" "SUCCESS")
+    endif(BUILD_WCC)  
 
   endif(NOT(${pf} STREQUAL "NOT"))
 

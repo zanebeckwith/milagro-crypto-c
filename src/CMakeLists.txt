@@ -97,11 +97,13 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     add_library(amcl_pairing_${tc} ${LIB_TYPE} ${SOURCES_PAIRING_${tc}})
     target_link_libraries (amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
 
-    if(BUILD_MPIN)
+    if(BUILD_MPIN OR BUILD_WCC)
+      file(COPY "pbc_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    endif(BUILD_MPIN OR BUILD_WCC)
 
-      file(COPY "mpin_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    if(BUILD_MPIN)
       set(SOURCES_MPIN_${tc}
-        ${CMAKE_CURRENT_BINARY_DIR}/mpin_support.c)
+        ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.c)
       file(READ "mpin_ZZZ.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
@@ -113,8 +115,24 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       message(STATUS "Build libamcl_mpin_${tc}")
       add_library(amcl_mpin_${tc} ${LIB_TYPE} ${SOURCES_MPIN_${tc}})
       target_link_libraries (amcl_mpin_${tc} amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
-
     endif(BUILD_MPIN)
+
+    if(BUILD_WCC)
+      set(SOURCES_WCC_${tc}
+        ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.c)
+      file(READ "wcc_ZZZ.c" tempc)
+      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/wcc_${tc}.c" "${tempc}")
+      set(SOURCES_WCCC_${tc} ${SOURCES_WCC_${tc}}
+        ${CMAKE_CURRENT_BINARY_DIR}/wcc_${tc}.c)
+
+      message(STATUS "Build libamcl_wcc_${tc}")
+      add_library(amcl_wcc_${tc} ${LIB_TYPE} ${SOURCES_WCC_${tc}})
+      target_link_libraries (amcl_wcc_${tc} amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
+    endif(BUILD_WCC)
+
   endif(NOT(${pf} STREQUAL "NOT"))
 
 endfunction(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)

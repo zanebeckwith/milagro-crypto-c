@@ -27,7 +27,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "mpin_ZZZ.h"
-#include "mpin_support.h"
+#include "pbc_support.h"
 #include "amcl.h"
 #include "utils.h"
 

@@ -1,5 +1,5 @@
-#ifndef MPIN_SUPPORT_H
-#define MPIN_SUPPORT_H
+#ifndef PBC_SUPPORT_H
+#define PBC_SUPPORT_H
 
 #include "amcl.h"
 

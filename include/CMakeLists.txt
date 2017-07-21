@@ -94,6 +94,10 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
     string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
 
+	if(BUILD_MPIN OR BUILD_WCC)
+      file(COPY pbc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	endif(BUILD_MPIN OR BUILD_WCC)
+
     if(BUILD_MPIN)
       set(fnameh "mpin_${tc}.h")
       file(READ "mpin_ZZZ.h" temph)
@@ -101,9 +105,19 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
       string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
       string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
+    endif(BUILD_MPIN)
 
-      file(COPY mpin_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-      endif(BUILD_MPIN)
+    if(BUILD_WCC)
+      set(fnameh "wcc_${tc}.h")
+      file(READ "wcc_ZZZ.h" temph)
+      string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
+      string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
+      string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
+
+      file(COPY wcc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    endif(BUILD_WCC)
+
   endif(NOT(${pf} STREQUAL "NOT"))
 
 endfunction(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
