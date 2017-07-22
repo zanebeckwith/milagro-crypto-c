@@ -95,7 +95,16 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
 
 	if(BUILD_MPIN OR BUILD_WCC)
-      file(COPY pbc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    file(COPY pbc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    set(PBC_TIME_PERMIT_TESTS 10 CACHE STRING "Number of days in the future to test M-PIN/WCC time permits")
+    set(PBC_RANDOM_TESTS 10 CACHE STRING "Number of random M-PIN/WCC tests")
+    # message(STATUS "PBC_TIME_PERMIT_TESTS=${PBC_TIME_PERMIT_TESTS}")
+    # message(STATUS "PBC_RANDOM_TESTS=${PBC_RANDOM_TESTS}")
+    # Configure test variables
+    configure_file (
+      "config_test.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/config_test.h"
+    )
 	endif(BUILD_MPIN OR BUILD_WCC)
 
     if(BUILD_MPIN)
@@ -114,8 +123,6 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
       string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
       string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
-
-      file(COPY wcc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     endif(BUILD_WCC)
 
   endif(NOT(${pf} STREQUAL "NOT"))

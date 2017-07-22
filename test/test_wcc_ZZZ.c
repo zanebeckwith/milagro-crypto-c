@@ -30,9 +30,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "wcc.h"
 #include "utils.h"
 #include "randapi.h"
+#include "wcc_ZZZ.h"
 
 int main(int argc, char** argv)
 {
@@ -90,8 +90,8 @@ int main(int argc, char** argv)
     octet MESSAGE1 = {0, sizeof(message1), message1};
     OCT_jstring(&MESSAGE1,"Hello Bob");
 
-    char k1[PAS_ZZZ];  // AES Key
-    char k2[PAS_ZZZ];  // AES Key
+    char k1[PAS];  // AES Key
+    char k2[PAS];  // AES Key
     octet K1= {0,sizeof(k1),k1};
     octet K2= {0,sizeof(k2),k2};
 
@@ -225,6 +225,10 @@ int main(int argc, char** argv)
 
     if (!OCT_comp(&K1,&K2))
     {
+    	printf("K1: 0x");
+    	OCT_output(&K1);
+    	printf("K2: 0x");
+    	OCT_output(&K2);
         printf("FAILURE No Time Permit Test. OCT_comp(&K1,&K2)\n");
         return 1;
     }

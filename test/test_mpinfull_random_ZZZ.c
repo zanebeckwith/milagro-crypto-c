@@ -29,13 +29,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "mpin_ZZZ.h"
 #include "pbc_support.h"
+#include "mpin_ZZZ.h"
 #include "randapi.h"
+#include "config_test.h"
 
 // Define PIN range:
 #define MAX_RANGE 10000
-#define nRandomTests 20
 
 void rand_str(char *dest, size_t length,csprng *RNG)
 {

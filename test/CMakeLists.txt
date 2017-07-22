@@ -373,7 +373,6 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
-
       # test wcc
       file(READ "test_wcc_ZZZ.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
@@ -384,7 +383,7 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
       TV_TEST ("test_wcc_sha384_${tc}" "test_wcc_${tc}.c" "amcl_wcc_${tc}" "SUCCESS" "sha384" "")
       TV_TEST ("test_wcc_sha512_${tc}" "test_wcc_${tc}.c" "amcl_wcc_${tc}" "SUCCESS" "sha512" "")
 
-      # test mpin random
+      # test wcc random
       file(READ "test_wcc_random_ZZZ.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")

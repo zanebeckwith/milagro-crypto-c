@@ -125,7 +125,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
       string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/wcc_${tc}.c" "${tempc}")
-      set(SOURCES_WCCC_${tc} ${SOURCES_WCC_${tc}}
+      set(SOURCES_WCC_${tc} ${SOURCES_WCC_${tc}}
         ${CMAKE_CURRENT_BINARY_DIR}/wcc_${tc}.c)
 
       message(STATUS "Build libamcl_wcc_${tc}")

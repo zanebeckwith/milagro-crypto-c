@@ -29,39 +29,36 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "WCC_ZZZ_ZZZ.h"
-
-// #define DEBUG
-
+#include "wcc_ZZZ.h"
 
 /* Map octet string to point on curve */
 static void mapit(octet *h,ECP_ZZZ *P)
 {
     BIG_XXX q,x,c;
     BIG_XXX_fromBytes(x,h->val);
-    BIG_XXX_rcopy(q,Modulus);
+    BIG_XXX_rcopy(q,Modulus_ZZZ);
     BIG_XXX_mod(x,q);
 
     while (!ECP_ZZZ_setx(P,x,0))
         BIG_XXX_inc(x,1);
 
-    BIG_XXX_rcopy(c,CURVE_Cof);
+    BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
     ECP_ZZZ_mul(P,c);
 }
 
 /* Map to hash value to point on G2 */
-static void mapit2(octet *h,ECP2_ZZZ *Q)
+static void mapit2(octet *h, ECP2_ZZZ *Q)
 {
     BIG_XXX q,one,Fx,Fy,x,hv;
     FP2_YYY X;
-#if CHOICE < BLS_CURVES
+#if (PAIRING_FRIENDLY_ZZZ == BN)
     ECP2_ZZZ T,K;
-#else
-    ECP2_ZZZ xQ, x2Q, x3Q, Aux1, Aux2;
+#elif (PAIRING_FRIENDLY_ZZZ == BLS)
+    ECP2_ZZZ xQ, x2Q;
 #endif
 
     BIG_XXX_fromBytes(hv,h->val);
-    BIG_XXX_rcopy(q,Modulus);
+    BIG_XXX_rcopy(q,Modulus_ZZZ);
     BIG_XXX_one(one);
     BIG_XXX_mod(hv,q);
 
@@ -72,14 +69,14 @@ static void mapit2(octet *h,ECP2_ZZZ *Q)
         BIG_XXX_inc(hv,1);
     }
 
-    BIG_XXX_rcopy(Fx,CURVE_Fra);
-    BIG_XXX_rcopy(Fy,CURVE_Frb);
+    BIG_XXX_rcopy(Fx,Fra_ZZZ);
+    BIG_XXX_rcopy(Fy,Frb_ZZZ);
     FP2_YYY_from_BIGs(&X,Fx,Fy);
-    BIG_XXX_rcopy(x,CURVE_Bnx);
+    BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
 
-#if CHOICE < BLS_CURVES
+#if (PAIRING_FRIENDLY_ZZZ == BN)
 
-    /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
+    /* Faster Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
     /* Q -> xQ + F(3xQ) + F(F(xQ)) + F(F(F(Q))). */
     ECP2_ZZZ_copy(&T,Q);
     ECP2_ZZZ_mul(&T,x);
@@ -100,39 +97,28 @@ static void mapit2(octet *h,ECP2_ZZZ *Q)
     ECP2_ZZZ_add(Q,&T);
     ECP2_ZZZ_affine(Q);
 
-#else
+#elif (PAIRING_FRIENDLY_ZZZ == BLS)
 
-    /* Hashing to G2 - Scott, Benger, Charlemagne, Perez, Kachisa */
-    /* Q -> 4Q+F(Q)-F(F(Q)) -xQ-F(xQ)+2F(F(xQ)) -x2Q-F(x2Q)-F(F(x2Q)) +x3Q+F(x3Q) */
+    /* Efficient hash maps to G2 on BLS curves - Budroni, Pintore */
+    /* Q -> x2Q -xQ -Q +F(xQ -Q) +F(F(2Q)) */
 
     ECP2_ZZZ_copy(&xQ,Q);
-    ECP2_ZZZ_copy(&Aux1,Q);
-    ECP2_ZZZ_mul(&xQ,x);      // compute xQ
+    ECP2_ZZZ_mul(&xQ,x);
     ECP2_ZZZ_copy(&x2Q,&xQ);
-    ECP2_ZZZ_mul(&x2Q,x);     // compute x2Q=x*xQ
-    ECP2_ZZZ_copy(&x3Q,&x2Q);
-    ECP2_ZZZ_mul(&x3Q,x);     // compute x3Q
+    ECP2_ZZZ_mul(&x2Q,x);
 
-    ECP2_ZZZ_sub(&x3Q,&x2Q);
-    ECP2_ZZZ_sub(&x3Q,&xQ);
-    ECP2_ZZZ_copy(&Aux2,&x3Q);
-    ECP2_ZZZ_dbl(&Aux1);
-    ECP2_ZZZ_dbl(&Aux1);
-    ECP2_ZZZ_add(&x3Q,&Aux1);  // [x3 -x2 -x +4]Q
+    ECP2_ZZZ_sub(&x2Q,&xQ);
+    ECP2_ZZZ_sub(&x2Q,Q);
 
-    ECP2_ZZZ_copy(&Aux1,Q);
-    ECP2_ZZZ_add(&Aux2,&Aux1);
-    ECP2_ZZZ_frob(&Aux2,&X);   // F([x3 -x2 -x +1]Q)
+    ECP2_ZZZ_sub(&xQ,Q);
+    ECP2_ZZZ_frob(&xQ,&X);
 
-    ECP2_ZZZ_neg(Q);
-    ECP2_ZZZ_dbl(&xQ);
-    ECP2_ZZZ_add(Q,&xQ);
-    ECP2_ZZZ_sub(Q,&x2Q);
+    ECP2_ZZZ_dbl(Q);
     ECP2_ZZZ_frob(Q,&X);
-    ECP2_ZZZ_frob(Q,&X);  // F(F([-x2 +2x -1]Q))
+    ECP2_ZZZ_frob(Q,&X);
 
-    ECP2_ZZZ_add(Q,&Aux2);
-    ECP2_ZZZ_add(Q,&x3Q);
+    ECP2_ZZZ_add(Q,&x2Q);
+    ECP2_ZZZ_add(Q,&xQ);
 
     ECP2_ZZZ_affine(Q);
 
@@ -216,12 +202,12 @@ static void hashit(int sha,int n,octet *x,octet *w)
 
     OCT_empty(w);
 
-    if (hlen>=MODBYTES)
-        OCT_jbytes(w,hh,MODBYTES);
+    if (hlen>=MODBYTES_XXX)
+        OCT_jbytes(w,hh,MODBYTES_XXX);
     else
     {
         OCT_jbytes(w,hh,hlen);
-        OCT_jbyte(w,0,MODBYTES-hlen);
+        OCT_jbyte(w,0,MODBYTES_XXX-hlen);
     }
 }
 
@@ -232,10 +218,10 @@ void WCC_ZZZ_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
     // hv has to store two points in G1, One in G2 and the Id length
     char hv[2000];
     octet HV= {0,sizeof(hv),hv};
-    char ht[PFS];
+    char ht[PFS_ZZZ];
     octet HT= {0,sizeof(ht),ht};
 
-    BIG_XXX_rcopy(q,CURVE_Order);
+    BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
 
 #ifdef DEBUG
     printf("WCC_ZZZ_Hq: A: ");
@@ -262,7 +248,7 @@ void WCC_ZZZ_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
     BIG_XXX_mod(hs,q);
     OCT_clear(&HT);
     BIG_XXX_toBytes(h->val,hs);
-    h->len=PGS;
+    h->len=PGS_ZZZ;
 }
 
 /*  Calculate a value in G1. VG1 = s*H1(ID) where ID is the identity */
@@ -270,7 +256,7 @@ int WCC_ZZZ_GET_G1_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG1
 {
     BIG_XXX s;
     ECP_ZZZ P;
-    char h[PFS];
+    char h[PFS_ZZZ];
     octet H= {0,sizeof(h),h};
 
     if (hashDone)
@@ -295,9 +281,9 @@ int WCC_ZZZ_GET_G1_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG1)
 {
     BIG_XXX s;
     ECP_ZZZ P,Q;
-    char h1[PFS];
+    char h1[PFS_ZZZ];
     octet H1= {0,sizeof(h1),h1};
-    char h2[PFS];
+    char h2[PFS_ZZZ];
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
@@ -324,9 +310,9 @@ int WCC_ZZZ_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2)
 {
     BIG_XXX s;
     ECP2_ZZZ P,Q;
-    char h1[PFS];
+    char h1[PFS_ZZZ];
     octet H1= {0,sizeof(h1),h1};
-    char h2[PFS];
+    char h2[PFS_ZZZ];
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
@@ -353,7 +339,7 @@ int WCC_ZZZ_GET_G2_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG2
 {
     BIG_XXX s;
     ECP2_ZZZ P;
-    char h[PFS];
+    char h[PFS_ZZZ];
     octet H= {0,sizeof(h),h};
 
     if (hashDone)
@@ -378,7 +364,7 @@ int WCC_ZZZ_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2)
 {
     BIG_XXX s;
     ECP2_ZZZ P;
-    char h[PFS];
+    char h[PFS_ZZZ];
     octet H= {0,sizeof(h),h};
 
     hashit(sha,date,HID,&H);
@@ -395,7 +381,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
 {
     ECP_ZZZ sAG1,ATPG1,PgG1;
     ECP2_ZZZ BG2,dateBG2,PbG2;
-    char hv1[PFS],hv2[PFS];
+    char hv1[PFS_ZZZ],hv2[PFS_ZZZ];
     octet HV1= {0,sizeof(hv1),hv1};
     octet HV2= {0,sizeof(hv2),hv2};
 
@@ -405,12 +391,12 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
     FP4_YYY  c;
     BIG_XXX t,x,z,pia,pib;
 
-    char xpgg1[2*PFS+1];
+    char xpgg1[2*PFS_ZZZ+1];
     octet xPgG1Oct= {0,sizeof(xpgg1), xpgg1};
 
-    char hv[6*PFS+1];
+    char hv[6*PFS_ZZZ+1];
     octet HV= {0,sizeof(hv),hv};
-    char ht[PFS];
+    char ht[PFS_ZZZ];
     octet HT= {0,sizeof(ht),ht};
 
     BIG_XXX_fromBytes(x,xOct->val);
@@ -424,7 +410,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
         OCT_output(PbG2Oct);
         printf("\n");
 #endif
-        return WCC_ZZZ_INVALID_POINT;
+        return WCC_INVALID_POINT;
     }
 
     if (!ECP_ZZZ_fromOctet(&PgG1,PgG1Oct))
@@ -434,7 +420,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
         OCT_output(PgG1Oct);
         printf("\n");
 #endif
-        return WCC_ZZZ_INVALID_POINT;
+        return WCC_INVALID_POINT;
     }
 
     hashit(sha,0,IdBOct,&HV1);
@@ -447,7 +433,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
         OCT_output(AKeyG1Oct);
         printf("\n");
 #endif
-        return WCC_ZZZ_INVALID_POINT;
+        return WCC_INVALID_POINT;
     }
 
     // Use time permits
@@ -460,7 +446,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
             printf("ATPG1Oct Invalid Point: ");
             OCT_output(ATPG1Oct);
             printf("\n");
-            return WCC_ZZZ_INVALID_POINT;
+            return WCC_INVALID_POINT;
 #endif
         }
 
@@ -496,22 +482,18 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
     // Generate AES Key : K=H(k,x.PgG1)
     FP12_YYY_trace(&c,&g);
 
-    HV.len = 4*PFS;
-    BIG_XXX_copy(t,c.a.a);
-    FP_YYY_redc(t);
+    HV.len = 4*PFS_ZZZ;
+    FP_YYY_redc(t,&(c.a.a));
     BIG_XXX_toBytes(&(HV.val[0]),t);
 
-    BIG_XXX_copy(t,c.a.b);
-    FP_YYY_redc(t);
-    BIG_XXX_toBytes(&(HV.val[PFS]),t);
+    FP_YYY_redc(t,&(c.a.b));
+    BIG_XXX_toBytes(&(HV.val[PFS_ZZZ]),t);
 
-    BIG_XXX_copy(t,c.b.a);
-    FP_YYY_redc(t);
-    BIG_XXX_toBytes(&(HV.val[PFS*2]),t);
+    FP_YYY_redc(t,&(c.b.a));
+    BIG_XXX_toBytes(&(HV.val[PFS_ZZZ*2]),t);
 
-    BIG_XXX_copy(t,c.b.b);
-    FP_YYY_redc(t);
-    BIG_XXX_toBytes(&(HV.val[PFS*3]),t);
+    FP_YYY_redc(t,&(c.b.b));
+    BIG_XXX_toBytes(&(HV.val[PFS_ZZZ*3]),t);
 
     // Set HV.len to correct value
     OCT_joctet(&HV,&xPgG1Oct);
@@ -529,7 +511,7 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
 {
     ECP_ZZZ AG1,dateAG1,PgG1,PaG1;
     ECP2_ZZZ sBG2,BTPG2;
-    char hv1[PFS],hv2[PFS];
+    char hv1[PFS_ZZZ],hv2[PFS_ZZZ];
     octet HV1= {0,sizeof(hv1),hv1};
     octet HV2= {0,sizeof(hv2),hv2};
 
@@ -539,12 +521,12 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
     FP4_YYY  c;
     BIG_XXX t,w,y,pia,pib;;
 
-    char wpag1[2*PFS+1];
+    char wpag1[2*PFS_ZZZ+1];
     octet wPaG1Oct= {0,sizeof(wpag1), wpag1};
 
-    char hv[6*PFS+1];
+    char hv[6*PFS_ZZZ+1];
     octet HV= {0,sizeof(hv),hv};
-    char ht[PFS];
+    char ht[PFS_ZZZ];
     octet HT= {0,sizeof(ht),ht};
 
     BIG_XXX_fromBytes(y,yOct->val);
@@ -553,22 +535,22 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
     BIG_XXX_fromBytes(pib,pibOct->val);
 
     if (!ECP_ZZZ_fromOctet(&PaG1,PaG1Oct))
-        return WCC_ZZZ_INVALID_POINT;
+        return WCC_INVALID_POINT;
 
     if (!ECP_ZZZ_fromOctet(&PgG1,PgG1Oct))
-        return WCC_ZZZ_INVALID_POINT;
+        return WCC_INVALID_POINT;
 
     hashit(sha,0,IdAOct,&HV1);
     mapit(&HV1,&AG1);
 
     if (!ECP2_ZZZ_fromOctet(&sBG2,BKeyG2Oct))
-        return WCC_ZZZ_INVALID_POINT;
+        return WCC_INVALID_POINT;
 
     if (date)
     {
         // Calculate e( (A+H(date|H(AID))) , (s*B+s*H(date|H(IdB))) )
         if (!ECP2_ZZZ_fromOctet(&BTPG2,BTPG2Oct))
-            return WCC_ZZZ_INVALID_POINT;
+            return WCC_INVALID_POINT;
 
         // H1(date|sha256(AID))
         hashit(sha,date,&HV1,&HV2);
@@ -602,22 +584,18 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
     // Generate AES Key: K=H(k,w.PaG1)
     FP12_YYY_trace(&c,&g);
 
-    HV.len = 4*PFS;
-    BIG_XXX_copy(t,c.a.a);
-    FP_YYY_redc(t);
+    HV.len = 4*PFS_ZZZ;
+    FP_YYY_redc(t,&(c.a.a));
     BIG_XXX_toBytes(&(HV.val[0]),t);
 
-    BIG_XXX_copy(t,c.a.b);
-    FP_YYY_redc(t);
-    BIG_XXX_toBytes(&(HV.val[PFS]),t);
+    FP_YYY_redc(t,&(c.a.b));
+    BIG_XXX_toBytes(&(HV.val[PFS_ZZZ]),t);
 
-    BIG_XXX_copy(t,c.b.a);
-    FP_YYY_redc(t);
-    BIG_XXX_toBytes(&(HV.val[PFS*2]),t);
+    FP_YYY_redc(t,&(c.b.a));
+    BIG_XXX_toBytes(&(HV.val[PFS_ZZZ*2]),t);
 
-    BIG_XXX_copy(t,c.b.b);
-    FP_YYY_redc(t);
-    BIG_XXX_toBytes(&(HV.val[PFS*3]),t);
+    FP_YYY_redc(t,&(c.b.b));
+    BIG_XXX_toBytes(&(HV.val[PFS_ZZZ*3]),t);
 
     // Set HV.len to correct value
     OCT_joctet(&HV,&wPaG1Oct);
@@ -631,14 +609,14 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
 
 }
 
-/* Generate a random number modulus the group order */
+/* Generate a random number Modulus_ZZZ the group order */
 int WCC_ZZZ_RANDOM_GENERATE(csprng *RNG,octet* S)
 {
     BIG_XXX r,s;
-    BIG_XXX_rcopy(r,CURVE_Order);
+    BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
     BIG_XXX_randomnum(s,r,RNG);
     BIG_XXX_toBytes(S->val,s);
-    S->len=PGS;
+    S->len=PGS_ZZZ;
     return 0;
 }
 
@@ -647,7 +625,7 @@ int WCC_ZZZ_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG1)
 {
     BIG_XXX s;
     ECP_ZZZ P;
-    char h[PFS];
+    char h[PFS_ZZZ];
     octet H= {0,sizeof(h),h};
 
     hashit(sha,date,HID,&H);
@@ -664,8 +642,8 @@ int WCC_ZZZ_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
 {
     ECP_ZZZ P,T;
     int res=0;
-    if (!ECP_ZZZ_fromOctet(&P,R1)) res=WCC_ZZZ_INVALID_POINT;
-    if (!ECP_ZZZ_fromOctet(&T,R2)) res=WCC_ZZZ_INVALID_POINT;
+    if (!ECP_ZZZ_fromOctet(&P,R1)) res=WCC_INVALID_POINT;
+    if (!ECP_ZZZ_fromOctet(&T,R2)) res=WCC_INVALID_POINT;
     if (res==0)
     {
         ECP_ZZZ_add(&P,&T);
@@ -679,8 +657,8 @@ int WCC_ZZZ_RECOMBINE_G2(octet *W1,octet *W2,octet *W)
 {
     ECP2_ZZZ Q,T;
     int res=0;
-    if (!ECP2_ZZZ_fromOctet(&Q,W1)) res=WCC_ZZZ_INVALID_POINT;
-    if (!ECP2_ZZZ_fromOctet(&T,W2)) res=WCC_ZZZ_INVALID_POINT;
+    if (!ECP2_ZZZ_fromOctet(&Q,W1)) res=WCC_INVALID_POINT;
+    if (!ECP2_ZZZ_fromOctet(&T,W2)) res=WCC_INVALID_POINT;
     if (res==0)
     {
         ECP2_ZZZ_add(&Q,&T);
