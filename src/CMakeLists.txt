@@ -179,8 +179,7 @@ aes.c
 gcm.c
 oct.c
 utils.c
-)
-# version.c)
+version.c)
 
 # Copy common header files to binary include directory
 file(COPY ${SOURCES_AMCL_CORE} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -193,8 +192,8 @@ ${CMAKE_CURRENT_BINARY_DIR}/aes.c
 ${CMAKE_CURRENT_BINARY_DIR}/gcm.c
 ${CMAKE_CURRENT_BINARY_DIR}/oct.c
 ${CMAKE_CURRENT_BINARY_DIR}/utils.c
+${CMAKE_CURRENT_BINARY_DIR}/version.c
 )
-# version.c
 
 message(STATUS "Build libamcl_core")
 add_library(amcl_core ${LIB_TYPE} ${DEST_SOURCES_AMCL_CORE})

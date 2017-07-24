@@ -1,5 +1,5 @@
 /**
- * @file test_rsa.c
+ * @file test_rsa_WWW.c
  * @author Kealan McCusker
  * @brief Test RSA
  *
@@ -28,16 +28,16 @@
 
 #include <stdio.h>
 #include <time.h>
-#include "rsa.h"
+#include "rsa_WWW.h"
 #include "randapi.h"
 
 int main()
 {
     int i;
     unsigned long ran;
-    char m[RFS],ml[RFS],c[RFS],e[RFS],s[RFS],raw[100];
-    rsa_public_key pub;
-    rsa_private_key priv;
+    char m[RFS_WWW],ml[RFS_WWW],c[RFS_WWW],e[RFS_WWW],s[RFS_WWW],raw[100];
+    rsa_public_key_WWW pub;
+    rsa_private_key_WWW priv;
     csprng RNG;
     octet M= {0,sizeof(m),m};
     octet ML= {0,sizeof(ml),ml};
@@ -58,21 +58,21 @@ int main()
     CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
     printf("Generating public/private key pair\n");
-    RSA_KEY_PAIR(&RNG,65537,&priv,&pub,NULL,NULL);
+    RSA_WWW_KEY_PAIR(&RNG,65537,&priv,&pub,NULL,NULL);
 
     printf("Encrypting test string\n");
     OCT_jstring(&M,(char *)"Hello World\n");
 
-    OAEP_ENCODE(HASH_TYPE_RSA,&M,&RNG,NULL,&E); /* OAEP encode message m to e  */
+    OAEP_ENCODE(HASH_TYPE_RSA_WWW,&M,&RNG,NULL,&E); /* OAEP encode message m to e  */
 
-    RSA_ENCRYPT(&pub,&E,&C);     /* encrypt encoded message */
+    RSA_WWW_ENCRYPT(&pub,&E,&C);     /* encrypt encoded message */
     printf("Ciphertext= ");
     OCT_output(&C);
 
     printf("Decrypting test string\n");
-    RSA_DECRYPT(&priv,&C,&ML);   /* ... and then decrypt it */
+    RSA_WWW_DECRYPT(&priv,&C,&ML);   /* ... and then decrypt it */
 
-    OAEP_DECODE(HASH_TYPE_RSA,NULL,&ML);    /* decode it */
+    OAEP_DECODE(HASH_TYPE_RSA_WWW,NULL,&ML);    /* decode it */
     OCT_output_string(&ML);
 
 
@@ -83,14 +83,14 @@ int main()
     }
 
     printf("Signing message\n");
-    PKCS15(HASH_TYPE_RSA,&M,&C);
+    PKCS15(HASH_TYPE_RSA_WWW,&M,&C);
 
-    RSA_DECRYPT(&priv,&C,&S); /* create signature in S */
+    RSA_WWW_DECRYPT(&priv,&C,&S); /* create signature in S */
 
     printf("Signature= ");
     OCT_output(&S);
 
-    RSA_ENCRYPT(&pub,&S,&ML);
+    RSA_WWW_ENCRYPT(&pub,&S,&ML);
 
     if (OCT_comp(&C,&ML))
     {
@@ -103,7 +103,7 @@ int main()
     }
 
     KILL_CSPRNG(&RNG);
-    RSA_PRIVATE_KEY_KILL(&priv);
+    RSA_WWW_PRIVATE_KEY_KILL(&priv);
 
     OCT_clear(&M);
     OCT_clear(&ML);   /* clean up afterwards */

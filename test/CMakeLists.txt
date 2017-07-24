@@ -43,7 +43,7 @@ SMOKE_TEST ( test_octet_consistency test_octet_consistency.c amcl_core "SUCCESS"
 
 # Test Version
 file (COPY test_version.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-# SMOKE_TEST ( test_version test_version.c amcl_core "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
+SMOKE_TEST ( test_version test_version.c amcl_core "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
 
 # Test hash functions
 file (COPY test_hash.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -412,6 +412,12 @@ function(RSA_TESTS_SET tb tff nb base ml)
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_big_consistency_${bd}.c" "${tempc}")
     SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_rsa_${tff}" "SUCCESS")
   endif()
+
+    # test rsa
+    file(READ "test_rsa_WWW.c" tempc)
+    string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_rsa_${tff}.c" "${tempc}")
+    SMOKE_TEST ("test_rsa_${tff}" "test_rsa_${tff}.c" "amcl_rsa_${tff}" "SUCCESS")
 
 endfunction(RSA_TESTS_SET tb tff nb base ml)
 

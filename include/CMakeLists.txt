@@ -170,6 +170,7 @@ endfunction(RSA_HEADERS_SET tb tff nb base ml)
 set(COMMON_HEADERS
   	utils.h
     randapi.h
+    version.h
   )
   #x509.h)
 

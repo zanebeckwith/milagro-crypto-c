@@ -97,8 +97,8 @@ set_property(CACHE AMCL_CHUNK PROPERTY STRINGS ${Word_Length_Values})
 message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
-set(AMCL_CURVE "BN254_CX" CACHE STRING "Choice of Field. See ./include/amcl.h for explanation")
-set(Curves_values "NIST256;C25519;BRAINPOOL;ANSSI;NUMS384E;NUMS384W;NUMS256E;NUMS256W;NUMS512E;NUMS512W;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN254;BN254_CX;BLS383")
+set(AMCL_CURVE "BN254CX" CACHE STRING "Choice of Field. See ./include/amcl.h for explanation")
+set(Curves_values "NIST256;C25519;BRAINPOOL;ANSSI;NUMS384E;NUMS384W;NUMS256E;NUMS256W;NUMS512E;NUMS512W;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN254;BN254CX;BLS383")
 set_property(CACHE AMCL_CURVE PROPERTY STRINGS ${Curves_values})
 message(STATUS "AMCL_CURVE='${AMCL_CURVE}'")
 
@@ -148,7 +148,7 @@ endif(BUILD_MPIN OR BUILD_WCC)
 # Add subdirectories
 add_subdirectory(include)
 add_subdirectory(src)
-# add_subdirectory(examples)
+add_subdirectory(examples)
 add_subdirectory(test)
 # add_subdirectory(benchmark)
 
