@@ -115,12 +115,23 @@ int main(int argc, char** argv)
         hash = SHA512;
     }
 
+    BIG_XXX r;
+
+    printf("BIG nbits   %d\n", (int)BIG_XXX_nbits(r));
+    printf("BIGBITS_XXX %d\n", (int)BIGBITS_XXX);
+
+
+
+
+
     /* unrandom seed value! */
     SEED.len=32;
     for (i=0; i<32; i++) SEED.val[i]=i+1;
 
     /* initialise random number generator */
     CREATE_CSPRNG(&RNG,&SEED);
+
+    printf("SEED: 0x");OCT_output(&SEED);
 
     /* TA: Generate master secret  */
     rtn = WCC_ZZZ_RANDOM_GENERATE(&RNG,&MS);
@@ -129,6 +140,8 @@ int main(int argc, char** argv)
         printf("TA WCC_ZZZ_RANDOM_GENERATE(&RNG,&MS) Error %d\n", rtn);
         return 1;
     }
+
+    printf("MS: 0x");OCT_output(&MS);
 
     // Alice's ID
     OCT_jstring(&IdA,"alice@miracl.com");
@@ -160,6 +173,8 @@ int main(int argc, char** argv)
         printf("Alice WCC_ZZZ_RANDOM_GENERATE(&RNG,&X) Error %d\n", rtn);
         return 1;
     }
+
+    printf("X: 0x");OCT_output(&X);
 
     rtn = WCC_ZZZ_GET_G1_MULTIPLE(hash,hashDoneOff,&X,&IdA,&PaG1);
     if (rtn != 0)
@@ -201,6 +216,9 @@ int main(int argc, char** argv)
     // pib = Hq(PbG2,PaG1,PgG1,IdA)
     WCC_ZZZ_Hq(hash,&PbG2,&PaG1,&PgG1,&IdA,&PIB);
 
+    // printf("PIA: ");OCT_output(&PIA);printf("\n");
+    // printf("PIB: ");OCT_output(&PIB);printf("\n");
+
     // Bob calculates AES Key
     WCC_ZZZ_RECEIVER_KEY(hash,date, &Y, &W,  &PIA, &PIB,  &PaG1, &PgG1, &BKeyG2, NULL, &IdA, &K2);
     if (rtn != 0)
@@ -214,6 +232,9 @@ int main(int argc, char** argv)
 
     // pib = Hq(PbG2,PaG1,PgG1,IdA)
     WCC_ZZZ_Hq(hash,&PbG2,&PaG1,&PgG1,&IdA,&PIB);
+
+    // printf("PIA: ");OCT_output(&PIA);printf("\n");
+    // printf("PIB: ");OCT_output(&PIB);printf("\n");
 
     // Alice calculates AES Key
     rtn = WCC_ZZZ_SENDER_KEY(hash,date, &X, &PIA, &PIB, &PbG2, &PgG1, &AKeyG1, NULL, &IdB, &K1);

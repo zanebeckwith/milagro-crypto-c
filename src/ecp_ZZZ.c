@@ -431,7 +431,11 @@ void ECP_ZZZ_outputxyz(ECP_ZZZ *P)
 /* Output point P */
 void ECP_ZZZ_output(ECP_ZZZ *P)
 {
-	BIG_XXX x,y;
+#if CURVETYPE_ZZZ!=MONTGOMERY
+    BIG_XXX x,y;
+#else
+    BIG_XXX x;
+#endif
     if (ECP_ZZZ_isinf(P))
     {
         printf("Infinity\n");
@@ -458,7 +462,11 @@ void ECP_ZZZ_output(ECP_ZZZ *P)
 /* Output point P */
 void ECP_ZZZ_rawoutput(ECP_ZZZ *P)
 {
-	BIG_XXX x,y,z;
+#if CURVETYPE_ZZZ!=MONTGOMERY
+    BIG_XXX x,y,z;
+#else
+    BIG_XXX x,z;
+#endif
 //   if (ECP_ZZZ_isinf(P))
  //   {
  //       printf("Infinity\n");

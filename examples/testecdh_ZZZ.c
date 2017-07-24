@@ -105,6 +105,8 @@ int ecdh(csprng *RNG)
     printf("Servers DH Key=  0x");
     OCT_output(&KEY);
 
+#if CURVETYPE_ZZZ != MONTGOMERY
+
     char ds[EGS_ZZZ],p1[30],p2[30],v[2*EFS_ZZZ+1],m[32],c[64],t[32],cs[EGS_ZZZ];
     octet DS= {0,sizeof(ds),ds};
     octet CS= {0,sizeof(cs),cs};
@@ -174,6 +176,8 @@ int ecdh(csprng *RNG)
         printf("ECDSA Signature/Verification succeeded\n");
     }
 
+#endif
+
     /* clear memory */
     OCT_clear(&S0);
     OCT_clear(&S1);
@@ -184,6 +188,7 @@ int ecdh(csprng *RNG)
     OCT_clear(&KEY);
     OCT_clear(&SALT);
     OCT_clear(&PW);
+#if CURVETYPE_ZZZ != MONTGOMERY
     OCT_clear(&DS);
     OCT_clear(&CS);
     OCT_clear(&P1);
@@ -192,7 +197,7 @@ int ecdh(csprng *RNG)
     OCT_clear(&M);
     OCT_clear(&C);
     OCT_clear(&T);
-
+#endif
     return 0;
 }
 

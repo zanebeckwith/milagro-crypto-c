@@ -100,7 +100,7 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c" "${tempc}")
-  TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tc}.txt" "")
+  TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tf}.txt" "")
 
   # Arithmetics test ecp
   file(READ "test_ecp_arithmetics_ZZZ.c" tempc)
@@ -488,7 +488,7 @@ foreach(CURVE ${AMCL_CURVE})
         CURVE_TESTS_SET("416" "C41417" "C41417" "52" "29" "414" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
     elseif(CURVE STREQUAL "NIST521")
         CURVE_TESTS_SET("528" "NIST521" "NIST521" "66" "28" "521" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
-    elseif(CURVE STREQUAL "NIST521")
+    elseif(CURVE STREQUAL "NUMS256W")
         CURVE_TESTS_SET("256" "256PMW" "NUMS256W" "32" "28" "256" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
     elseif(CURVE STREQUAL "NUMS256E")
         CURVE_TESTS_SET("256" "256PME" "NUMS256E" "32" "29" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
@@ -522,97 +522,70 @@ foreach(RSA ${AMCL_RSA})
   else()
       message(FATAL_ERROR "Invalid RSA input")
   endif(RSA STREQUAL "2048")
+
+  if(BUILD_X509)
+
+		foreach(CURVE ${AMCL_CURVE})
+
+			if(CURVE STREQUAL "NIST256" AND RSA STREQUAL "2048")
+				file(READ "test_x509_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_x509_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_x509_${RSA}_${CURVE}_1" "test_x509_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/x509/2048_P256/x509-vect.txt" "")
+		    TV_TEST ("test_x509_${RSA}_${CURVE}_2" "test_x509_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/x509/2048_P256/pkits-vect.txt" "")
+
+		    file(READ "test_rsa_sign_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_rsa_sign_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_rsa_sign_${RSA}_${CURVE}" "test_rsa_sign_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt" "")
+			endif(CURVE STREQUAL "NIST256" AND RSA STREQUAL "2048")
+
+			if(CURVE STREQUAL "NIST256" AND RSA STREQUAL "4096")
+				file(READ "test_rsa_sign_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_rsa_sign_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_rsa_sign_${RSA}_${CURVE}" "test_rsa_sign_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/rsa/4096/pkcs-vect.txt" "")
+
+				file(READ "test_x509_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_x509_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_x509_${RSA}_${CURVE}" "test_x509_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/x509/4096/x509-vect.txt" "")
+			endif(CURVE STREQUAL "NIST256" AND RSA STREQUAL "4096")
+
+			if(CURVE STREQUAL "NIST384" AND RSA STREQUAL "3072")
+		    file(READ "test_rsa_sign_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_rsa_sign_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_rsa_sign_${RSA}_${CURVE}" "test_rsa_sign_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/rsa/3072/pkcs-vect.txt" "")
+
+				file(READ "test_x509_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_x509_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_x509_${RSA}_${CURVE}" "test_x509_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/x509/3072_P384/x509-vect.txt" "")
+			endif(CURVE STREQUAL "NIST384" AND RSA STREQUAL "3072")
+
+			if(CURVE STREQUAL "NIST521")
+				file(READ "test_x509_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_x509_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_x509_${RSA}_${CURVE}" "test_x509_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/x509/P521/x509-vect.txt" "")
+			endif(CURVE STREQUAL "NIST521")
+
+			if(CURVE STREQUAL "C25519" AND RSA STREQUAL "2048")
+				file(READ "test_rsa_sign_WWW_ZZZ.c" tempc)
+				string(REGEX REPLACE "WWW" ${RSA} tempc "${tempc}")
+		    string(REGEX REPLACE "ZZZ" ${CURVE} tempc "${tempc}")
+		    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_rsa_sign_${RSA}_${CURVE}.c" "${tempc}")
+		    TV_TEST ("test_rsa_sign_${RSA}_${CURVE}" "test_rsa_sign_${RSA}_${CURVE}.c" "amcl_x509" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt" "")
+			endif(CURVE STREQUAL "C25519" AND RSA STREQUAL "2048")
+
+		endforeach(CURVE ${AMCL_CURVE})
+	endif(BUILD_X509)
 endforeach(RSA)
-
-
-# if((AMCL_CHOICE STREQUAL "NIST521")  AND (AMCL_FFLEN STREQUAL "8") AND (BUILD_X509))
-#   message(STATUS "Run ${AMCL_CHOICE} x509 Tests")
-#   add_executable (test_x509 test_x509.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_x509 x509)
-#   # test
-#   add_test(NAME test_x509_NIST521 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/P521/x509-vect.txt)
-#   set_tests_properties (test_x509_NIST521 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "NIST521")  AND (AMCL_FFLEN STREQUAL "8") AND (BUILD_X509))
-
-# if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
-#   message(STATUS "Run ${AMCL_CHOICE} RSA2048 Tests")
-#   add_executable (test_rsa_sign test_rsa_sign.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_rsa_sign amcl_x509) 
-#   # test
-#   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
-#   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8"))
-
-# if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8") AND (BUILD_X509))
-#   message(STATUS "Run ${AMCL_CHOICE} x509 Tests")
-#   add_executable (test_x509 test_x509.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_x509 amcl_x509) 
-#   # test
-#   add_test(NAME test_x509_NIST256_1 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/2048_P256/pkits-vect.txt)
-#   set_tests_properties (test_x509_NIST256_1 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-#   add_test(NAME test_x509_NIST256_2 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/2048_P256/x509-vect.txt)
-#   set_tests_properties (test_x509_NIST256_2 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "8") AND (BUILD_X509))
-
-# if((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
-#   message(STATUS "Run ${AMCL_CHOICE} RSA3072 Tests")
-#   add_executable (test_rsa_sign test_rsa_sign.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_rsa_sign amcl_x509)
-#   # test
-#   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/3072/pkcs-vect.txt)
-#   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8"))
-
-# if((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8") AND (BUILD_X509))
-#   message(STATUS "Run ${AMCL_CHOICE} RSA3072 Tests")
-#   add_executable (test_x509 test_x509.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_x509 amcl_x509)
-#   # test
-#   add_test(NAME test_x509_NIST384 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/3072_P384/x509-vect.txt)
-#   set_tests_properties (test_x509_NIST384 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "NIST384") AND (AMCL_FFLEN STREQUAL "8") AND (BUILD_X509))
-
-# if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
-#   message(STATUS "Run ${AMCL_CHOICE} RSA4096 Tests")
-#   add_executable (test_rsa_sign test_rsa_sign.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_rsa_sign amcl_x509)
-#   # test
-#   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/4096/pkcs-vect.txt)
-#   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16"))
-
-# if((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16") AND (BUILD_X509))
-#   message(STATUS "Run ${AMCL_CHOICE} x509 Tests")
-#   add_executable (test_x509 test_x509.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_x509 amcl_x509) 
-#   # test
-#   add_test(NAME test_x509_NIST256 COMMAND ${TARGET_SYSTEM_EMULATOR} test_x509 ${PROJECT_SOURCE_DIR}/testVectors/x509/4096/x509-vect.txt)
-#   set_tests_properties (test_x509_NIST256 PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "NIST256") AND (AMCL_FFLEN STREQUAL "16") AND (BUILD_X509))
-
-# if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE_ZZZ STREQUAL "EDWARDS"))
-#   message(STATUS "Run ${AMCL_CHOICE} RSA2048 Tests")
-#   add_executable (test_rsa_sign test_rsa_sign.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_rsa_sign amcl_x509) 
-#   # test
-#   add_test(NAME test_rsa_sign COMMAND ${TARGET_SYSTEM_EMULATOR} test_rsa_sign ${PROJECT_SOURCE_DIR}/testVectors/rsa/2048/pkcs-vect.txt)
-#   set_tests_properties (test_rsa_sign PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE_ZZZ STREQUAL "EDWARDS"))
-
-# if((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE_ZZZ STREQUAL "MONTGOMERY"))
-#   message(STATUS "Run ${AMCL_CHOICE} ECDH Tests")
-#   add_executable (test_ecdh test_ecdh.c)
-#   # Link the executable to the libraries
-#   target_link_libraries (test_ecdh amcl_ecc) 
-#   # test
-#   add_test(NAME test_ecdh COMMAND ${TARGET_SYSTEM_EMULATOR} test_ecdh ${PROJECT_SOURCE_DIR}/testVectors/ecdh/C25519/KAS_ECC_CDH_PrimitiveTest.txt)
-#   set_tests_properties (test_ecdh PROPERTIES PASS_REGULAR_EXPRESSION SUCCESS)
-# endif((AMCL_CHOICE STREQUAL "C25519") AND (AMCL_FFLEN STREQUAL "8") AND (AMCL_CURVETYPE_ZZZ STREQUAL "MONTGOMERY"))

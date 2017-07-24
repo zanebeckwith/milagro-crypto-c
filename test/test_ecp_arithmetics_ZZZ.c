@@ -80,13 +80,12 @@ int main(int argc, char** argv)
 
     ECP_ZZZ inf, ECPaux1;
     BIG_XXX BIGaux1;
-    FP_YYY FPaux1;
 
     char oct[LINE_LEN];
     octet OCTaux = {0,sizeof(oct),oct};
 #if CURVETYPE_ZZZ!=MONTGOMERY
     BIG_XXX BIGaux2;
-    FP_YYY FPaux2;
+    FP_YYY FPaux1,FPaux2;
     ECP_ZZZ ECPaux2;
 #endif
     ECP_ZZZ ecp1;

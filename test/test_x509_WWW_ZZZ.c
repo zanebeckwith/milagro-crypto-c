@@ -23,7 +23,7 @@
  * under the License.
  */
 
-#include "rsa.h"
+#include "rsa_WWW.h"
 #include "ecdh_ZZZ.h"
 #include "x509.h"
 #include "utils.h"
@@ -41,6 +41,8 @@ typedef enum { false, true } bool;
 #define H256 2
 #define H384 3
 #define H512 4
+
+// #define CHOICE "ZZZ"
 
 #define LINE_LEN 10000
 #define MAX_STRING 300
@@ -72,7 +74,7 @@ octet H= {0,sizeof(h),h};
 char hh[5000];
 octet HH= {0,sizeof(hh),hh};
 
-char hp[RFS];
+char hp[RFS_WWW];
 octet HP= {0,sizeof(hp),hp};
 
 // countryName
@@ -209,7 +211,7 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    rsa_public_key PK;
+    rsa_public_key_WWW PK;
 
     bool readLine = false;
     int i=0;
@@ -626,12 +628,12 @@ int main(int argc, char** argv)
             // printf("Checking Self-Signed Signature\r\n");
             if (ca.type==ECC)
             {
-                if (ca.curve!=CHOICE)
-                {
-                    printf("TEST X509 ERROR CURVE IS NOT SUPPORTED LINE %d\n",i);
-                    exit(EXIT_FAILURE);
-                }
-                int res=ECP_ZZZ_PUBLIC_KEY_VALIDATE(1,&CAKEY);
+                // if (ca.curve!=CHOICE)
+                // {
+                //     printf("TEST X509 ERROR CURVE IS NOT SUPPORTED LINE %d\n",i);
+                //     exit(EXIT_FAILURE);
+                // }
+                int res=ECP_ZZZ_PUBLIC_KEY_VALIDATE(&CAKEY);
                 if (res!=0)
                 {
                     printf("TEST X509 ERROR PUBLIC KEY IS INVALID LINE %d\n",i);
@@ -658,7 +660,7 @@ int main(int argc, char** argv)
             if (ca.type==RSA)
             {
                 PK.e=65537; // assuming this!
-                FF_fromOctet(PK.n,&CAKEY,FFLEN);
+                FF_WWW_fromOctet(PK.n,&CAKEY,FFLEN_WWW);
 
                 sha=0;
                 if (st.hash==H256) sha=SHA256;
@@ -671,7 +673,7 @@ int main(int argc, char** argv)
                 }
                 PKCS15(sha,&H,&HP);
 
-                RSA_ENCRYPT(&PK,&SIG,&HH);
+                RSA_WWW_ENCRYPT(&PK,&SIG,&HH);
                 if (!OCT_comp(&HP,&HH))
                 {
                     printf("TEST X509 ERROR RSA VERIFICATION FAILED LINE %d\n",i);
@@ -988,12 +990,12 @@ int main(int argc, char** argv)
 
             if (ca.type==ECC)
             {
-                if (ca.curve!=CHOICE)
-                {
-                    printf("TEST X509 ERROR CURVE IS NOT SUPPORTED LINE %d\n",i);
-                    exit(EXIT_FAILURE);
-                }
-                int res=ECP_ZZZ_PUBLIC_KEY_VALIDATE(1,&CAKEY);
+                // if (ca.curve!=CHOICE)
+                // {
+                //     printf("TEST X509 ERROR CURVE IS NOT SUPPORTED LINE %d\n",i);
+                //     exit(EXIT_FAILURE);
+                // }
+                int res=ECP_ZZZ_PUBLIC_KEY_VALIDATE(&CAKEY);
                 if (res!=0)
                 {
                     printf("TEST X509 ERROR PUBLIC KEY IS INVALID LINE %d\n",i);
@@ -1020,7 +1022,7 @@ int main(int argc, char** argv)
             if (ca.type==RSA)
             {
                 PK.e=65537; // assuming this!
-                FF_fromOctet(PK.n,&CAKEY,FFLEN);
+                FF_WWW_fromOctet(PK.n,&CAKEY,FFLEN_WWW);
 
                 sha=0;
                 if (st.hash==H256) sha=SHA256;
@@ -1033,7 +1035,7 @@ int main(int argc, char** argv)
                 }
                 PKCS15(sha,&H,&HP);
 
-                RSA_ENCRYPT(&PK,&SIG,&HH);
+                RSA_WWW_ENCRYPT(&PK,&SIG,&HH);
                 if (!OCT_comp(&HP,&HH))
                 {
                     printf("TEST X509 ERROR RSA VERIFICATION FAILED LINE %d\n",i);

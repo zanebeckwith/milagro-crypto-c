@@ -1,5 +1,5 @@
 /**
- * @file test_rsa_sign.c
+ * @file test_rsa_sign_WWW_ZZZ.c
  * @author Kealan McCusker
  * @brief Test RSA signature
  *
@@ -25,11 +25,11 @@
 
 /* Build executible after installation:
 
-  gcc -std=c99 -g ./test_rsa_sign.c -I/opt/amcl/include -L/opt/amcl/lib -lx509 -lrsa -lecdh -lamcl -o test_rsa_sign
+  gcc -std=c99 -g ./test_rsa_sign.c -I/opt/amcl/include -L/opt/amcl/lib -lx509 -lrsa -lecdh -lamcl -o test_rsa_sign_WWW_ZZZ
 
 */
 
-#include "rsa.h"
+#include "rsa_WWW.h"
 #include "ecdh_ZZZ.h"
 #include "x509.h"
 #include "utils.h"
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        printf("usage: ./test_rsa_sign [path to test vector file]\n");
+        printf("usage: ./test_rsa_sign_WWW_ZZZ [path to test vector file]\n");
         exit(EXIT_FAILURE);
     }
     int sha;
@@ -109,16 +109,16 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    rsa_public_key pub;
-    rsa_private_key priv;
+    rsa_public_key_WWW pub;
+    rsa_private_key_WWW priv;
 
     // Prime p:
-    char p[RFS/2];
+    char p[RFS_WWW/2];
     octet P= {sizeof(p),sizeof(p),p};
     const char* PStr = "p = ";
 
     // Prime q:
-    char q[RFS/2];
+    char q[RFS_WWW/2];
     octet Q= {sizeof(q),sizeof(q),q};
     const char* QStr = "q = ";
 
@@ -230,11 +230,11 @@ int main(int argc, char** argv)
 
             // Assign public key
             pub.e=65537;
-            FF_fromOctet(pub.n,&CAKEY,FFLEN);
+            FF_WWW_fromOctet(pub.n,&CAKEY,FFLEN_WWW);
 
 #ifdef DEBUG
             printf("pub.n ");
-            FF_output(pub.n,FFLEN);
+            FF_WWW_output(pub.n,FFLEN_WWW);
             printf("\n");
 #endif
 
@@ -248,10 +248,10 @@ int main(int argc, char** argv)
                 printf("Hash Function not supported\n");
                 exit(EXIT_FAILURE);
             }
-            char mp[RFS];
+            char mp[RFS_WWW];
             octet MP= {0,sizeof(mp),mp};
             PKCS15(sha,&H,&MP);
-            RSA_ENCRYPT(&pub,&SIG,&HH);
+            RSA_WWW_ENCRYPT(&pub,&SIG,&HH);
 
 #ifdef DEBUG
             printf("MP ");
@@ -267,32 +267,32 @@ int main(int argc, char** argv)
             }
 
             // Generating public/private key pair from p amd q
-            RSA_KEY_PAIR(NULL,65537,&priv,&pub,&P,&Q);
+            RSA_WWW_KEY_PAIR(NULL,65537,&priv,&pub,&P,&Q);
 
 #ifdef DEBUG
             printf("priv.p ");
-            FF_output(priv.p,FFLEN/2);
+            FF_WWW_output(priv.p,FFLEN_WWW/2);
             printf("\n");
             printf("priv.q ");
-            FF_output(priv.q,FFLEN/2);
+            FF_WWW_output(priv.q,FFLEN_WWW/2);
             printf("\n");
             printf("priv.dp ");
-            FF_output(priv.dp,FFLEN/2);
+            FF_WWW_output(priv.dp,FFLEN_WWW/2);
             printf("\n");
             printf("priv.dq ");
-            FF_output(priv.dq,FFLEN/2);
+            FF_WWW_output(priv.dq,FFLEN_WWW/2);
             printf("\n");
             printf("priv.c ");
-            FF_output(priv.c,FFLEN/2);
+            FF_WWW_output(priv.c,FFLEN_WWW/2);
             printf("\n");
 #endif
 
-            char hp[RFS];
+            char hp[RFS_WWW];
             octet HP= {0,sizeof(hp),hp};
 
             // Sign message
             PKCS15(sha,&H,&HP);
-            RSA_DECRYPT(&priv,&HP,&SIG2);
+            RSA_WWW_DECRYPT(&priv,&HP,&SIG2);
 
 #ifdef DEBUG
             printf("HP= ");
