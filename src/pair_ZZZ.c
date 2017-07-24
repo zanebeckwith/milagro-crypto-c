@@ -134,8 +134,8 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 
     BIG_XXX_norm(n);
 
-//    ECP2_ZZZ_affine(P);
-//    ECP_ZZZ_affine(Q);
+    // ECP2_ZZZ_affine(P);
+    // ECP_ZZZ_affine(Q);
 
     FP_YYY_copy(&Qx,&(Q->x));
     FP_YYY_copy(&Qy,&(Q->y));

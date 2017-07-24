@@ -471,6 +471,9 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
     // pib.BG2+PbG2
     ECP2_ZZZ_add(&BG2, &PbG2);
 
+    ECP2_ZZZ_affine(&BG2);
+    ECP_ZZZ_affine(&sAG1);
+
     PAIR_ZZZ_ate(&g,&BG2,&sAG1);
     PAIR_ZZZ_fexp(&g);
     // printf("WCC_ZZZ_SENDER_KEY e(sAG1,BG2) = ");FP12_YYY_output(&g); printf("\n");
@@ -572,6 +575,9 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
 
     // pia.AG1+PaG1
     ECP_ZZZ_add(&AG1, &PaG1);
+
+    ECP2_ZZZ_affine(&sBG2);
+    ECP_ZZZ_affine(&AG1);
 
     PAIR_ZZZ_ate(&g,&sBG2,&AG1);
     PAIR_ZZZ_fexp(&g);
