@@ -54,6 +54,8 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
   add_library(amcl_curve_${tc} ${LIB_TYPE} ${SOURCES_CURVE_${tc}})
   target_link_libraries (amcl_curve_${tc} amcl_core)
 
+  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_curve_${tc})
+
   if(NOT(${pf} STREQUAL "NOT"))
 
     file(READ "fp2_YYY.c" tempc)
@@ -97,6 +99,8 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     add_library(amcl_pairing_${tc} ${LIB_TYPE} ${SOURCES_PAIRING_${tc}})
     target_link_libraries (amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
 
+    set(INSTALL_LIBS ${INSTALL_LIBS} amcl_pairing_${tc})
+
     if(BUILD_MPIN OR BUILD_WCC)
       file(COPY "pbc_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     endif(BUILD_MPIN OR BUILD_WCC)
@@ -115,6 +119,8 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       message(STATUS "Build libamcl_mpin_${tc}")
       add_library(amcl_mpin_${tc} ${LIB_TYPE} ${SOURCES_MPIN_${tc}})
       target_link_libraries (amcl_mpin_${tc} amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
+
+      set(INSTALL_LIBS ${INSTALL_LIBS} amcl_mpin_${tc})
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
@@ -131,9 +137,16 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       message(STATUS "Build libamcl_wcc_${tc}")
       add_library(amcl_wcc_${tc} ${LIB_TYPE} ${SOURCES_WCC_${tc}})
       target_link_libraries (amcl_wcc_${tc} amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
+
+      set(INSTALL_LIBS ${INSTALL_LIBS} amcl_wcc_${tc})
     endif(BUILD_WCC)
 
   endif(NOT(${pf} STREQUAL "NOT"))
+
+  install (TARGETS ${INSTALL_LIBS} DESTINATION lib PERMISSIONS
+      OWNER_WRITE OWNER_READ OWNER_EXECUTE
+      GROUP_READ GROUP_EXECUTE
+      WORLD_READ WORLD_EXECUTE)
 
 endfunction(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
@@ -169,6 +182,13 @@ function(RSA_SRC_SET tb tff nb base ml)
   add_library(amcl_rsa_${tff} ${LIB_TYPE} ${SOURCES_RSA_${tff}})
   target_link_libraries (amcl_rsa_${tff} amcl_core)
 
+  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_rsa_${tff})
+
+  install (TARGETS ${INSTALL_LIBS} DESTINATION lib PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
+
 endfunction(RSA_SRC_SET tb tff nb base ml)
 
 set(SOURCES_AMCL_CORE
@@ -198,6 +218,11 @@ ${CMAKE_CURRENT_BINARY_DIR}/version.c
 message(STATUS "Build libamcl_core")
 add_library(amcl_core ${LIB_TYPE} ${DEST_SOURCES_AMCL_CORE})
 target_link_libraries (amcl_core)
+
+install (TARGETS amcl_core DESTINATION lib PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
 
 string(REGEX REPLACE "," ";" AMCL_CURVE ${AMCL_CURVE})
 string(REGEX REPLACE "," ";" AMCL_RSA ${AMCL_RSA})
@@ -306,70 +331,18 @@ if(BUILD_X509)
   file(COPY "x509.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   message(STATUS "Build libamcl_x509")
   add_library(amcl_x509 ${LIB_TYPE} ${CMAKE_CURRENT_BINARY_DIR}/x509.c)
-  set(link_x509 ${link_x509}
-      "amcl_core")
+  set(link_x509 ${link_x509} "amcl_core")
   foreach(CURVE ${AMCL_CURVE})
-    set(link_x509 ${link_x509}
-      "amcl_curve_${CURVE}")
+    set(link_x509 ${link_x509} "amcl_curve_${CURVE}")
   endforeach(CURVE)
   foreach(RSA ${AMCL_RSA})
-    set(link_x509 ${link_x509}
-      "amcl_rsa_${RSA}")
+    set(link_x509 ${link_x509} "amcl_rsa_${RSA}")
   endforeach(RSA)
   target_link_libraries (amcl_x509 ${link_x509})
+
+  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_x509)
 endif(BUILD_X509)
 
-# if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-#     message(STATUS "Copy libs to test for testing")
-#     add_custom_command(
-#                 TARGET amcl_core
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.dll" "${PROJECT_BINARY_DIR}/test/")
-
-#     add_custom_command(
-#                 TARGET amcl_curve
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_curve.dll" "${PROJECT_BINARY_DIR}/test/")
-
-#     add_custom_command(
-#                 TARGET amcl_ecc
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_ecc.dll" "${PROJECT_BINARY_DIR}/test/")
-
-#     add_custom_command(
-#                 TARGET amcl_rsa
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.dll" "${PROJECT_BINARY_DIR}/test/")
-
-#     if(BUILD_X509)
-#     add_custom_command(
-#                 TARGET amcl_x509
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_x509.dll" "${PROJECT_BINARY_DIR}/test/")
-#     endif(BUILD_X509)
-
-#     if(BUILD_MPIN OR BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_pairing
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_pairing.dll" "${PROJECT_BINARY_DIR}/test/")
-#     endif(BUILD_MPIN OR BUILD_WCC)
-
-#     if(BUILD_MPIN)
-#       add_custom_command(
-#                   TARGET amcl_mpin
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_mpin.dll" "${PROJECT_BINARY_DIR}/test/")
-#     endif(BUILD_MPIN)
-
-#     if(BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_wcc
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_wcc.dll" "${PROJECT_BINARY_DIR}/test/")
-#     endif(BUILD_WCC)
-
-# endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # # Copy built libs to wrappers/python to allow testing without
 # # having to install the libs.
@@ -683,28 +656,9 @@ endif(BUILD_X509)
 
 # endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
 
-# # Install libs
-# install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
-#         OWNER_WRITE OWNER_READ OWNER_EXECUTE
-#         GROUP_WRITE GROUP_READ
-#         WORLD_WRITE WORLD_READ WORLD_EXECUTE)
-
-# set(INSTALL_LIBS amcl_core amcl_curve amcl_rsa amcl_ecc)
-
-# if(BUILD_X509)
-#   set(INSTALL_LIBS ${INSTALL_LIBS} amcl_x509)
-# endif(BUILD_X509)
-
-# if(BUILD_MPIN)
-#   set(INSTALL_LIBS ${INSTALL_LIBS} amcl_mpin amcl_pairing )
-# endif(BUILD_MPIN)
-
-# if(BUILD_WCC)
-#   set(INSTALL_LIBS ${INSTALL_LIBS} amcl_wcc amcl_pairing )
-# endif(BUILD_WCC)
-
-# install (TARGETS ${INSTALL_LIBS} DESTINATION lib PERMISSIONS
-#         OWNER_WRITE OWNER_READ OWNER_EXECUTE
-#         GROUP_READ GROUP_EXECUTE
-#         WORLD_READ WORLD_EXECUTE)
+# Install libs
+install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_WRITE GROUP_READ
+        WORLD_WRITE WORLD_READ WORLD_EXECUTE)
 

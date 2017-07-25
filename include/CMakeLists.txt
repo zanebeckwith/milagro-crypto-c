@@ -9,6 +9,9 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   string(REGEX REPLACE "@BASE@" ${base} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_big_${bd}.h" "${temph}")
 
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+  	${CMAKE_CURRENT_BINARY_DIR}/config_big_${bd}.h)
+
   file(READ "config_field_YYY.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
@@ -22,6 +25,9 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   string(REGEX REPLACE "@SH@" ${sh} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_field_${tf}.h" "${temph}")
 
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+  	${CMAKE_CURRENT_BINARY_DIR}/config_field_${tf}.h)
+
   file(READ "config_curve_ZZZ.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
@@ -30,14 +36,23 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   string(REGEX REPLACE "@PF@" ${pf} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_curve_${tc}.h" "${temph}")
 
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+  	${CMAKE_CURRENT_BINARY_DIR}/config_curve_${tc}.h)
+
   file(READ "big_XXX.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h" "${temph}")
+
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+  	${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h)
 
   file(READ "fp_YYY.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.h" "${temph}")
+
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+  	${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.h)
 
   file(READ "ecp_ZZZ.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
@@ -45,11 +60,17 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ecp_${tc}.h" "${temph}")
 
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+  	${CMAKE_CURRENT_BINARY_DIR}/ecp_${tc}.h)
+
   file(READ "ecdh_ZZZ.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
   string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ecdh_${tc}.h" "${temph}")
+
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+  	${CMAKE_CURRENT_BINARY_DIR}/ecdh_${tc}.h)
 
   file(COPY ecdh_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -58,17 +79,26 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
     file(READ "fp2_YYY.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp2_${tc}.h" "${temph}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp2_${tf}.h" "${temph}")
+
+	  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  	${CMAKE_CURRENT_BINARY_DIR}/fp2_${tf}.h)
 
     file(READ "fp4_YYY.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp4_${tc}.h" "${temph}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp4_${tf}.h" "${temph}")
+
+	  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  	${CMAKE_CURRENT_BINARY_DIR}/fp4_${tf}.h)
 
     file(READ "fp12_YYY.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp12_${tc}.h" "${temph}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp12_${tf}.h" "${temph}")
+
+	  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  	${CMAKE_CURRENT_BINARY_DIR}/fp12_${tf}.h)
 
     file(READ "ecp2_ZZZ.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
@@ -76,11 +106,17 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
     string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.h" "${temph}")
 
+	  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  	${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.h)
+
     file(READ "pair_ZZZ.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
     string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.h" "${temph}")
+
+	  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  	${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.h)
 
 	if(BUILD_MPIN OR BUILD_WCC)
     file(COPY pbc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -93,6 +129,10 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
       "config_test.h"
       "${CMAKE_CURRENT_BINARY_DIR}/config_test.h"
     )
+
+	  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  	${CMAKE_CURRENT_BINARY_DIR}/pbc_support.h
+	  	${CMAKE_CURRENT_BINARY_DIR}/config_test.h)
 	endif(BUILD_MPIN OR BUILD_WCC)
 
     if(BUILD_MPIN)
@@ -102,6 +142,9 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
       string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
       string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
+
+ 		  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  		${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.h)
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
@@ -111,9 +154,17 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
       string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
       string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
+
+ 		  set(CURVE_HEADERS ${CURVE_HEADERS}
+	  		${CMAKE_CURRENT_BINARY_DIR}/wcc_${tc}.h)
     endif(BUILD_WCC)
 
   endif(NOT(${pf} STREQUAL "NOT"))
+
+  install (FILES ${CURVE_HEADERS} DESTINATION include PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
 
 endfunction(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
 
@@ -126,30 +177,54 @@ function(RSA_HEADERS_SET tb tff nb base ml)
   string(REGEX REPLACE "@BASE@" ${base} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_big_${bd}.h" "${temph}")
 
+  set(RSA_HEADERS ${RSA_HEADERS}
+		${CMAKE_CURRENT_BINARY_DIR}/config_big_${bd}.h)
+
   file(READ "config_ff_WWW.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "WWW" ${tff} temph "${temph}")
   string(REGEX REPLACE "@ML@" ${ml} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_ff_${tff}.h" "${temph}")
 
+  set(RSA_HEADERS ${RSA_HEADERS}
+		${CMAKE_CURRENT_BINARY_DIR}/config_ff_${tff}.h)
+
   file(READ "big_XXX.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h" "${temph}")
+
+  set(RSA_HEADERS ${RSA_HEADERS}
+		${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h)
 
   file(READ "ff_WWW.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "WWW" ${tff} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.h" "${temph}")
 
+  set(RSA_HEADERS ${RSA_HEADERS}
+		${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.h)
+
   file(READ "rsa_WWW.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "WWW" ${tff} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.h" "${temph}")
 
+  set(RSA_HEADERS ${RSA_HEADERS}
+		${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.h)
+
   file(COPY rsa_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  set(RSA_HEADERS ${RSA_HEADERS}
+		${CMAKE_CURRENT_BINARY_DIR}/rsa_support.h)
   if(BUILD_X509)
-    file(COPY "x509.h" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  	file(COPY "x509.h" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  	set(RSA_HEADERS ${RSA_HEADERS}
+			${CMAKE_CURRENT_BINARY_DIR}/x509.h)
   endif(BUILD_X509)
+
+  install (FILES ${RSA_HEADERS} DESTINATION include PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
 
 endfunction(RSA_HEADERS_SET tb tff nb base ml)
 
@@ -275,18 +350,24 @@ foreach(RSA ${AMCL_RSA})
   endif(RSA STREQUAL "2048")
 endforeach(RSA)
 
-# # Copy header files to binary include directory
-# file(COPY ${COPY_HEADERS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-# # Copy header files for testing before installation
-# file(COPY ${AMCL_HEADERS} DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
 
-# install (DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
-#         OWNER_WRITE OWNER_READ OWNER_EXECUTE
-#         GROUP_WRITE GROUP_READ
-#         WORLD_WRITE WORLD_READ WORLD_EXECUTE)
+install (DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_WRITE GROUP_READ
+        WORLD_WRITE WORLD_READ WORLD_EXECUTE)
 
-# install (FILES ${AMCL_HEADERS} DESTINATION include PERMISSIONS
-#         OWNER_WRITE OWNER_READ OWNER_EXECUTE
-#         GROUP_READ GROUP_EXECUTE
-#         WORLD_READ WORLD_EXECUTE)
+install (FILES ${COMMON_HEADERS} DESTINATION include PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION include PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/arch.h DESTINATION include PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)

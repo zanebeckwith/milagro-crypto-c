@@ -176,7 +176,7 @@ add_subdirectory(benchmark)
 #   endif(DOXYGEN_FOUND)
 # endif (BUILD_DOXYGEN)
 
-# message(STATUS "Install ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "Install ${CMAKE_INSTALL_PREFIX}")
 
 # uninstall target
 configure_file(
