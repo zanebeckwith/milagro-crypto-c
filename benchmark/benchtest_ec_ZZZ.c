@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include "ecp_ZZZ.h"
 
 #define MIN_TIME 10.0
@@ -75,15 +74,15 @@ int main()
     for (i=4; i<10; i++) pr[i]=i;
     RAND_seed(&RNG,10,pr);
 
-    BIG_XXX_rcopy(x,CURVE_Gx);
-#if CURVETYPE!=MONTGOMERY
-    BIG_XXX_rcopy(y,CURVE_Gy);
+    BIG_XXX_rcopy(x,CURVE_Gx_ZZZ);
+#if CURVETYPE_ZZZ!=MONTGOMERY
+    BIG_XXX_rcopy(y,CURVE_Gy_ZZZ);
     ECP_ZZZ_set(&G,x,y);
 #else
     ECP_ZZZ_set(&G,x);
 #endif
 
-    BIG_XXX_rcopy(r,CURVE_Order);
+    BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
     BIG_XXX_randomnum(s,r,&RNG);
     ECP_ZZZ_copy(&P,&G);
     ECP_ZZZ_mul(&P,r);

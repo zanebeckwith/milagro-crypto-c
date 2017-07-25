@@ -40,9 +40,9 @@ int main()
     double elapsed;
     char pr[10];
     unsigned long ran;
-    RSA_WWW_public_key pub_WWW;
-    RSA_WWW_private_key priv_WWW;
-    char m[RFS],d[RFS],c[RFS];
+    rsa_public_key_WWW pub;
+    rsa_private_key_WWW priv;
+    char m[RFS_WWW],d[RFS_WWW],c[RFS_WWW];
     octet M= {0,sizeof(m),m};
     octet D= {0,sizeof(d),d};
     octet C= {0,sizeof(c),c};
@@ -67,7 +67,7 @@ int main()
     for (i=4; i<10; i++) pr[i]=i;
     RAND_seed(&RNG,10,pr);
 
-    printf("Generating %d-bit RSA public/private key pair\n",FFLEN*BIGBITS);
+    printf("Generating %d-bit RSA public/private key pair\n",FFLEN_WWW*BIGBITS_XXX);
 
     iterations=0;
     start=clock();
@@ -84,8 +84,8 @@ int main()
 
     //FF_randomnum(plain,pub.n,&RNG,FFLEN);
 
-    M.len=RFS;
-    for (i=0; i<RFS; i++) M.val[i]=i%128;
+    M.len=RFS_WWW;
+    for (i=0; i<RFS_WWW; i++) M.val[i]=i%128;
 
     iterations=0;
     start=clock();
@@ -113,7 +113,7 @@ int main()
     printf("RSA dec - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-    for (i=0; i<RFS; i++)
+    for (i=0; i<RFS_WWW; i++)
     {
         if (M.val[i]!=D.val[i])
         {
