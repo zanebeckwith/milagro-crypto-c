@@ -1,5 +1,5 @@
 /**
- * @file wcc.h
+ * @file wcc_ZZZ.h
  * @author Mike Scott
  * @author Kealan McCusker
  * @date 28th April 2016
