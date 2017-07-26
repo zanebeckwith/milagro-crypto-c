@@ -95,12 +95,14 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
     SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_curve_${tc}" "SUCCESS")
   endif()
 
-  # Arithmetics test fp
-  file(READ "test_fp_arithmetics_YYY.c" tempc)
-  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c" "${tempc}")
-  TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tf}.txt" "")
+  if(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c"))
+    # Arithmetics test fp
+    file(READ "test_fp_arithmetics_YYY.c" tempc)
+    string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+    string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c" "${tempc}")
+    TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tf}.txt" "")
+  endif(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c"))
 
   # Arithmetics test ecp
   file(READ "test_ecp_arithmetics_ZZZ.c" tempc)
