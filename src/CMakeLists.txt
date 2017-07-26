@@ -101,13 +101,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
     set(INSTALL_LIBS ${INSTALL_LIBS} amcl_pairing_${tc})
 
-    if(BUILD_MPIN OR BUILD_WCC)
-      file(COPY "pbc_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    endif(BUILD_MPIN OR BUILD_WCC)
-
     if(BUILD_MPIN)
-      set(SOURCES_MPIN_${tc}
-        ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.c)
       file(READ "mpin_ZZZ.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
@@ -124,8 +118,6 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
-      set(SOURCES_WCC_${tc}
-        ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.c)
       file(READ "wcc_ZZZ.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
@@ -214,6 +206,12 @@ ${CMAKE_CURRENT_BINARY_DIR}/oct.c
 ${CMAKE_CURRENT_BINARY_DIR}/utils.c
 ${CMAKE_CURRENT_BINARY_DIR}/version.c
 )
+
+if(BUILD_MPIN OR BUILD_WCC)
+  file(COPY "pbc_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  set(DEST_SOURCES_AMCL_CORE ${DEST_SOURCES_AMCL_CORE}
+    ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.c)
+endif(BUILD_MPIN OR BUILD_WCC)
 
 message(STATUS "Build libamcl_core")
 add_library(amcl_core ${LIB_TYPE} ${DEST_SOURCES_AMCL_CORE})
