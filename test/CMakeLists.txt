@@ -41,9 +41,13 @@ endfunction(TV_TEST)
 file (COPY test_octet_consistency.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 SMOKE_TEST ( test_octet_consistency test_octet_consistency.c amcl_core "SUCCESS")
 
-# Test Version
+# Test version
 file (COPY test_version.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 SMOKE_TEST ( test_version test_version.c amcl_core "Version: ${AMCL_VERSION_MAJOR}.${AMCL_VERSION_MINOR}.${AMCL_VERSION_PATCH}")
+
+# Test utils
+file (COPY test_utils.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+SMOKE_TEST ( test_utils test_utils.c amcl_core "SUCCESS")
 
 # Test hash functions
 file (COPY test_hash.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
