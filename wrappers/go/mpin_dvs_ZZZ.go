@@ -20,7 +20,7 @@ under the License.
 package amcl
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
+#cgo CFLAGS:  -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
 #cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_mpin_ZZZ -lamcl_pairing_ZZZ -lamcl_curve_ZZZ -lamcl_core
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,9 +30,6 @@ package amcl
 #include "utils.h"
 */
 import "C"
-import (
-	"errors"
-)
 
 // ECC points constant
 const PAS_ZZZ int = int(C.PAS_ZZZ)
@@ -40,9 +37,11 @@ const PGS_ZZZ int = int(C.PGS_ZZZ)
 const PFS_ZZZ int = int(C.PFS_ZZZ)
 const hashBytes int = int(C.PFS_ZZZ)
 const IVS int = 12
-const G1S = 2*PFS_ZZZ + 1
-const G2S = 4*PFS_ZZZ
-const GTS = 12*PFS_ZZZ
+const G1S_ZZZ = 2*PFS_ZZZ + 1
+const G2S_ZZZ = 4*PFS_ZZZ
+const GTS_ZZZ = 12*PFS_ZZZ
+
+const HASH_TYPE_MPIN = SHA256
 
 /*
 
@@ -91,7 +90,7 @@ func GetServerSecret_ZZZ(masterSecret []byte) (errorCode int, serverSecret []byt
 	masterSecretStr := string(masterSecret)
 	masterSecretOct := GetOctet(masterSecretStr)
 	defer OctetFree(&masterSecretOct)
-	serverSecretOct := GetOctetZero(G2S)
+	serverSecretOct := GetOctetZero(G2S_ZZZ)
 	defer OctetFree(&serverSecretOct)
 
 	rtn := C.MPIN_ZZZ_GET_SERVER_SECRET(&masterSecretOct, &serverSecretOct)
@@ -126,10 +125,10 @@ func RecombineG1_ZZZ(R1 []byte, R2 []byte) (errorCode int, R []byte) {
 	R2Str := string(R2)
 	R2Oct := GetOctet(R2Str)
 	defer OctetFree(&R2Oct)
-	ROct := GetOctetZero(G1S)
+	ROct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&ROct)
 
-	rtn := C.MPIN_RECOMBINE_G1(&R1Oct, &R2Oct, &ROct)
+	rtn := C.MPIN_ZZZ_RECOMBINE_G1(&R1Oct, &R2Oct, &ROct)
 	errorCode = int(rtn)
 
 	// Convert octet to bytes
@@ -161,7 +160,7 @@ func RecombineG2_ZZZ(W1 []byte, W2 []byte) (errorCode int, W []byte) {
 	W2Str := string(W2)
 	W2Oct := GetOctet(W2Str)
 	defer OctetFree(&W2Oct)
-	WOct := GetOctetZero(G2S)
+	WOct := GetOctetZero(G2S_ZZZ)
 	defer OctetFree(&WOct)
 
 	rtn := C.MPIN_ZZZ_RECOMBINE_G2(&W1Oct, &W2Oct, &WOct)
@@ -196,7 +195,7 @@ func GetClientSecret_ZZZ(masterSecret []byte, hashMPinId []byte) (errorCode int,
 	hashMPinIdStr := string(hashMPinId)
 	hashMPinIdOct := GetOctet(hashMPinIdStr)
 	defer OctetFree(&hashMPinIdOct)
-	clientSecretOct := GetOctetZero(G1S)
+	clientSecretOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&clientSecretOct)
 
 	rtn := C.MPIN_ZZZ_GET_CLIENT_SECRET(&masterSecretOct, &hashMPinIdOct, &clientSecretOct)
@@ -226,7 +225,7 @@ Returns:
 */
 func GetDVSKeyPair_ZZZ(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publicKey []byte) {
 	// Form octets
-	publicKeyOct := GetOctetZero(G2S)
+	publicKeyOct := GetOctetZero(G2S_ZZZ)
 	defer OctetFree(&publicKeyOct)
 	zStr := string(z)
 	zOct := GetOctet(zStr)
@@ -278,7 +277,7 @@ func GetClientPermit_ZZZ(hashType, epochDate int, masterSecret, hashMPinId []byt
 	hashMPinIdStr := string(hashMPinId)
 	hashMPinIdOct := GetOctet(hashMPinIdStr)
 	defer OctetFree(&hashMPinIdOct)
-	timePermitOct := GetOctetZero(G1S)
+	timePermitOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&timePermitOct)
 
 	rtn := C.MPIN_ZZZ_GET_CLIENT_PERMIT(C.int(hashType), C.int(epochDate), &masterSecretOct, &hashMPinIdOct, &timePermitOct)
@@ -327,7 +326,7 @@ func ExtractPIN_ZZZ(hashType int, mpinId []byte, PIN int, clientSecret []byte) (
 
 /*
 
-Client performs client side of the one-PAS_ZZZs version of the M-Pin protocol. If Time Permits are
+Client performs client side of the one-Pass version of the M-Pin protocol. If Time Permits are
 disabled then set epoch_date = 0.In this case UT is not generated and can be set to nil.
 If Time Permits are enabled, and PIN error detection is OFF, U is not generated and
 can be set to nil. If Time Permits are enabled and PIN error detection is ON then U
@@ -386,7 +385,7 @@ func Client_ZZZ(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, P
 		UTOct = nil
 		timePermitOct = nil
 	} else {
-		pUT = GetOctetZero(G1S)
+		pUT = GetOctetZero(G1S_ZZZ)
 		UTOct = &pUT
 		TPStr := string(timePermit)
 		ptimePermit = GetOctet(TPStr)
@@ -408,9 +407,9 @@ func Client_ZZZ(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, P
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
 
-	VOct := GetOctetZero(G1S)
+	VOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&VOct)
-	UOct := GetOctetZero(G1S)
+	UOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&UOct)
 
 	yOct := GetOctetZero(PGS_ZZZ)
@@ -460,9 +459,9 @@ func Precompute_ZZZ(token, hashMPinId []byte) (errorCode int, pc1, pc2 []byte) {
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
 
-	pc1Oct := GetOctetZero(GTS)
+	pc1Oct := GetOctetZero(GTS_ZZZ)
 	defer OctetFree(&pc1Oct)
-	pc2Oct := GetOctetZero(GTS)
+	pc2Oct := GetOctetZero(GTS_ZZZ)
 	defer OctetFree(&pc2Oct)
 
 	rtn := C.MPIN_ZZZ_PRECOMPUTE(&tokenOct, &hashMPinIdOct, nil, &pc1Oct, &pc2Oct)
@@ -478,7 +477,7 @@ func Precompute_ZZZ(token, hashMPinId []byte) (errorCode int, pc1, pc2 []byte) {
 /*
 
 GetG1Multiple_ZZZ calculates W=x*P where random x < q is the order of the group of points on the curve.
-When RNG is nil x is PAS_ZZZsed in otherwise it is PAS_ZZZsed out.
+When RNG is nil x is Passed in otherwise it is Passed out.
 
 If type=0 then P is. point on the curve or else P is an octet that has to be
 mapped to the curve
@@ -507,7 +506,7 @@ func GetG1Multiple_ZZZ(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int,
 	GOct := GetOctet(GStr)
 	defer OctetFree(&GOct)
 
-	WOct := GetOctetZero(G1S)
+	WOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&WOct)
 
 	var pRNG *C.csprng
@@ -533,7 +532,7 @@ func GetG1Multiple_ZZZ(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int,
 
 /*
 
-Server_ZZZ performs server side of the one-PAS_ZZZs version of the M-Pin protocol
+Server_ZZZ performs server side of the one-Pass version of the M-Pin protocol
 with support for the key-escrow less scheme. If Time Permits are disabled,
 set epoch_date = 0, and UT and HTID are not generated and can be set to nil.
 If Time Permits are enabled, and PIN error detection is OFF,
@@ -552,19 +551,19 @@ Args:
     mpinId: M-Pin ID, or hash of the M-Pin ID in anonymous mode, or M-Pin ID | publicKey in key-escrow less scheme
     publicKey: client public key in key-escrow less version, or nil otherwise
     message: message to be signed
-    Kangaroo_ZZZ: Set to true to perform Kangaroo_ZZZ
+    Kangaroo_ZZZ: Set to true to perform Kangaroo
 
 Returns:
 
     errorCode: error from the C function
     HID:  H(mpin_id). H is a map to a point on the curve
     HTID: H(mpin_id)+H(epoch_date|H(mpin_id)). H is a map to a point on the curve
-    E: value to help the Kangaroo_ZZZs to find the PIN error, or nil if not required
-    F: value to help the Kangaroo_ZZZs to find the PIN error, or nil if not required
+    E: value to help the Kangaroos to find the PIN error, or nil if not required
+    F: value to help the Kangaroos to find the PIN error, or nil if not required
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled used for debug
 
 */
-func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, publicKey, message []byte, Kangaroo_ZZZ bool) (errorCode int, HID, HTID, y, E, F []byte) {
+func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, publicKey, message []byte, Kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte) {
 	serverSecretStr := string(serverSecret)
 	serverSecretOct := GetOctet(serverSecretStr)
 	defer OctetFree(&serverSecretOct)
@@ -578,9 +577,9 @@ func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpin
 	mpinIdOct := GetOctet(mpinIdStr)
 	defer OctetFree(&mpinIdOct)
 
-	HIDOct := GetOctetZero(G1S)
+	HIDOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&HIDOct)
-	HTIDOct := GetOctetZero(G1S)
+	HTIDOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&HTIDOct)
 	yOct := GetOctetZero(PGS_ZZZ)
 	defer OctetFree(&yOct)
@@ -623,13 +622,13 @@ func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpin
 		pmessage = GetOctet(messageStr)
 		messageOct = &pmessage
 	}
-	if !Kangaroo_ZZZ {
+	if (!Kangaroo) {
 		EOct = nil
 		FOct = nil
 	} else {
-		pE = GetOctetZero(GTS)
+		pE = GetOctetZero(GTS_ZZZ)
 		EOct = &pE
-		pF = GetOctetZero(GTS)
+		pF = GetOctetZero(GTS_ZZZ)
 		FOct = &pF
 	}
 
@@ -641,7 +640,7 @@ func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpin
 	HTID = OctetToBytes(&HTIDOct)
 	y = OctetToBytes(&yOct)
 
-	if !Kangaroo_ZZZ {
+	if (!Kangaroo) {
 		return errorCode, HID[:], HTID[:], y[:], nil, nil
 	} else {
 		E = OctetToBytes(EOct)
@@ -652,7 +651,7 @@ func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpin
 
 /*
 
-Kangaroo_ZZZ uses Pollards Kangaroo_ZZZs to find PIN error
+Kangaroo_ZZZ uses Pollards Kangaroos to find PIN error
 
 Args:
 
@@ -661,7 +660,7 @@ Args:
 
 Returns:
 
-    PINError: error in PIN or 0 if Kangaroo_ZZZs failed
+    PINError: error in PIN or 0 if Kangaroos failed
 
 */
 func Kangaroo_ZZZ(E []byte, F []byte) (PINError int) {
@@ -672,7 +671,7 @@ func Kangaroo_ZZZ(E []byte, F []byte) (PINError int) {
 	FOct := GetOctet(FStr)
 	defer OctetFree(&FOct)
 
-	rtn := C.MPIN_KANGAROO_ZZZ(&EOct, &FOct)
+	rtn := C.MPIN_ZZZ_KANGAROO(&EOct, &FOct)
 	PINError = int(rtn)
 
 	return PINError
@@ -798,7 +797,7 @@ func ClientKey_ZZZ(hashType, PIN int, pc1, pc2, r, x, HM, T []byte) (errorCode i
 
 /*
 
-Server1_ZZZ performs first PAS_ZZZs of the server side of the 3-PAS_ZZZs version of the M-Pin protocol
+Server1_ZZZ performs first Pass of the server side of the 3-Pass version of the M-Pin protocol
 If Time Permits are disabled, set epoch_date = 0, and UT and HTID are not generated
 and can be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
 U and HID are not needed and can be set to nil. If Time Permits are enabled,
@@ -822,9 +821,9 @@ func Server1_ZZZ(hashType, epochDate int, mpinId []byte) (HID, HTID []byte) {
 	mpinIdOct := GetOctet(mpinIdStr)
 	defer OctetFree(&mpinIdOct)
 
-	HIDOct := GetOctetZero(G1S)
+	HIDOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&HIDOct)
-	HTIDOct := GetOctetZero(G1S)
+	HTIDOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&HTIDOct)
 
 	C.MPIN_ZZZ_SERVER_1(C.int(hashType), C.int(epochDate), &mpinIdOct, &HIDOct, &HTIDOct)
@@ -838,7 +837,7 @@ func Server1_ZZZ(hashType, epochDate int, mpinId []byte) (HID, HTID []byte) {
 
 /*
 
-Server2_ZZZ performs server side of the three-PAS_ZZZs version of the M-Pin protocol, wiht
+Server2_ZZZ performs server side of the three-Pass version of the M-Pin protocol, wiht
 support for the key-escrow less scheme.  If Time Permits are disabled,
 set epoch_date = 0, and UT and HTID are not generated and can be set to nil.
 If Time Permits are enabled, and PIN error detection is OFF,
@@ -918,9 +917,9 @@ func Server2_ZZZ(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []b
 		EOct = nil
 		FOct = nil
 	} else {
-		pE = GetOctetZero(GTS)
+		pE = GetOctetZero(GTS_ZZZ)
 		EOct = &pE
-		pF = GetOctetZero(GTS)
+		pF = GetOctetZero(GTS_ZZZ)
 		FOct = &pF
 	}
 
@@ -939,7 +938,7 @@ func Server2_ZZZ(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []b
 
 /*
 
-Client1_ZZZ performs first PAS_ZZZs of the client side of the three PAS_ZZZs version of the M-Pin protocol.
+Client1_ZZZ performs first Pass of the client side of the three Pass version of the M-Pin protocol.
 If Time Permits are disabled then set epoch_date = 0.In this case UT is not generated0
 and can be set to nil. If Time Permits are enabled, and PIN error detection is OFF,
 U is not generated and can be set to nil. If Time Permits are enabled and PIN error
@@ -975,9 +974,9 @@ func Client1_ZZZ(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, 
 	tokenOct := GetOctet(tokenStr)
 	defer OctetFree(&tokenOct)
 
-	SECOct := GetOctetZero(G1S)
+	SECOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&SECOct)
-	UOct := GetOctetZero(G1S)
+	UOct := GetOctetZero(G1S_ZZZ)
 	defer OctetFree(&UOct)
 
 	var pUT C.octet
@@ -1004,7 +1003,7 @@ func Client1_ZZZ(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, 
 		timePermitOct = nil
 		UTOct = nil
 	} else {
-		pUT = GetOctetZero(G1S)
+		pUT = GetOctetZero(G1S_ZZZ)
 		UTOct = &pUT
 		TPStr := string(timePermit)
 		pTP = GetOctet(TPStr)
@@ -1029,7 +1028,7 @@ func Client1_ZZZ(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, 
 
 /*
 
-Client2_ZZZ performs second PAS_ZZZs of the client side of the 3-PAS_ZZZs version of the M-Pin protocol
+Client2_ZZZ performs second Pass of the client side of the 3-Pass version of the M-Pin protocol
 
 Args:
 
@@ -1062,73 +1061,4 @@ func Client2_ZZZ(x []byte, y []byte, SEC []byte) (errorCode int, V []byte) {
 	V = OctetToBytes(&SECOct)
 
 	return errorCode, V[:]
-}
-
-/*
-
-HashAll_ZZZ hashs the session transcript
-
-Args:
-
-    hashType: Hash function
-    hashMPinId: An octet pointer to the hash of the M-Pin ID
-    U: U = x.H(mpin_id)
-    UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
-    y: server challenge
-    V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
-    Z: client part response
-    T: server part response
-
-Returns:
-
-    HM: hash of the input values
-
-*/
-func HashAll_ZZZ(hashType int, hashMPinId, U, UT, V, y, Z, T []byte) (HM []byte) {
-	// Form Octets
-	hashMPinIdStr := string(hashMPinId)
-	hashMPinIdOct := GetOctet(hashMPinIdStr)
-	defer OctetFree(&hashMPinIdOct)
-
-	UStr := string(U)
-	UOct := GetOctet(UStr)
-	defer OctetFree(&UOct)
-
-	UTStr := string(UT)
-	UTOct := GetOctet(UTStr)
-	defer OctetFree(&UTOct)
-
-	yStr := string(y)
-	yOct := GetOctet(yStr)
-	defer OctetFree(&yOct)
-
-	VStr := string(V)
-	VOct := GetOctet(VStr)
-	defer OctetFree(&VOct)
-
-	ZStr := string(Z)
-	ZOct := GetOctet(ZStr)
-	defer OctetFree(&ZOct)
-
-	TStr := string(T)
-	TOct := GetOctet(TStr)
-	defer OctetFree(&TOct)
-
-	HMOct := GetOctetZero(hashBytes)
-	defer OctetFree(&HMOct)
-
-	// Hash values
-	if UT == nil {
-		C.MPIN_ZZZ_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, nil, &yOct, &VOct, &ZOct, &TOct, &HMOct)
-	} else {
-		UTStr := string(UT)
-		UTOct := GetOctet(UTStr)
-		defer OctetFree(&UTOct)
-		C.MPIN_ZZZ_HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &yOct, &VOct, &ZOct, &TOct, &HMOct)
-	}
-
-	// Convert octet to bytes
-	HM = OctetToBytes(&HMOct)
-
-	return HM[:]
 }

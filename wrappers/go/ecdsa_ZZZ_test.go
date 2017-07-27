@@ -82,14 +82,14 @@ func TestECDSA_ZZZ(t *testing.T) {
 
 	rng := CreateCSPRNG(seed)
 
-	PAS_ZZZsPhraseStr := "AlicePAS_ZZZsPhrase"
-	PAS_ZZZsPhrase := []byte(PAS_ZZZsPhraseStr)
+	PassPhraseStr := "AlicePassPhrase"
+	PassPhrase := []byte(PassPhraseStr)
 
 	SaltStr := "aabbccddee"
 	Salt := []byte(SaltStr)
 
 	// Generate ECC Private Key
-	PrivKey := PBKDF2(SHA256, PAS_ZZZsPhrase[:], Salt[:], 1000, EGS)
+	PrivKey := PBKDF2(SHA256, PassPhrase[:], Salt[:], 1000, EGS_ZZZ)
 
 	// Destroy Private Key
 	defer CleanMemory(PrivKey[:])

@@ -1,5 +1,5 @@
 /**
- * @file rsa.go
+ * @file rsa_WWW.go
  * @author Alessandro Budroni
  * @brief Wrappers for RSA functions
  *
@@ -26,21 +26,22 @@
 package amcl
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
+#cgo CFLAGS:  -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
 #cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_rsa_WWW -lamcl_core
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
 #include "randapi.h"
-#include "rsa.h"
+#include "rsa_WWW.h"
 #include "utils.h"
 */
 import "C"
 
 // RSA Constant
-const MAX_RSA_BYTES int = int(C.MAX_RSA_BYTES) // MAX_RSA_BYTES is the maximum RSA level of security supported - 4096
 const RFS_WWW int = int(C.RFS_WWW)                     // RFS_WWW is the RSA Public Key Size in bytes
 const FFLEN_WWW int = int(C.FFLEN_WWW)                 // FFLEN_WWW consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+
+const HASH_TYPE_RSA_WWW int = int(C.HASH_TYPE_RSA_WWW) // HASH_TYPE_RSA_WWW is the chosen Hash algorithm
 
 // RSAKeyPair generates an RSA key pair
 func RSAKeyPair_WWW(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key_WWW, C.rsa_public_key_WWW) {
@@ -58,54 +59,8 @@ func RSAKeyPair_WWW(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key
 	return RSA_PrivKey, RSA_PubKey
 }
 
-// PKCS15 (PKCS 1.5) - padding of a message to be signed
-func PKCS15(hashType int, M []byte) (errorCode int, C []byte) {
-	MStr := string(M)
-	MOct := GetOctet(MStr)
-	defer OctetFree(&MOct)
-	COct := GetOctetZero(RFS_WWW)
-	defer OctetFree(&COct)
-
-	rtn := C.PKCS15(C.int(hashType), &MOct, &COct)
-	errorCode = int(rtn)
-	C = OctetToBytes(&COct)
-	return errorCode, C[:]
-}
-
-// OAEPencode encodes the message for encryption
-func OAEPencode(hashType int, M []byte, RNG *RandNG, P []byte) (errorCode int, F []byte) {
-	MStr := string(M)
-	MOct := GetOctet(MStr)
-	defer OctetFree(&MOct)
-	PStr := string(P)
-	POct := GetOctet(PStr)
-	defer OctetFree(&POct)
-	FOct := GetOctetZero(RFS_WWW)
-	defer OctetFree(&FOct)
-
-	rtn := C.OAEP_ENCODE(C.int(hashType), &MOct, RNG.csprng(), &POct, &FOct)
-	errorCode = int(rtn)
-	F = OctetToBytes(&FOct)
-	return errorCode, F[:]
-}
-
-// OAEPdecode decodes message M after decryption, F is the decoded message
-func OAEPdecode(hashType int, P []byte, M []byte) (int, []byte) {
-	MStr := string(M)
-	MOct := GetOctet(MStr)
-	defer OctetFree(&MOct)
-	PStr := string(P)
-	POct := GetOctet(PStr)
-	defer OctetFree(&POct)
-
-	rtn := C.OAEP_DECODE(C.int(hashType), &POct, &MOct)
-	errorCode := int(rtn)
-	M = OctetToBytes(&MOct)
-	return errorCode, M[:]
-}
-
-// RSA_WWW_ENCRYPT encrypts F with the public key
-func RSA_WWW_ENCRYPT(RSA_PubKey *C.rsa_public_key_WWW, F []byte) (G []byte) {
+// RSAEncrypt_WWW encrypts F with the public key
+func RSAEncrypt_WWW(RSA_PubKey *C.rsa_public_key_WWW, F []byte) (G []byte) {
 	FStr := string(F)
 	FOct := GetOctet(FStr)
 	defer OctetFree(&FOct)
@@ -117,8 +72,8 @@ func RSA_WWW_ENCRYPT(RSA_PubKey *C.rsa_public_key_WWW, F []byte) (G []byte) {
 	return G[:]
 }
 
-// RSA_WWW_DECRYPT decrypts G with the private key
-func RSA_WWW_DECRYPT(RSA_PrivKey *C.rsa_private_key_WWW, G []byte) (F []byte) {
+// RSADecrypt_WWW decrypts G with the private key
+func RSADecrypt_WWW(RSA_PrivKey *C.rsa_private_key_WWW, G []byte) (F []byte) {
 	GStr := string(G)
 	GOct := GetOctet(GStr)
 	defer OctetFree(&GOct)
@@ -130,7 +85,7 @@ func RSA_WWW_DECRYPT(RSA_PrivKey *C.rsa_private_key_WWW, G []byte) (F []byte) {
 	return F[:]
 }
 
-// RSA_PRIVATE_KEY_KILL_WWW destroys an RSA private Key
-func RSA_PRIVATE_KEY_KILL_WWW(RSA_PrivKey *C.rsa_private_key_WWW) {
-	C.RSA_PRIVATE_KEY_KILL_WWW(RSA_PrivKey)
+// RSAPrivateKeyKill_WWW destroys an RSA private Key
+func RSAPrivateKeyKill_WWW(RSA_PrivKey *C.rsa_private_key_WWW) {
+	C.RSA_WWW_PRIVATE_KEY_KILL(RSA_PrivKey)
 }

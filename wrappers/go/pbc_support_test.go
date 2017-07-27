@@ -20,16 +20,12 @@ under the License.
 package amcl
 
 import (
-	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	mathrand "math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-var HASH_TYPE_MPIN = SHA256
 
 const nIter int = 100
 

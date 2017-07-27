@@ -1,5 +1,5 @@
 /**
- * @file test_rsa.go
+ * @file test_rsa_WWW.go
  * @author Alessandro Budroni
  * @brief RSA test
  *
@@ -68,13 +68,13 @@ func main() {
 	fmt.Printf("%x\n\n", F[:])
 
 	// encrypt encoded MESSAGE
-	G := amcl.RSA_WWW_ENCRYPT(&RSA_PubKey, F[:])
+	G := amcl.RSAEncrypt_WWW(&RSA_PubKey, F[:])
 
 	fmt.Printf("Encrypted MESSAGE: 0x")
 	fmt.Printf("%x\n\n", G[:])
 
 	// decrypt encrypted MESSAGE
-	ML := amcl.RSA_WWW_DECRYPT(&RSA_PrivKey, G[:])
+	ML := amcl.RSADecrypt_WWW(&RSA_PrivKey, G[:])
 
 	fmt.Printf("Decrypted MESSAGE: 0x")
 	fmt.Printf("%x\n\n", ML[:])
@@ -98,6 +98,6 @@ func main() {
 
 	// destroy private key
 	fmt.Printf("Destroy private key\n\n")
-	amcl.RSA_PRIVATE_KEY_KILL_WWW(&RSA_PrivKey)
+	amcl.RSAPrivateKeyKill_WWW(&RSA_PrivKey)
 
 }

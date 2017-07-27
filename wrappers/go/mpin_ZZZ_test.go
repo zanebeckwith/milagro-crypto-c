@@ -29,10 +29,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var HASH_TYPE_MPIN = SHA256
-
-const nIter int = 100
-
 // Set to true if library built with "-D USE_ANONYMOUS=on"
 const USE_ANONYMOUS = false
 
@@ -114,7 +110,7 @@ func TestGoodPIN_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -219,7 +215,7 @@ func TestTimePermitGoodPIN_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -342,7 +338,7 @@ func TestBadPIN_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -465,7 +461,7 @@ func TestBadToken_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -586,7 +582,7 @@ func TestRandom_ZZZ(t *testing.T) {
 		defer CleanMemory(CS2[:])
 
 		// Combine client secret shares
-		CS := make([]byte, G1S)
+		CS := make([]byte, G1S_ZZZ)
 		_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 		// Destroy CS
@@ -709,7 +705,7 @@ func TestGoodSignature_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -832,7 +828,7 @@ func TestSignatureExpired_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -956,7 +952,7 @@ func TestBadSignature_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -1078,7 +1074,7 @@ func TestPINError_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -1201,7 +1197,7 @@ func TestMPINFull_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -1284,7 +1280,7 @@ func TestMPINFull_ZZZ(t *testing.T) {
 	defer CleanMemory(T[:])
 
 	// Hash all values
-	HM := HashAll_ZZZ(HASH_TYPE_MPIN, HCID[:], U[:], UT[:], Y[:], V[:], Z[:], T[:])
+	HM := HashAll(HASH_TYPE_MPIN, HCID[:], U[:], UT[:], Y[:], V[:], Z[:], T[:])
 
 	// Destroy HM
 	defer CleanMemory(HM[:])
@@ -1302,7 +1298,7 @@ func TestMPINFull_ZZZ(t *testing.T) {
 	assert.Equal(t, AES_KEY_SERVER, AES_KEY_CLIENT, "Should be equal")
 }
 
-func TestTwoPAS_ZZZsGoodPIN_ZZZ(t *testing.T) {
+func TestTwoPassGoodPIN_ZZZ(t *testing.T) {
 	want := 0
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -1371,7 +1367,7 @@ func TestTwoPAS_ZZZsGoodPIN_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -1383,14 +1379,14 @@ func TestTwoPAS_ZZZsGoodPIN_ZZZ(t *testing.T) {
 	// Destroy TOKEN
 	defer CleanMemory(TOKEN[:])
 
-	// Client PAS_ZZZs 1
+	// Client Pass 1
 	var X [PGS_ZZZ]byte
 	_, XOut, SEC, U, _ := Client1_ZZZ(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], nil)
 
 	// Destroy X
 	defer CleanMemory(X[:])
 
-	// Server PAS_ZZZs 1
+	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
@@ -1405,19 +1401,19 @@ func TestTwoPAS_ZZZsGoodPIN_ZZZ(t *testing.T) {
 	// Destroy HTID
 	defer CleanMemory(HTID[:])
 
-	// Client PAS_ZZZs 2
+	// Client Pass 2
 	_, V := Client2_ZZZ(XOut[:], Y[:], SEC[:])
 
 	// Destroy V
 	defer CleanMemory(V[:])
 
-	// Server PAS_ZZZs 2
+	// Server Pass 2
 	got, _, _ := Server2_ZZZ(date, HID[:], HTID[:], Y[:], SS[:], U[:], nil, V[:], false)
 
 	assert.Equal(t, want, got, "Should be equal")
 }
 
-func TestTwoPAS_ZZZsTimePermitGoodPIN_ZZZ(t *testing.T) {
+func TestTwoPassTimePermitGoodPIN_ZZZ(t *testing.T) {
 	want := 0
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -1486,7 +1482,7 @@ func TestTwoPAS_ZZZsTimePermitGoodPIN_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -1516,14 +1512,14 @@ func TestTwoPAS_ZZZsTimePermitGoodPIN_ZZZ(t *testing.T) {
 	// Destroy TOKEN
 	defer CleanMemory(TOKEN[:])
 
-	// Client PAS_ZZZs 1
+	// Client Pass 1
 	var X [PGS_ZZZ]byte
 	_, XOut, SEC, U, UT := Client1_ZZZ(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
 	// Destroy X
 	defer CleanMemory(X[:])
 
-	// Server PAS_ZZZs 1
+	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
@@ -1538,19 +1534,19 @@ func TestTwoPAS_ZZZsTimePermitGoodPIN_ZZZ(t *testing.T) {
 	// Destroy HTID
 	defer CleanMemory(HTID[:])
 
-	// Client PAS_ZZZs 2
+	// Client Pass 2
 	_, V := Client2_ZZZ(XOut[:], Y[:], SEC[:])
 
 	// Destroy V
 	defer CleanMemory(V[:])
 
-	// Server PAS_ZZZs 2
+	// Server Pass 2
 	got, _, _ := Server2_ZZZ(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], false)
 
 	assert.Equal(t, want, got, "Should be equal")
 }
 
-func TestTwoPAS_ZZZsBadPIN_ZZZ(t *testing.T) {
+func TestTwoPassBadPIN_ZZZ(t *testing.T) {
 	want := -19
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -1619,7 +1615,7 @@ func TestTwoPAS_ZZZsBadPIN_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -1649,7 +1645,7 @@ func TestTwoPAS_ZZZsBadPIN_ZZZ(t *testing.T) {
 	// Destroy TOKEN
 	defer CleanMemory(TOKEN[:])
 
-	// Client PAS_ZZZs 1
+	// Client Pass 1
 	var X [PGS_ZZZ]byte
 	_, XOut, SEC, U, UT := Client1_ZZZ(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
@@ -1658,7 +1654,7 @@ func TestTwoPAS_ZZZsBadPIN_ZZZ(t *testing.T) {
 	// Destroy SEC
 	defer CleanMemory(SEC[:])
 
-	// Server PAS_ZZZs 1
+	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
@@ -1675,18 +1671,18 @@ func TestTwoPAS_ZZZsBadPIN_ZZZ(t *testing.T) {
 	// Destroy Y
 	defer CleanMemory(Y[:])
 
-	// Client PAS_ZZZs 2
+	// Client Pass 2
 	_, V := Client2_ZZZ(XOut[:], Y[:], SEC[:])
 
 	// Destroy V
 	defer CleanMemory(V[:])
 
-	// Server PAS_ZZZs 2
+	// Server Pass 2
 	got, _, _ := Server2_ZZZ(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], false)
 	assert.Equal(t, want, got, "Should be equal")
 }
 
-func TestTwoPAS_ZZZsBadToken_ZZZ(t *testing.T) {
+func TestTwoPassBadToken_ZZZ(t *testing.T) {
 	want := -19
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -1755,7 +1751,7 @@ func TestTwoPAS_ZZZsBadToken_ZZZ(t *testing.T) {
 	defer CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, G1S)
+	CS := make([]byte, G1S_ZZZ)
 	_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 	// Destroy CS
@@ -1785,7 +1781,7 @@ func TestTwoPAS_ZZZsBadToken_ZZZ(t *testing.T) {
 	// Destroy TOKEN
 	defer CleanMemory(TOKEN[:])
 
-	// Client PAS_ZZZs 1
+	// Client Pass 1
 	var X [PGS_ZZZ]byte
 	_, XOut, SEC, U, UT := Client1_ZZZ(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
@@ -1794,7 +1790,7 @@ func TestTwoPAS_ZZZsBadToken_ZZZ(t *testing.T) {
 	// Destroy SEC
 	defer CleanMemory(SEC[:])
 
-	// Server PAS_ZZZs 1
+	// Server Pass 1
 	var HID []byte
 	var HTID []byte
 	if USE_ANONYMOUS {
@@ -1811,10 +1807,10 @@ func TestTwoPAS_ZZZsBadToken_ZZZ(t *testing.T) {
 	// Destroy Y
 	defer CleanMemory(Y[:])
 
-	// Client PAS_ZZZs 2
+	// Client Pass 2
 	_, _ = Client2_ZZZ(XOut[:], Y[:], SEC[:])
 
-	// Server PAS_ZZZs 2
+	// Server Pass 2
 	// Send UT as V to model bad token
 	got, _, _ := Server2_ZZZ(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], UT[:], false)
 	assert.Equal(t, want, got, "Should be equal")
@@ -1888,7 +1884,7 @@ func TestRandomTwoPASS_ZZZ(t *testing.T) {
 		defer CleanMemory(CS2[:])
 
 		// Combine client secret shares
-		CS := make([]byte, G1S)
+		CS := make([]byte, G1S_ZZZ)
 		_, CS = RecombineG1_ZZZ(CS1[:], CS2[:])
 
 		// Destroy CS
@@ -1918,7 +1914,7 @@ func TestRandomTwoPASS_ZZZ(t *testing.T) {
 		// Destroy TOKEN
 		defer CleanMemory(TOKEN[:])
 
-		// Client PAS_ZZZs 1
+		// Client Pass 1
 		var X [PGS_ZZZ]byte
 		_, XOut, SEC, U, UT := Client1_ZZZ(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN2, TOKEN[:], TP[:])
 
@@ -1927,7 +1923,7 @@ func TestRandomTwoPASS_ZZZ(t *testing.T) {
 		// Destroy SEC
 		defer CleanMemory(SEC[:])
 
-		// Server PAS_ZZZs 1
+		// Server Pass 1
 		var HID []byte
 		var HTID []byte
 		if USE_ANONYMOUS {
@@ -1940,13 +1936,13 @@ func TestRandomTwoPASS_ZZZ(t *testing.T) {
 		// Destroy Y
 		defer CleanMemory(Y[:])
 
-		// Client PAS_ZZZs 2
+		// Client Pass 2
 		_, V := Client2_ZZZ(XOut[:], Y[:], SEC[:])
 
 		// Destroy V
 		defer CleanMemory(V[:])
 
-		// Server PAS_ZZZs 2
+		// Server Pass 2
 		got, _, _ := Server2_ZZZ(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], false)
 		assert.Equal(t, want, got, "Should be equal")
 

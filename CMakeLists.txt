@@ -19,7 +19,7 @@ message(STATUS "Generator - ${CMAKE_GENERATOR}")
 # Add options for build
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 #option (BUILD_PYTHON "Build Python" OFF)
-option (BUILD_GO "Build Golang" OFF)
+option (BUILD_GO "Build Golang" ON)
 option (BUILD_MPIN "Build MPIN" ON)
 option (BUILD_WCC "Build WCC" ON)
 option (BUILD_DOXYGEN "Build Doxygen" ON)

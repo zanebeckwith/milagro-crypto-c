@@ -1,5 +1,5 @@
 /**
- * @file test_rsa_sign.go
+ * @file test_rsa_sign_WWW.go
  * @author Alessandro Budroni
  * @brief RSA signature test
  *
@@ -68,19 +68,19 @@ func main() {
 	fmt.Printf("%x\n\n", C[:])
 
 	// create signature in S
-	S := amcl.RSA_WWW_DECRYPT(&RSA_PrivKey, C[:])
+	S := amcl.RSADecrypt_WWW(&RSA_PrivKey, C[:])
 
 	fmt.Printf("Signed MESSAGE: ")
 	fmt.Printf("%x\n\n", S[:])
 
-	Cgot := amcl.RSA_WWW_ENCRYPT(&RSA_PubKey, S[:])
+	Cgot := amcl.RSAEncrypt_WWW(&RSA_PubKey, S[:])
 
 	fmt.Printf("Verify signature MESSAGE: ")
 	fmt.Printf("%x\n\n", Cgot[:])
 
 	// destroy private key
 	fmt.Printf("Destroy private key\n\n")
-	amcl.RSA_PRIVATE_KEY_KILL_WWW(&RSA_PrivKey)
+	amcl.RSAPrivateKeyKill_WWW(&RSA_PrivKey)
 
 	// NOTE - use the following only for testing
 	rtn = int(amcl.OctetComp(C, Cgot))

@@ -210,7 +210,7 @@ func main() {
 		fmt.Scan(&PIN2)
 	}
 
-	////// Client PAS_ZZZs 1 //////
+	////// Client Pass 1 //////
 	// Send U and UT to server
 	var X [amcl.PGS_ZZZ]byte
 	fmt.Printf("X: 0x")
@@ -230,7 +230,7 @@ func main() {
 	// Destroy SEC
 	defer amcl.CleanMemory(SEC[:])
 
-	//////   Server PAS_ZZZs 1  //////
+	//////   Server Pass 1  //////
 	/* Calculate H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
 	HID, HTID := amcl.Server1_ZZZ(HASH_TYPE_MPIN, date, ID)
 
@@ -246,7 +246,7 @@ func main() {
 	// Destroy Y
 	defer amcl.CleanMemory(Y[:])
 
-	/* Client Second PAS_ZZZs: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
+	/* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
 	rtn, V := amcl.Client2_ZZZ(XOut[:], Y[:], SEC[:])
 	if rtn != 0 {
 		fmt.Printf("FAILURE: CLIENT_2 rtn: %d\n", rtn)
@@ -255,7 +255,7 @@ func main() {
 	// Destroy V
 	defer amcl.CleanMemory(V[:])
 
-	/* Server Second PAS_ZZZs. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help Kangaroo_ZZZs to find error. */
+	/* Server Second Pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help Kangaroo_ZZZs to find error. */
 	/* If PIN error not required, set E and F = null */
 
 	rtn, E, F := amcl.Server2_ZZZ(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], true)

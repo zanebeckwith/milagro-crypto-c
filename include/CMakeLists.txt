@@ -74,6 +74,9 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
 
   file(COPY ecdh_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+  set(CURVE_HEADERS ${CURVE_HEADERS}
+    ${CMAKE_CURRENT_BINARY_DIR}/ecdh_support.h)
+
   if(NOT(${pf} STREQUAL "NOT"))
 
     file(READ "fp2_YYY.h" temph)
@@ -166,6 +169,11 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
 
+  # if(BUILD_GO)
+  #   # Copy header files for testing before installation
+  #   file(COPY ${CURVE_HEADERS} DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+  # endif(BUILD_GO)
+
 endfunction(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
 
 # Copy rsa dependant header files
@@ -225,6 +233,11 @@ function(RSA_HEADERS_SET tb tff nb base ml)
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
+
+  # if(BUILD_GO)
+  #   # Copy header files for testing before installation
+  #   file(COPY ${RSA_HEADERS} DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+  # endif(BUILD_GO)
 
 endfunction(RSA_HEADERS_SET tb tff nb base ml)
 
@@ -405,3 +418,10 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/arch.h DESTINATION include PERMISSION
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
+
+# if(BUILD_GO)
+#   # Copy header files for testing before installation
+#   file(COPY ${COMMON_HEADERS} DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+#   file(COPY ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+#   file(COPY ${CMAKE_CURRENT_BINARY_DIR}/arch.h DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+# endif(BUILD_GO)

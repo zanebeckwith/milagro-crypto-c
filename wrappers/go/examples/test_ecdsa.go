@@ -46,12 +46,12 @@ func main() {
 
 	rng := amcl.CreateCSPRNG(seed)
 
-	// Set PAS_ZZZsPhrase
-	PAS_ZZZsPhraseStr := "AlicePAS_ZZZsPhrase"
-	PAS_ZZZsPhrase := []byte(PAS_ZZZsPhraseStr)
+	// Set PassPhrase
+	PassPhraseStr := "AlicePassPhrase"
+	PassPhrase := []byte(PassPhraseStr)
 
-	fmt.Printf("PAS_ZZZsPhrase: ")
-	fmt.Printf("%s\n\n", PAS_ZZZsPhrase[:])
+	fmt.Printf("PassPhrase: ")
+	fmt.Printf("%s\n\n", PassPhrase[:])
 
 	// Set Salt
 	SaltStr := "aabbccddee"
@@ -64,14 +64,14 @@ func main() {
 	fmt.Printf("Generating public/private key pair...\n\n")
 
 	// Generate ECC Private Key
-	PrivKey := amcl.PBKDF2(amcl.SHA256, PAS_ZZZsPhrase[:], Salt[:], 1000, amcl.EGS)
+	PrivKey := amcl.PBKDF2(amcl.SHA256, PassPhrase[:], Salt[:], 1000, amcl.EGS)
 
 	// Destroy Private Key
 	defer amcl.CleanMemory(PrivKey[:])
 	// Destroy Salt
 	defer amcl.CleanMemory(Salt[:])
-	// Destroy PAS_ZZZsphrase
-	defer amcl.CleanMemory(PAS_ZZZsPhrase[:])
+	// Destroy Passphrase
+	defer amcl.CleanMemory(PassPhrase[:])
 
 	fmt.Printf("Private Key: 0x")
 	fmt.Printf("%x\n\n", PrivKey[:])

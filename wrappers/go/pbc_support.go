@@ -20,7 +20,7 @@ under the License.
 package amcl
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
+#cgo CFLAGS:  -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
 #cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_core
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,6 +98,75 @@ func HashId(hashType int, mpinId []byte) (hashMPinId []byte) {
 
 /*
 
+HashAll hashs the session transcript
+
+Args:
+
+    hashType: Hash function
+    hashMPinId: An octet pointer to the hash of the M-Pin ID
+    U: U = x.H(mpin_id)
+    UT: UT = x.(H(ID)+H(epoch_date|H(ID)))
+    y: server challenge
+    V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
+    Z: client part response
+    T: server part response
+
+Returns:
+
+    HM: hash of the input values
+
+*/
+func HashAll(hashType int, hashMPinId, U, UT, V, y, Z, T []byte) (HM []byte) {
+	// Form Octets
+	hashMPinIdStr := string(hashMPinId)
+	hashMPinIdOct := GetOctet(hashMPinIdStr)
+	defer OctetFree(&hashMPinIdOct)
+
+	UStr := string(U)
+	UOct := GetOctet(UStr)
+	defer OctetFree(&UOct)
+
+	UTStr := string(UT)
+	UTOct := GetOctet(UTStr)
+	defer OctetFree(&UTOct)
+
+	yStr := string(y)
+	yOct := GetOctet(yStr)
+	defer OctetFree(&yOct)
+
+	VStr := string(V)
+	VOct := GetOctet(VStr)
+	defer OctetFree(&VOct)
+
+	ZStr := string(Z)
+	ZOct := GetOctet(ZStr)
+	defer OctetFree(&ZOct)
+
+	TStr := string(T)
+	TOct := GetOctet(TStr)
+	defer OctetFree(&TOct)
+
+	HMOct := GetOctetZero(hashBytes)
+	defer OctetFree(&HMOct)
+
+	// Hash values
+	if UT == nil {
+		C.HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, nil, &yOct, &VOct, &ZOct, &TOct, &HMOct)
+	} else {
+		UTStr := string(UT)
+		UTOct := GetOctet(UTStr)
+		defer OctetFree(&UTOct)
+		C.HASH_ALL(C.int(hashType), &hashMPinIdOct, &UOct, &UTOct, &yOct, &VOct, &ZOct, &TOct, &HMOct)
+	}
+
+	// Convert octet to bytes
+	HM = OctetToBytes(&HMOct)
+
+	return HM[:]
+}
+
+/*
+
 GenerateRandomByte generates a random byte array
 
 Args:
@@ -124,7 +193,7 @@ func GenerateRandomByte(RNG *RandNG, randomLen int) (randomValue []byte) {
 
 /*
 
-GenerateOTP returns a random six digit one time PAS_ZZZsword
+GenerateOTP returns a random six digit one time Password
 
 Args:
 
@@ -132,7 +201,7 @@ Args:
 
 Returns:
 
-    otp: One time PAS_ZZZsword
+    otp: One time Password
 
 */
 func GenerateOTP(RNG *RandNG) int {
@@ -185,7 +254,7 @@ func AesGcmEncrypt(K, IV, H, P []byte) (C, T []byte, err error) {
 	COct := GetOctetZero(lenC)
 	defer OctetFree(&COct)
 
-	C.MPIN_AES_GCM_ENCRYPT(&KOct, &IVOct, &HOct, &POct, &COct, &TOct)
+	C.AES_GCM_ENCRYPT(&KOct, &IVOct, &HOct, &POct, &COct, &TOct)
 
 	// Convert octet to bytes
 	C = OctetToBytes(&COct)
@@ -237,7 +306,7 @@ func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte, err error) {
 	POct := GetOctetZero(lenP)
 	defer OctetFree(&POct)
 
-	C.MPIN_AES_GCM_DECRYPT(&KOct, &IVOct, &HOct, &COct, &POct, &TOct)
+	C.AES_GCM_DECRYPT(&KOct, &IVOct, &HOct, &COct, &POct, &TOct)
 
 	// Convert octet to bytes
 	P = OctetToBytes(&POct)

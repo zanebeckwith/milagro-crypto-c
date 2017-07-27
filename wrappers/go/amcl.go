@@ -20,12 +20,11 @@ under the License.
 package amcl
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I. -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
+#cgo CFLAGS:  -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
 #cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_core
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
-#include "rsa.h"
 #include "randapi.h"
 #include "utils.h"
 */
@@ -39,8 +38,6 @@ import (
 const SHA256 int = 32
 const SHA384 int = 48
 const SHA512 int = 64
-
-const HASH_TYPE_RSA int = int(C.HASH_TYPE_RSA) // HASH_TYPE_RSA is the chosen Hash algorithm
 
 // RandNG is a type alias for C.csprng
 type RandNG C.csprng

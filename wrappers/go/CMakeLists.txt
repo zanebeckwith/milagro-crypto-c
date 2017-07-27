@@ -32,11 +32,11 @@ if(BUILD_MPIN)
 		"${PROJECT_BINARY_DIR}/wrappers/go/pbc_support.go"
 	)
 
-  # Configure go pbc_support test
-  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/pbc_support_test.go" tempc)
-  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-  string(CONFIGURE "${tempc}" tempc)
-  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/pbc_support_test.go" "${tempc}")
+		# Configure go pbc_support test
+	configure_file (
+		"${PROJECT_SOURCE_DIR}/wrappers/go/pbc_support_test.go"
+		"${PROJECT_BINARY_DIR}/wrappers/go/pbc_support_test.go"
+	)
 
   INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.go pbc_support_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
 	    OWNER_WRITE OWNER_READ OWNER_EXECUTE
@@ -45,7 +45,22 @@ if(BUILD_MPIN)
 
 endif(BUILD_MPIN)
 
+# Configure rsa_support wrapper
+configure_file (
+	"${PROJECT_SOURCE_DIR}/wrappers/go/rsa_support.go"
+	"${PROJECT_BINARY_DIR}/wrappers/go/rsa_support.go"
+)
 
+# Configure ecdh_support wrapper
+configure_file (
+	"${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_support.go"
+	"${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_support.go"
+)
+
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/rsa_support.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+	OWNER_WRITE OWNER_READ OWNER_EXECUTE
+	GROUP_READ GROUP_EXECUTE
+	WORLD_READ WORLD_EXECUTE)
 
 function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
   # Configure go ecdsa wrapper
@@ -65,7 +80,7 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
 	  GROUP_READ GROUP_EXECUTE
 	  WORLD_READ WORLD_EXECUTE)
 
-	if(BUILD_MPIN)
+	if(BUILD_MPIN AND NOT(${pf} STREQUAL "NOT"))
 		if(USE_DVS)
 		  # Configure go mpin_dvs wrapper
 		  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_dvs_ZZZ.go" tempc)
@@ -103,7 +118,7 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
         WORLD_READ WORLD_EXECUTE)
 		
 		endif(USE_DVS)
-	endif(BUILD_MPIN)
+	endif(BUILD_MPIN AND NOT(${pf} STREQUAL "NOT"))
 endfunction(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
 
 function(RSA_GOLANG_SET tb tff nb base ml)
@@ -111,7 +126,7 @@ function(RSA_GOLANG_SET tb tff nb base ml)
   file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/rsa_WWW.go" tempc)
   string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
   string(CONFIGURE "${tempc}" tempc)
-  file(WRITE "${PROJECT_BINARY_DIR}/rsa_${tff}.go" "${tempc}")
+  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/rsa_${tff}.go" "${tempc}")
 
   # Configure go rsa test
   file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/rsa_WWW_test.go" tempc)

@@ -1,5 +1,5 @@
 /**
- * @file rsa_test.go
+ * @file rsa__WWW_test.go
  * @author Alessandro Budroni
  * @brief RSA Wrappers tests
  *
@@ -53,19 +53,19 @@ func TestRSA_WWW(t *testing.T) {
 	RSA_PrivKey, RSA_PubKey := RSAKeyPair_WWW(&rng, 65537, nil, nil)
 
 	// OAEP encode MESSAGE to e
-	_, F := OAEPencode(HASH_TYPE_RSA, MESSAGE, &rng, nil)
+	_, F := OAEPencode(HASH_TYPE_RSA_WWW, RFS_WWW, MESSAGE, &rng, nil)
 
 	// encrypt encoded MESSAGE
-	G := RSA_WWW_ENCRYPT(&RSA_PubKey, F[:])
+	G := RSAEncrypt_WWW(&RSA_PubKey, F[:])
 
 	// decrypt encrypted MESSAGE
-	ML := RSA_WWW_DECRYPT(&RSA_PrivKey, G[:])
+	ML := RSADecrypt_WWW(&RSA_PrivKey, G[:])
 
 	// OAEP decode MESSAGE
-	_, Fgot := OAEPdecode(HASH_TYPE_RSA, nil, ML[:])
+	_, Fgot := OAEPdecode(HASH_TYPE_RSA_WWW, nil, ML[:])
 
 	// destroy private key
-	RSA_PRIVATE_KEY_KILL_WWW(&RSA_PrivKey)
+	RSAPrivateKeyKill_WWW(&RSA_PrivKey)
 
 	assert.Equal(t, Fgot, MESSAGE, "Should be equal")
 }
@@ -90,15 +90,15 @@ func TestRsaSign_WWW(t *testing.T) {
 	MESSAGE := []byte(MESSAGEstr)
 
 	// Signing message
-	_, C := PKCS15(HASH_TYPE_RSA, MESSAGE)
+	_, C := PKCS15(HASH_TYPE_RSA_WWW, RFS_WWW, MESSAGE)
 
 	// create signature in S
-	S := RSA_WWW_DECRYPT(&RSA_PrivKey, C[:])
+	S := RSADecrypt_WWW(&RSA_PrivKey, C[:])
 
-	Cgot := RSA_WWW_ENCRYPT(&RSA_PubKey, S[:])
+	Cgot := RSAEncrypt_WWW(&RSA_PubKey, S[:])
 
 	// destroy private key
-	RSA_PRIVATE_KEY_KILL_WWW(&RSA_PrivKey)
+	RSAPrivateKeyKill_WWW(&RSA_PrivKey)
 
 	assert.Equal(t, C, Cgot, "Should be equal")
 }

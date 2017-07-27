@@ -1,9 +1,9 @@
 # Create AMCL library
 
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # Add the binary tree directory to the search path for linking and include files
 link_directories( ${CMAKE_CURRENT_BINARY_DIR} )
@@ -45,10 +45,6 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
   set(SOURCES_CURVE_${tc} ${SOURCES_CURVE_${tc}}
     ${CMAKE_CURRENT_BINARY_DIR}/ecdh_${tc}.c
     ${CMAKE_CURRENT_BINARY_DIR}/rom_curve_${tc}.c)
-
-  file(COPY "ecdh_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-  set(SOURCES_CURVE_${tc} ${SOURCES_CURVE_${tc}}
-      ${CMAKE_CURRENT_BINARY_DIR}/ecdh_support.c)
 
   message(STATUS "Build libamcl_curve_${tc}")
   add_library(amcl_curve_${tc} ${LIB_TYPE} ${SOURCES_CURVE_${tc}})
@@ -101,6 +97,41 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
     set(INSTALL_LIBS ${INSTALL_LIBS} amcl_pairing_${tc})
 
+    # Copy built libs to wrappers/go to allow testing without
+		# having to install the libs.
+		if (BUILD_GO AND BUILD_SHARED_LIBS)
+		  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+		    add_custom_command(
+		                TARGET amcl_pairing_${tc}
+		                POST_BUILD
+		                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+		  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+		  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+		    add_custom_command(
+		                TARGET amcl_pairing_${tc}
+		                POST_BUILD
+		                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+		  endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+		  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+		    add_custom_command(
+		                TARGET amcl_pairing_${tc}
+		                POST_BUILD
+		                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+		  endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+		endif (BUILD_GO AND BUILD_SHARED_LIBS)
+
+		# Static build
+		if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+		  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+		    add_custom_command(
+		                TARGET amcl_pairing_${tc}
+		                POST_BUILD
+		                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+		  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+		endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+
     if(BUILD_MPIN)
       file(READ "mpin_ZZZ.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
@@ -115,6 +146,42 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       target_link_libraries (amcl_mpin_${tc} amcl_pairing_${tc} amcl_curve_${tc} amcl_core)
 
       set(INSTALL_LIBS ${INSTALL_LIBS} amcl_mpin_${tc})
+
+      # Copy built libs to wrappers/go to allow testing without
+			# having to install the libs.
+			if (BUILD_GO AND BUILD_SHARED_LIBS)
+			  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+			    add_custom_command(
+			                TARGET amcl_mpin_${tc}
+			                POST_BUILD
+			                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+			  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+			  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+			    add_custom_command(
+			                TARGET amcl_mpin_${tc}
+			                POST_BUILD
+			                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+			  endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+			  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+			    add_custom_command(
+			                TARGET amcl_mpin_${tc}
+			                POST_BUILD
+			                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+			  endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+			endif (BUILD_GO AND BUILD_SHARED_LIBS)
+
+			# Static build
+			if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+			  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+			    add_custom_command(
+			                TARGET amcl_mpin_${tc}
+			                POST_BUILD
+			                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+			  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+			endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
@@ -139,6 +206,41 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       OWNER_WRITE OWNER_READ OWNER_EXECUTE
       GROUP_READ GROUP_EXECUTE
       WORLD_READ WORLD_EXECUTE)
+
+  # Copy built libs to wrappers/go to allow testing without
+	# having to install the libs.
+	if (BUILD_GO AND BUILD_SHARED_LIBS)
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	    add_custom_command(
+	                TARGET amcl_curve_${tc}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	    add_custom_command(
+	                TARGET amcl_curve_${tc}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	    add_custom_command(
+	                TARGET amcl_curve_${tc}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	endif (BUILD_GO AND BUILD_SHARED_LIBS)
+
+	# Static build
+	if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	    add_custom_command(
+	                TARGET amcl_curve_${tc}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
 
 endfunction(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
@@ -166,10 +268,6 @@ function(RSA_SRC_SET tb tff nb base ml)
   set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
       ${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.c)
 
-  file(COPY "rsa_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-  set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
-      ${CMAKE_CURRENT_BINARY_DIR}/rsa_support.c)
-
   message(STATUS "Build libamcl_rsa_${tff}")
   add_library(amcl_rsa_${tff} ${LIB_TYPE} ${SOURCES_RSA_${tff}})
   target_link_libraries (amcl_rsa_${tff} amcl_core)
@@ -180,6 +278,41 @@ function(RSA_SRC_SET tb tff nb base ml)
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
+
+	# Copy built libs to wrappers/go to allow testing without
+	# having to install the libs.
+	if (BUILD_GO AND BUILD_SHARED_LIBS)
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	    add_custom_command(
+	                TARGET amcl_rsa_${tff}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	    add_custom_command(
+	                TARGET amcl_rsa_${tff}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	    add_custom_command(
+	                TARGET amcl_rsa_${tff}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	endif (BUILD_GO AND BUILD_SHARED_LIBS)
+
+	# Static build
+	if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	    add_custom_command(
+	                TARGET amcl_rsa_${tff}
+	                POST_BUILD
+	                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+	  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
 
 endfunction(RSA_SRC_SET tb tff nb base ml)
 
@@ -212,6 +345,14 @@ if(BUILD_MPIN OR BUILD_WCC)
   set(DEST_SOURCES_AMCL_CORE ${DEST_SOURCES_AMCL_CORE}
     ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.c)
 endif(BUILD_MPIN OR BUILD_WCC)
+
+file(COPY "rsa_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+set(DEST_SOURCES_AMCL_CORE ${DEST_SOURCES_AMCL_CORE}
+  ${CMAKE_CURRENT_BINARY_DIR}/rsa_support.c)
+
+file(COPY "ecdh_support.c" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+set(DEST_SOURCES_AMCL_CORE ${DEST_SOURCES_AMCL_CORE}
+  ${CMAKE_CURRENT_BINARY_DIR}/ecdh_support.c)
 
 message(STATUS "Build libamcl_core")
 add_library(amcl_core ${LIB_TYPE} ${DEST_SOURCES_AMCL_CORE})
@@ -372,8 +513,53 @@ if(BUILD_X509)
   endforeach(RSA)
   target_link_libraries (amcl_x509 ${link_x509})
 
-  set(INSTALL_LIBS ${INSTALL_LIBS} amcl_x509)
+  install (TARGETS amcl_x509 DESTINATION lib PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
 endif(BUILD_X509)
+
+# Install libs
+install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
+        OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_WRITE GROUP_READ
+        WORLD_WRITE WORLD_READ WORLD_EXECUTE)
+
+# Copy built libs to wrappers/go to allow testing without
+# having to install the libs.
+if (BUILD_GO AND BUILD_SHARED_LIBS)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    add_custom_command(
+                TARGET amcl_core
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    add_custom_command(
+                TARGET amcl_core
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    add_custom_command(
+                TARGET amcl_core
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+endif (BUILD_GO AND BUILD_SHARED_LIBS)
+
+# Static build
+if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    add_custom_command(
+                TARGET amcl_core
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
+
 
 
 # # Copy built libs to wrappers/python to allow testing without
@@ -490,207 +676,4 @@ endif(BUILD_X509)
 
 
 # endif (BUILD_PYTHON AND BUILD_SHARED_LIBS)
-
-
-# # Copy built libs to wrappers/go to allow testing without
-# # having to install the libs.
-# if (BUILD_GO AND BUILD_SHARED_LIBS)
-
-#   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-#     message(STATUS "Copy libs to wrappers/go for testing")
-#     add_custom_command(
-#                 TARGET amcl_core
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_rsa
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_ecc
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_ecc.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_curve
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_curve.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     if(BUILD_MPIN OR BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_pairing
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_pairing.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN OR BUILD_WCC)
-
-#     if(BUILD_MPIN)
-#       add_custom_command(
-#                   TARGET amcl_mpin
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_mpin.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN)
-
-#     if(BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_wcc
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_wcc.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_WCC)  
-
-#   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-#   if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-#     message(STATUS "Copy libs to wrappers/go for testing")
-#     add_custom_command(
-#                 TARGET amcl_core
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_rsa
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_ecc
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_ecc.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_curve
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_curve.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     if(BUILD_MPIN OR BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_pairing
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_pairing.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN OR BUILD_WCC)
-
-#     if(BUILD_MPIN)
-#       add_custom_command(
-#                   TARGET amcl_mpin
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_mpin.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN)
-
-#     if(BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_wcc
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_wcc.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_WCC)
-
-#   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-#   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
-#     message(STATUS "Copy libs to wrappers/go for testing")
-#     add_custom_command(
-#                 TARGET amcl_core
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_rsa
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_ecc
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_ecc.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_curve
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_curve.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     if(BUILD_MPIN OR BUILD_WCC)
-#         add_custom_command(
-#                     TARGET amcl_pairing
-#                     POST_BUILD
-#                     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_pairing.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN OR BUILD_WCC)
-
-#     if(BUILD_MPIN)
-#       add_custom_command(
-#                   TARGET amcl_mpin
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_mpin.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN)
-
-#     if(BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_wcc
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_wcc.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_WCC)  
-
-
-#   endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
-
-# endif (BUILD_GO AND BUILD_SHARED_LIBS)
-
-# # Static build
-# if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-
-#   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-#     message(STATUS "Copy libs to wrappers/go for testing")
-#     add_custom_command(
-#                 TARGET amcl_core
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_core.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_rsa
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_rsa.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_ecc
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_ecc.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     add_custom_command(
-#                 TARGET amcl_curve
-#                 POST_BUILD
-#                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_curve.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-
-#     if(BUILD_MPIN OR BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_pairing
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_pairing.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN OR BUILD_WCC)
-
-#     if(BUILD_MPIN)
-#       add_custom_command(
-#                   TARGET amcl_mpin
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_mpin.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_MPIN)
-
-#     if(BUILD_WCC)
-#       add_custom_command(
-#                   TARGET amcl_wcc
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/libamcl_wcc.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-#     endif(BUILD_WCC)  
-
-#   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-# endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-
-# Install libs
-install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_WRITE GROUP_READ
-        WORLD_WRITE WORLD_READ WORLD_EXECUTE)
 
