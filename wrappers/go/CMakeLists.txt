@@ -72,10 +72,9 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
   # Configure go ecdsa test
   file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_ZZZ_test.go" tempc)
   string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-  string(CONFIGURE "${tempc}" tempc)
   file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}_test.go" "${tempc}")
 
-	INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go ecdsa_${tc}_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+	INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
 	  OWNER_WRITE OWNER_READ OWNER_EXECUTE
 	  GROUP_READ GROUP_EXECUTE
 	  WORLD_READ WORLD_EXECUTE)
@@ -91,10 +90,9 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
 		  # Configure go mpin_dvs test
 		  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_dvs_ZZZ_test.go" tempc)
 		  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-		  string(CONFIGURE "${tempc}" tempc)
 		  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/mpin_dvs_${tc}_test.go" "${tempc}")
 
-	    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.go mpin_dvs_${tc}_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+	    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
@@ -109,10 +107,9 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
 		  # Configure go mpin test
 		  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_ZZZ_test.go" tempc)
 		  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-		  string(CONFIGURE "${tempc}" tempc)
 		  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/mpin_${tc}_test.go" "${tempc}")
 
-		  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.go mpin_${tc}_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+		  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
@@ -131,10 +128,9 @@ function(RSA_GOLANG_SET tb tff nb base ml)
   # Configure go rsa test
   file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/rsa_WWW_test.go" tempc)
   string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
-  string(CONFIGURE "${tempc}" tempc)
   file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/rsa_${tff}_test.go" "${tempc}")
 
- INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/rsa_${tff}.go rsa_${tff}_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+ INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/rsa_${tff}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)

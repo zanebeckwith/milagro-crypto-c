@@ -64,7 +64,7 @@ func main() {
 	fmt.Printf("Generating public/private key pair...\n\n")
 
 	// Generate ECC Private Key
-	PrivKey := amcl.PBKDF2(amcl.SHA256, PassPhrase[:], Salt[:], 1000, amcl.EGS)
+	PrivKey := amcl.PBKDF2(amcl.SHA256, PassPhrase[:], Salt[:], 1000, amcl.EGS_ZZZ)
 
 	// Destroy Private Key
 	defer amcl.CleanMemory(PrivKey[:])
