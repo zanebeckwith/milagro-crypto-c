@@ -38,8 +38,8 @@ const PFS_ZZZ int = int(C.PFS_ZZZ)
 const hashBytes int = int(C.PFS_ZZZ)
 const IVS int = 12
 const G1S_ZZZ = 2*PFS_ZZZ + 1
-const G2S_ZZZ = 4*PFS_ZZZ
-const GTS_ZZZ = 12*PFS_ZZZ
+const G2S_ZZZ = 4 * PFS_ZZZ
+const GTS_ZZZ = 12 * PFS_ZZZ
 
 const HASH_TYPE_MPIN = SHA256
 
@@ -622,7 +622,7 @@ func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpin
 		pmessage = GetOctet(messageStr)
 		messageOct = &pmessage
 	}
-	if (!Kangaroo) {
+	if !Kangaroo {
 		EOct = nil
 		FOct = nil
 	} else {
@@ -640,7 +640,7 @@ func Server_ZZZ(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpin
 	HTID = OctetToBytes(&HTIDOct)
 	y = OctetToBytes(&yOct)
 
-	if (!Kangaroo) {
+	if !Kangaroo {
 		return errorCode, HID[:], HTID[:], y[:], nil, nil
 	} else {
 		E = OctetToBytes(EOct)

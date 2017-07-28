@@ -176,8 +176,11 @@ int main(int argc, char** argv)
             FP_YYY_reduce(&FP2aux1.b);
             if(FP2_YYY_equals(&FP2aux1,&FP2_1) != 1)
             {
-                printf("\ncomputed "); FP2_YYY_output(&FP2aux1);
-                printf("\nexpected "); FP2_YYY_output(&FP2_1);printf("\n");
+                printf("\ncomputed ");
+                FP2_YYY_output(&FP2aux1);
+                printf("\nexpected ");
+                FP2_YYY_output(&FP2_1);
+                printf("\n");
                 printf("ERROR in generating FP_YYY from two BIGs, line %d\n",i);
                 exit(EXIT_FAILURE);
             }

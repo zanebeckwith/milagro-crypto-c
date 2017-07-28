@@ -5,8 +5,8 @@
 
 // BIG stuff
 
-#define MODBYTES_XXX @NB@  
-#define BASEBITS_XXX @BASE@ 
+#define MODBYTES_XXX @NB@
+#define BASEBITS_XXX @BASE@
 
 
 #endif

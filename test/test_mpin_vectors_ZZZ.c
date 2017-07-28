@@ -178,10 +178,10 @@ int main(int argc, char** argv)
             }
             else if (!OCT_comp(&rtSS1,&SS1))
             {
-            	printf("rtSS1: 0x");
-            	OCT_output(&rtSS1);
-            	printf("  SS1: 0x");
-            	OCT_output(&SS1);
+                printf("rtSS1: 0x");
+                OCT_output(&rtSS1);
+                printf("  SS1: 0x");
+                OCT_output(&SS1);
                 printf("ERROR generating server secret, line %d\n",i);
                 exit(EXIT_FAILURE);
             }

@@ -76,7 +76,7 @@ int main()
     BIG_XXX_rcopy(y,CURVE_Gy_ZZZ);
     ECP_ZZZ_set(&G,x,y);
 
-    
+
     BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
     BIG_XXX_randomnum(s,r,&RNG);
     ECP_ZZZ_copy(&P,&G);
@@ -87,25 +87,27 @@ int main()
         printf("FAILURE - rG!=O\n");
         return 0;
     }
-    
+
     iterations=0;
     start=clock();
-    do {
+    do
+    {
         ECP_ZZZ_copy(&P,&G);
         PAIR_ZZZ_G1mul(&P,s);
 
         iterations++;
         elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
-    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    }
+    while (elapsed<MIN_TIME || iterations<MIN_ITERS);
     elapsed=1000.0*elapsed/iterations;
     printf("G1 mul              - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-    
-    FP_YYY_rcopy(&(wx.a),CURVE_Pxa_ZZZ); 
-    FP_YYY_rcopy(&(wx.b),CURVE_Pxb_ZZZ); 
-    FP_YYY_rcopy(&(wy.a),CURVE_Pya_ZZZ); 
-    FP_YYY_rcopy(&(wy.b),CURVE_Pyb_ZZZ);     
+
+    FP_YYY_rcopy(&(wx.a),CURVE_Pxa_ZZZ);
+    FP_YYY_rcopy(&(wx.b),CURVE_Pxb_ZZZ);
+    FP_YYY_rcopy(&(wy.a),CURVE_Pya_ZZZ);
+    FP_YYY_rcopy(&(wy.b),CURVE_Pyb_ZZZ);
     ECP2_ZZZ_set(&W,&wx,&wy);
 
     ECP2_ZZZ_copy(&Q,&W);
@@ -119,13 +121,15 @@ int main()
 
     iterations=0;
     start=clock();
-    do {
+    do
+    {
         ECP2_ZZZ_copy(&Q,&W);
         PAIR_ZZZ_G2mul(&Q,s);
 
         iterations++;
         elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
-    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    }
+    while (elapsed<MIN_TIME || iterations<MIN_ITERS);
     elapsed=1000.0*elapsed/iterations;
     printf("G2 mul              - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
@@ -145,13 +149,15 @@ int main()
 
     iterations=0;
     start=clock();
-    do {
+    do
+    {
         FP12_YYY_copy(&g,&w);
         PAIR_ZZZ_GTpow(&g,s);
 
         iterations++;
         elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
-    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    }
+    while (elapsed<MIN_TIME || iterations<MIN_ITERS);
     elapsed=1000.0*elapsed/iterations;
     printf("GT pow              - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
@@ -160,39 +166,45 @@ int main()
 
     iterations=0;
     start=clock();
-    do {
+    do
+    {
         FP12_YYY_compow(&cm,&g,s,r);
         iterations++;
         elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
-    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    }
+    while (elapsed<MIN_TIME || iterations<MIN_ITERS);
     elapsed=1000.0*elapsed/iterations;
     printf("GT pow (compressed) - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
     iterations=0;
     start=clock();
-    do {
+    do
+    {
         PAIR_ZZZ_ate(&w,&Q,&P);
         iterations++;
         elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
-    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    }
+    while (elapsed<MIN_TIME || iterations<MIN_ITERS);
     elapsed=1000.0*elapsed/iterations;
     printf("PAIRing ATE         - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
     iterations=0;
     start=clock();
-    do {
+    do
+    {
         FP12_YYY_copy(&g,&w);
         PAIR_ZZZ_fexp(&g);
         iterations++;
         elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
-    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    }
+    while (elapsed<MIN_TIME || iterations<MIN_ITERS);
     elapsed=1000.0*elapsed/iterations;
     printf("PAIRing FEXP        - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-    ECP_ZZZ_copy(&P,&G);  
+    ECP_ZZZ_copy(&P,&G);
     ECP2_ZZZ_copy(&Q,&W);
 
     PAIR_ZZZ_G1mul(&P,s);

@@ -38,8 +38,8 @@ package amcl
 import "C"
 
 // RSA Constant
-const RFS_WWW int = int(C.RFS_WWW)                     // RFS_WWW is the RSA Public Key Size in bytes
-const FFLEN_WWW int = int(C.FFLEN_WWW)                 // FFLEN_WWW consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+const RFS_WWW int = int(C.RFS_WWW)     // RFS_WWW is the RSA Public Key Size in bytes
+const FFLEN_WWW int = int(C.FFLEN_WWW) // FFLEN_WWW consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
 
 const HASH_TYPE_RSA_WWW int = int(C.HASH_TYPE_RSA_WWW) // HASH_TYPE_RSA_WWW is the chosen Hash algorithm
 

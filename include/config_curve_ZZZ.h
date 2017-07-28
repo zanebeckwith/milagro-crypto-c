@@ -6,11 +6,11 @@
 
 // ECP stuff
 
-#define CURVETYPE_ZZZ @CT@  
+#define CURVETYPE_ZZZ @CT@
 #define PAIRING_FRIENDLY_ZZZ @PF@
 
 /*
-#define CURVETYPE_ZZZ EDWARDS 
+#define CURVETYPE_ZZZ EDWARDS
 #define PAIRING_FRIENDLY_ZZZ NOT
 */
 

@@ -5,7 +5,7 @@
 
 /* Auxiliary Functions */
 
-extern void ehashit(int ,octet *,int ,octet *,octet *,int);
+extern void ehashit(int,octet *,int,octet *,octet *,int);
 
 /**	@brief hash an octet into another octet
  *
@@ -76,4 +76,4 @@ extern int AES_CBC_IV0_DECRYPT(octet *K,octet *C,octet *P);
 	@return 0 or an error code
  */
 
- #endif
+#endif

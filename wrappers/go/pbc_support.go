@@ -314,4 +314,3 @@ func AesGcmDecrypt(K, IV, H, C []byte) (P, T []byte, err error) {
 
 	return P, T, nil
 }
-

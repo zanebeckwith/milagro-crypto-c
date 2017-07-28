@@ -5,7 +5,7 @@
 
 #define TIME_SLOT_MINUTES 1440  /**< Time Slot = 1 day */
 
-extern void mhashit(int ,int ,octet *,octet *);
+extern void mhashit(int,int,octet *,octet *);
 
 
 /**	@brief Supply today's date as days from the epoch

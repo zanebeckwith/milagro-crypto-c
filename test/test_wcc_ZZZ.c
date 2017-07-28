@@ -131,7 +131,8 @@ int main(int argc, char** argv)
     /* initialise random number generator */
     CREATE_CSPRNG(&RNG,&SEED);
 
-    printf("SEED: 0x");OCT_output(&SEED);
+    printf("SEED: 0x");
+    OCT_output(&SEED);
 
     /* TA: Generate master secret  */
     rtn = WCC_ZZZ_RANDOM_GENERATE(&RNG,&MS);
@@ -141,7 +142,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    printf("MS: 0x");OCT_output(&MS);
+    printf("MS: 0x");
+    OCT_output(&MS);
 
     // Alice's ID
     OCT_jstring(&IdA,"alice@miracl.com");
@@ -174,7 +176,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    printf("X: 0x");OCT_output(&X);
+    printf("X: 0x");
+    OCT_output(&X);
 
     rtn = WCC_ZZZ_GET_G1_MULTIPLE(hash,hashDoneOff,&X,&IdA,&PaG1);
     if (rtn != 0)
@@ -246,10 +249,10 @@ int main(int argc, char** argv)
 
     if (!OCT_comp(&K1,&K2))
     {
-    	printf("K1: 0x");
-    	OCT_output(&K1);
-    	printf("K2: 0x");
-    	OCT_output(&K2);
+        printf("K1: 0x");
+        OCT_output(&K1);
+        printf("K2: 0x");
+        OCT_output(&K2);
         printf("FAILURE No Time Permit Test. OCT_comp(&K1,&K2)\n");
         return 1;
     }
