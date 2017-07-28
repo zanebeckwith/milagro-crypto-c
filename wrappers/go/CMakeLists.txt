@@ -56,33 +56,40 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/rsa_support.go DESTINATION "${GO_PATH}
   GROUP_READ GROUP_EXECUTE
   WORLD_READ WORLD_EXECUTE)
 
-# Configure ecdh_support wrapper
-configure_file (
-	"${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_support.go"
-	"${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_support.go"
-)
+if(NOT(AMCL_CURVE MATCHES "C25519"))
 
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecdsa_support.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
-  OWNER_WRITE OWNER_READ OWNER_EXECUTE
-  GROUP_READ GROUP_EXECUTE
-  WORLD_READ WORLD_EXECUTE)
+	# Configure ecdh_support wrapper
+	configure_file (
+		"${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_support.go"
+		"${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_support.go"
+	)
 
-function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
-  # Configure go ecdsa wrapper
-  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_ZZZ.go" tempc)
-  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-  string(CONFIGURE "${tempc}" tempc)
-  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go" "${tempc}")
-
-  # Configure go ecdsa test
-  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_ZZZ_test.go" tempc)
-  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}_test.go" "${tempc}")
-
-	INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecdsa_support.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
 	  OWNER_WRITE OWNER_READ OWNER_EXECUTE
 	  GROUP_READ GROUP_EXECUTE
 	  WORLD_READ WORLD_EXECUTE)
+
+endif(NOT(AMCL_CURVE MATCHES "C25519"))
+
+function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
+
+	if(NOT(AMCL_CURVE MATCHES "C25519"))
+	  # Configure go ecdsa wrapper
+	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_ZZZ.go" tempc)
+	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+	  string(CONFIGURE "${tempc}" tempc)
+	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go" "${tempc}")
+
+	  # Configure go ecdsa test
+	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_ZZZ_test.go" tempc)
+	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}_test.go" "${tempc}")
+
+		INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+		  OWNER_WRITE OWNER_READ OWNER_EXECUTE
+		  GROUP_READ GROUP_EXECUTE
+		  WORLD_READ WORLD_EXECUTE)
+	endif(NOT(AMCL_CURVE MATCHES "C25519"))
 
 	if(BUILD_MPIN AND NOT(${pf} STREQUAL "NOT"))
 		if(USE_DVS)

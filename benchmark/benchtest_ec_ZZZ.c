@@ -34,7 +34,10 @@
 int main()
 {
     csprng RNG;
-    BIG_XXX s,r,x,y;
+#if CURVETYPE_ZZZ!=MONTGOMERY
+    BIG_XXX y;
+#endif
+    BIG_XXX s,r,x;
     ECP_ZZZ P,G;
     int i,iterations;
     clock_t start;
