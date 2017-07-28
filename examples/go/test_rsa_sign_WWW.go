@@ -58,7 +58,7 @@ func main() {
 	fmt.Printf("%s\n\n", MESSAGE[:])
 
 	// Signing message
-	rtn, C := amcl.PKCS15(amcl.HASH_TYPE_RSA, MESSAGE)
+	rtn, C := amcl.PKCS15(amcl.HASH_TYPE_RSA_WWW, amcl.RFS_WWW, MESSAGE)
 	if rtn != 1 {
 		fmt.Println("PKCS15 Error:", rtn)
 		return

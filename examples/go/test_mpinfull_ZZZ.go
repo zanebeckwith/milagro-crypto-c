@@ -149,7 +149,7 @@ func main() {
 	defer amcl.CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, amcl.G1S)
+	CS := make([]byte, amcl.G1S_ZZZ)
 	rtn, CS = amcl.RecombineG1_ZZZ(CS1[:], CS2[:])
 	if rtn != 0 {
 		fmt.Println("RecombineG1_ZZZ Error:", rtn)
@@ -279,7 +279,7 @@ func main() {
 	defer amcl.CleanMemory(T[:])
 
 	// Hash all values
-	HM := amcl.HashAll_ZZZ(HASH_TYPE_MPIN, HCID[:], U[:], nil, V[:], Y2[:], Z[:], T[:])
+	HM := amcl.HashAll(HASH_TYPE_MPIN, HCID[:], U[:], nil, V[:], Y2[:], Z[:], T[:])
 
 	// Destroy HM
 	defer amcl.CleanMemory(HM[:])

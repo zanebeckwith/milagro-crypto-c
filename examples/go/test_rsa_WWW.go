@@ -58,7 +58,7 @@ func main() {
 	RSA_PrivKey, RSA_PubKey := amcl.RSAKeyPair_WWW(&rng, 65537, nil, nil)
 
 	// OAEP encode MESSAGE to e
-	rtn, F := amcl.OAEPencode(amcl.HASH_TYPE_RSA, MESSAGE, &rng, nil)
+	rtn, F := amcl.OAEPencode(amcl.HASH_TYPE_RSA_WWW, amcl.RFS_WWW, MESSAGE, &rng, nil)
 	if rtn != 1 {
 		fmt.Println("OAEPencode Error:", rtn)
 		return
@@ -80,7 +80,7 @@ func main() {
 	fmt.Printf("%x\n\n", ML[:])
 
 	// OAEP decode MESSAGE
-	rtn, MESSAGEgot := amcl.OAEPdecode(amcl.HASH_TYPE_RSA, nil, ML[:])
+	rtn, MESSAGEgot := amcl.OAEPdecode(amcl.HASH_TYPE_RSA_WWW, nil, ML[:])
 	if rtn != 1 {
 		fmt.Println("OAEPdecode Error:", rtn)
 		return

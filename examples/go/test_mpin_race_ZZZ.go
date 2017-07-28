@@ -120,7 +120,7 @@ func run(rng *amcl.RandNG) {
 	defer amcl.CleanMemory(CS2[:])
 
 	// Combine client secret shares
-	CS := make([]byte, amcl.G1S)
+	CS := make([]byte, amcl.G1S_ZZZ)
 	rtn, CS = amcl.RecombineG1_ZZZ(CS1[:], CS2[:])
 	if rtn != 0 {
 		fmt.Println("RecombineG1_ZZZ Error:", rtn, SS, CS)
