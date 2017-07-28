@@ -126,6 +126,10 @@ NOTE: The build can be configured by setting flags on the command line, for exam
     cmake -DAMCL_CHUNK=64 ../..
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl -D AMCL_CHUNK=64 -D BUILD_WCC=on ../..
 
+It is possible also to build the library supporting more than one elliptic curve and more  than one RSA security level, for example
+
+	cmake -DAMCL_CURVE=BN254CX,NIST254 -DAMCL_RSA=2048,3072 ../..
+
 To list other available CMake options, use:
 
     cmake -LH

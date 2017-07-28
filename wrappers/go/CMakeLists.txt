@@ -51,16 +51,21 @@ configure_file (
 	"${PROJECT_BINARY_DIR}/wrappers/go/rsa_support.go"
 )
 
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/rsa_support.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+  OWNER_WRITE OWNER_READ OWNER_EXECUTE
+  GROUP_READ GROUP_EXECUTE
+  WORLD_READ WORLD_EXECUTE)
+
 # Configure ecdh_support wrapper
 configure_file (
 	"${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_support.go"
 	"${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_support.go"
 )
 
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/rsa_support.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
-	OWNER_WRITE OWNER_READ OWNER_EXECUTE
-	GROUP_READ GROUP_EXECUTE
-	WORLD_READ WORLD_EXECUTE)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecdsa_support.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+  OWNER_WRITE OWNER_READ OWNER_EXECUTE
+  GROUP_READ GROUP_EXECUTE
+  WORLD_READ WORLD_EXECUTE)
 
 function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
   # Configure go ecdsa wrapper

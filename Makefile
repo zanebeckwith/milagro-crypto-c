@@ -42,10 +42,8 @@ RELEASE=$(shell cat RELEASE)
 include $(PROJECTROOT)/config.mk
 
 # Common CMake options for building the language wrappers
-WRAPPYTHON=""
-#"-DBUILD_PYTHON=on"
-WRAPGOLANG=""
-#"-DBUILD_GO=on"
+WRAPPYTHON="-DBUILD_PYTHON=on"
+WRAPGOLANG="-DBUILD_GO=on"
 
 # Space-separated list of build options (grouped by type):
 # <NAME>:<DOUBLECOMMA-SEPARATED_LIST_OF_CMAKE_OPTIONS>
@@ -195,12 +193,9 @@ ifeq ($(CMAKE_BUILD_TYPE),Coverage)
 	-DBUILD_GO=$(AMCL_BUILD_GO) \
 	-DAMCL_CHUNK=$(AMCL_CHUNK) \
 	-DAMCL_CURVE=$(AMCL_CURVE) \
-	-DAMCL_CURVETYPE=$(AMCL_CURVETYPE) \
-	-DAMCL_FFLEN=$(AMCL_FFLEN) \
 	-DBUILD_MPIN=$(AMCL_BUILD_MPIN) \
 	-DBUILD_WCC=$(AMCL_BUILD_WCC) \
 	-DBUILD_DOXYGEN=$(AMCL_BUILD_DOXYGEN) \
-	-DUSE_ANONYMOUS=$(AMCL_USE_ANONYMOUS) \
 	-DUSE_DVS=$(AMCL_USE_DVS) \
 	-DAMCL_MAXPIN=$(AMCL_MAXPIN) \
 	-DAMCL_PBLEN=$(AMCL_PBLEN) \
@@ -227,8 +222,6 @@ else
 	-DBUILD_GO=$(AMCL_BUILD_GO) \
 	-DAMCL_CHUNK=$(AMCL_CHUNK) \
 	-DAMCL_CURVE=$(AMCL_CURVE) \
-	-DAMCL_CURVETYPE=$(AMCL_CURVETYPE) \
-	-DAMCL_FFLEN=$(AMCL_FFLEN) \
 	-DBUILD_MPIN=$(AMCL_BUILD_MPIN) \
 	-DBUILD_WCC=$(AMCL_BUILD_WCC) \
 	-DBUILD_DOXYGEN=$(AMCL_BUILD_DOXYGEN) \
@@ -260,7 +253,6 @@ format:
 	astyle --style=allman --recursive --suffix=none 'examples/*.c'
 	astyle --style=allman --recursive --suffix=none 'benchmark/*.c'
 	find ./wrappers/go -type f -name "*.go" -exec gofmt -s -w {} \;
-	find ./wrappers/go -type f -name "*.go.in" -exec gofmt -s -w {} \;
 	autopep8 --in-place --aggressive --aggressive ./wrappers/python/*.py
 
 # Remove any build artifact
@@ -282,7 +274,7 @@ qa:
 build_group:
 	@parallel --no-notice --verbose make build_qa_item ITEM={} ::: ${${BUILD_GROUP}}
 
-# Build the project using one of the pre-defined targets (example: "make build TYPE=LINUX_64BIT_BN254CX_WRAPPERS")
+# Build the project using one of the pre-defined targets (example: "make build TYPE=LINUX_64BIT_BN254CX")
 build:
 	make build_item ITEM=$(filter ${TYPE}:%,$(BUILDS))
 
