@@ -29,9 +29,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	USE_ANONYMOUS = false
-)
 
 func TestKeyEscrowLess_ZZZ(t *testing.T) {
 	want := 0
@@ -139,12 +136,8 @@ func TestKeyEscrowLess_ZZZ(t *testing.T) {
 	// Destroy X
 	defer CleanMemory(X[:])
 
-	// Authenticate
-	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], HCID[:], Pa, nil, false)
-	} else {
-		got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
-	}
+	got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
+
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -254,11 +247,8 @@ func TestKeyEscrowLessRandom_ZZZ(t *testing.T) {
 	defer CleanMemory(X[:])
 
 	// Authenticate
-	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], HCID[:], Pa, nil, false)
-	} else {
-		got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
-	}
+	got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
+
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -388,11 +378,8 @@ func TestKeyEscrowWrongPK_ZZZ(t *testing.T) {
 
 	timeValue += 10
 	// Authenticate
-	if USE_ANONYMOUS {
-		got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], HCID[:], Pa, nil, false)
-	} else {
-		got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], Pa, nil, false)
-	}
+	got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], Pa, nil, false)
+
 	assert.Equal(t, want, got, "Should be equal")
 }
 
@@ -504,11 +491,8 @@ func TestKeyEscrowLessTwoPassWrongPK_ZZZ(t *testing.T) {
 
 	// Server Pass 1
 	var HID []byte
-	if USE_ANONYMOUS {
-		HID, _ = Server1_ZZZ(HASH_TYPE_MPIN, 0, HCID)
-	} else {
-		HID, _ = Server1_ZZZ(HASH_TYPE_MPIN, 0, ID)
-	}
+	HID, _ = Server1_ZZZ(HASH_TYPE_MPIN, 0, ID)
+
 	_, Y := RandomGenerate_ZZZ(&rng)
 
 	// Destroy HID
@@ -633,11 +617,8 @@ func TestKeyEscrowLessTwoPASS_ZZZ(t *testing.T) {
 
 	// Server Pass 1
 	var HID []byte
-	if USE_ANONYMOUS {
-		HID, _ = Server1_ZZZ(HASH_TYPE_MPIN, 0, HCID)
-	} else {
-		HID, _ = Server1_ZZZ(HASH_TYPE_MPIN, 0, ID)
-	}
+	HID, _ = Server1_ZZZ(HASH_TYPE_MPIN, 0, ID)
+
 	_, Y := RandomGenerate_ZZZ(&rng)
 
 	// Destroy HID

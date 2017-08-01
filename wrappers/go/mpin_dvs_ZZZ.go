@@ -326,7 +326,7 @@ func ExtractPIN_ZZZ(hashType int, mpinId []byte, PIN int, clientSecret []byte) (
 
 /*
 
-Client performs client side of the one-Pass version of the M-Pin protocol. If Time Permits are
+Client_ZZZ performs client side of the one-Pass version of the M-Pin protocol. If Time Permits are
 disabled then set epoch_date = 0.In this case UT is not generated and can be set to nil.
 If Time Permits are enabled, and PIN error detection is OFF, U is not generated and
 can be set to nil. If Time Permits are enabled and PIN error detection is ON then U

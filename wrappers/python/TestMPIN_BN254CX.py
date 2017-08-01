@@ -130,7 +130,7 @@ class TestMPIN(unittest.TestCase):
 
             # Server second pass
             rtn, E, F = mpin_BN254CX.server_2(
-                date, HID, HTID, y, server_secret, u, ut, v)
+                date, HID, HTID, y, server_secret, u, ut, v, None)
             self.assertEqual(rtn, vector['SERVER_OUTPUT'])
 
 

@@ -64,9 +64,9 @@ extern int MPIN_ZZZ_CLIENT_1(int h,int d,octet *ID,csprng *R,octet *x,int pin,oc
 extern int MPIN_ZZZ_RANDOM_GENERATE(csprng *R,octet *S);
 extern int MPIN_ZZZ_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa);
 extern int MPIN_ZZZ_CLIENT_2(octet *x,octet *y,octet *V);
-extern int MPIN_ZZZ_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t);
+extern int MPIN_ZZZ_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t,octet *Pa);
 extern void MPIN_ZZZ_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
-extern int MPIN_ZZZ_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F);
+extern int MPIN_ZZZ_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *Pa);
 extern int MPIN_ZZZ_RECOMBINE_G1(octet *Q1,octet *Q2,octet *Q);
 extern int MPIN_ZZZ_RECOMBINE_G2(octet *P1,octet *P2,octet *P);
 extern int MPIN_ZZZ_KANGAROO(octet *E,octet *F);
@@ -881,7 +881,7 @@ def server_1(hash_type, epoch_date, mpin_id):
     return HID_hex.decode("hex"), HTID_hex.decode("hex")
 
 
-def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
+def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v, pa):
     """Perform third pass on the server side of the 3-pass version of the M-Pin protocol
 
     Perform server side of the three-pass version of the M-Pin protocol. If Time
@@ -900,6 +900,7 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
         u: u = x.H(ID)
         ut: ut = x.(H(ID)+H(epoch_date|H(ID)))
         v: v = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
+        pa: client's public key for key-escrow-less
 
     Returns::
 
@@ -917,6 +918,10 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
     u1, u1_val = make_octet(None, u)
     ut1, ut1_val = make_octet(None, ut)
     v1, v1_val = make_octet(None, v)
+    if pa is None:
+        pa1 = ffi.NULL
+    else:
+        pa1, pa1_val = make_octet(None, pa)
 
     e1, e1_val = make_octet(GT)
     f1, f1_val = make_octet(GT)
@@ -931,7 +936,8 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
         ut1,
         v1,
         e1,
-        f1)
+        f1,
+        pa1)
 
     e_hex = to_hex(e1)
     f_hex = to_hex(f1)
@@ -951,7 +957,7 @@ def server_2(epoch_date, HID, HTID, y, server_secret, u, ut, v):
 
 
 def server(hash_type, epoch_date, server_secret,
-           u, ut, v, mpin_id, message, epoch_time):
+           u, ut, v, mpin_id, message, epoch_time, pa):
     """Perform server side of the one-pass version of the M-Pin protocol
 
     Perform server side of the one-pass version of the M-Pin protocol. If Time
@@ -970,6 +976,7 @@ def server(hash_type, epoch_date, server_secret,
         mpin_id: M-Pin ID or hash of the M-Pin ID in anonymous mode
         message: message to be signed
         epoch_time: Epoch time in seconds
+        pa: client's public key for key-escrow-less
 
     Returns::
 
@@ -999,6 +1006,10 @@ def server(hash_type, epoch_date, server_secret,
     e1, e1_val = make_octet(GT)
     f1, f1_val = make_octet(GT)
     y1, y1_val = make_octet(PGS)
+    if pa is None:
+        pa1 = ffi.NULL
+    else:
+        pa1, pa1_val = make_octet(None, pa)
 
     error_code = libamcl_mpin_ZZZ.MPIN_ZZZ_SERVER(
         hash_type,
@@ -1014,7 +1025,8 @@ def server(hash_type, epoch_date, server_secret,
         f1,
         mpin_id1,
         message1,
-        epoch_time)
+        epoch_time,
+        pa1)
 
     HID_hex = to_hex(HID1)
     HTID_hex = to_hex(HTID1)
@@ -1397,7 +1409,6 @@ if __name__ == "__main__":
     TIME_PERMITS = True
     MPIN_ZZZ_FULL = True
     PIN_ERROR = True
-    USE_ANONYMOUS = False
 
     HASH_TYPE_MPIN = SHA256
 
@@ -1424,11 +1435,6 @@ if __name__ == "__main__":
     if DEBUG:
         print "mpin_id: %s" % mpin_id.encode("hex")
         print "hash_mpin_id: %s" % hash_mpin_id.encode("hex")
-
-    if USE_ANONYMOUS:
-        pID = hash_mpin_id
-    else:
-        pID = mpin_id
 
     # Generate master secret for MIRACL and Customer
     rtn, ms1 = random_generate(rng)
@@ -1536,7 +1542,7 @@ if __name__ == "__main__":
 
         # Server MPIN
         rtn, HID, HTID, E, F, y2 = server(
-            HASH_TYPE_MPIN, date, server_secret, u, ut, v, pID, None, epoch_time)
+            HASH_TYPE_MPIN, date, server_secret, u, ut, v, mpin_id, None, epoch_time)
         if DEBUG:
             print "y2 ", y2.encode("hex")
         if rtn != 0:
@@ -1596,7 +1602,7 @@ if __name__ == "__main__":
 
         # Server calculates H(ID) and H(T|H(ID)) (if time permits enabled),
         # and maps them to points on the curve HID and HTID resp.
-        HID, HTID = server_1(HASH_TYPE_MPIN, date, pID)
+        HID, HTID = server_1(HASH_TYPE_MPIN, date, mpin_id)
 
         # Server generates Random number y and sends it to Client
         rtn, y = random_generate(rng)
@@ -1672,7 +1678,7 @@ if __name__ == "__main__":
     del seed
     del mpin_id
     del hash_mpin_id
-    del pID
+    del mpin_id
     del ms1
     del ms2
     del ss1

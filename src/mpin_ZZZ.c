@@ -555,23 +555,15 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
     octet H= {0,sizeof(h),h};
     ECP_ZZZ P,R;
 
-#ifdef USE_ANONYMOUS
-    mapit(CID,&P);
-#else
     mhashit(sha,-1,CID,&H);
     mapit(&H,&P);
-#endif
 
     ECP_ZZZ_toOctet(HID,&P);  // new
 
     if (date)
     {
         //	if (HID!=NULL) ECP_ZZZ_toOctet(HID,&P);
-#ifdef USE_ANONYMOUS
-        mhashit(sha,date,CID,&H);
-#else
         mhashit(sha,date,&H,&H);
-#endif
         mapit(&H,&R);
         ECP_ZZZ_add(&P,&R);
         ECP_ZZZ_toOctet(HTID,&P);
@@ -581,11 +573,7 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 }
 
 /* Implement M-Pin on server side */
-#ifdef USE_DVS
 int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F,octet *Pa)
-#else
-int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
-#endif
 {
     BIG_XXX px,py,y;
     FP2_YYY qx,qy;
@@ -601,13 +589,11 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
 
     // key-escrow less scheme: use Pa instead of Q in pairing computation
     // Q left for backward compatiblity
-#ifdef USE_DVS
     if (Pa!=NULL)
     {
         if (!ECP2_ZZZ_fromOctet(&Q, Pa)) res=MPIN_INVALID_POINT;
     }
     else
-#endif
         if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
 
     if (res==0)
@@ -986,11 +972,7 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
 }
 
 /* One pass MPIN Server */
-#ifdef USE_DVS
 int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue,octet *Pa)
-#else
-int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue)
-#endif
 {
     int rtn=0;
     char m[M_SIZE];
@@ -1012,11 +994,7 @@ int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,o
 
     MPIN_ZZZ_GET_Y(sha,TimeValue,&M,Y);
 
-#ifdef USE_DVS
     rtn = MPIN_ZZZ_SERVER_2(date,HID,HTID,Y,sQ,U,UT,V,E,F,Pa);
-#else
-    rtn = MPIN_ZZZ_SERVER_2(date,HID,HTID,Y,sQ,U,UT,V,E,F);
-#endif
 
     if (rtn != 0)
         return rtn;

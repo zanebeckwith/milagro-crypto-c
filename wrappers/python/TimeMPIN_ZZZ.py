@@ -48,7 +48,6 @@ if __name__ == "__main__":
     TIME_PERMITS = True
     MPIN_FULL = True
     PIN_ERROR = True
-    USE_ANONYMOUS = False
 
     if TIME_PERMITS:
         date = mpin_ZZZ.today()
@@ -71,10 +70,7 @@ if __name__ == "__main__":
         print "mpin_id: %s" % mpin_id.encode("hex")
         print "hash_mpin_id: %s" % hash_mpin_id.encode("hex")
 
-    if USE_ANONYMOUS:
-        pID = hash_mpin_id
-    else:
-        pID = mpin_id
+    mpin_id = mpin_id
 
     # Generate master secret for MIRACL and Customer
     time_func('rtn, ms1 = mpin_ZZZ.random_generate(rng)', nIter)
@@ -193,10 +189,10 @@ if __name__ == "__main__":
 
         # Server MPIN
         time_func(
-            'rtn, HID, HTID, E, F, y2 = mpin_ZZZ.server(HASH_TYPE_MPIN, date, server_secret, u, ut, v, pID, None, epoch_time)',
+            'rtn, HID, HTID, E, F, y2 = mpin_ZZZ.server(HASH_TYPE_MPIN, date, server_secret, u, ut, v, mpin_id, None, epoch_time, None)',
             nIter)
         rtn, HID, HTID, E, F, y2 = mpin_ZZZ.server(
-            HASH_TYPE_MPIN, date, server_secret, u, ut, v, pID, None, epoch_time)
+            HASH_TYPE_MPIN, date, server_secret, u, ut, v, mpin_id, None, epoch_time, None)
         if DEBUG:
             print "y2 ", y2.encode("hex")
         if rtn != 0:
@@ -269,8 +265,8 @@ if __name__ == "__main__":
 
         # Server calculates H(ID) and H(T|H(ID)) (if time permits enabled),
         # and maps them to points on the curve HID and HTID resp.
-        time_func('HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, date, pID)', nIter)
-        HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, date, pID)
+        time_func('HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, date, mpin_id)', nIter)
+        HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, date, mpin_id)
 
         # Server generates Random number y and sends it to Client
         time_func('rtn, y = mpin_ZZZ.random_generate(rng)', nIter)
@@ -286,9 +282,9 @@ if __name__ == "__main__":
 
         # Server second pass
         time_func(
-            'rtn, E, F = mpin_ZZZ.server_2(date, HID, HTID, y, server_secret, u, ut, v)',
+            'rtn, E, F = mpin_ZZZ.server_2(date, HID, HTID, y, server_secret, u, ut, v, None)',
             nIter)
-        rtn, E, F = mpin_ZZZ.server_2(date, HID, HTID, y, server_secret, u, ut, v)
+        rtn, E, F = mpin_ZZZ.server_2(date, HID, HTID, y, server_secret, u, ut, v, None)
         if rtn != 0:
             print "ERROR: %s is not authenticated" % mpin_id
             if PIN_ERROR:

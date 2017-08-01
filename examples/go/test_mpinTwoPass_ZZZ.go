@@ -258,7 +258,7 @@ func main() {
 	/* Server Second Pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help Kangaroo_ZZZs to find error. */
 	/* If PIN error not required, set E and F = null */
 
-	rtn, E, F := amcl.Server2_ZZZ(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], true)
+	rtn, E, F := amcl.Server2_ZZZ(date, HID[:], HTID[:], nil, Y[:], SS[:], U[:], UT[:], V[:], true)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: Server2 rtn: %d\n", rtn)
 	}

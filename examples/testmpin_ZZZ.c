@@ -183,14 +183,6 @@ int mpin(csprng *RNG)
     pF=NULL;
 #endif
 
-    /* When set only send hashed IDs to server */
-    octet *pID;
-#ifdef USE_ANONYMOUS
-    pID = &HCID;
-#else
-    pID = &CLIENT_ID;
-#endif
-
 #ifdef SINGLE_PAS_ZZZS
     int timeValue;
     printf("MPIN Single PAS_ZZZs\n");
@@ -210,11 +202,7 @@ int mpin(csprng *RNG)
 
 
 
-#ifdef USE_DVS
-    rtn=MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue,NULL);
-#else
-    rtn=MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue);
-#endif
+    rtn=MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,&CLIENT_ID,NULL,timeValue,NULL);
 
 
 #ifdef FULL
@@ -238,7 +226,7 @@ int mpin(csprng *RNG)
 #endif
 
     /* Server calculates H(ID) and H(ID)+H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-    MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,date,pID,pHID,pHTID);
+    MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,date,&CLIENT_ID,pHID,pHTID);
 
     /* Server generates Random number Y and sends it to Client */
     MPIN_ZZZ_RANDOM_GENERATE(RNG,&Y);
@@ -258,11 +246,7 @@ int mpin(csprng *RNG)
     /* Server Second phase. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
     /* If PIN error not required, set E and F = NULL */
 
-#ifdef USE_DVS
     rtn=MPIN_ZZZ_SERVER_2(date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,NULL);
-#else
-    rtn=MPIN_ZZZ_SERVER_2(date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF);
-#endif
 
 #endif // SINGLE_PAS_ZZZS
 

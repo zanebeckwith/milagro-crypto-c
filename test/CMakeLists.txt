@@ -99,22 +99,24 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
     SMOKE_TEST ("test_big_consistency_${bd}" "test_big_consistency_${bd}.c" "amcl_curve_${tc}" "SUCCESS")
   endif()
 
-  if(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c"))
+  if(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c") AND NOT(${tf} STREQUAL "NUMS384E"))
     # Arithmetics test fp
     file(READ "test_fp_arithmetics_YYY.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c" "${tempc}")
     TV_TEST ("test_fp_arithmetics_${tf}" "test_fp_arithmetics_${tf}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/fp/test_vector_${tf}.txt" "")
-  endif(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c"))
+  endif(NOT(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_fp_arithmetics_${tf}.c") AND NOT(${tf} STREQUAL "NUMS384E"))
 
-  # Arithmetics test ecp
-  file(READ "test_ecp_arithmetics_ZZZ.c" tempc)
-  string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-  string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_ecp_arithmetics_${tc}.c" "${tempc}")
-  TV_TEST ("test_ecp_arithmetics_${tc}" "test_ecp_arithmetics_${tc}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/ecp/test_vector_${tc}.txt" "")
+  if(NOT(${tf} STREQUAL "NUMS256E" AND ${tf} STREQUAL "NUMS256E" AND ${tf} STREQUAL "NUMS384E"))
+    # Arithmetics test ecp
+    file(READ "test_ecp_arithmetics_ZZZ.c" tempc)
+    string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+    string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+    string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_ecp_arithmetics_${tc}.c" "${tempc}")
+    TV_TEST ("test_ecp_arithmetics_${tc}" "test_ecp_arithmetics_${tc}.c" "amcl_curve_${tc}" "SUCCESS" "${PROJECT_SOURCE_DIR}/testVectors/ecp/test_vector_${tc}.txt" "")
+  endif(NOT(${tf} STREQUAL "NUMS256E" AND ${tf} STREQUAL "NUMS256E" AND ${tf} STREQUAL "NUMS384E"))
 
   if(${tf} STREQUAL "NIST256")
     # Test ecdh with curve NIST256
@@ -307,23 +309,21 @@ function(CURVE_TESTS_SET tb tf tc nb base nbt m8 mt ct pf)
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpin_tp_${tc}.c" "${tempc}")
       SMOKE_TEST ("test_mpin_tp_${tc}" "test_mpin_tp_${tc}.c" "amcl_mpin_${tc}" "SUCCESS Error Code 0")
 
-      if(USE_DVS)
-      	# test DVS signature
-        file(READ "test_mpin_dvs_ZZZ.c" tempc)
-	      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-	      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-	      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-	      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpin_dvs_${tc}.c" "${tempc}")
-	      SMOKE_TEST ("test_mpin_dvs_${tf}" "test_mpin_dvs_${tc}.c" "amcl_mpin_${tc}" "SUCCESS Error Code 0")
+      # test DVS signature
+      file(READ "test_mpin_dvs_ZZZ.c" tempc)
+      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpin_dvs_${tc}.c" "${tempc}")
+      SMOKE_TEST ("test_mpin_dvs_${tf}" "test_mpin_dvs_${tc}.c" "amcl_mpin_${tc}" "SUCCESS Error Code 0")
 
-	      # test DVS signature with wrong public key
-	      file(READ "test_mpin_dvs_wrong_pk_ZZZ.c" tempc)
-	      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
-	      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
-	      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-	      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpin_dvs_wrong_pk_${tc}.c" "${tempc}")
-	      SMOKE_TEST ("test_mpin_dvs_wrong_pk_${tf}" "test_mpin_dvs_wrong_pk_${tc}.c" "amcl_mpin_${tc}" "FAILURE Signature Verification Error Code -19")
-      endif(USE_DVS)
+      # test DVS signature with wrong public key
+      file(READ "test_mpin_dvs_wrong_pk_ZZZ.c" tempc)
+      string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
+      string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
+      string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpin_dvs_wrong_pk_${tc}.c" "${tempc}")
+      SMOKE_TEST ("test_mpin_dvs_wrong_pk_${tf}" "test_mpin_dvs_wrong_pk_${tc}.c" "amcl_mpin_${tc}" "FAILURE Signature Verification Error Code -19")
 
        # test mpin random
       file(READ "test_mpin_random_ZZZ.c" tempc)

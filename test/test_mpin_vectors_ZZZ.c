@@ -137,8 +137,6 @@ int main(int argc, char** argv)
     char f[12*PFS_ZZZ];
     octet F= {0,sizeof(f),f};
 
-    octet *pID;
-
     fp = fopen(argv[1], "r");
     if (fp == NULL)
     {
@@ -460,13 +458,8 @@ int main(int argc, char** argv)
             linePtr = line + len;
             sscanf(linePtr,"%d\n",&SERVER_OUTPUT);
 // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
-// When set only send hashed IDs to server
-#ifdef USE_ANONYMOUS
-            pID = &HASH_MPIN_ID_HEX;
-#else
-            pID = &MPIN_ID_HEX;
-#endif
-            MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,DATE,pID,&HID,&HTID);
+
+            MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,DATE,&MPIN_ID_HEX,&HID,&HTID);
 // Client second PAS_ZZZs
             rtn = MPIN_ZZZ_CLIENT_2(&X,&Y,&rtSEC);
             if (rtn != 0)
@@ -480,11 +473,7 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
 // Server second PAS_ZZZs
-#ifdef USE_DVS
             rtn = MPIN_ZZZ_SERVER_2(DATE,&HID,&HTID,&Y,&SERVER_SECRET,&U,&UT,&V,&E,&F,NULL);
-#else
-            rtn = MPIN_ZZZ_SERVER_2(DATE,&HID,&HTID,&Y,&SERVER_SECRET,&U,&UT,&V,&E,&F);
-#endif
 
             if (rtn != SERVER_OUTPUT)
             {

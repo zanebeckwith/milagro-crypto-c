@@ -131,14 +131,6 @@ int main()
     HASH_ID(HASH_TYPE_MPIN_ZZZ,&ID,&HCID);
     OCT_output(&HCID);
 
-    /* When set only send hashed IDs to server */
-    octet *pID;
-#ifdef USE_ANONYMOUS
-    pID = &HCID;
-#else
-    pID = &ID;
-#endif
-
     /* Generate Client master secret for MIRACL and Customer */
     rtn = MPIN_ZZZ_RANDOM_GENERATE(&RNG,&MS1);
     if (rtn != 0)
@@ -254,7 +246,7 @@ int main()
     OCT_output(&SEC);
 
     /* Server: Verify message */
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&HM,TimeValue,&Pa);
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,&ID,&HM,TimeValue,&Pa);
     printf("Y2 = 0x");
     OCT_output(&Y2);
     if (rtn != 0)

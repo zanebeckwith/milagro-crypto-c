@@ -268,7 +268,7 @@ func main() {
 	defer amcl.CleanMemory(Z[:])
 
 	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := amcl.Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], true)
+	rtn, HID, HTID, Y2, E, F := amcl.Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], nil, MESSAGE[:], true)
 	if rtn != 0 {
 		fmt.Printf("FAILURE: SERVER rtn: %d\n", rtn)
 	}

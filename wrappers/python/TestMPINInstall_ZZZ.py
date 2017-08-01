@@ -119,7 +119,7 @@ class TestMPIN(unittest.TestCase):
 
         # Server second pass
         rtn, E, F = mpin_ZZZ.server_2(
-            self.date, HID, HTID, y, server_secret, u, ut, v)
+            self.date, HID, HTID, y, server_secret, u, ut, v, None)
         self.assertEqual(rtn, 0)
 
     def test_2(self):
@@ -191,7 +191,7 @@ class TestMPIN(unittest.TestCase):
 
         # Server second pass
         rtn, E, F = mpin_ZZZ.server_2(
-            self.date, HID, HTID, y, server_secret, u, ut, v)
+            self.date, HID, HTID, y, server_secret, u, ut, v, None)
         self.assertEqual(rtn, -19)
 
     def test_3(self):
@@ -264,7 +264,7 @@ class TestMPIN(unittest.TestCase):
         # Server second pass
         # v is equal to ut to model a bad token
         rtn, E, F = mpin_ZZZ.server_2(
-            self.date, HID, HTID, y, server_secret, u, ut, ut)
+            self.date, HID, HTID, y, server_secret, u, ut, ut, None)
         self.assertEqual(rtn, -19)
 
     def test_4(self):

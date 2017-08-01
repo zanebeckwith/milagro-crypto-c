@@ -117,14 +117,6 @@ int main()
     HASH_ID(HASH_TYPE_MPIN_ZZZ,&ID,&HCID);
     OCT_output(&HCID);
 
-    /* When set only send hashed IDs to server */
-    octet *pID;
-#ifdef USE_ANONYMOUS
-    pID = &HCID;
-#else
-    pID = &ID;
-#endif
-
     /* Generate Client master secret for MIRACL and Customer */
     rtn = MPIN_ZZZ_RANDOM_GENERATE(&RNG,&MS1);
     if (rtn != 0)
@@ -261,11 +253,7 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-#ifdef USE_DVS
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue,NULL);
-#else
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
-#endif
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,&M,TimeValue,NULL);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);
@@ -299,11 +287,8 @@ int main()
 
     /* Server  */
     TimeValue += 10;
-#ifdef USE_DVS
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue,NULL);
-#else
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
-#endif
+
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,&M,TimeValue,NULL);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);
@@ -340,11 +325,8 @@ int main()
     OCT_clear(&M);
     message = "bad message";
     OCT_jstring(&M,message);
-#ifdef USE_DVS
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue,NULL);
-#else
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
-#endif
+
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,&M,TimeValue,NULL);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);
@@ -413,11 +395,7 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-#ifdef USE_DVS
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue,NULL);
-#else
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
-#endif
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,&M,TimeValue,NULL);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);
@@ -453,11 +431,8 @@ int main()
 
     /* Server  */
     TimeValue += 10;
-#ifdef USE_DVS
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue,NULL);
-#else
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
-#endif
+
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,&M,TimeValue,NULL);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);
@@ -495,11 +470,8 @@ int main()
     OCT_clear(&M);
     message = "bad message";
     OCT_jstring(&M,message);
-#ifdef USE_DVS
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue,NULL);
-#else
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,pID,&M,TimeValue);
-#endif
+
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,&M,TimeValue,NULL);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);

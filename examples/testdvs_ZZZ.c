@@ -137,14 +137,6 @@ int main()
     printf("HCID: 0x");
     OCT_output(&HCID);
 
-    /* When set only send hashed IDs to server */
-    octet *pID;
-#ifdef USE_ANONYMOUS
-    pID = &HCID;
-#else
-    pID = &ID;
-#endif
-
     /* Generate Client master secret for MIRACL and Customer */
     rtn = MPIN_ZZZ_RANDOM_GENERATE(&RNG,&MS1);
     if (rtn != 0)
@@ -248,7 +240,7 @@ int main()
     printf("HM: 0x");
     OCT_output(&HM);
 
-    rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,0,pID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&HM,TimeValue,&Y1);
+    rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,0,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,NULL,NULL,&HM,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_ZZZ_CLIENT ERROR %d\n", rtn);
@@ -256,7 +248,7 @@ int main()
     }
     printf("Send to server:\n");
     printf("ID:");
-    OCT_output(pID);
+    OCT_output(&ID);
     printf("U:");
     OCT_output(&U);
     printf("V:");
@@ -264,7 +256,7 @@ int main()
     printf("TimeValue %d\n", TimeValue);
 
     /* Server: Verify message */
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,pID,&HM,TimeValue,&Pa);
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,0,&HID,NULL,&Y2,&ServerSecret,&U,NULL,&SEC,NULL,NULL,&ID,&HM,TimeValue,&Pa);
     if (rtn != 0)
     {
         printf("FAILURE Signature Verification %d\n", rtn);

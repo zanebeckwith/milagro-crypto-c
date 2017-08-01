@@ -111,14 +111,6 @@ int main()
     HASH_ID(HASH_TYPE_MPIN_ZZZ,&ID,&HCID);
     OCT_output(&HCID);
 
-    /* When set only send hashed IDs to server */
-    octet *pID;
-#ifdef USE_ANONYMOUS
-    pID = &HCID;
-#else
-    pID = &ID;
-#endif
-
     /* Generate Client master secret for MIRACL and Customer */
     rtn = MPIN_ZZZ_RANDOM_GENERATE(&RNG,&MS1);
     if (rtn != 0)
@@ -242,7 +234,7 @@ int main()
     }
 
     /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-    MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,date,pID,&HID,&HTID);
+    MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,date,&ID,&HID,&HTID);
 
     /* Server generates Random number Y and sends it to Client */
     rtn = MPIN_ZZZ_RANDOM_GENERATE(&RNG,&Y);
@@ -266,11 +258,7 @@ int main()
     OCT_output(&SEC);
 
     /* Server second PAS_ZZZs */
-#ifdef USE_DVS
     rtn = MPIN_ZZZ_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F,NULL);
-#else
-    rtn = MPIN_ZZZ_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F);
-#endif
 
     if (rtn != 0)
     {

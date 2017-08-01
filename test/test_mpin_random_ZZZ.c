@@ -103,8 +103,6 @@ int main()
     octet E= {0,sizeof(e),e};
     octet F= {0,sizeof(f),f};
 
-    octet *pID;
-
     int date = 0;
 
     int byte_count = 32;
@@ -192,12 +190,6 @@ int main()
         HASH_ID(HASH_TYPE_MPIN_ZZZ,&ID,&HCID);
         OCT_output(&HCID);
 
-#ifdef USE_ANONYMOUS
-        pID = &HCID;
-#else
-        pID = &ID;
-#endif
-
         srand ( time (NULL) );
         PIN1 = rand()%MAX_RANGE; // Get random between 0 and MAX_RANGE
         PIN2 = PIN1;
@@ -281,7 +273,7 @@ int main()
         }
 
         /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-        MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,date,pID,&HID,&HTID);
+        MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,date,&ID,&HID,&HTID);
 
         /* Server generates Random number Y and sends it to Client */
         rtn = MPIN_ZZZ_RANDOM_GENERATE(&RNG,&Y);
@@ -304,11 +296,7 @@ int main()
         OCT_output(&SEC);
 
         /* Server second PAS_ZZZs */
-#ifdef USE_DVS
         rtn = MPIN_ZZZ_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F,NULL);
-#else
-        rtn = MPIN_ZZZ_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F);
-#endif
 
         if (rtn != 0)
         {
