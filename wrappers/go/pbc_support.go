@@ -34,6 +34,9 @@ import (
 	"errors"
 )
 
+const IVS int = 12
+const HASH_TYPE_MPIN = SHA256
+
 /*
 
 Today returns today's date as days elapsed from the epoch. This function uses the system clock
@@ -79,7 +82,7 @@ Returns:
     hashMPinId: hash of the M-Pin ID
 
 */
-func HashId(hashType int, mpinId []byte) (hashMPinId []byte) {
+func HashId(hashType int, hashBytes int, mpinId []byte) (hashMPinId []byte) {
 	// Form Octets
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)
@@ -116,7 +119,7 @@ Returns:
     HM: hash of the input values
 
 */
-func HashAll(hashType int, hashMPinId, U, UT, V, y, Z, T []byte) (HM []byte) {
+func HashAll(hashType int, hashBytes int, hashMPinId, U, UT, V, y, Z, T []byte) (HM []byte) {
 	// Form Octets
 	hashMPinIdStr := string(hashMPinId)
 	hashMPinIdOct := GetOctet(hashMPinIdStr)

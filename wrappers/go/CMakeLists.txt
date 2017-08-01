@@ -93,16 +93,16 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
 
 	if(BUILD_MPIN AND NOT(${pf} STREQUAL "NOT"))
 
-	  # Configure go mpin_dvs wrapper
-	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_dvs_ZZZ.go" tempc)
+	  # Configure go mpin wrapper
+	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_ZZZ.go" tempc)
 	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
 	  string(CONFIGURE "${tempc}" tempc)
 	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/mpin_${tc}.go" "${tempc}")
 
-	  # Configure go mpin_dvs test
-	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_dvs_ZZZ_test.go" tempc)
+	  # Configure go mpin test
+	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_ZZZ_test.go" tempc)
 	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/mpin_dvs_${tc}_test.go" "${tempc}")
+	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/mpin_${tc}_test.go" "${tempc}")
 
     INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
       OWNER_WRITE OWNER_READ OWNER_EXECUTE
