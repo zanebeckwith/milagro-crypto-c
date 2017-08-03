@@ -1,9 +1,10 @@
 # Create AMCL library
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # Add the binary tree directory to the search path for linking and include files
 link_directories( ${CMAKE_CURRENT_BINARY_DIR} )
@@ -219,7 +220,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
         if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
           add_custom_command(
-                      TARGET mcl_mpin_${tc}
+                      TARGET amcl_mpin_${tc}
                       POST_BUILD
                       COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/python/")
         endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
