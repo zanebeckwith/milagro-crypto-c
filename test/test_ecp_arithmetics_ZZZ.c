@@ -163,7 +163,7 @@ int main(int argc, char** argv)
             ECP_ZZZ_rhs(&FPaux1,&FPaux1);
             FP_YYY_reduce(&FPaux1); // in case of lazy reduction
             FP_YYY_reduce(&FPaux2); // in case of lazy reduction
-            if (!FP_YYY_equals(&FPaux1,&FPaux2)!=0) // test if y^2=f(x)
+            if (!FP_YYY_equals(&FPaux1,&FPaux2)) // test if y^2=f(x)
             {
                 printf("ERROR computing right hand side of equation ECP_ZZZ, line %d\n",i);
                 exit(EXIT_FAILURE);

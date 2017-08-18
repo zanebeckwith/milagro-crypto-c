@@ -173,7 +173,7 @@ int main(int argc, char** argv)
             FP_YYY_copy(&supp1,&FP_2);
             FP_YYY_sub(&supp,&supp,&supp1);
             FP_YYY_reduce(&supp);
-            if((!FP_YYY_equals(&supp,&FPsub) != 0) && (!FP_YYY_equals(&supp1,&FPsub) != 0))
+            if(!FP_YYY_equals(&supp,&FPsub))
             {
                 printf("ERROR subtraction between two FPs, line %d\n",i);
                 exit(EXIT_FAILURE);
@@ -263,7 +263,7 @@ int main(int argc, char** argv)
                     FP_YYY_add(&supp1,&supp1,&FP_1);
                 }
                 FP_YYY_norm(&supp1);
-                if(!FP_YYY_equals(&supp,&supp1) != 0)
+                if(!FP_YYY_equals(&supp,&supp1))
                 {
                     printf("comp1 ");
                     FP_YYY_output(&supp);
@@ -353,7 +353,7 @@ int main(int argc, char** argv)
             FP_YYY_neg(&supp,&supp);
             FP_YYY_reduce(&supp);
             FP_YYY_norm(&supp);
-            if(!FP_YYY_equals(&supp,&FPneg) != 0)
+            if(!FP_YYY_equals(&supp,&FPneg))
             {
                 printf("comp ");
                 FP_YYY_output(&supp);
