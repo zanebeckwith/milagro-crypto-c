@@ -67,15 +67,6 @@ int read_ECP_ZZZ(ECP_ZZZ *ecp, char* string)
 
 int main(int argc, char** argv)
 {
-    // BIG_XXX BBB, MOD;
-    // BIG_XXX_rcopy(BBB,CURVE_B_ZZZ);
-    // BIG_XXX_rcopy(MOD,Modulus_YYY);
-    // printf("\n\nA: %d\n\n",CURVE_A_ZZZ);
-    // BIG_XXX_output(BBB);
-    // printf("\n\n");
-    // BIG_XXX_output(MOD);
-    // printf("\n\n");
-
     if (argc != 2)
     {
         printf("usage: ./test_ecp_arithmetics_ZZZ [path to test vector file]\n");
