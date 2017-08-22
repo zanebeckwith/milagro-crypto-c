@@ -258,7 +258,7 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
     int i,len=s;
     BIG_zero(a);
 
-    if (s>MODBYTES) s=MODBYTES;
+    if (len>MODBYTES) len=MODBYTES;
     for (i=0; i<len; i++)
     {
         BIG_fshl(a,8);
