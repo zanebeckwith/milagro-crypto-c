@@ -98,6 +98,15 @@ only be one entry in the GOPATH
 If you have docker installed then type ```make dbuild``` to build and test
 the library in a docker container.
 
+##### Multiple curves and RSA security levels
+
+The default build (see config.mk) uses multiple curves and RSA security 
+levels. There is an example called testall.c in the examples directory that 
+shows how to write a program to use the different curves etc in a single 
+program. To build and run the example use this script;
+
+    buildMulti.sh
+
 ##### Manual build
 
 NOTE: The default build is for 64 bit machines
