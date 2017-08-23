@@ -355,10 +355,12 @@ if __name__ == "__main__":
         print "MS2: %s" % toHex(MS2)
 
     # Generate Alice's sender key shares
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1, AHV, A1KeyG1)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_MULTIPLE(
+        HASH_TYPE_WCC, 1, MS1, AHV, A1KeyG1)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS1,AHV,A1KeyG1) Error %s" % rtn
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2, AHV, A2KeyG1)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_MULTIPLE(
+        HASH_TYPE_WCC, 1, MS2, AHV, A2KeyG1)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_MULTIPLE(HASH_TYPE_WCC, 1, MS2,AHV,A2KeyG1) Error %s" % rtn
     if DEBUG:
@@ -372,10 +374,12 @@ if __name__ == "__main__":
     print "AKeyG1: %s" % toHex(AKeyG1)
 
     # Generate Alice's sender time permit shares
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS1, AHV, A1TPG1)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_PERMIT(
+        HASH_TYPE_WCC, date, MS1, AHV, A1TPG1)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS1,AHV,A1TPG1) Error %s" % rtn
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_PERMIT(HASH_TYPE_WCC, date, MS2, AHV, A2TPG1)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_PERMIT(
+        HASH_TYPE_WCC, date, MS2, AHV, A2TPG1)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_PERMIT(HASH_TYPE_WCC, date,MS2,AHV,A2TPG1) Error %s" % rtn
     if DEBUG:
@@ -389,10 +393,12 @@ if __name__ == "__main__":
     print "ATPG1: %s" % toHex(ATPG1)
 
     # Generate Bob's receiver secret key shares
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS1, BHV, B1KeyG2)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_MULTIPLE(
+        HASH_TYPE_WCC, 1, MS1, BHV, B1KeyG2)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS1,BHV,B1KeyG2) Error %s" % rtn
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_MULTIPLE(HASH_TYPE_WCC, 1, MS2, BHV, B2KeyG2)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_MULTIPLE(
+        HASH_TYPE_WCC, 1, MS2, BHV, B2KeyG2)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_MULTIPLE(HASH_TYPE_WCC,1,MS2,BHV,B2KeyG2) Error %s" % rtn
     if DEBUG:
@@ -406,10 +412,12 @@ if __name__ == "__main__":
     print "BKeyG2: %s" % toHex(BKeyG2)
 
     # Generate Bob's receiver time permit shares
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS1, BHV, B1TPG2)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_PERMIT(
+        HASH_TYPE_WCC, date, MS1, BHV, B1TPG2)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_PERMIT(date,MS1,BHV,B1TPG2) Error %s" % rtn
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_PERMIT(HASH_TYPE_WCC, date, MS2, BHV, B2TPG2)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_PERMIT(
+        HASH_TYPE_WCC, date, MS2, BHV, B2TPG2)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_PERMIT(date,MS2,BHV,B2TPG2) Error %s" % rtn
     if DEBUG:
@@ -428,7 +436,8 @@ if __name__ == "__main__":
     if DEBUG:
         print "X: %s" % toHex(X)
 
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_TPMULT(HASH_TYPE_WCC, date, X, IdA, PaG1)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_TPMULT(
+        HASH_TYPE_WCC, date, X, IdA, PaG1)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_TPMULT(HASH_TYPE_WCC,date,X,IdA,PaG1) Error %s", rtn
     if DEBUG:
@@ -440,7 +449,8 @@ if __name__ == "__main__":
     if DEBUG:
         print "W: %s" % toHex(W)
 
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_TPMULT(HASH_TYPE_WCC, date, W, IdA, PgG1)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_TPMULT(
+        HASH_TYPE_WCC, date, W, IdA, PgG1)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_TPMULT(HASH_TYPE_WCC,date,W,IdA,PgG1) Error %s", rtn
     if DEBUG:
@@ -452,7 +462,8 @@ if __name__ == "__main__":
     if DEBUG:
         print "Y: %s" % toHex(Y)
 
-    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_TPMULT(HASH_TYPE_WCC, date, Y, IdB, PbG2)
+    rtn = libamcl_wcc_ZZZ.WCC_ZZZ_GET_G2_TPMULT(
+        HASH_TYPE_WCC, date, Y, IdB, PbG2)
     if rtn != 0:
         print "libamcl_wcc_ZZZ.WCC_ZZZ_GET_G1_TPMULT(HASH_TYPE_WCC,date,Y,IdB,PbG2) Error %s", rtn
     if DEBUG:

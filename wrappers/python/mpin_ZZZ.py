@@ -829,7 +829,8 @@ def get_G1_multiple(rng, type, x, P):
         rng_in = ffi.NULL
     P1, P1_val = make_octet(None, P)
     W1, W1_val = make_octet(G1)
-    error_code = libamcl_mpin_ZZZ.MPIN_ZZZ_GET_G1_MULTIPLE(rng_in, type, x1, P1, W1)
+    error_code = libamcl_mpin_ZZZ.MPIN_ZZZ_GET_G1_MULTIPLE(
+        rng_in, type, x1, P1, W1)
 
     x_hex = to_hex(x1)
     W_hex = to_hex(W1)
@@ -868,7 +869,8 @@ def server_1(hash_type, epoch_date, mpin_id):
     HTID1, HTID1_val = make_octet(G1)
     HID1, HID1_val = make_octet(G1)
 
-    libamcl_mpin_ZZZ.MPIN_ZZZ_SERVER_1(hash_type, epoch_date, mpin_id1, HID1, HTID1)
+    libamcl_mpin_ZZZ.MPIN_ZZZ_SERVER_1(
+        hash_type, epoch_date, mpin_id1, HID1, HTID1)
 
     HID_hex = to_hex(HID1)
     HTID_hex = to_hex(HTID1)
@@ -1116,7 +1118,7 @@ def hash_all(hash_type, hash_mpin_id, u, ut, v, y, z, t):
 
     hm1, hm1_val = make_octet(PFS)
     libamcl_core.HASH_ALL(hash_type, hash_mpin_id1,
-                               u1, ut1, v1, y1, z1, t1, hm1)
+                          u1, ut1, v1, y1, z1, t1, hm1)
 
     hm_hex = to_hex(hm1)
 

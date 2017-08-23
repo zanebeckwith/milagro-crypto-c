@@ -593,8 +593,7 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     {
         if (!ECP2_ZZZ_fromOctet(&Q, Pa)) res=MPIN_INVALID_POINT;
     }
-    else
-        if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+    else if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
 
     if (res==0)
     {
