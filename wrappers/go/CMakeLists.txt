@@ -20,6 +20,8 @@ configure_file (
 	"${PROJECT_BINARY_DIR}/wrappers/go/amcl.go"
 )
 
+file(COPY "${PROJECT_SOURCE_DIR}/wrappers/go/README.md" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
+
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
     OWNER_WRITE OWNER_READ OWNER_EXECUTE
     GROUP_READ GROUP_EXECUTE

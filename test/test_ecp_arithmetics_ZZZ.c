@@ -178,7 +178,7 @@ int main(int argc, char** argv)
             }
         }
 #if CURVETYPE_ZZZ!=MONTGOMERY
-        if (!strncmp(line,  ECP2line, strlen(ECP2line))) //get second test vector
+        if (!strncmp(line,  ECP2line, strlen(ECP2line))) // get second test vector
         {
             len = strlen(ECP2line);
             linePtr = line + len;

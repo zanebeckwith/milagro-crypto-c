@@ -158,7 +158,7 @@ if (BUILD_GO)
   set(GO_PATH "$ENV{GOPATH}" CACHE STRING "GOPATH")
   message(STATUS "Build Golang: GOPATH='${GO_PATH}'")
   add_subdirectory (wrappers/go)
-  add_subdirectory (examples/go)
+  add_subdirectory (wrappers/go/examples)
 endif (BUILD_GO)
 
 # Build Documentation
