@@ -33,7 +33,7 @@ under the License.
 
 #define TIME_SLOT_MINUTES 1440  /**< Time Slot = 1 day */
 
-/** @brief general purpose hash function w=hash(n|x) 
+/** @brief general purpose hash function w=hash(n|x)
  *
 	@param sha is the hash type
 	@param n integer involved in the hash

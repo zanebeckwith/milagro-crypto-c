@@ -338,9 +338,11 @@ class TestMPIN(unittest.TestCase):
         # Plaintext input
         plaintext1 = "A test message"
 
-        ciphertext, tag1 = mpin_ZZZ.aes_gcm_encrypt(key, iv, header, plaintext1)
+        ciphertext, tag1 = mpin_ZZZ.aes_gcm_encrypt(
+            key, iv, header, plaintext1)
 
-        plaintext2, tag2 = mpin_ZZZ.aes_gcm_decrypt(key, iv, header, ciphertext)
+        plaintext2, tag2 = mpin_ZZZ.aes_gcm_decrypt(
+            key, iv, header, ciphertext)
 
         self.assertEqual(tag1, tag2)
         self.assertEqual(plaintext1, plaintext2)
@@ -360,7 +362,8 @@ class TestMPIN(unittest.TestCase):
         # Plaintext input
         plaintext1 = "A test message"
 
-        ciphertext, tag1 = mpin_ZZZ.aes_gcm_encrypt(key, iv, header, plaintext1)
+        ciphertext, tag1 = mpin_ZZZ.aes_gcm_encrypt(
+            key, iv, header, plaintext1)
 
         new = list(ciphertext)
         new[0] = "a"
@@ -387,7 +390,8 @@ class TestMPIN(unittest.TestCase):
         # Plaintext input
         plaintext1 = "A test message"
 
-        ciphertext, tag1 = mpin_ZZZ.aes_gcm_encrypt(key, iv, header, plaintext1)
+        ciphertext, tag1 = mpin_ZZZ.aes_gcm_encrypt(
+            key, iv, header, plaintext1)
 
         new = list(header)
         new[0] = "a"

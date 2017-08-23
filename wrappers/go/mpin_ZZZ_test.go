@@ -29,7 +29,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func TestKeyEscrowLess_ZZZ(t *testing.T) {
 	want := 0
 	var got int

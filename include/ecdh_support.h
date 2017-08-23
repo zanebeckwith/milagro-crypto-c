@@ -38,7 +38,7 @@ under the License.
 
 /* general purpose hash function w=hash(p|n|x|y) */
 
-/** @brief general purpose hash function w=hash(p|n|x|y) 
+/** @brief general purpose hash function w=hash(p|n|x|y)
  *
 	@param sha is the hash type
 	@param p first octect involved in the hash

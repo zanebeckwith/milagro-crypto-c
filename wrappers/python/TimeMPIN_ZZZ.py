@@ -129,10 +129,12 @@ if __name__ == "__main__":
     time_func(
         'rtn, tp1 = mpin_ZZZ.get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id)',
         nIter)
-    rtn, tp1 = mpin_ZZZ.get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id)
+    rtn, tp1 = mpin_ZZZ.get_client_permit(
+        HASH_TYPE_MPIN, date, ms1, hash_mpin_id)
     if rtn != 0:
         print "get_client_permit(HASH_TYPE_MPIN, date, ms1, hash_mpin_id) Error %s" % rtn
-    rtn, tp2 = mpin_ZZZ.get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id)
+    rtn, tp2 = mpin_ZZZ.get_client_permit(
+        HASH_TYPE_MPIN, date, ms2, hash_mpin_id)
     if rtn != 0:
         print "get_client_permit(HASH_TYPE_MPIN, date, ms2, hash_mpin_id) Error %s" % rtn
     if DEBUG:
@@ -151,7 +153,8 @@ if __name__ == "__main__":
     time_func(
         'rtn, token = mpin_ZZZ.extract_pin(HASH_TYPE_MPIN, mpin_id, PIN, client_secret)',
         nIter)
-    rtn, token = mpin_ZZZ.extract_pin(HASH_TYPE_MPIN, mpin_id, PIN, client_secret)
+    rtn, token = mpin_ZZZ.extract_pin(
+        HASH_TYPE_MPIN, mpin_id, PIN, client_secret)
     if rtn != 0:
         print "extract_pin(HASH_TYPE_MPIN, mpin_id, PIN, token) Error %s" % rtn
     print "Token: %s" % token.encode("hex")
@@ -224,7 +227,8 @@ if __name__ == "__main__":
             time_func(
                 'HM = mpin_ZZZ.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)',
                 nIter)
-            HM = mpin_ZZZ.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
+            HM = mpin_ZZZ.hash_all(
+                HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
 
             time_func(
                 'rtn, client_aes_key = mpin_ZZZ.client_key(HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)',
@@ -265,7 +269,9 @@ if __name__ == "__main__":
 
         # Server calculates H(ID) and H(T|H(ID)) (if time permits enabled),
         # and maps them to points on the curve HID and HTID resp.
-        time_func('HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, date, mpin_id)', nIter)
+        time_func(
+            'HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, date, mpin_id)',
+            nIter)
         HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, date, mpin_id)
 
         # Server generates Random number y and sends it to Client
@@ -284,7 +290,8 @@ if __name__ == "__main__":
         time_func(
             'rtn, E, F = mpin_ZZZ.server_2(date, HID, HTID, y, server_secret, u, ut, v, None)',
             nIter)
-        rtn, E, F = mpin_ZZZ.server_2(date, HID, HTID, y, server_secret, u, ut, v, None)
+        rtn, E, F = mpin_ZZZ.server_2(
+            date, HID, HTID, y, server_secret, u, ut, v, None)
         if rtn != 0:
             print "ERROR: %s is not authenticated" % mpin_id
             if PIN_ERROR:
@@ -319,7 +326,8 @@ if __name__ == "__main__":
             time_func(
                 'HM = mpin_ZZZ.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)',
                 nIter)
-            HM = mpin_ZZZ.hash_all(HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
+            HM = mpin_ZZZ.hash_all(
+                HASH_TYPE_MPIN, hash_mpin_id, u, ut, v, y, Z, T)
 
             time_func(
                 'rtn, client_aes_key = mpin_ZZZ.client_key(HASH_TYPE_MPIN, pc1, pc2, PIN, r, x, HM, T)',
