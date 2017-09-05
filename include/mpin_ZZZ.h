@@ -37,21 +37,10 @@ under the License.
 
 /* Field size is assumed to be greater than or equal to group size */
 
-#define PGS_ZZZ MODBYTES_XXX  /**< MPIN Group Size */
-#define PFS_ZZZ MODBYTES_XXX  /**< MPIN Field Size */
-#define PAS_ZZZ 16        /**< MPIN Symmetric Key Size */
+#define MPIN_PGS_ZZZ MODBYTES_XXX  /**< MPIN Group Size */
+#define MPIN_PFS_ZZZ MODBYTES_XXX  /**< MPIN Field Size */
 
-#define MPIN_OK             0   /**< Function completed without error */
-#define MPIN_INVALID_POINT  -14	/**< Point is NOT on the curve */
-#define MPIN_BAD_PIN        -19 /**< Bad PIN number entered */
-
-#define MAXPIN_ZZZ 10000         /**< max PIN */
-#define PBLEN_ZZZ 14             /**< max length of PIN in bits */
-
-#define HASH_TYPE_MPIN_ZZZ SHA256   /**< Choose Hash function */
-
-#define MESSAGE_SIZE 256  /**< Signature message size  */
-#define M_SIZE (MESSAGE_SIZE+2*PFS_ZZZ+1)   /**< Signature message size and G1 size */
+#define M_SIZE (MESSAGE_SIZE+2*MPIN_PFS_ZZZ+1)   /**< Signature message size and G1 size */
 
 /* MPIN support functions */
 

@@ -62,16 +62,16 @@ int main(int argc, char** argv)
     char line[LINE_LEN];
     char * linePtr = NULL;
 
-    char ms1[PFS_ZZZ];
+    char ms1[MPIN_PFS_ZZZ];
     octet MS1= {0,sizeof(ms1),ms1};
     const char* MS1line = "MS1 = ";
-    char ms2[PFS_ZZZ];
+    char ms2[MPIN_PFS_ZZZ];
     octet MS2= {0,sizeof(ms2),ms2};
     const char* MS2line = "MS2 = ";
-    char ss1[4*PFS_ZZZ], rtss1[4*PFS_ZZZ];
+    char ss1[4*MPIN_PFS_ZZZ], rtss1[4*MPIN_PFS_ZZZ];
     octet SS1= {0,sizeof(ss1),ss1}, rtSS1= {0,sizeof(rtss1),rtss1};
     const char* SS1line = "SS1 = ";
-    char ss2[4*PFS_ZZZ], rtss2[4*PFS_ZZZ];
+    char ss2[4*MPIN_PFS_ZZZ], rtss2[4*MPIN_PFS_ZZZ];
     octet SS2= {0,sizeof(ss2),ss2}, rtSS2= {0,sizeof(rtss2),rtss2};
     const char* SS2line = "SS2 = ";
     int DATE = 0;
@@ -80,61 +80,61 @@ int main(int argc, char** argv)
     const char* PIN1line = "PIN1 = ";
     int PIN2 = 0;
     const char* PIN2line = "PIN2 = ";
-    char server_secret[4*PFS_ZZZ], rt_server_secret[4*PFS_ZZZ];
+    char server_secret[4*MPIN_PFS_ZZZ], rt_server_secret[4*MPIN_PFS_ZZZ];
     octet SERVER_SECRET= {0,sizeof(server_secret),server_secret}, rtSERVER_SECRET= {0,sizeof(rt_server_secret),rt_server_secret};
     const char* SERVER_SECRETline = "SERVER_SECRET = ";
-    char tp1[2*PFS_ZZZ+1], rttp1[2*PFS_ZZZ+1];
+    char tp1[2*MPIN_PFS_ZZZ+1], rttp1[2*MPIN_PFS_ZZZ+1];
     octet TP1= {0,sizeof(tp1),tp1}, rtTP1= {0,sizeof(rttp1),rttp1};
     const char* TP1line = "TP1 = ";
-    char tp2[2*PFS_ZZZ+1], rttp2[2*PFS_ZZZ+1];
+    char tp2[2*MPIN_PFS_ZZZ+1], rttp2[2*MPIN_PFS_ZZZ+1];
     octet TP2= {0,sizeof(tp2),tp2}, rtTP2= {0,sizeof(rttp2),rttp2};
     const char* TP2line = "TP2 = ";
-    char cs1[2*PFS_ZZZ+1], rtcs1[2*PFS_ZZZ+1];
+    char cs1[2*MPIN_PFS_ZZZ+1], rtcs1[2*MPIN_PFS_ZZZ+1];
     octet CS1= {0,sizeof(cs1),cs1}, rtCS1= {0,sizeof(rtcs1),rtcs1};
     const char* CS1line = "CS1 = ";
-    char cs2[2*PFS_ZZZ+1], rtcs2[2*PFS_ZZZ+1];
+    char cs2[2*MPIN_PFS_ZZZ+1], rtcs2[2*MPIN_PFS_ZZZ+1];
     octet CS2= {0,sizeof(cs2),cs2}, rtCS2= {0,sizeof(rtcs2),rtcs2};
     const char* CS2line = "CS2 = ";
-    char client_secret[2*PFS_ZZZ+1], rtclient_secret[2*PFS_ZZZ+1];
+    char client_secret[2*MPIN_PFS_ZZZ+1], rtclient_secret[2*MPIN_PFS_ZZZ+1];
     octet CLIENT_SECRET= {0,sizeof(client_secret),client_secret}, rtCLIENT_SECRET= {0,sizeof(rtclient_secret),rtclient_secret};
     const char* CLIENT_SECRETline = "CLIENT_SECRET = ";
-    char hash_mpin_id_hex[PFS_ZZZ], rthash_mpin_id_hex[PFS_ZZZ];
+    char hash_mpin_id_hex[MPIN_PFS_ZZZ], rthash_mpin_id_hex[MPIN_PFS_ZZZ];
     octet HASH_MPIN_ID_HEX= {0,sizeof(hash_mpin_id_hex),hash_mpin_id_hex}, rtHASH_MPIN_ID_HEX= {0,sizeof(rthash_mpin_id_hex),rthash_mpin_id_hex};
     const char* HASH_MPIN_ID_HEXline = "HASH_MPIN_ID_HEX = ";
-    char time_permit[2*PFS_ZZZ+1], rttime_permit[2*PFS_ZZZ+1];
+    char time_permit[2*MPIN_PFS_ZZZ+1], rttime_permit[2*MPIN_PFS_ZZZ+1];
     octet TIME_PERMIT= {0,sizeof(time_permit),time_permit}, rtTIME_PERMIT= {0,sizeof(rttime_permit),rttime_permit};
     const char* TIME_PERMITline = "TIME_PERMIT = ";
     char mpin_id_hex[300+1];
     octet MPIN_ID_HEX= {0,sizeof(mpin_id_hex),mpin_id_hex};
     const char* MPIN_ID_HEXline = "MPIN_ID_HEX = ";
-    char token[2*PFS_ZZZ+1];
+    char token[2*MPIN_PFS_ZZZ+1];
     octet TOKEN= {0,sizeof(token),token};
     const char* TOKENline = "TOKEN = ";
     int SERVER_OUTPUT = 0;
     const char* SERVER_OUTPUTline = "SERVER_OUTPUT = ";
-    char u[2*PFS_ZZZ+1], rtu[2*PFS_ZZZ+1];
+    char u[2*MPIN_PFS_ZZZ+1], rtu[2*MPIN_PFS_ZZZ+1];
     octet U= {0,sizeof(u),u}, rtU= {0,sizeof(rtu),rtu};
     const char* Uline = "U = ";
-    char v[2*PFS_ZZZ+1];
+    char v[2*MPIN_PFS_ZZZ+1];
     octet V= {0,sizeof(v),v};
     const char* Vline = "V = ";
-    char y[PFS_ZZZ];
+    char y[MPIN_PFS_ZZZ];
     octet Y= {0,sizeof(y),y};
     const char* Yline = "Y = ";
-    char x[PFS_ZZZ];
+    char x[MPIN_PFS_ZZZ];
     octet X= {0,sizeof(x),x};
     const char* Xline = "X = ";
-    char ut[2*PFS_ZZZ+1], rtut[2*PFS_ZZZ+1];
+    char ut[2*MPIN_PFS_ZZZ+1], rtut[2*MPIN_PFS_ZZZ+1];
     octet UT= {0,sizeof(ut),ut}, rtUT= {0,sizeof(rtut),rtut};
     const char* UTline = "UT = ";
-    char sec[2*PFS_ZZZ+1], rtsec[2*PFS_ZZZ+1];
+    char sec[2*MPIN_PFS_ZZZ+1], rtsec[2*MPIN_PFS_ZZZ+1];
     octet SEC= {0,sizeof(sec),sec}, rtSEC= {0,sizeof(rtsec),rtsec};
     const char* SECline = "SEC = ";
-    char hid[2*PFS_ZZZ+1], htid[2*PFS_ZZZ+1];
+    char hid[2*MPIN_PFS_ZZZ+1], htid[2*MPIN_PFS_ZZZ+1];
     octet HID= {0,sizeof(hid), hid}, HTID= {0,sizeof(htid),htid};
-    char e[12*PFS_ZZZ];
+    char e[12*MPIN_PFS_ZZZ];
     octet E= {0,sizeof(e),e};
-    char f[12*PFS_ZZZ];
+    char f[12*MPIN_PFS_ZZZ];
     octet F= {0,sizeof(f),f};
 
     fp = fopen(argv[1], "r");
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_OCTET(&HASH_MPIN_ID_HEX,linePtr);
 // Hash MPIN_ID
-            HASH_ID(HASH_TYPE_MPIN_ZZZ,&MPIN_ID_HEX,&rtHASH_MPIN_ID_HEX);
+            HASH_ID(HASH_TYPE_MPIN,&MPIN_ID_HEX,&rtHASH_MPIN_ID_HEX);
             if (!OCT_comp(&HASH_MPIN_ID_HEX,&rtHASH_MPIN_ID_HEX))
             {
                 printf("ERROR hashing identity, line %d\n",i);
@@ -328,10 +328,10 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_OCTET(&TP1,linePtr);
 // Generate first Time Permit
-            rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,DATE,&MS1,&HASH_MPIN_ID_HEX,&rtTP1);
+            rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,DATE,&MS1,&HASH_MPIN_ID_HEX,&rtTP1);
             if (rtn != 0)
             {
-                printf("MPIN_ZZZ_GET_CLIENT_PERMIT((HASH_TYPE_MPIN_ZZZ,DATE,&MS1,&HASH_MPIN_ID_HEX,&TP1) Error %d, line %d\n",rtn,i);
+                printf("MPIN_ZZZ_GET_CLIENT_PERMIT((HASH_TYPE_MPIN,DATE,&MS1,&HASH_MPIN_ID_HEX,&TP1) Error %d, line %d\n",rtn,i);
                 exit(EXIT_FAILURE);
             }
             if (!OCT_comp(&TP1,&rtTP1))
@@ -347,10 +347,10 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_OCTET(&TP2,linePtr);
 // Generate second Time Permit
-            rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,DATE,&MS2,&HASH_MPIN_ID_HEX,&rtTP2);
+            rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,DATE,&MS2,&HASH_MPIN_ID_HEX,&rtTP2);
             if (rtn != 0)
             {
-                printf("MPIN_ZZZ_GET_CLIENT_PERMIT((HASH_TYPE_MPIN_ZZZ,DATE,&MS1,&HASH_MPIN_ID_HEX,&TP2) Error %d, line %d\n",rtn,i);
+                printf("MPIN_ZZZ_GET_CLIENT_PERMIT((HASH_TYPE_MPIN,DATE,&MS1,&HASH_MPIN_ID_HEX,&TP2) Error %d, line %d\n",rtn,i);
                 exit(EXIT_FAILURE);
             }
             if (!OCT_comp(&TP2,&rtTP2))
@@ -385,7 +385,7 @@ int main(int argc, char** argv)
             linePtr = line + len;
             read_OCTET(&TOKEN,linePtr);
 // Client extracts PIN1 from secret to create Token
-            rtn = MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN_ZZZ,&MPIN_ID_HEX, PIN1, &rtCLIENT_SECRET);
+            rtn = MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN,&MPIN_ID_HEX, PIN1, &rtCLIENT_SECRET);
             if (rtn != 0)
             {
                 printf("MPIN_ZZZ_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d, line %d\n",rtn,i);
@@ -424,8 +424,8 @@ int main(int argc, char** argv)
             len = strlen(SECline);
             linePtr = line + len;
             read_OCTET(&SEC,linePtr);
-// Client first PAS_ZZZs
-            rtn = MPIN_ZZZ_CLIENT_1(HASH_TYPE_MPIN_ZZZ,DATE,&MPIN_ID_HEX,NULL,&X,PIN2,&TOKEN,&rtSEC,&rtU,&rtUT,&TIME_PERMIT);
+// Client first pass
+            rtn = MPIN_ZZZ_CLIENT_1(HASH_TYPE_MPIN,DATE,&MPIN_ID_HEX,NULL,&X,PIN2,&TOKEN,&rtSEC,&rtU,&rtUT,&TIME_PERMIT);
             if (rtn != 0)
             {
                 printf("MPIN_ZZZ_CLIENT_1 ERROR %d, line %d\n",rtn,i);
@@ -433,7 +433,7 @@ int main(int argc, char** argv)
             }
             else if (!OCT_comp(&U,&rtU) || !OCT_comp(&UT,&rtUT) || !OCT_comp(&SEC,&rtSEC))
             {
-                printf("ERROR performing CLIENT FIRST PAS_ZZZS, line %d\n",i);
+                printf("ERROR performing CLIENT FIRST PASS, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
@@ -459,8 +459,8 @@ int main(int argc, char** argv)
             sscanf(linePtr,"%d\n",&SERVER_OUTPUT);
 // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
 
-            MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,DATE,&MPIN_ID_HEX,&HID,&HTID);
-// Client second PAS_ZZZs
+            MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN,DATE,&MPIN_ID_HEX,&HID,&HTID);
+// Client second pass
             rtn = MPIN_ZZZ_CLIENT_2(&X,&Y,&rtSEC);
             if (rtn != 0)
             {
@@ -469,15 +469,15 @@ int main(int argc, char** argv)
             }
             if (!OCT_comp(&V,&rtSEC))
             {
-                printf("ERROR performing CLIENT SECOND PAS_ZZZS, line %d\n",i);
+                printf("ERROR performing CLIENT SECOND PASS, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
-// Server second PAS_ZZZs
+// Server second pass
             rtn = MPIN_ZZZ_SERVER_2(DATE,&HID,&HTID,&Y,&SERVER_SECRET,&U,&UT,&V,&E,&F,NULL);
 
             if (rtn != SERVER_OUTPUT)
             {
-                printf("ERROR performing SERVER SECOND PAS_ZZZS, line %d\n",i);
+                printf("ERROR performing SERVER SECOND PASS, line %d\n",i);
                 exit(EXIT_FAILURE);
             }
         }
