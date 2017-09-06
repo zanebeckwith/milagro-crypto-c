@@ -73,7 +73,7 @@ static void mpin_hash(int sha,FP4_YYY *f, ECP_ZZZ *P,octet *w)
         break;
     }
 
-    OCT_jbytes(w,h,PAS_ZZZ);
+    OCT_jbytes(w,h,MPIN_PAS);
     for (i=0; i<hlen; i++) h[i]=0;
 }
 
@@ -143,7 +143,7 @@ int MPIN_ZZZ_ENCODING(csprng *RNG,octet *E)
         BIG_XXX_inc(v,m+1);
         E->val[0]=su+2*sv;
         BIG_XXX_toBytes(&(E->val[1]),u);
-        BIG_XXX_toBytes(&(E->val[PFS_ZZZ+1]),v);
+        BIG_XXX_toBytes(&(E->val[MPIN_PFS_ZZZ+1]),v);
     }
 
     return res;
@@ -161,7 +161,7 @@ int MPIN_ZZZ_DECODING(octet *D)
     {
 
         BIG_XXX_fromBytes(u,&(D->val[1]));
-        BIG_XXX_fromBytes(v,&(D->val[PFS_ZZZ+1]));
+        BIG_XXX_fromBytes(v,&(D->val[MPIN_PFS_ZZZ+1]));
 
         su=D->val[0]&1;
         sv=(D->val[0]>>1)&1;
@@ -237,9 +237,9 @@ int MPIN_ZZZ_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
         mhashit(sha,-1,CID,&H);
         ECP_ZZZ_mapit(&R,&H);
 
-        pin%=MAXPIN_ZZZ;
+        pin%=MAXPIN;
 
-        ECP_ZZZ_pinmul(&R,pin,PBLEN_ZZZ);
+        ECP_ZZZ_pinmul(&R,pin,PBLEN);
         ECP_ZZZ_sub(&P,&R);
 
         ECP_ZZZ_toOctet(TOKEN,&P);
@@ -388,10 +388,10 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
 
     if (res==0)
     {
-        pin%=MAXPIN_ZZZ;
+        pin%=MAXPIN;
 
         ECP_ZZZ_copy(&W,&P);				// W=H(ID)
-        ECP_ZZZ_pinmul(&W,pin,PBLEN_ZZZ);			// W=alpha.H(ID)
+        ECP_ZZZ_pinmul(&W,pin,PBLEN);			// W=alpha.H(ID)
         ECP_ZZZ_add(&T,&W);					// T=Token+alpha.H(ID) = s.H(ID)
 
         if (date)
@@ -540,23 +540,17 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
         if (!ECP2_ZZZ_fromOctet(&sQ,SST)) res=MPIN_INVALID_POINT;
     }
 
-
-    if (res==0)
-    {
-        if (!ECP2_ZZZ_fromOctet(&sQ,SST)) res=MPIN_INVALID_POINT;
-    }
-
     if (res==0)
     {
         if (date)
         {
             BIG_XXX_fromBytes(px,&(xCID->val[1]));
-            BIG_XXX_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
+            BIG_XXX_fromBytes(py,&(xCID->val[MPIN_PFS_ZZZ+1]));
         }
         else
         {
             BIG_XXX_fromBytes(px,&(xID->val[1]));
-            BIG_XXX_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
+            BIG_XXX_fromBytes(py,&(xID->val[MPIN_PFS_ZZZ+1]));
         }
         if (!ECP_ZZZ_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
     }
@@ -619,12 +613,12 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     return res;
 }
 
-#if MAXPIN_ZZZ==10000
+#if MAXPIN==10000
 #define MR_TS 10  /* 2^10/10 approx = sqrt(MAXPIN) */
 #define TRAP 200  /* 2*sqrt(MAXPIN) */
 #endif
 
-#if MAXPIN_ZZZ==1000000
+#if MAXPIN==1000000
 #define MR_TS 14
 #define TRAP 2000
 #endif
@@ -671,7 +665,7 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
     FP12_YYY_conj(&gf,&t);
     steps=0;
     dm=0;
-    while (dm-dn<MAXPIN_ZZZ)
+    while (dm-dn<MAXPIN)
     {
         steps++;
         if (steps>4*TRAP) break;
@@ -696,7 +690,7 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
             break;
         }
     }
-    if (steps>4*TRAP || dm-dn>=MAXPIN_ZZZ)
+    if (steps>4*TRAP || dm-dn>=MAXPIN)
     {
         res=0;    /* Trap Failed  - probable invalid token */
     }
@@ -773,7 +767,7 @@ int MPIN_ZZZ_CLIENT_KEY(int sha,octet *G1,octet *G2,int pin,octet *R,octet *X,oc
         BIG_XXX_add(z,z,h);    // new
         BIG_XXX_mod(z,r);
 
-        FP12_YYY_pinpow(&g2,pin,PBLEN_ZZZ);
+        FP12_YYY_pinpow(&g2,pin,PBLEN);
         FP12_YYY_mul(&g1,&g2);
 
         PAIR_ZZZ_G1mul(&W,x);
@@ -875,7 +869,7 @@ void MPIN_ZZZ_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
     BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
     BIG_XXX_mod(y,q);
     BIG_XXX_toBytes(Y->val,y);
-    Y->len=PGS_ZZZ;
+    Y->len=MPIN_PGS_ZZZ;
 }
 
 /* One pass MPIN Client */
