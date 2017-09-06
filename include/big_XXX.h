@@ -523,7 +523,7 @@ static inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 /* No integer type available that can store double the wordlength */
 /* accumulate partial products */
 
-static inline chunk muladd(chunk x,chunk y,chunk c,chunk *r)
+static inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 {
     chunk x0,x1,y0,y1;
     chunk bot,top,mid,carry;
