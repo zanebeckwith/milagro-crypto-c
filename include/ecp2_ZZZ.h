@@ -206,13 +206,11 @@ extern void ECP2_ZZZ_frob(ECP2_ZZZ *P,FP2_YYY *f);
  */
 extern void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ *Q,BIG_XXX *b);
 
-#if PAIRING_FRIENDLY_ZZZ != NOT
 /**	@brief Maps random BIG to curve point of correct order
  *
 	@param P ECP2 instance of correct order
 	@param W OCTET byte array to be mapped
  */
-extern void ECP2_ZZZ_mapit2(ECP2_ZZZ *P,octet *W);
-#endif
+extern void ECP2_ZZZ_mapit(ECP2_ZZZ *P,octet *W);
 
 #endif

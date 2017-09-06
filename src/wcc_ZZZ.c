@@ -223,11 +223,11 @@ int WCC_ZZZ_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2)
 
     // H1(ID)
     hashit(sha,0,ID,&H1);
-    ECP2_ZZZ_mapit2(&P,&H1);
+    ECP2_ZZZ_mapit(&P,&H1);
 
     // H1(date|sha256(ID))
     hashit(sha,date,&H1,&H2);
-    ECP2_ZZZ_mapit2(&Q,&H2);
+    ECP2_ZZZ_mapit(&Q,&H2);
 
     // P = P + Q
     ECP2_ZZZ_add(&P,&Q);
@@ -250,12 +250,12 @@ int WCC_ZZZ_GET_G2_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG2
 
     if (hashDone)
     {
-        ECP2_ZZZ_mapit2(&P,ID);
+        ECP2_ZZZ_mapit(&P,ID);
     }
     else
     {
         hashit(sha,0,ID,&H);
-        ECP2_ZZZ_mapit2(&P,&H);
+        ECP2_ZZZ_mapit(&P,&H);
     }
 
     BIG_XXX_fromBytes(s,S->val);
@@ -274,7 +274,7 @@ int WCC_ZZZ_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2)
     octet H= {0,sizeof(h),h};
 
     hashit(sha,date,HID,&H);
-    ECP2_ZZZ_mapit2(&P,&H);
+    ECP2_ZZZ_mapit(&P,&H);
     BIG_XXX_fromBytes(s,S->val);
     PAIR_ZZZ_G2mul(&P,s);
 
@@ -330,7 +330,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
     }
 
     hashit(sha,0,IdBOct,&HV1);
-    ECP2_ZZZ_mapit2(&BG2,&HV1);
+    ECP2_ZZZ_mapit(&BG2,&HV1);
 
     if (!ECP_ZZZ_fromOctet(&sAG1,AKeyG1Oct))
     {
@@ -358,7 +358,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
 
         // H2(date|sha256(IdB))
         hashit(sha,date,&HV1,&HV2);
-        ECP2_ZZZ_mapit2(&dateBG2,&HV2);
+        ECP2_ZZZ_mapit(&dateBG2,&HV2);
 
         // sAG1 = sAG1 + ATPG1
         ECP_ZZZ_add(&sAG1, &ATPG1);
