@@ -48,17 +48,6 @@ under the License.
 #define WCC_INVALID_POINT -51  /**< Point is NOT on the curve */
 #define TIME_SLOT_MINUTES 1440 /**< Time Slot = 1 day */
 
-/* SOK costants */
-#define PAS 16  			   	 /**< AES Symmetric Key Size */
-#define SOK_ZZZ_OK         0     /**< return code */
-#define SOK_INVALID_POINT -14    /**< return error code */
-#define TIME_SLOT_MINUTES 1440   /**< Time Slot = 1 day */
-
-#define PIV 12                   /**< AES-GCM Initialization Vector Size */
-#define PTAG 16                  /**< AES-GCM MAC Size */
-
-
-
 /** @brief general purpose hash function w=hash(n|x)
  *
 	@param sha is the hash type
