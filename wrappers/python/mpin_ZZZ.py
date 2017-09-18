@@ -1617,7 +1617,7 @@ if __name__ == "__main__":
             print "client_2(x, y, sec) Error %s" % rtn
 
         # Server second pass
-        rtn, E, F = server_2(date, HID, HTID, y, server_secret, u, ut, v)
+        rtn, E, F = server_2(date, HID, HTID, y, server_secret, u, ut, v, None)
         if rtn != 0:
             print "ERROR: %s is not authenticated" % mpin_id
             if PIN_ERROR:
@@ -1678,7 +1678,6 @@ if __name__ == "__main__":
 
     # Clear memory
     del seed
-    del mpin_id
     del hash_mpin_id
     del mpin_id
     del ms1
