@@ -35,7 +35,6 @@ import "C"
 const PAS_ZZZ int = int(C.MPIN_PAS)
 const PGS_ZZZ int = int(C.MPIN_PGS_ZZZ)
 const PFS_ZZZ int = int(C.MPIN_PFS_ZZZ)
-const hashBytes_ZZZ int = int(C.MPIN_PFS_ZZZ)
 const G1S_ZZZ = 2*PFS_ZZZ + 1
 const G2S_ZZZ = 4 * PFS_ZZZ
 const GTS_ZZZ = 12 * PFS_ZZZ
