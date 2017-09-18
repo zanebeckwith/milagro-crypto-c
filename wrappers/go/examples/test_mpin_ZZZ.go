@@ -77,7 +77,7 @@ func runTest(rng *amcl.RandNG) {
 	defer amcl.CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := amcl.HashId(HASH_TYPE_MPIN, PFS_ZZZ, ID)
+	HCID := amcl.HashId(HASH_TYPE_MPIN, amcl.PFS_ZZZ, ID)
 
 	// Generate server secret share 1
 	rtn, SS1 := amcl.GetServerSecret_ZZZ(MS1[:])
