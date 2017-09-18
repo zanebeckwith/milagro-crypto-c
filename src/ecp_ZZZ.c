@@ -1338,15 +1338,16 @@ void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
 #if PAIRING_FRIENDLY_ZZZ == BLS
     BIG_XXX c;
 #endif
-	BIG_XXX_fromBytes(x,W->val);
+    BIG_XXX_fromBytes(x,W->val);
     BIG_XXX_rcopy(q,Modulus_YYY);
     BIG_XXX_mod(x,q);
-	int k=0;
+    int k=0;
 
     while (!ECP_ZZZ_setx(P,x,0))
-	{
-        BIG_XXX_inc(x,1); k++;
-	}
+    {
+        BIG_XXX_inc(x,1);
+        k++;
+    }
 #if PAIRING_FRIENDLY_ZZZ == BLS
     BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
     ECP_ZZZ_mul(P,c);

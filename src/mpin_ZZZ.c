@@ -299,9 +299,9 @@ int MPIN_ZZZ_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
         if (!ECP_ZZZ_fromOctet(&P,G)) res=MPIN_INVALID_POINT;
     }
     else
-	{
-		ECP_ZZZ_mapit(&P,G);
-	}
+    {
+        ECP_ZZZ_mapit(&P,G);
+    }
 
     if (res==0)
     {
