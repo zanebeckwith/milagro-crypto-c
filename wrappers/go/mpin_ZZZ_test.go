@@ -80,7 +80,7 @@ func TestKeyEscrowLess_ZZZ(t *testing.T) {
 	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := HashId(HASH_TYPE_MPIN, hashBytes_ZZZ, ID)
+	HCID := HashId(HASH_TYPE_MPIN, PFS_ZZZ, ID)
 
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret_ZZZ(MS1[:])
@@ -190,7 +190,7 @@ func TestKeyEscrowLessRandom_ZZZ(t *testing.T) {
 	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := HashId(HASH_TYPE_MPIN, hashBytes_ZZZ, ID)
+	HCID := HashId(HASH_TYPE_MPIN, PFS_ZZZ, ID)
 
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret_ZZZ(MS1[:])
@@ -302,7 +302,7 @@ func TestKeyEscrowWrongPK_ZZZ(t *testing.T) {
 	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := HashId(HASH_TYPE_MPIN, hashBytes_ZZZ, ID)
+	HCID := HashId(HASH_TYPE_MPIN, PFS_ZZZ, ID)
 
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret_ZZZ(MS1[:])
@@ -430,7 +430,7 @@ func TestKeyEscrowLessTwoPassWrongPK_ZZZ(t *testing.T) {
 	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := HashId(HASH_TYPE_MPIN, hashBytes_ZZZ, ID)
+	HCID := HashId(HASH_TYPE_MPIN, PFS_ZZZ, ID)
 
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret_ZZZ(MS1[:])
@@ -556,7 +556,7 @@ func TestKeyEscrowLessTwoPASS_ZZZ(t *testing.T) {
 	ID = append(ID, Pa...)
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := HashId(HASH_TYPE_MPIN, hashBytes_ZZZ, ID)
+	HCID := HashId(HASH_TYPE_MPIN, PFS_ZZZ, ID)
 
 	// Generate server secret share 1
 	_, SS1 := GetServerSecret_ZZZ(MS1[:])
