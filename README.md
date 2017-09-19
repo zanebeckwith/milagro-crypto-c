@@ -56,7 +56,7 @@ The above packages can be installed in different ways, depending on the Operatin
     sudo pip install cffi
 
 
-* **MacOs**
+* **MacOS**
 
 
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
