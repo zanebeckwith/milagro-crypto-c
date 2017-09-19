@@ -59,64 +59,64 @@ int main()
     char id[256];
     octet ID = {0,sizeof(id),id};
 
-    char x[PGS_ZZZ],y[PGS_ZZZ];
+    char x[MPIN_PGS_ZZZ],y[MPIN_PGS_ZZZ];
     octet X= {sizeof(x), sizeof(x),x};
     octet Y= {sizeof(y),sizeof(y),y};
 
     /* Master secret shares */
-    char ms1[PGS_ZZZ], ms2[PGS_ZZZ];
+    char ms1[MPIN_PGS_ZZZ], ms2[MPIN_PGS_ZZZ];
     octet MS1= {sizeof(ms1),sizeof(ms1),ms1};
     octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
 
     /* Hash values of client ID */
-    char hcid[PFS_ZZZ];
+    char hcid[MPIN_PFS_ZZZ];
     octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
 
     /* Hash values of messages */
-    char hm[PFS_ZZZ];
+    char hm[MPIN_PFS_ZZZ];
     octet HM= {sizeof(hm),sizeof(hm), hm};
 
     /* Client secret and shares */
-    char cs1[2*PFS_ZZZ+1], cs2[2*PFS_ZZZ+1], sec[2*PFS_ZZZ+1];
+    char cs1[2*MPIN_PFS_ZZZ+1], cs2[2*MPIN_PFS_ZZZ+1], sec[2*MPIN_PFS_ZZZ+1];
     octet SEC= {sizeof(sec),sizeof(sec),sec};
     octet CS1= {sizeof(cs1),sizeof(cs1), cs1};
     octet CS2= {sizeof(cs2),sizeof(cs2), cs2};
 
     /* Server secret and shares */
-    char ss1[4*PFS_ZZZ], ss2[4*PFS_ZZZ], serverSecret[4*PFS_ZZZ];
+    char ss1[4*MPIN_PFS_ZZZ], ss2[4*MPIN_PFS_ZZZ], serverSecret[4*MPIN_PFS_ZZZ];
     octet ServerSecret= {sizeof(serverSecret),sizeof(serverSecret),serverSecret};
     octet SS1= {sizeof(ss1),sizeof(ss1),ss1};
     octet SS2= {sizeof(ss2),sizeof(ss2),ss2};
 
     /* Time Permit and shares */
-    char tp1[2*PFS_ZZZ+1], tp2[2*PFS_ZZZ+1], tp[2*PFS_ZZZ+1];
+    char tp1[2*MPIN_PFS_ZZZ+1], tp2[2*MPIN_PFS_ZZZ+1], tp[2*MPIN_PFS_ZZZ+1];
     octet TP= {sizeof(tp),sizeof(tp),tp};
     octet TP1= {sizeof(tp1),sizeof(tp1),tp1};
     octet TP2= {sizeof(tp2),sizeof(tp2),tp2};
 
     /* Token stored on computer */
-    char token[2*PFS_ZZZ+1];
+    char token[2*MPIN_PFS_ZZZ+1];
     octet TOKEN= {sizeof(token),sizeof(token),token};
 
     /* Precomputed values stored on device */
-    char g1[12*PFS_ZZZ],g2[12*PFS_ZZZ];
+    char g1[12*MPIN_PFS_ZZZ],g2[12*MPIN_PFS_ZZZ];
     octet G1= {0,sizeof(g1),g1};
     octet G2= {0,sizeof(g2),g2};
 
-    char ut[2*PFS_ZZZ+1],u[2*PFS_ZZZ+1];
+    char ut[2*MPIN_PFS_ZZZ+1],u[2*MPIN_PFS_ZZZ+1];
     octet UT= {sizeof(ut),sizeof(ut),ut};
     octet U= {sizeof(u),sizeof(u),u};
 
-    char hid[2*PFS_ZZZ+1],htid[2*PFS_ZZZ+1];
+    char hid[2*MPIN_PFS_ZZZ+1],htid[2*MPIN_PFS_ZZZ+1];
     octet HID= {0,sizeof(hid),hid};
     octet HTID= {0,sizeof(htid),htid};
 
-    char e[12*PFS_ZZZ], f[12*PFS_ZZZ];
+    char e[12*MPIN_PFS_ZZZ], f[12*MPIN_PFS_ZZZ];
     octet E= {sizeof(e),sizeof(e),e};
     octet F= {sizeof(f),sizeof(f),f};
 
-    char r[PGS_ZZZ],z[2*PFS_ZZZ+1],w[PGS_ZZZ],t[2*PFS_ZZZ+1];
-    char ck[PAS_ZZZ],sk[PAS_ZZZ];
+    char r[MPIN_PGS_ZZZ],z[2*MPIN_PFS_ZZZ+1],w[MPIN_PGS_ZZZ],t[2*MPIN_PFS_ZZZ+1];
+    char ck[MPIN_PAS],sk[MPIN_PAS];
     octet R= {0,sizeof(r),r};
     octet Z= {0,sizeof(z),z};
     octet W= {0,sizeof(w),w};
@@ -210,7 +210,7 @@ int main()
         printf("PIN1 %d PIN2 %d\n", PIN1, PIN2);
 
         /* Hash ID */
-        HASH_ID(HASH_TYPE_MPIN_ZZZ,&ID,&HCID);
+        HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
         OCT_output(&HCID);
 
         /* Generate client secret shares */
@@ -244,16 +244,16 @@ int main()
         /* Generate Time Permit shares */
         date = today();
         printf("Date %d \n", date);
-        rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,date,&MS1,&HCID,&TP1);
+        rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
         if (rtn != 0)
         {
-            printf("MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
+            printf("MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1) Error %d\n", rtn);
             return 1;
         }
-        rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,date,&MS2,&HCID,&TP2);
+        rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
         if (rtn != 0)
         {
-            printf("MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
+            printf("MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2) Error %d\n", rtn);
             return 1;
         }
         printf("TP1 = 0x");
@@ -280,7 +280,7 @@ int main()
         OCT_output(&TP);
 
         /* Client extracts PIN1 from secret to create Token */
-        rtn = MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN_ZZZ,&ID, PIN1, &TOKEN);
+        rtn = MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
         if (rtn != 0)
         {
             printf("MPIN_ZZZ_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
@@ -292,8 +292,8 @@ int main()
         /* Client precomputation */
         MPIN_ZZZ_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
 
-        /* Client first PAS_ZZZs */
-        rtn = MPIN_ZZZ_CLIENT_1(HASH_TYPE_MPIN_ZZZ,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
+        /* Client first pass */
+        rtn = MPIN_ZZZ_CLIENT_1(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,&U,&UT,&TP);
         if (rtn != 0)
         {
             printf("MPIN_ZZZ_CLIENT_1 ERROR %d\n", rtn);
@@ -304,7 +304,7 @@ int main()
         MPIN_ZZZ_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);
 
         /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-        MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN_ZZZ,date,&ID,&HID,&HTID);
+        MPIN_ZZZ_SERVER_1(HASH_TYPE_MPIN,date,&ID,&HID,&HTID);
 
         /* Server generates Random number Y and sends it to Client */
         rtn = MPIN_ZZZ_RANDOM_GENERATE(&RNG,&Y);
@@ -321,7 +321,7 @@ int main()
         printf("T = 0x");
         OCT_output(&T);
 
-        /* Client second PAS_ZZZs */
+        /* Client second pass */
         rtn = MPIN_ZZZ_CLIENT_2(&X,&Y,&SEC);
         if (rtn != 0)
         {
@@ -330,7 +330,7 @@ int main()
         printf("V = 0x");
         OCT_output(&SEC);
 
-        /* Server second PAS_ZZZs */
+        /* Server second pass */
         rtn = MPIN_ZZZ_SERVER_2(date,&HID,&HTID,&Y,&ServerSecret,&U,&UT,&SEC,&E,&F,NULL);
 
         if (rtn != 0)
@@ -346,16 +346,16 @@ int main()
             }
         }
 
-        HASH_ALL(HASH_TYPE_MPIN_ZZZ,&HCID,&U,&UT,&SEC,&Y,&Z,&T,&HM);
-        MPIN_ZZZ_CLIENT_KEY(HASH_TYPE_MPIN_ZZZ,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
+        HASH_ALL(HASH_TYPE_MPIN,&HCID,&U,&UT,&SEC,&Y,&Z,&T,&HM);
+        MPIN_ZZZ_CLIENT_KEY(HASH_TYPE_MPIN,&G1,&G2,PIN2,&R,&X,&HM,&T,&CK);
         printf("Client Key = ");
         OCT_output(&CK);
 
         /* Server will use the hashed ID if anonymous connection required.
-        HASH_ID(HASH_TYPE_MPIN_ZZZ,&ID,&HSID);
-        HASH_ALL(HASH_TYPE_MPIN_ZZZ,&HSID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
+        HASH_ID(HASH_TYPE_MPIN,&ID,&HSID);
+        HASH_ALL(HASH_TYPE_MPIN,&HSID,NULL,&UT,&SEC,&Y,&Z,&T,&HM);
         */
-        MPIN_ZZZ_SERVER_KEY(HASH_TYPE_MPIN_ZZZ,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
+        MPIN_ZZZ_SERVER_KEY(HASH_TYPE_MPIN,&Z,&ServerSecret,&W,&HM,&HID,NULL,&UT,&SK);
         printf("Server Key = ");
         OCT_output(&SK);
 

@@ -106,8 +106,8 @@
 /**< Note - no 128-bit type available    */
 #else
 #define chunk int64_t		/**< C type corresponding to word length */
-#ifdef __GNUC__
-#define dchunk __int128		/**< Always define double length chunk type if available - GCC supports 128 bit type  ??? */
+#if defined(__SIZEOF_INT128__) && __SIZEOF_INT128__ == 16
+#define dchunk __int128                /**< Always define double length chunk type if available (supported by GCC & Clang on 64-bit architectures) */
 #endif
 #endif
 #endif

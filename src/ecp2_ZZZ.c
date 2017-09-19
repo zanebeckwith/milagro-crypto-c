@@ -641,9 +641,8 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
     ECP2_ZZZ_affine(P);
 }
 
-#if PAIRING_FRIENDLY_ZZZ != NOT
 /* Map to hash value to point on G2 from random BIG */
-void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,octet *W)
+void ECP2_ZZZ_mapit(ECP2_ZZZ *Q,octet *W)
 {
     BIG_XXX q,one,Fx,Fy,x,hv;
     FP2_YYY X;
@@ -652,7 +651,7 @@ void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,octet *W)
 #elif (PAIRING_FRIENDLY_ZZZ == BLS)
     ECP2_ZZZ xQ, x2Q;
 #endif
-	BIG_XXX_fromBytes(hv,W->val);
+    BIG_XXX_fromBytes(hv,W->val);
     BIG_XXX_rcopy(q,Modulus_ZZZ);
     BIG_XXX_one(one);
     BIG_XXX_mod(hv,q);
@@ -719,7 +718,6 @@ void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,octet *W)
 
 #endif
 }
-#endif
 
 /*
 

@@ -1,7 +1,7 @@
 /**
  * @file test_mpin_ZZZ.c
  * @author Kealan McCusker
- * @brief Test good token and correct PIN with D-TA. Single PAS_ZZZs
+ * @brief Test good token and correct PIN with D-TA. Single pass
  *
  * LICENSE
  *
@@ -23,7 +23,7 @@
  * under the License.
  */
 
-/* Test good token and correct PIN with D-TA. Single PAS_ZZZs */
+/* Test good token and correct PIN with D-TA. Single pass */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,50 +40,50 @@ int main()
     char id[256];
     octet ID = {0,sizeof(id),id};
 
-    char x[PGS_ZZZ],y1[PGS_ZZZ],y2[PGS_ZZZ];
+    char x[MPIN_PGS_ZZZ],y1[MPIN_PGS_ZZZ],y2[MPIN_PGS_ZZZ];
     octet X= {0, sizeof(x),x};
     octet Y1= {0,sizeof(y1),y1};
     octet Y2= {0,sizeof(y2),y2};
 
     /* Master secret shares */
-    char ms1[PGS_ZZZ], ms2[PGS_ZZZ];
+    char ms1[MPIN_PGS_ZZZ], ms2[MPIN_PGS_ZZZ];
     octet MS1= {0,sizeof(ms1),ms1};
     octet MS2= {0,sizeof(ms2),ms2};
 
     /* Hash values of Client ID */
-    char hcid[PFS_ZZZ];
+    char hcid[MPIN_PFS_ZZZ];
     octet HCID= {0,sizeof(hcid), hcid};
 
     /* Client secret and shares */
-    char cs1[2*PFS_ZZZ+1], cs2[2*PFS_ZZZ+1], sec[2*PFS_ZZZ+1];
+    char cs1[2*MPIN_PFS_ZZZ+1], cs2[2*MPIN_PFS_ZZZ+1], sec[2*MPIN_PFS_ZZZ+1];
     octet SEC= {0,sizeof(sec),sec};
     octet CS1= {0,sizeof(cs1), cs1};
     octet CS2= {0,sizeof(cs2), cs2};
 
     /* Server secret and shares */
-    char ss1[4*PFS_ZZZ], ss2[4*PFS_ZZZ], serverSecret[4*PFS_ZZZ];
+    char ss1[4*MPIN_PFS_ZZZ], ss2[4*MPIN_PFS_ZZZ], serverSecret[4*MPIN_PFS_ZZZ];
     octet ServerSecret= {0,sizeof(serverSecret),serverSecret};
     octet SS1= {0,sizeof(ss1),ss1};
     octet SS2= {0,sizeof(ss2),ss2};
 
     /* Time Permit and shares */
-    char tp1[2*PFS_ZZZ+1], tp2[2*PFS_ZZZ+1], tp[2*PFS_ZZZ+1];
+    char tp1[2*MPIN_PFS_ZZZ+1], tp2[2*MPIN_PFS_ZZZ+1], tp[2*MPIN_PFS_ZZZ+1];
     octet TP= {0,sizeof(tp),tp};
     octet TP1= {0,sizeof(tp1),tp1};
     octet TP2= {0,sizeof(tp2),tp2};
 
     /* Token stored on computer */
-    char token[2*PFS_ZZZ+1];
+    char token[2*MPIN_PFS_ZZZ+1];
     octet TOKEN= {0,sizeof(token),token};
 
-    char ut[2*PFS_ZZZ+1];
+    char ut[2*MPIN_PFS_ZZZ+1];
     octet UT= {0,sizeof(ut),ut};
 
-    char hid[2*PFS_ZZZ+1],htid[2*PFS_ZZZ+1];
+    char hid[2*MPIN_PFS_ZZZ+1],htid[2*MPIN_PFS_ZZZ+1];
     octet HID= {0,sizeof(hid),hid};
     octet HTID= {0,sizeof(htid),htid};
 
-    char e[12*PFS_ZZZ], f[12*PFS_ZZZ];
+    char e[12*MPIN_PFS_ZZZ], f[12*MPIN_PFS_ZZZ];
     octet E= {0,sizeof(e),e};
     octet F= {0,sizeof(f),f};
 
@@ -110,7 +110,7 @@ int main()
     CREATE_CSPRNG(&RNG,&SEED);
 
     /* Hash ID */
-    HASH_ID(HASH_TYPE_MPIN_ZZZ,&ID,&HCID);
+    HASH_ID(HASH_TYPE_MPIN,&ID,&HCID);
     OCT_output(&HCID);
 
     /* Generate Client master secret for MIRACL and Customer */
@@ -190,13 +190,13 @@ int main()
     /* Generate Time Permit shares */
     date = today();
     printf("Date %d \n", date);
-    rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,date,&MS1,&HCID,&TP1);
+    rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS1,&HCID,&TP1);
     if (rtn != 0)
     {
         printf("MPIN_ZZZ_GET_CLIENT_PERMIT(date,&MS1,&HCID,&TP1) Error %d\n", rtn);
         return 1;
     }
-    rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN_ZZZ,date,&MS2,&HCID,&TP2);
+    rtn = MPIN_ZZZ_GET_CLIENT_PERMIT(HASH_TYPE_MPIN,date,&MS2,&HCID,&TP2);
     if (rtn != 0)
     {
         printf("MPIN_ZZZ_GET_CLIENT_PERMIT(date,&MS2,&HCID,&TP2) Error %d\n", rtn);
@@ -218,7 +218,7 @@ int main()
     OCT_output(&TP);
 
     /* Client extracts PIN1 from secret to create Token */
-    rtn = MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN_ZZZ,&ID, PIN1, &TOKEN);
+    rtn = MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN,&ID, PIN1, &TOKEN);
     if (rtn != 0)
     {
         printf("MPIN_ZZZ_EXTRACT_PIN( &ID, PIN, &TOKEN) Error %d\n", rtn);
@@ -227,11 +227,11 @@ int main()
     printf("Token = 0x");
     OCT_output(&TOKEN);
 
-    /* Single PAS_ZZZs MPIN protocol */
+    /* Single pass MPIN protocol */
     /* Client  */
     TimeValue = GET_TIME();
     printf("TimeValue %d \n", TimeValue);
-    rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN_ZZZ,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,NULL,TimeValue,&Y1);
+    rtn = MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN,date,&ID,&RNG,&X,PIN2,&TOKEN,&SEC,NULL,&UT,&TP,NULL,TimeValue,&Y1);
     if (rtn != 0)
     {
         printf("MPIN_ZZZ_CLIENT ERROR %d\n", rtn);
@@ -243,7 +243,7 @@ int main()
     OCT_output(&SEC);
 
     /* Server  */
-    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN_ZZZ,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,NULL,TimeValue,NULL);
+    rtn = MPIN_ZZZ_SERVER(HASH_TYPE_MPIN,date,&HID,&HTID,&Y2,&ServerSecret,NULL,&UT,&SEC,&E,&F,&ID,NULL,TimeValue,NULL);
 
     printf("Y2 = 0x");
     OCT_output(&Y2);

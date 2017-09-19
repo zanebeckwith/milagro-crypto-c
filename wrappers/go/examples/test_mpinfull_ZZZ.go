@@ -86,7 +86,7 @@ func main() {
 	defer amcl.CleanMemory(MS2[:])
 
 	// Either Client or TA calculates Hash(ID)
-	HCID := amcl.HashId(HASH_TYPE_MPIN, hashBytes_ZZZ, ID)
+	HCID := amcl.HashId(HASH_TYPE_MPIN, amcl.PFS_ZZZ, ID)
 
 	// Generate server secret share 1
 	rtn, SS1 := amcl.GetServerSecret_ZZZ(MS1[:])
@@ -279,7 +279,7 @@ func main() {
 	defer amcl.CleanMemory(T[:])
 
 	// Hash all values
-	HM := amcl.HashAll(HASH_TYPE_MPIN, hashBytes_ZZZ, HCID[:], U[:], nil, V[:], Y2[:], Z[:], T[:])
+	HM := amcl.HashAll(HASH_TYPE_MPIN, amcl.PFS_ZZZ, HCID[:], U[:], nil, V[:], Y2[:], Z[:], T[:])
 
 	// Destroy HM
 	defer amcl.CleanMemory(HM[:])

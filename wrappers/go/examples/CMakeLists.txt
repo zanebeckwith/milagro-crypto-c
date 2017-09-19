@@ -36,10 +36,6 @@ function(CURVE_GOEXAMPLE_SET tb tf tc nb base nbt m8 mt ct pf)
     string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_mpinTwoPass_${tc}.go" "${tempc}")
 
-    # Configure go mpin time permit tests
-    file(READ "time_mpin_ZZZ.go" tempc)
-    string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/time_mpin_${tc}.go" "${tempc}")
 
 	endif(BUILD_MPIN AND NOT(${pf} STREQUAL "NOT"))
 endfunction(CURVE_GOEXAMPLE_SET tb tf tc nb base nbt m8 mt ct pf)
