@@ -28,6 +28,10 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   set(CURVE_HEADERS ${CURVE_HEADERS}
   	${CMAKE_CURRENT_BINARY_DIR}/config_field_${tf}.h)
 
+  file(READ "${CMAKE_CURRENT_BINARY_DIR}/version.h" temph)
+  string(REGEX REPLACE "@SC@" "#define ${tc}_VER\n@SC@" temph "${temph}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "${temph}")
+
   file(READ "config_curve_ZZZ.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
@@ -187,6 +191,10 @@ function(RSA_HEADERS_SET tb tff nb base ml)
 
   set(RSA_HEADERS ${RSA_HEADERS}
 		${CMAKE_CURRENT_BINARY_DIR}/config_big_${bd}.h)
+
+  file(READ "${CMAKE_CURRENT_BINARY_DIR}/version.h" temph)
+  string(REGEX REPLACE "@RSL@" "#define RSA_SECURITY_LEVEL_${tff}_VER\n@RSL@" temph "${temph}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "${temph}")
 
   file(READ "config_ff_WWW.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
@@ -397,7 +405,11 @@ foreach(RSA ${AMCL_RSA})
   endif(AMCL_CHUNK STREQUAL "64")
 endforeach(RSA)
 
-
+# Clean regex marker in version.h
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/version.h" temph)
+string(REGEX REPLACE "@SC@" "" temph "${temph}")
+string(REGEX REPLACE "@RSL@" "" temph "${temph}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "${temph}")
 
 install (DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
