@@ -1,18 +1,18 @@
 # AMCL - *Apache Milagro Crypto Library*
 
-[![Master Branch](https://img.shields.io/badge/-master:-gray.svg)](https://github.com/miracl/milagro-crypto-c/tree/master)
-[![Master Build Status](https://secure.travis-ci.org/miracl/milagro-crypto-c.png?branch=master)](https://travis-ci.org/miracl/milagro-crypto-c?branch=master)
-[![Master Coverage Status](https://coveralls.io/repos/miracl/milagro-crypto-c/badge.svg?branch=master&service=github)](https://coveralls.io/github/miracl/milagro-crypto-c?branch=master)
+[![Master Branch](https://img.shields.io/badge/-master:-gray.svg)](https://github.com/milagro-crypto/milagro-crypto-c/tree/master)
+[![Master Build Status](https://secure.travis-ci.org/milagro-crypto/milagro-crypto-c.png?branch=master)](https://travis-ci.org/milagro-crypto/milagro-crypto-c?branch=master)
+[![Master Coverage Status](https://coveralls.io/repos/github/milagro-crypto/milagro-crypto-c/badge.svg?branch=master)](https://coveralls.io/github/milagro-crypto/milagro-crypto-c?branch=master)
 
-[![Develop Branch](https://img.shields.io/badge/-develop:-gray.svg)](https://github.com/miracl/milagro-crypto-c/tree/develop)
-[![Develop Build Status](https://secure.travis-ci.org/miracl/milagro-crypto-c.png?branch=develop)](https://travis-ci.org/miracl/milagro-crypto-c?branch=develop)
-[![Develop Coverage Status](https://coveralls.io/repos/miracl/milagro-crypto-c/badge.svg?branch=develop&service=github)](https://coveralls.io/github/miracl/milagro-crypto-c?branch=develop)
+[![Develop Branch](https://img.shields.io/badge/-develop:-gray.svg)](https://github.com/milagro-crypto/milagro-crypto-c/tree/develop)
+[![Develop Build Status](https://secure.travis-ci.org/milagro-crypto/milagro-crypto-c.png?branch=develop)](https://travis-ci.org/milagro-crypto/milagro-crypto-c?branch=develop)
+[![Develop Coverage Status](https://coveralls.io/repos/github/milagro-crypto/milagro-crypto-c/badge.svg?branch=develop)](https://coveralls.io/github/milagro-crypto/milagro-crypto-c?branch=develop)
 
 
 * **category**:    Library
 * **copyright**:   2016 The Apache Software Foundation
 * **license**:     ASL 2.0 ([Apache License Version 2.0, January 2004](http://www.apache.org/licenses/LICENSE-2.0))
-* **link**:        https://github.com/miracl/milagro-crypto-c
+* **link**:        https://github.com/milagro-crypto/milagro-crypto-c
 * **introduction**: [AMCL.pdf](doc/AMCL.pdf)
 
 
@@ -111,7 +111,7 @@ program. To build and run the example use this script;
 
 NOTE: The default build is for 64 bit machines
 
-    git clone https://github.com/miracl/milagro-crypto-c
+    git clone https://github.com/milagro-crypto/milagro-crypto-c
     cd milagro-crypto-c
     mkdir -p target/build
     cd target/build
@@ -158,7 +158,7 @@ After having built the libraries you can build a binary installer and a source d
 
 Start a command prompt as an administrator
 
-    git clone https://github.com/miracl/milagro-crypto-c
+    git clone https://github.com/milagro-crypto/milagro-crypto-c
     cd milagro-crypto-c
     mkdir target\build
     cd target\build
