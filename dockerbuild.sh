@@ -28,7 +28,7 @@ DOCKERDEV=${VENDOR}/dev_${PROJECT}
 docker build -t ${DOCKERDEV} ./resources/DockerDev/
 
 # Define the project root path
-PRJPATH=/root/src/${CVSPATH}/${PROJECT}
+PRJPATH=/go/src/${CVSPATH}/${PROJECT}
 
 # Generate a temporary Dockerfile to build and test the project
 # NOTE: The exit status of the RUN command is stored to be returned later,
@@ -38,8 +38,8 @@ FROM ${DOCKERDEV}
 RUN mkdir -p ${PRJPATH}
 ADD ./ ${PRJPATH}
 WORKDIR ${PRJPATH}
-RUN GOPATH=/root go get -u -v github.com/stretchr/testify/assert && \
-make ${MAKETARGET} || (echo \$? > target/make.exit)
+ENV GOPATH /go
+RUN make ${MAKETARGET} || (echo \$? > target/make.exit)
 EOM
 
 # Define the temporary Docker image name
