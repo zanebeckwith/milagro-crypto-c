@@ -89,8 +89,8 @@ the library.
 
     make
 
-If you are using GO then you must set the GOPATH first. Note that there can 
-only be one entry in the GOPATH 
+If you are using GO then you must set the GOPATH first. Note that there can
+only be one entry in the GOPATH
 
     export GOPATH=${HOME}/src
     make
@@ -100,9 +100,9 @@ the library in a docker container.
 
 ##### Multiple curves and RSA security levels
 
-The default build (see config.mk) uses multiple curves and RSA security 
-levels. There is an example called testall.c in the examples directory that 
-shows how to write a program to use the different curves etc in a single 
+The default build (see config.mk) uses multiple curves and RSA security
+levels. There is an example called testall.c in the examples directory that
+shows how to write a program to use the different curves etc in a single
 program. To build and run the example use this script;
 
     buildMulti.sh
@@ -147,7 +147,7 @@ To list other available CMake options, use:
 
     sudo make uninstall
 
-##### Building an installer 
+##### Building an installer
 
 After having built the libraries you can build a binary installer and a source distribution by running this command
 
@@ -188,35 +188,33 @@ After having built the libraries you can build a Windows installer using this co
 
 In order for this to work NSSI has to have been installed
 
-
 ## Contributions
 
-This project includes a Makefile that allows you to test and build the project in a Linux-compatible system with simple commands.  
-All the artifacts and reports produced using this Makefile are stored in the *target* folder.  
+This project includes a Makefile that allows you to test and build the project in a Linux-compatible system with simple commands.
+All the artifacts and reports produced using this Makefile are stored in the *target* folder.
 
-All the packages listed in the *resources/DockerDev/Dockerfile* file are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a [Docker](https://www.docker.com) container using the command "MAKETARGET=buildall make dbuild".
+All the packages listed in the *Dockerfile* are required in order to build and test all the library options in the current environment. Alternatively, everything can be built inside a [Docker](https://www.docker.com) container using the command "make -f Makefile.docker buildall".
 
 To see all available options:
 ```
 make help
 ```
 
-To build the project inside a Docker container (requires Docker):
+To build the builder Docker image:
 ```
-MAKETARGET=buildall make dbuild
+make -f Makefile.docker
+```
+
+To build the project inside a Docker container (requires Docker) you need to build a builder image (once), and then build the project in its context:
+```
+make -f Makefile.docker buildall
 ```
 
 To build a particular set of predefined makefile options inside a Docker container:
 ```
-MAKETARGET='build TYPE=LINUX_64BIT_NIST256_RSA2048' make dbuild
+make -f Makefile.docker build TYPE=LINUX_64BIT_NIST256_RSA2048
 ```
 The list of pre-defined options can be listed by typing ```make help```
-
-
-The base Docker building environment is defined in the following Dockerfile:
-```
-resources/DockerDev/Dockerfile
-```
 
 To execute all the test builds and generate reports in the current environment:
 ```
@@ -226,41 +224,4 @@ make qa
 To format the code (please use this command before submitting any pull request):
 ```
 make format
-```
-
-## Useful Docker commands
-
-To manually create the container you can execute:
-```
-docker build --tag="miracl/amcldev" .
-```
-
-To log into the newly created container:
-```
-docker run -t -i miracl/amcldev /bin/bash
-```
-
-To get the container ID:
-```
-CONTAINER_ID=`docker ps -a | grep miracl/amcldev | cut -c1-12`
-```
-
-To delete the newly created docker container:
-```
-docker rm -f $CONTAINER_ID
-```
-
-To delete the docker image:
-```
-docker rmi -f miracl/amcldev
-```
-
-To delete all containers
-```
-docker rm $(docker ps -a -q)
-```
-
-To delete all images
-```
-docker rmi $(docker images -q)
 ```

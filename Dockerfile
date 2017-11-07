@@ -1,4 +1,4 @@
-FROM ubuntu AS downloader
+FROM ubuntu:latest AS downloader
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates
@@ -11,7 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
 
 
-FROM ubuntu
+FROM ubuntu:latest
+
+# Install and configure GO
+ENV GOPATH /go
+ENV PATH $PATH:/usr/local/go/bin:$GOPATH/bin
+COPY --from=downloader /usr/local/go /usr/local/
 
 RUN dpkg --add-architecture i386 \
     && apt-get update && apt-get install -y --no-install-recommends \
@@ -33,15 +38,11 @@ RUN dpkg --add-architecture i386 \
     wine \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && go get github.com/stretchr/testify/assert \
     && pip install --upgrade pip \
     && pip install \
     autopep8 \
     cffi \
     wheel
 
-# Install and configure GO
-ENV GOPATH /go
-ENV PATH $PATH:/usr/local/go/bin:$GOPATH/bin
-COPY --from=downloader /usr/local/go /usr/local/
-RUN go version \
-    && go get github.com/stretchr/testify/assert
+CMD ["/bin/bash"]
