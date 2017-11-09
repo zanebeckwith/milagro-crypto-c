@@ -5,7 +5,7 @@
 #
 # This file is intended to be executed in a Linux-compatible system and requires
 # the packages listed in resources/DockerDev/Dockerfile to execute the build in
-# the current environment, or Docker to build everything inside a Docker 
+# the current environment, or Docker to build everything inside a Docker
 # container via the command "MAKETARGET=buildall make dbuild".
 #
 # Requires GNU parallel: https://www.gnu.org/software/parallel/
@@ -172,7 +172,7 @@ help:
 	@echo ""
 
 # Default build configured in config.mk
-default: 
+default:
 	@echo -e "\n\n*** BUILD default - see config.mk ***\n"
 	rm -rf target/default/*
 ifeq ($(CMAKE_BUILD_TYPE),Coverage)
@@ -203,7 +203,7 @@ ifeq ($(CMAKE_BUILD_TYPE),Coverage)
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
 	lcov --remove coverage/amcl.info "/test_*" --output-file coverage/amcl.info && \
-	genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info 
+	genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info
 else
 	mkdir -p target/default
 	cd target/default && \
@@ -225,7 +225,7 @@ else
 	-DDEBUG_REDUCE=$(DEBUG_REDUCE) \
 	-DDEBUG_NORM=$(DEBUG_NORM) \
 	../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
-	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 
+	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0
 ifeq ($(AMCL_TEST),ON)
 	cd target/default && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
@@ -233,7 +233,7 @@ ifeq ($(AMCL_TEST),ON)
 endif
 ifeq ($(AMCL_BUILD_DOXYGEN),ON)
 	cd target/default && \
-	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0 
+	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0
 endif
 endif
 
@@ -274,7 +274,7 @@ build:
 # Same as build_item but stores the exit code and faling items
 build_qa_item:
 	make build_item ITEM=${ITEM} || (echo $$? > target/make.exit && echo ${ITEM} >> target/make_qa_errors.log);
- 
+
 # Build the specified item entry from the BUILDS list
 build_item:
 	make buildx BUILD_NAME=$(word 1,$(subst :, ,${ITEM})) BUILD_PARAMS=$(word 2,$(subst :, ,${ITEM}))
@@ -294,8 +294,8 @@ ifneq ($(strip $(filter %COVERAGE,${BUILD_NAME})),)
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	lcov --no-checksum --directory . --capture --output-file coverage/amcl.info && \
 	lcov --remove coverage/amcl.info "/test_*" --output-file coverage/amcl.info && \
-	genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info 
-else 
+	genhtml -o coverage -t "milagro-crypto-c Test Coverage" coverage/amcl.info
+else
 	mkdir -p target/${BUILD_NAME}
 	cd target/${BUILD_NAME} && \
 	cmake $(subst $(dcomma),$(space),${BUILD_PARAMS}) ../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
@@ -329,7 +329,7 @@ pubdocs:
 	cd ./target/DOCS/ && \
 	git add . -A && \
 	git commit -m 'Update documentation' && \
-	git push origin master --force 
+	git push origin master --force
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
 
