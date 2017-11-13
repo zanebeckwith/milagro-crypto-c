@@ -14,8 +14,10 @@ jobs:
       script:
         - ls -als $HOME/docker
         - if [ -f $HOME/docker/cache.tar ]; then docker load -i $HOME/docker/cache.tar; fi
+        - OLD_IMAGE_ID=$(docker images --format {{.ID}} milagro-crypto/amcl-builder)
         - docker build --cache-from=milagro-crypto/amcl-builder -t milagro-crypto/amcl-builder .
-        - docker save milagro-crypto/amcl-builder > $HOME/docker/cache.tar
+        - NEW_IMAGE_ID=$(docker images --format {{.ID}} milagro-crypto/amcl-builder)
+        - if [ "$OLD_IMAGE_ID" != "$NEW_IMAGE_ID" ]; then docker save milagro-crypto/amcl-builder > $HOME/docker/cache.tar.gz; fi
         - ls -als $HOME/docker
 
     - &main
