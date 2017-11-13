@@ -12,6 +12,7 @@ jobs:
 
     - stage: Build builder container
       script:
+        - if [[ -e $HOME/docker/cache.tar.gz ]]; docker load -i $HOME/docker/cache.tar.gz; fi
         - docker load -i $HOME/docker/cache.tar.gz
         - docker build --cache-from=milagro-crypto/amcl-builder -t milagro-crypto/amcl-builder .
         - docker save milagro-crypto/amcl-builder > $HOME/docker/cache.tar.gz
