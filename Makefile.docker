@@ -18,6 +18,8 @@ default:
 	$(call make,default)
 qa:
 	$(call make,qa)
+build_group:
+	$(call make,build_group BUILD_GROUP=$(BUILD_GROUP))
 build:
 	$(call make,build TYPE=$(TYPE))
 buildall:

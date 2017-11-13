@@ -1,27 +1,35 @@
 language: clang
-
-sudo: required
-dist: trusty
-
-branches:
-  except:
-    - release
-
-branches:
-  only:
-    - master
-    - develop
-    - travis
-
-install:
-  - gem install coveralls-lcov
-
+sudo: true
 services:
   - docker
 
-script:
-  - make -f Makefile.docker
-  - make -f Makefile.docker buildall
+jobs:
+  include:
 
-after_success:
-  - coveralls-lcov /home/travis/build/milagro-crypto/milagro-crypto-c/target/LINUX_64BIT_COVERAGE/coverage/amcl.info
+    - stage: Build builder container
+      script:
+        - make -f Makefile.docker builder
+
+    - stage: Coverage
+      install:
+        - gem install coveralls-lcov
+      script:
+        - make -f Makefile.docker build_group BUILD_GROUP=BUILDS_COVERAGE
+      after_success:
+        - coveralls-lcov /home/travis/build/milagro-crypto/milagro-crypto-c/target/LINUX_64BIT_COVERAGE/coverage/amcl.info
+
+    - &test
+      stage: test alternative environments
+      env:
+        BUILD_GROUP=BUILDS_64
+      script:
+        - make -f Makefile.docker build_group BUILD_GROUP=$(BUILDS_64)
+    - <<: *test
+      env:
+        BUILD_GROUP=BUILDS_32
+    - <<: *test
+      env:
+        BUILD_GROUP=BUILDS_16
+    - <<: *test
+      env:
+        BUILD_GROUP=BUILDS_ASAN
