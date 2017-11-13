@@ -12,7 +12,8 @@ jobs:
 
     - stage: Build builder container
       script:
-        - if [[ -e $HOME/docker/cache.tar.gz ]]; then docker load -i $HOME/docker/cache.tar.gz; fi
+        - ls -als $HOME/docker
+        - if [ -f $HOME/docker/cache.tar.gz ]; then docker load -i $HOME/docker/cache.tar.gz; fi
         - docker build --cache-from=milagro-crypto/amcl-builder -t milagro-crypto/amcl-builder .
         - docker save milagro-crypto/amcl-builder > $HOME/docker/cache.tar.gz
 
@@ -21,6 +22,7 @@ jobs:
       env:
         BUILD_GROUP=BUILDS_ASAN
       script:
+        - ls -als $HOME/docker
         - docker load -i $HOME/docker/cache.tar.gz
         - make -f Makefile.docker build_group BUILD_GROUP=$BUILD_GROUP
 
