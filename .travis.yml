@@ -3,33 +3,43 @@ sudo: true
 services:
   - docker
 
+cache:
+  directories:
+    - $HOME/docker/
+
 jobs:
   include:
 
     - stage: Build builder container
       script:
         - make -f Makefile.docker builder
+        - docker save milagro-crypto/amcl-builder > $HOME/docker/cache.tar.gz
 
-    - stage: Coverage
+    - &main
+      stage: ASan
+      env:
+        BUILD_GROUP=BUILDS_ASAN
+      script:
+        - docker load -i $HOME/docker/cache.tar.gz
+        - make -f Makefile.docker build_group BUILD_GROUP=$(BUILD_GROUP)
+
+    - <<: *main
+      stage: Coverage
+      env:
+        - BUILD_GROUP=BUILDS_COVERAGE
       install:
         - gem install coveralls-lcov
-      script:
-        - make -f Makefile.docker build_group BUILD_GROUP=BUILDS_COVERAGE
       after_success:
         - coveralls-lcov /home/travis/build/milagro-crypto/milagro-crypto-c/target/LINUX_64BIT_COVERAGE/coverage/amcl.info
 
     - &test
+      <<: *main
       stage: test alternative environments
       env:
         BUILD_GROUP=BUILDS_64
-      script:
-        - make -f Makefile.docker build_group BUILD_GROUP=$(BUILDS_64)
     - <<: *test
       env:
         BUILD_GROUP=BUILDS_32
     - <<: *test
       env:
         BUILD_GROUP=BUILDS_16
-    - <<: *test
-      env:
-        BUILD_GROUP=BUILDS_ASAN
