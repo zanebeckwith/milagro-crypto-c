@@ -16,6 +16,7 @@ jobs:
         - if [ -f $HOME/docker/cache.tar ]; then docker load -i $HOME/docker/cache.tar; fi
         - docker build --cache-from=milagro-crypto/amcl-builder -t milagro-crypto/amcl-builder .
         - docker save milagro-crypto/amcl-builder > $HOME/docker/cache.tar
+        - ls -als $HOME/docker
 
     - &main
       stage: ASan
