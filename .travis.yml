@@ -25,6 +25,7 @@ jobs:
       script:
         - ls -als $HOME/docker
         - docker load -i $HOME/docker/cache.tar
+        - docker images
         - make -f Makefile.docker build_group BUILD_GROUP=$BUILD_GROUP
 
     - <<: *main
