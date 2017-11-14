@@ -1,23 +1,11 @@
 language: clang
-
 sudo: required
 dist: trusty
-
-branches:
-  except:
-    - release
-
-branches:
-  only:
-    - master
-    - develop
-    - travis
+services:
+  - docker
 
 install:
   - gem install coveralls-lcov
-
-services:
-  - docker
 
 script:
   - make -f Makefile.docker
