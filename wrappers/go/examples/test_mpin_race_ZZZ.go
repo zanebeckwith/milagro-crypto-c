@@ -17,25 +17,19 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package main
+package test
 
 import (
 	"encoding/hex"
 	"fmt"
 	"sync"
 	"time"
-
-	"github.com/miracl/amcl-go-wrapper"
 )
 
 const numRoutines = 1000
 
-var (
-	HASH_TYPE_MPIN = amcl.SHA256
-	wg             sync.WaitGroup
-)
-
-func run(rng *amcl.RandNG) {
+func run(rng *amcl.RandNG, wg sync.WaitGroup) {
+	HASH_TYPE_MPIN := amcl.SHA256
 
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -190,7 +184,8 @@ func run(rng *amcl.RandNG) {
 	wg.Done()
 }
 
-func main() {
+// ExampleMPinAuthentications is example for concurrent MPin authentications
+func ExampleMPinAuthentications() {
 	// Seed value for Random Number Generator (RNG)
 	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)
@@ -206,7 +201,7 @@ func main() {
 	wg.Add(numRoutines)
 	t := time.Now()
 	for x := 0; x < numRoutines; x++ {
-		go run(&rng)
+		go run(&rng, &wg)
 	}
 	wg.Wait()
 

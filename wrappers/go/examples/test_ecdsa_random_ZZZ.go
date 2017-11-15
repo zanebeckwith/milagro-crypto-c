@@ -23,16 +23,15 @@
  * under the License.
  */
 
-package main
+package test
 
 import (
 	"encoding/hex"
 	"fmt"
-
-	"github.com/miracl/amcl-go-wrapper"
 )
 
-func main() {
+// ExampleECDSARandom is example for ECDSA
+func ExampleECDSARandom() {
 
 	var rtn int
 

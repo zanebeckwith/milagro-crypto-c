@@ -17,18 +17,17 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package main
+package test
 
 import (
 	"encoding/hex"
 	"fmt"
-
-	"github.com/miracl/amcl-go-wrapper"
 )
 
-var HASH_TYPE_MPIN = amcl.SHA256
+// ExampleMPinFullWithTP is example for MPin full work-flow with time permits
+func ExampleMPinFullWithTP() {
+	HASH_TYPE_MPIN := amcl.SHA256
 
-func main() {
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)

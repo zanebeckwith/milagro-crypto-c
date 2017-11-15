@@ -23,16 +23,15 @@
  * under the License.
  */
 
-package main
+package test
 
 import (
 	"encoding/hex"
 	"fmt"
-
-	"github.com/miracl/amcl-go-wrapper"
 )
 
-func main() {
+// ExampleRSASign is example for RSA signing
+func ExampleRSASign() {
 
 	var rtn int
 

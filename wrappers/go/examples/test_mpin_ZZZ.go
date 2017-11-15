@@ -17,18 +17,16 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package main
+package test
 
 import (
 	"encoding/hex"
 	"fmt"
-
-	"github.com/miracl/amcl-go-wrapper"
 )
 
-var HASH_TYPE_MPIN = amcl.SHA256
-
 func runTest(rng *amcl.RandNG) {
+	HASH_TYPE_MPIN := amcl.SHA256
+
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -266,7 +264,8 @@ func runTest(rng *amcl.RandNG) {
 	}
 }
 
-func main() {
+// ExampleMPinAuthentication is example for single MPin authentication
+func ExampleMPinAuthentication() {
 	// Seed value for Random Number Generator (RNG)
 	seedHex := "ac4509d6"
 	seed, err := hex.DecodeString(seedHex)

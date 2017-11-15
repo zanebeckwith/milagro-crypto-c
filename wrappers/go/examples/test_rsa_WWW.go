@@ -23,16 +23,15 @@
  * under the License.
  */
 
-package main
+package test
 
 import (
 	"encoding/hex"
 	"fmt"
-
-	"github.com/miracl/amcl-go-wrapper"
 )
 
-func main() {
+// ExampleRSAEncryption is example for RSA encryption and decryption
+func ExampleRSAEncryption() {
 
 	var rtn int
 
