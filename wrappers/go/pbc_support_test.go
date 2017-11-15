@@ -23,8 +23,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 const nIter int = 100
@@ -32,22 +30,38 @@ const nIter int = 100
 func TestOctets_ZZZ(t *testing.T) {
 	// Test bad hex
 	oct := GetOctetHex("zz")
-	assert.Equal(t, 0, int(oct.len), "Invalid hex should have len 0")
+	if int(oct.len) != 0 {
+		t.Errorf("invalid hex length; len=%v; expected=%v", int(oct.len), 0)
+	}
+
 	// Test good hex
 	oct = GetOctetHex("30")
-	assert.Equal(t, 1, int(oct.len), "Hex octed doesn't match")
-	oct = GetOctetHex("30")
-	assert.Equal(t, 48, int(*oct.val), "Hex octed doesn't match")
+	if int(oct.len) != 1 {
+		t.Errorf("invalid hex length; len=%v; expected=%v", int(oct.len), 1)
+	}
 
+	oct = GetOctetHex("30")
+	if int(*oct.val) != 48 {
+		t.Errorf("invalid hex length; len=%v; expected=%v", int(oct.len), 48)
+	}
+
+	e := "010203"
 	c := GetOctet(string([]byte{1, 2, 3}))
 	h := OctetToHex(&c)
+	if h != e {
+		t.Errorf("OctetToHex failed; got=h; expected=%v", e)
+	}
 
-	rtn := int(OctetComp([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9}, []byte{1, 2, 3, 4, 5, 6, 7, 8, 9}))
-	assert.Equal(t, rtn, 1, "Value should match 1")
+	rtn := OctetComp([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9}, []byte{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	if rtn != 1 {
+		t.Errorf("unexpected return code; rtn=%v; expected=%v", rtn, 1)
+	}
 
-	assert.Equal(t, "010203", h, "Octet convertion should match")
+	expected := "\x01\x02\x03"
 	s := OctetToString(&c)
-	assert.Equal(t, "\x01\x02\x03", s, "Octet convertion should match")
+	if s != expected {
+		t.Errorf("octet convertion failed; %v != %v", s, expected)
+	}
 }
 
 func TestGenerateRandomByte_ZZZ(t *testing.T) {
@@ -60,8 +74,11 @@ func TestGenerateRandomByte_ZZZ(t *testing.T) {
 	}
 	rng := CreateCSPRNG(seed)
 
+	expected := "57d662d39b1b245da469"
 	b := GenerateRandomByte(&rng, 10)
-	assert.Equal(t, "57d662d39b1b245da469", fmt.Sprintf("%x", b), "Should be equal")
+	if fmt.Sprintf("%x", b) != expected {
+		t.Errorf("random byte generation failed; %x != %v", b, expected)
+	}
 }
 
 func TestGenerateOTP_ZZZ(t *testing.T) {
@@ -74,8 +91,11 @@ func TestGenerateOTP_ZZZ(t *testing.T) {
 	}
 	rng := CreateCSPRNG(seed)
 
+	expected := 715827
 	otp := GenerateOTP(&rng)
-	assert.Equal(t, 715827, otp, "Should be equal")
+	if otp != expected {
+		t.Errorf("OTP generation failed; %v != %v", otp, expected)
+	}
 }
 
 func TestAesGcm_ZZZ(t *testing.T) {
@@ -111,15 +131,23 @@ func TestAesGcm_ZZZ(t *testing.T) {
 			if err != nil {
 				t.Fatal("Fatal error on AES Key length")
 			}
-			assert.Equal(t, tc.outC, hex.EncodeToString(C), "Should be equal")
-			assert.Equal(t, tc.outT, hex.EncodeToString(T), "Should be equal")
+			if hex.EncodeToString(C) != tc.outC || hex.EncodeToString(T) != tc.outT {
+				t.Errorf("AES GCM encryption failed; {C:%v, T:%v} != {C:%v, T:%v}",
+					hex.EncodeToString(C), hex.EncodeToString(T),
+					tc.outC, tc.outT,
+				)
+			}
 
 			dP, dT, err := AesGcmDecrypt(hexDecode(tc.Key), hexDecode(tc.IV), hexDecode(tc.AAD), hexDecode(tc.outC))
 			if err != nil {
-				t.Fatal("Fatal error on AES Key length")
+				t.Fatalf("AES GCM decrypt failed; err = %v;", err)
 			}
-			assert.Equal(t, tc.PlainText, hex.EncodeToString(dP), "Should be equal")
-			assert.Equal(t, tc.outT, hex.EncodeToString(dT), "Should be equal")
+			if hex.EncodeToString(dP) != tc.PlainText || hex.EncodeToString(dT) != tc.outT {
+				t.Errorf("AES GCM decrypt failed; {P:%v, T:%v} != {P:%v, T:%v}",
+					hex.EncodeToString(dP), hex.EncodeToString(dT),
+					tc.PlainText, tc.outT,
+				)
+			}
 		})
 	}
 }

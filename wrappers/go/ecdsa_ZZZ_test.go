@@ -29,8 +29,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestECDSARandom_ZZZ(t *testing.T) {
@@ -47,14 +45,18 @@ func TestECDSARandom_ZZZ(t *testing.T) {
 
 	// Generate ECC Key Pair
 	rtn, PrivKey, PubKey := ECPKeyPairGenerate_ZZZ(&rng, nil)
-	assert.Equal(t, rtn, 0, "Error - Generating ECC Key Pair")
+	if rtn != 0 {
+		t.Errorf("ECC key pair generation failed; rtn=%v", rtn)
+	}
 
 	// Destroy Private Key
 	defer CleanMemory(PrivKey[:])
 
 	// Validate ECC Public Key
 	rtn = ECPPublicKeyValidate_ZZZ(1, PubKey[:])
-	assert.Equal(t, rtn, 0, "Error - ECC Public Key is invalid!")
+	if rtn != 0 {
+		t.Errorf("ECC Public Key is invalid; rtn=%v", rtn)
+	}
 
 	// Message to sign
 	MESSAGEstr := "Hello World\n"
@@ -62,11 +64,15 @@ func TestECDSARandom_ZZZ(t *testing.T) {
 
 	// Sign Message
 	rtn, C, D := ECPSpDsa_ZZZ(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
-	assert.Equal(t, rtn, 0, "Error - ECDSA Signature Failed!")
+	if rtn != 0 {
+		t.Errorf("ECDSA signature failed; rtn=%v", rtn)
+	}
 
 	// Verify Message
 	rtn = ECPVpDsa_ZZZ(SHA256, PubKey[:], MESSAGE[:], C[:], D[:])
-	assert.Equal(t, rtn, 0, "Error - ECDSA Verification Failed!")
+	if rtn != 0 {
+		t.Errorf("ECDSA verification failed; rtn=%v", rtn)
+	}
 
 }
 
@@ -96,11 +102,15 @@ func TestECDSA_ZZZ(t *testing.T) {
 
 	// Generate ECC Key Pair
 	rtn, PrivKey, PubKey := ECPKeyPairGenerate_ZZZ(nil, PrivKey)
-	assert.Equal(t, rtn, 0, "Error - Generating ECC Key Pair")
+	if rtn != 0 {
+		t.Errorf("ECC key pair generation failed; rtn=%v", rtn)
+	}
 
 	// Validate ECC Public Key
 	rtn = ECPPublicKeyValidate_ZZZ(1, PubKey[:])
-	assert.Equal(t, rtn, 0, "Error - ECC Public Key is invalid!")
+	if rtn != 0 {
+		t.Errorf("ECC public key is invalid; rtn=%v", rtn)
+	}
 
 	// Message to sign
 	MESSAGEstr := "Hello World\n"
@@ -108,10 +118,14 @@ func TestECDSA_ZZZ(t *testing.T) {
 
 	// Sign Message
 	rtn, C, D := ECPSpDsa_ZZZ(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
-	assert.Equal(t, rtn, 0, "Error - ECDSA Signature Failed!")
+	if rtn != 0 {
+		t.Errorf("ECDSA signature sailed; rtn=%v", rtn)
+	}
 
 	// Verify Message
 	rtn = ECPVpDsa_ZZZ(SHA256, PubKey[:], MESSAGE[:], C[:], D[:])
-	assert.Equal(t, rtn, 0, "Error - ECDSA Verification Failed!")
+	if rtn != 0 {
+		t.Errorf("ECDSA verification failed; rtn=%v", rtn)
+	}
 
 }

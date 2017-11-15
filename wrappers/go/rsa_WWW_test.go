@@ -26,11 +26,10 @@
 package amcl
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestRSA_WWW(t *testing.T) {
@@ -67,7 +66,9 @@ func TestRSA_WWW(t *testing.T) {
 	// destroy private key
 	RSAPrivateKeyKill_WWW(&RSA_PrivKey)
 
-	assert.Equal(t, Fgot, MESSAGE, "Should be equal")
+	if !bytes.Equal(Fgot, MESSAGE) {
+		t.Errorf("OAEP decode failed; %v != %v", string(Fgot), MESSAGEstr)
+	}
 }
 
 func TestRsaSign_WWW(t *testing.T) {
@@ -100,5 +101,7 @@ func TestRsaSign_WWW(t *testing.T) {
 	// destroy private key
 	RSAPrivateKeyKill_WWW(&RSA_PrivKey)
 
-	assert.Equal(t, C, Cgot, "Should be equal")
+	if !bytes.Equal(Cgot, C) {
+		t.Error("RSA encryption failed; %v != %v", string(Cgot), string(C))
+	}
 }

@@ -25,13 +25,9 @@ import (
 	"fmt"
 	//mathrand "math/rand"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestKeyEscrowLess_ZZZ(t *testing.T) {
-	want := 0
-	var got int
 
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
@@ -135,15 +131,13 @@ func TestKeyEscrowLess_ZZZ(t *testing.T) {
 	// Destroy X
 	defer CleanMemory(X[:])
 
-	got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
-
-	assert.Equal(t, want, got, "Should be equal")
+	rtn, _, _, _, _, _ := Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
+	if rtn != 0 {
+		t.Errorf("One-Pass failed; rtn=%v", rtn)
+	}
 }
 
 func TestKeyEscrowLessRandom_ZZZ(t *testing.T) {
-	want := 0
-	var got int
-
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -246,15 +240,13 @@ func TestKeyEscrowLessRandom_ZZZ(t *testing.T) {
 	defer CleanMemory(X[:])
 
 	// Authenticate
-	got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
-
-	assert.Equal(t, want, got, "Should be equal")
+	rtn, _, _, _, _, _ := Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
+	if rtn != 0 {
+		t.Errorf("One-Pass failed; rtn=%v", rtn)
+	}
 }
 
 func TestKeyEscrowWrongPK_ZZZ(t *testing.T) {
-	want := -19
-	var got int
-
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -377,15 +369,14 @@ func TestKeyEscrowWrongPK_ZZZ(t *testing.T) {
 
 	timeValue += 10
 	// Authenticate
-	got, _, _, _, _, _ = Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], Pa, nil, false)
-
-	assert.Equal(t, want, got, "Should be equal")
+	expected := -19
+	rtn, _, _, _, _, _ := Server_ZZZ(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], Pa, nil, false)
+	if rtn != expected {
+		t.Errorf("One-Pass - unexpected return code; rtn: %v != %v", rtn, expected)
+	}
 }
 
 func TestKeyEscrowLessTwoPassWrongPK_ZZZ(t *testing.T) {
-	want := -19
-	var got int
-
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -504,14 +495,14 @@ func TestKeyEscrowLessTwoPassWrongPK_ZZZ(t *testing.T) {
 
 	// Server Pass 2
 	// Send UT as V to model bad token
-	got, _, _ = Server2_ZZZ(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
-	assert.Equal(t, want, got, "Should be equal")
+	expected := -19
+	rtn, _, _ := Server2_ZZZ(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
+	if rtn != expected {
+		t.Errorf("Server Pass 2 - unexpected return code; rtn: %v != %v", rtn, expected)
+	}
 }
 
 func TestKeyEscrowLessTwoPASS_ZZZ(t *testing.T) {
-	want := 0
-	var got int
-
 	// Assign the End-User an ID
 	IDstr := "testUser@miracl.com"
 	ID := []byte(IDstr)
@@ -630,6 +621,8 @@ func TestKeyEscrowLessTwoPASS_ZZZ(t *testing.T) {
 
 	// Server Pass 2
 	// Send UT as V to model bad token
-	got, _, _ = Server2_ZZZ(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
-	assert.Equal(t, want, got, "Should be equal")
+	rtn, _, _ := Server2_ZZZ(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
+	if rtn != 0 {
+		t.Errorf("Server Pass 2 failed; rtn=%v", rtn)
+	}
 }

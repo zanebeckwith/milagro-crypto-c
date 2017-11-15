@@ -38,7 +38,6 @@ RUN dpkg --add-architecture i386 \
     wine \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && go get github.com/stretchr/testify/assert \
     && pip install --upgrade pip \
     && pip install \
     autopep8 \

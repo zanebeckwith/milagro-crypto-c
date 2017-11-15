@@ -255,7 +255,6 @@ clean:
 
 # Execute all builds and tests
 qa:
-	go get github.com/stretchr/testify/assert
 	@mkdir -p target/
 	@echo 0 > target/make.exit
 	@echo '' > target/make_qa_errors.log
