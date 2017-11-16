@@ -137,7 +137,6 @@ endif(BUILD_MPIN OR BUILD_WCC)
 # Add subdirectories
 add_subdirectory(include)
 add_subdirectory(src)
-add_subdirectory(examples)
 add_subdirectory(test)
 add_subdirectory(benchmark)
 
@@ -158,7 +157,6 @@ if (BUILD_GO)
   set(GO_PATH "$ENV{GOPATH}" CACHE STRING "GOPATH")
   message(STATUS "Build Golang: GOPATH='${GO_PATH}'")
   add_subdirectory (wrappers/go)
-  add_subdirectory (wrappers/go/examples)
 endif (BUILD_GO)
 
 # Build Documentation

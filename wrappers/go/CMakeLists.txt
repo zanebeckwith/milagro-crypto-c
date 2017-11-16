@@ -20,9 +20,37 @@ configure_file (
 	"${PROJECT_BINARY_DIR}/wrappers/go/amcl.go"
 )
 
-file(COPY "${PROJECT_SOURCE_DIR}/wrappers/go/README.md" DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
-
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+    OWNER_WRITE OWNER_READ OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE)
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_test.go"
+    "${PROJECT_BINARY_DIR}/wrappers/go/mpin_test.go"
+)
+
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+    OWNER_WRITE OWNER_READ OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE)
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_test.go"
+    "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_test.go"
+)
+
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecdsa_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
+    OWNER_WRITE OWNER_READ OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE)
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/wrappers/go/rsa_test.go"
+    "${PROJECT_BINARY_DIR}/wrappers/go/rsa_test.go"
+)
+
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/rsa_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
     OWNER_WRITE OWNER_READ OWNER_EXECUTE
     GROUP_READ GROUP_EXECUTE
     WORLD_READ WORLD_EXECUTE)
@@ -272,4 +300,3 @@ endforeach(RSA)
 
 add_test(NAME test_golang_wrappers COMMAND go test -race -v)
 set_tests_properties (test_golang_wrappers PROPERTIES PAS_ZZZS_REGULAR_EXPRESSION PAS_ZZZS) #this need to be fixed since it doesn't catch failing tests
-
