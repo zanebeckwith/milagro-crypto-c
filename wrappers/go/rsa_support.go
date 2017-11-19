@@ -40,6 +40,10 @@ import "C"
 // RSA Constant
 const MAX_RSA_BYTES int = int(C.MAX_RSA_BYTES) // MAX_RSA_BYTES is the maximum RSA level of security supported - 4096
 
+type RSAPrivateKey interface{}
+
+type RSAPublicKey interface{}
+
 // PKCS15 (PKCS 1.5) - padding of a message to be signed
 func PKCS15(hashType, RFS int, M []byte) (errorCode int, C []byte) {
 	MStr := string(M)

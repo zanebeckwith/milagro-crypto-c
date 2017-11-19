@@ -44,7 +44,7 @@ const FFLEN_WWW int = int(C.FFLEN_WWW) // FFLEN_WWW consists in 2^n multiplier o
 const HASH_TYPE_RSA_WWW int = int(C.HASH_TYPE_RSA_WWW) // HASH_TYPE_RSA_WWW is the chosen Hash algorithm
 
 // RSAKeyPair generates an RSA key pair
-func RSAKeyPair_WWW(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key_WWW, C.rsa_public_key_WWW) {
+func RSAKeyPair_WWW(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey) {
 	PStr := string(P)
 	POct := GetOctet(PStr)
 	defer OctetFree(&POct)
@@ -56,36 +56,39 @@ func RSAKeyPair_WWW(RNG *RandNG, e int32, P []byte, Q []byte) (C.rsa_private_key
 	var RSA_PrivKey C.rsa_private_key_WWW
 
 	C.RSA_WWW_KEY_PAIR(RNG.csprng(), eVal, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
-	return RSA_PrivKey, RSA_PubKey
+	return &RSA_PrivKey, &RSA_PubKey
 }
 
 // RSAEncrypt_WWW encrypts F with the public key
-func RSAEncrypt_WWW(RSA_PubKey *C.rsa_public_key_WWW, F []byte) (G []byte) {
+func RSAEncrypt_WWW(publicKey RSAPublicKey, F []byte) (G []byte) {
 	FStr := string(F)
 	FOct := GetOctet(FStr)
 	defer OctetFree(&FOct)
 	GOct := GetOctetZero(RFS_WWW)
 	defer OctetFree(&GOct)
 
+	RSA_PubKey := publicKey.(*C.rsa_public_key_WWW)
 	C.RSA_WWW_ENCRYPT(RSA_PubKey, &FOct, &GOct)
 	G = OctetToBytes(&GOct)
 	return G[:]
 }
 
 // RSADecrypt_WWW decrypts G with the private key
-func RSADecrypt_WWW(RSA_PrivKey *C.rsa_private_key_WWW, G []byte) (F []byte) {
+func RSADecrypt_WWW(privateKey RSAPrivateKey, G []byte) (F []byte) {
 	GStr := string(G)
 	GOct := GetOctet(GStr)
 	defer OctetFree(&GOct)
 	FOct := GetOctetZero(RFS_WWW)
 	defer OctetFree(&FOct)
 
+	RSA_PrivKey := privateKey.(*C.rsa_private_key_WWW)
 	C.RSA_WWW_DECRYPT(RSA_PrivKey, &GOct, &FOct)
 	F = OctetToBytes(&FOct)
 	return F[:]
 }
 
 // RSAPrivateKeyKill_WWW destroys an RSA private Key
-func RSAPrivateKeyKill_WWW(RSA_PrivKey *C.rsa_private_key_WWW) {
+func RSAPrivateKeyKill_WWW(privateKey RSAPrivateKey) {
+	RSA_PrivKey := privateKey.(*C.rsa_private_key_WWW)
 	C.RSA_WWW_PRIVATE_KEY_KILL(RSA_PrivKey)
 }

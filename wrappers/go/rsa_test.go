@@ -54,11 +54,11 @@ func ExampleRSAEncryption() {
 	fmt.Printf("encoded message: 0x%x\n", F[:])
 
 	// encrypt encoded MESSAGE
-	G := RSAEncrypt_2048(&RSA_PubKey, F[:])
+	G := RSAEncrypt_2048(RSA_PubKey, F[:])
 	fmt.Printf("encrypted message: 0x%x\n", G[:])
 
 	// decrypt encrypted MESSAGE
-	ML := RSADecrypt_2048(&RSA_PrivKey, G[:])
+	ML := RSADecrypt_2048(RSA_PrivKey, G[:])
 	fmt.Printf("decrypted message: 0x%x\n", ML[:])
 
 	// OAEP decode MESSAGE
@@ -75,7 +75,7 @@ func ExampleRSAEncryption() {
 	}
 
 	// destroy private key
-	RSAPrivateKeyKill_2048(&RSA_PrivKey)
+	RSAPrivateKeyKill_2048(RSA_PrivKey)
 
 	// Output:
 	// message: Hello World
@@ -115,15 +115,15 @@ func ExampleRSASign() {
 	fmt.Printf("padded message: %x\n", C[:])
 
 	// create signature in S
-	S := RSADecrypt_2048(&RSA_PrivKey, C[:])
+	S := RSADecrypt_2048(RSA_PrivKey, C[:])
 	fmt.Printf("signed message: %x\n", S[:])
 
-	Cgot := RSAEncrypt_2048(&RSA_PubKey, S[:])
+	Cgot := RSAEncrypt_2048(RSA_PubKey, S[:])
 
 	fmt.Printf("verify signature message: %x\n", Cgot[:])
 
 	// destroy private key
-	RSAPrivateKeyKill_2048(&RSA_PrivKey)
+	RSAPrivateKeyKill_2048(RSA_PrivKey)
 
 	// Use the following only for testing
 	rtn = int(OctetComp(C, Cgot))

@@ -55,16 +55,16 @@ func TestRSA_WWW(t *testing.T) {
 	_, F := OAEPencode(HASH_TYPE_RSA_WWW, RFS_WWW, MESSAGE, &rng, nil)
 
 	// encrypt encoded MESSAGE
-	G := RSAEncrypt_WWW(&RSA_PubKey, F[:])
+	G := RSAEncrypt_WWW(RSA_PubKey, F[:])
 
 	// decrypt encrypted MESSAGE
-	ML := RSADecrypt_WWW(&RSA_PrivKey, G[:])
+	ML := RSADecrypt_WWW(RSA_PrivKey, G[:])
 
 	// OAEP decode MESSAGE
 	_, Fgot := OAEPdecode(HASH_TYPE_RSA_WWW, nil, ML[:])
 
 	// destroy private key
-	RSAPrivateKeyKill_WWW(&RSA_PrivKey)
+	RSAPrivateKeyKill_WWW(RSA_PrivKey)
 
 	if !bytes.Equal(Fgot, MESSAGE) {
 		t.Errorf("OAEP decode failed; %v != %v", string(Fgot), MESSAGEstr)
@@ -94,12 +94,12 @@ func TestRsaSign_WWW(t *testing.T) {
 	_, C := PKCS15(HASH_TYPE_RSA_WWW, RFS_WWW, MESSAGE)
 
 	// create signature in S
-	S := RSADecrypt_WWW(&RSA_PrivKey, C[:])
+	S := RSADecrypt_WWW(RSA_PrivKey, C[:])
 
-	Cgot := RSAEncrypt_WWW(&RSA_PubKey, S[:])
+	Cgot := RSAEncrypt_WWW(RSA_PubKey, S[:])
 
 	// destroy private key
-	RSAPrivateKeyKill_WWW(&RSA_PrivKey)
+	RSAPrivateKeyKill_WWW(RSA_PrivKey)
 
 	if !bytes.Equal(Cgot, C) {
 		t.Error("RSA encryption failed; %v != %v", string(Cgot), string(C))
