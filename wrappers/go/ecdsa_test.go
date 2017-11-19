@@ -21,7 +21,218 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"testing"
 )
+
+func TestECDSA(t *testing.T) {
+	seed, err := hex.DecodeString("9e8b4178790cd57a5761c4a6f164ba72")
+	if err != nil {
+		t.Fatal(err)
+	}
+	rng := CreateCSPRNG(seed)
+
+	testCases := []struct {
+		curve             string
+		pbkdfKeyLen       int
+		genKey            func(RNG *RandNG, S []byte) (int, []byte, []byte)
+		genRNG            *RandNG
+		genSeed           []byte
+		ecpPubKeyValidate func(f int, W []byte) int
+		sign              func(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte)
+		verify            func(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int)
+	}{
+		{
+			curve:             "BLS383",
+			pbkdfKeyLen:       EGS_BLS383,
+			genKey:            ECPKeyPairGenerate_BLS383,
+			ecpPubKeyValidate: ECPPublicKeyValidate_BLS383,
+			sign:              ECPSpDsa_BLS383,
+			verify:            ECPVpDsa_BLS383,
+		},
+		{
+			curve:             "BN254",
+			pbkdfKeyLen:       EGS_BN254,
+			genKey:            ECPKeyPairGenerate_BN254,
+			ecpPubKeyValidate: ECPPublicKeyValidate_BN254,
+			sign:              ECPSpDsa_BN254,
+			verify:            ECPVpDsa_BN254,
+		},
+		{
+			curve:             "BN254CX",
+			pbkdfKeyLen:       EGS_BN254CX,
+			genKey:            ECPKeyPairGenerate_BN254CX,
+			ecpPubKeyValidate: ECPPublicKeyValidate_BN254CX,
+			sign:              ECPSpDsa_BN254CX,
+			verify:            ECPVpDsa_BN254CX,
+		},
+		{
+			curve:             "ED25519",
+			pbkdfKeyLen:       EGS_ED25519,
+			genKey:            ECPKeyPairGenerate_ED25519,
+			ecpPubKeyValidate: ECPPublicKeyValidate_ED25519,
+			sign:              ECPSpDsa_ED25519,
+			verify:            ECPVpDsa_ED25519,
+		},
+		{
+			curve:             "GOLDILOCKS",
+			pbkdfKeyLen:       EGS_GOLDILOCKS,
+			genKey:            ECPKeyPairGenerate_GOLDILOCKS,
+			ecpPubKeyValidate: ECPPublicKeyValidate_GOLDILOCKS,
+			sign:              ECPSpDsa_GOLDILOCKS,
+			verify:            ECPVpDsa_GOLDILOCKS,
+		},
+		{
+			curve:             "NIST256",
+			pbkdfKeyLen:       EGS_NIST256,
+			genKey:            ECPKeyPairGenerate_NIST256,
+			ecpPubKeyValidate: ECPPublicKeyValidate_NIST256,
+			sign:              ECPSpDsa_NIST256,
+			verify:            ECPVpDsa_NIST256,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.curve, func(t *testing.T) {
+
+			PassPhraseStr := "AlicePassPhrase"
+			PassPhrase := []byte(PassPhraseStr)
+
+			SaltStr := "aabbccddee"
+			Salt := []byte(SaltStr)
+
+			// Generate ECC Private Key
+			PrivKey := PBKDF2(SHA256, PassPhrase[:], Salt[:], 1000, tc.pbkdfKeyLen)
+
+			// Destroy Private Key
+			defer CleanMemory(PrivKey[:])
+
+			// Generate ECC Key Pair
+			rtn, PrivKey, PubKey := tc.genKey(nil, PrivKey)
+			if rtn != 0 {
+				t.Errorf("ECC key pair generation failed; rtn=%v", rtn)
+			}
+
+			// Validate ECC Public Key
+			rtn = tc.ecpPubKeyValidate(1, PubKey[:])
+			if rtn != 0 {
+				t.Errorf("ECC public key is invalid; rtn=%v", rtn)
+			}
+
+			// Message to sign
+			MESSAGEstr := "Hello World\n"
+			MESSAGE := []byte(MESSAGEstr)
+
+			// Sign Message
+			rtn, C, D := tc.sign(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
+			if rtn != 0 {
+				t.Errorf("ECDSA signature sailed; rtn=%v", rtn)
+			}
+
+			// Verify Message
+			rtn = tc.verify(SHA256, PubKey[:], MESSAGE[:], C[:], D[:])
+			if rtn != 0 {
+				t.Errorf("ECDSA verification failed; rtn=%v", rtn)
+			}
+		})
+	}
+}
+
+func TestECDSARandom(t *testing.T) {
+	seed, err := hex.DecodeString("9e8b4178790cd57a5761c4a6f164ba72")
+	if err != nil {
+		t.Fatal(err)
+	}
+	rng := CreateCSPRNG(seed)
+
+	testCases := []struct {
+		curve             string
+		genKey            func(RNG *RandNG, S []byte) (int, []byte, []byte)
+		genRNG            *RandNG
+		genSeed           []byte
+		ecpPubKeyValidate func(f int, W []byte) int
+		sign              func(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte)
+		verify            func(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int)
+	}{
+		{
+			curve:             "BLS383",
+			genKey:            ECPKeyPairGenerate_BLS383,
+			ecpPubKeyValidate: ECPPublicKeyValidate_BLS383,
+			sign:              ECPSpDsa_BLS383,
+			verify:            ECPVpDsa_BLS383,
+		},
+		{
+			curve:             "BN254",
+			genKey:            ECPKeyPairGenerate_BN254,
+			ecpPubKeyValidate: ECPPublicKeyValidate_BN254,
+			sign:              ECPSpDsa_BN254,
+			verify:            ECPVpDsa_BN254,
+		},
+		{
+			curve:             "BN254CX",
+			genKey:            ECPKeyPairGenerate_BN254CX,
+			ecpPubKeyValidate: ECPPublicKeyValidate_BN254CX,
+			sign:              ECPSpDsa_BN254CX,
+			verify:            ECPVpDsa_BN254CX,
+		},
+		{
+			curve:             "ED25519",
+			genKey:            ECPKeyPairGenerate_ED25519,
+			ecpPubKeyValidate: ECPPublicKeyValidate_ED25519,
+			sign:              ECPSpDsa_ED25519,
+			verify:            ECPVpDsa_ED25519,
+		},
+		{
+			curve:             "GOLDILOCKS",
+			genKey:            ECPKeyPairGenerate_GOLDILOCKS,
+			ecpPubKeyValidate: ECPPublicKeyValidate_GOLDILOCKS,
+			sign:              ECPSpDsa_GOLDILOCKS,
+			verify:            ECPVpDsa_GOLDILOCKS,
+		},
+		{
+			curve:             "NIST256",
+			genKey:            ECPKeyPairGenerate_NIST256,
+			ecpPubKeyValidate: ECPPublicKeyValidate_NIST256,
+			sign:              ECPSpDsa_NIST256,
+			verify:            ECPVpDsa_NIST256,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.curve, func(t *testing.T) {
+
+			// Generate ECC Key Pair
+			rtn, PrivKey, PubKey := tc.genKey(&rng, nil)
+			if rtn != 0 {
+				t.Errorf("ECC key pair generation failed; rtn=%v", rtn)
+			}
+
+			// Destroy Private Key
+			defer CleanMemory(PrivKey[:])
+
+			// Validate ECC Public Key
+			rtn = tc.ecpPubKeyValidate(1, PubKey[:])
+			if rtn != 0 {
+				t.Errorf("ECC Public Key is invalid; rtn=%v", rtn)
+			}
+
+			// Message to sign
+			MESSAGEstr := "Hello World\n"
+			MESSAGE := []byte(MESSAGEstr)
+
+			// Sign Message
+			rtn, C, D := tc.sign(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
+			if rtn != 0 {
+				t.Errorf("ECDSA signature failed; rtn=%v", rtn)
+			}
+
+			// Verify Message
+			rtn = tc.verify(SHA256, PubKey[:], MESSAGE[:], C[:], D[:])
+			if rtn != 0 {
+				t.Errorf("ECDSA verification failed; rtn=%v", rtn)
+			}
+		})
+	}
+}
 
 // ExampleECDSA is example for ECDSA
 func ExampleECDSA() {

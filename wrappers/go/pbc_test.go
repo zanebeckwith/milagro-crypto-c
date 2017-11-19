@@ -1,21 +1,19 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package amcl
 
@@ -27,7 +25,7 @@ import (
 
 const nIter int = 100
 
-func TestOctets_ZZZ(t *testing.T) {
+func TestOctets(t *testing.T) {
 	// Test bad hex
 	oct := GetOctetHex("zz")
 	if int(oct.len) != 0 {
@@ -64,7 +62,7 @@ func TestOctets_ZZZ(t *testing.T) {
 	}
 }
 
-func TestGenerateRandomByte_ZZZ(t *testing.T) {
+func TestGenerateRandomByte(t *testing.T) {
 	// Seed value for Random Number Generator (RNG)
 	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
 	seed, err := hex.DecodeString(seedHex)
@@ -81,7 +79,7 @@ func TestGenerateRandomByte_ZZZ(t *testing.T) {
 	}
 }
 
-func TestGenerateOTP_ZZZ(t *testing.T) {
+func TestGenerateOTP(t *testing.T) {
 	// Seed value for Random Number Generator (RNG)
 	seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
 	seed, err := hex.DecodeString(seedHex)
@@ -98,7 +96,7 @@ func TestGenerateOTP_ZZZ(t *testing.T) {
 	}
 }
 
-func TestAesGcm_ZZZ(t *testing.T) {
+func TestAesGcm(t *testing.T) {
 	testCases := []struct {
 		Key       string
 		IV        string
@@ -152,7 +150,7 @@ func TestAesGcm_ZZZ(t *testing.T) {
 	}
 }
 
-func TestBadAesGcm_ZZZ(t *testing.T) {
+func TestBadAesGcm(t *testing.T) {
 	testCases := []struct {
 		Key       string
 		IV        string

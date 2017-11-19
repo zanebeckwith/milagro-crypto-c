@@ -64,8 +64,8 @@ if(BUILD_MPIN)
 
 		# Configure go pbc_support test
 	configure_file (
-		"${PROJECT_SOURCE_DIR}/wrappers/go/pbc_support_test.go"
-		"${PROJECT_BINARY_DIR}/wrappers/go/pbc_support_test.go"
+		"${PROJECT_SOURCE_DIR}/wrappers/go/pbc_test.go"
+		"${PROJECT_BINARY_DIR}/wrappers/go/pbc_test.go"
 	)
 
   INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.go pbc_support_test.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
@@ -110,11 +110,6 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
 	  string(CONFIGURE "${tempc}" tempc)
 	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go" "${tempc}")
 
-	  # Configure go ecdsa test
-	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/ecdsa_ZZZ_test.go" tempc)
-	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}_test.go" "${tempc}")
-
 		INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/ecdsa_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
 		  OWNER_WRITE OWNER_READ OWNER_EXECUTE
 		  GROUP_READ GROUP_EXECUTE
@@ -128,11 +123,6 @@ function(CURVE_GOLANG_SET tb tf tc nb base nbt m8 mt ct pf)
 	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
 	  string(CONFIGURE "${tempc}" tempc)
 	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/mpin_${tc}.go" "${tempc}")
-
-	  # Configure go mpin test
-	  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/mpin_ZZZ_test.go" tempc)
-	  string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
-	  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/mpin_${tc}_test.go" "${tempc}")
 
     INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
       OWNER_WRITE OWNER_READ OWNER_EXECUTE
@@ -148,11 +138,6 @@ function(RSA_GOLANG_SET tb tff nb base ml)
   string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
   string(CONFIGURE "${tempc}" tempc)
   file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/rsa_${tff}.go" "${tempc}")
-
-  # Configure go rsa test
-  file(READ "${PROJECT_SOURCE_DIR}/wrappers/go/rsa_WWW_test.go" tempc)
-  string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
-  file(WRITE "${PROJECT_BINARY_DIR}/wrappers/go/rsa_${tff}_test.go" "${tempc}")
 
  INSTALL(FILES ${PROJECT_BINARY_DIR}/wrappers/go/rsa_${tff}.go DESTINATION "${GO_PATH}/src/github.com/miracl/amcl-go-wrapper" PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE

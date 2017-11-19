@@ -18,10 +18,152 @@
 package amcl
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"log"
+	"testing"
 )
+
+func TestRSA(t *testing.T) {
+	testCases := []struct {
+		keySize     int
+		hashType    int
+		keyPairFunc func(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey)
+		encryptFunc func(publicKey RSAPublicKey, F []byte) (G []byte)
+		decryptFunc func(privateKey RSAPrivateKey, G []byte) (F []byte)
+		keyKillFunc func(privateKey RSAPrivateKey)
+	}{
+		{
+			keySize:     RFS_2048,
+			hashType:    HASH_TYPE_RSA_2048,
+			keyPairFunc: RSAKeyPair_2048,
+			encryptFunc: RSAEncrypt_2048,
+			decryptFunc: RSADecrypt_2048,
+			keyKillFunc: RSAPrivateKeyKill_2048,
+		},
+		{
+			keySize:     RFS_3072,
+			hashType:    HASH_TYPE_RSA_3072,
+			keyPairFunc: RSAKeyPair_3072,
+			encryptFunc: RSAEncrypt_3072,
+			decryptFunc: RSADecrypt_3072,
+			keyKillFunc: RSAPrivateKeyKill_3072,
+		},
+		{
+			keySize:     RFS_4096,
+			hashType:    HASH_TYPE_RSA_4096,
+			keyPairFunc: RSAKeyPair_4096,
+			encryptFunc: RSAEncrypt_4096,
+			decryptFunc: RSADecrypt_4096,
+			keyKillFunc: RSAPrivateKeyKill_4096,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("KeySize%v", tc.keySize*8), func(t *testing.T) {
+			// Seed value for Random Number Generator (RNG)
+			seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+			seed, err := hex.DecodeString(seedHex)
+			if err != nil {
+				fmt.Println("Error decoding seed value")
+				return
+			}
+
+			rng := CreateCSPRNG(seed)
+
+			// Message to encrypt
+			MESSAGEstr := "Hello World\n"
+			MESSAGE := []byte(MESSAGEstr)
+
+			// Generating public/private key pair
+			RSA_PrivKey, RSA_PubKey := tc.keyPairFunc(&rng, 65537, nil, nil)
+
+			// OAEP encode MESSAGE to e
+			_, F := OAEPencode(tc.hashType, tc.keySize, MESSAGE, &rng, nil)
+
+			// encrypt encoded MESSAGE
+			G := tc.encryptFunc(RSA_PubKey, F[:])
+
+			// decrypt encrypted MESSAGE
+			ML := tc.decryptFunc(RSA_PrivKey, G[:])
+
+			// OAEP decode MESSAGE
+			_, Fgot := OAEPdecode(tc.hashType, nil, ML[:])
+
+			// destroy private key
+			tc.keyKillFunc(RSA_PrivKey)
+
+			if !bytes.Equal(Fgot, MESSAGE) {
+				t.Errorf("OAEP decode failed; %v != %v", string(Fgot), MESSAGEstr)
+			}
+		})
+	}
+}
+
+func TestRSASign(t *testing.T) {
+	testCases := []struct {
+		keySize     int
+		hashType    int
+		keyPairFunc func(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey)
+		encryptFunc func(publicKey RSAPublicKey, F []byte) (G []byte)
+		decryptFunc func(privateKey RSAPrivateKey, G []byte) (F []byte)
+		keyKillFunc func(privateKey RSAPrivateKey)
+	}{
+		{
+			keySize:     RFS_2048,
+			hashType:    HASH_TYPE_RSA_2048,
+			keyPairFunc: RSAKeyPair_2048,
+			encryptFunc: RSAEncrypt_2048,
+			decryptFunc: RSADecrypt_2048,
+			keyKillFunc: RSAPrivateKeyKill_2048,
+		},
+		{
+			keySize:     RFS_3072,
+			hashType:    HASH_TYPE_RSA_3072,
+			keyPairFunc: RSAKeyPair_3072,
+			encryptFunc: RSAEncrypt_3072,
+			decryptFunc: RSADecrypt_3072,
+			keyKillFunc: RSAPrivateKeyKill_3072,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("KeySize%v", tc.keySize*8), func(t *testing.T) {
+			// Seed value for Random Number Generator (RNG)
+			seedHex := "9e8b4178790cd57a5761c4a6f164ba72"
+			seed, err := hex.DecodeString(seedHex)
+			if err != nil {
+				fmt.Println("Error decoding seed value")
+				return
+			}
+
+			rng := CreateCSPRNG(seed)
+
+			// Generating public/private key pair
+			RSA_PrivKey, RSA_PubKey := tc.keyPairFunc(&rng, 65537, nil, nil)
+
+			// Message to encrypt
+			MESSAGEstr := "Hello World\n"
+			MESSAGE := []byte(MESSAGEstr)
+
+			// Signing message
+			_, C := PKCS15(tc.hashType, tc.keySize, MESSAGE)
+
+			// create signature in S
+			S := tc.decryptFunc(RSA_PrivKey, C[:])
+
+			Cgot := tc.encryptFunc(RSA_PubKey, S[:])
+
+			// destroy private key
+			tc.keyKillFunc(RSA_PrivKey)
+
+			if !bytes.Equal(Cgot, C) {
+				t.Error("RSA encryption failed; %v != %v", string(Cgot), string(C))
+			}
+		})
+	}
+}
 
 // ExampleRSAEncryption is example for RSA encryption and decryption
 func ExampleRSAEncryption() {

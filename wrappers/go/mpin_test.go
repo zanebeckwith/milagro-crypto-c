@@ -22,7 +22,714 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"testing"
 )
+
+var mPinTestCases = []struct {
+	curve                  string
+	PFS                    int
+	G1S                    int
+	PGS                    int
+	rng                    func(RNG *RandNG) (errorCode int, S []byte)
+	getDVSKeyPair          func(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publicKey []byte)
+	getServerSecret        func(masterSecret []byte) (errorCode int, serverSecret []byte)
+	recombineServerSecret  func(W1 []byte, W2 []byte) (errorCode int, W []byte)
+	getClientSecret        func(masterSecret []byte, hashMPinId []byte) (errorCode int, clientSecret []byte)
+	recombineClientSecret  func(R1 []byte, R2 []byte) (errorCode int, R []byte)
+	getKeyEscrowLessSecret func(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte)
+	extractPin             func(hashType int, mpinId []byte, PIN int, clientSecret []byte) (errorCode int, token []byte)
+	client                 func(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte)
+	server                 func(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, publicKey, message []byte, Kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte)
+	clientPass1            func(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte)
+	serverPass1            func(hashType, epochDate int, mpinId []byte) (HID, HTID []byte)
+	clientPass2            func(x []byte, y []byte, SEC []byte) (errorCode int, V []byte)
+	serverPass2            func(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, Kangaroo_BN254 bool) (errorCode int, E []byte, F []byte)
+	getClientPermit        func(hashType, epochDate int, masterSecret, hashMPinId []byte) (errorCode int, timePermit []byte)
+}{
+	{
+		curve:                  "BLS383",
+		PFS:                    PFS_BLS383,
+		G1S:                    G1S_BLS383,
+		PGS:                    PGS_BLS383,
+		rng:                    RandomGenerate_BLS383,
+		getDVSKeyPair:          GetDVSKeyPair_BLS383,
+		getServerSecret:        GetServerSecret_BLS383,
+		recombineServerSecret:  RecombineG2_BLS383,
+		getClientSecret:        GetClientSecret_BLS383,
+		recombineClientSecret:  RecombineG1_BLS383,
+		getKeyEscrowLessSecret: GetG1Multiple_BLS383,
+		extractPin:             ExtractPIN_BLS383,
+		client:                 Client_BLS383,
+		server:                 Server_BLS383,
+		clientPass1:            Client1_BLS383,
+		serverPass1:            Server1_BLS383,
+		clientPass2:            Client2_BLS383,
+		serverPass2:            Server2_BLS383,
+		getClientPermit:        GetClientPermit_BLS383,
+	},
+	{
+		curve:                  "BN254",
+		PFS:                    PFS_BN254,
+		G1S:                    G1S_BN254,
+		PGS:                    PGS_BN254,
+		rng:                    RandomGenerate_BN254,
+		getDVSKeyPair:          GetDVSKeyPair_BN254,
+		getServerSecret:        GetServerSecret_BN254,
+		recombineServerSecret:  RecombineG2_BN254,
+		getClientSecret:        GetClientSecret_BN254,
+		recombineClientSecret:  RecombineG1_BN254,
+		getKeyEscrowLessSecret: GetG1Multiple_BN254,
+		extractPin:             ExtractPIN_BN254,
+		client:                 Client_BN254,
+		server:                 Server_BN254,
+		clientPass1:            Client1_BN254,
+		serverPass1:            Server1_BN254,
+		clientPass2:            Client2_BN254,
+		serverPass2:            Server2_BN254,
+		getClientPermit:        GetClientPermit_BN254,
+	},
+	{
+		curve:                  "BN254CX",
+		PFS:                    PFS_BN254CX,
+		G1S:                    G1S_BN254CX,
+		PGS:                    PGS_BN254CX,
+		rng:                    RandomGenerate_BN254CX,
+		getDVSKeyPair:          GetDVSKeyPair_BN254CX,
+		getServerSecret:        GetServerSecret_BN254CX,
+		recombineServerSecret:  RecombineG2_BN254CX,
+		getClientSecret:        GetClientSecret_BN254CX,
+		recombineClientSecret:  RecombineG1_BN254CX,
+		getKeyEscrowLessSecret: GetG1Multiple_BN254CX,
+		extractPin:             ExtractPIN_BN254CX,
+		client:                 Client_BN254CX,
+		server:                 Server_BN254CX,
+		clientPass1:            Client1_BN254CX,
+		serverPass1:            Server1_BN254CX,
+		clientPass2:            Client2_BN254CX,
+		serverPass2:            Server2_BN254CX,
+		getClientPermit:        GetClientPermit_BN254CX,
+	},
+}
+
+func TestKeyEscrowLess(t *testing.T) {
+	for _, tc := range mPinTestCases {
+		t.Run(tc.curve, func(t *testing.T) {
+			// Assign the End-User an ID
+			IDstr := "testUser@miracl.com"
+			ID := []byte(IDstr)
+
+			// Epoch time in days
+			date := 0
+
+			// Epoch time in seconds
+			timeValue := 1439465203
+
+			// PIN variable to create token
+			PIN1 := 1234
+			// PIN variable to authenticate
+			PIN2 := 1234
+
+			// Seed value for Random Number Generator (RNG)
+			seedHex := "ac4509d6"
+			seed, err := hex.DecodeString(seedHex)
+			if err != nil {
+				fmt.Println("Error decoding seed value")
+				return
+			}
+			rng := CreateCSPRNG(seed)
+
+			// Generate Master Secret Share 1
+			_, MS1 := tc.rng(&rng)
+
+			// Destroy MS1
+			defer CleanMemory(MS1[:])
+
+			// Generate Master Secret Share 2
+			_, MS2 := tc.rng(&rng)
+
+			// Destroy MS2
+			defer CleanMemory(MS2[:])
+
+			// Generate Public Key
+			_, Z := tc.rng(&rng)
+			_, _, Pa := tc.getDVSKeyPair(nil, Z[:])
+
+			// Destroy Z
+			defer CleanMemory(Z[:])
+
+			// Compute ID|Pa
+			ID = append(ID, Pa...)
+
+			// Either Client or TA calculates Hash(ID)
+			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
+
+			// Generate server secret share 1
+			_, SS1 := tc.getServerSecret(MS1[:])
+
+			// Destroy SS1
+			defer CleanMemory(SS1[:])
+
+			// Generate server secret share 2
+			_, SS2 := tc.getServerSecret(MS2[:])
+
+			// Destroy SS2
+			defer CleanMemory(SS2[:])
+
+			// Combine server secret shares
+			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+
+			// Destroy SS
+			defer CleanMemory(SS[:])
+
+			// Generate client secret share 1
+			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+
+			// Destroy CS1
+			defer CleanMemory(CS1[:])
+
+			// Generate client secret share 2
+			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+
+			// Destroy CS2
+			defer CleanMemory(CS2[:])
+
+			// Combine client secret shares
+			CS := make([]byte, tc.G1S)
+			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+
+			// Compute key-escrow less secret
+			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
+
+			// Destroy CS
+			defer CleanMemory(CS[:])
+
+			// Create token
+			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+
+			// Destroy TOKEN
+			defer CleanMemory(TOKEN[:])
+
+			// Send U, UT, V, timeValue and Message to server
+			X := make([]byte, tc.PGS)
+			_, _, _, V, U, _ := tc.client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
+
+			// Destroy X
+			defer CleanMemory(X[:])
+
+			rtn, _, _, _, _, _ := tc.server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
+			if rtn != 0 {
+				t.Errorf("One-Pass failed; rtn=%v", rtn)
+			}
+		})
+	}
+}
+
+func TestKeyEscrowLessRandom(t *testing.T) {
+	for _, tc := range mPinTestCases {
+		t.Run(tc.curve, func(t *testing.T) {
+
+			// Assign the End-User an ID
+			IDstr := "testUser@miracl.com"
+			ID := []byte(IDstr)
+
+			// Epoch time in days
+			date := 0
+
+			// Epoch time in seconds
+			timeValue := 1439465203
+
+			// PIN variable to create token
+			PIN1 := 1234
+			// PIN variable to authenticate
+			PIN2 := 1234
+
+			// Seed value for Random Number Generator (RNG)
+			seedHex := "ac4509d6"
+			seed, err := hex.DecodeString(seedHex)
+			if err != nil {
+				fmt.Println("Error decoding seed value")
+				return
+			}
+			rng := CreateCSPRNG(seed)
+
+			// Generate Master Secret Share 1
+			_, MS1 := tc.rng(&rng)
+
+			// Destroy MS1
+			defer CleanMemory(MS1[:])
+
+			// Generate Master Secret Share 2
+			_, MS2 := tc.rng(&rng)
+
+			// Destroy MS2
+			defer CleanMemory(MS2[:])
+
+			// Generate Public Key
+			_, Z, Pa := tc.getDVSKeyPair(&rng, nil)
+
+			// Destroy Z
+			defer CleanMemory(Z[:])
+
+			// Compute ID|Pa
+			ID = append(ID, Pa...)
+
+			// Either Client or TA calculates Hash(ID)
+			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
+
+			// Generate server secret share 1
+			_, SS1 := tc.getServerSecret(MS1[:])
+
+			// Destroy SS1
+			defer CleanMemory(SS1[:])
+
+			// Generate server secret share 2
+			_, SS2 := tc.getServerSecret(MS2[:])
+
+			// Destroy SS2
+			defer CleanMemory(SS2[:])
+
+			// Combine server secret shares
+			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+
+			// Destroy SS
+			defer CleanMemory(SS[:])
+
+			// Generate client secret share 1
+			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+
+			// Destroy CS1
+			defer CleanMemory(CS1[:])
+
+			// Generate client secret share 2
+			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+
+			// Destroy CS2
+			defer CleanMemory(CS2[:])
+
+			// Combine client secret shares
+			CS := make([]byte, tc.G1S)
+			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+
+			// Compute key-escrow less secret
+			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
+
+			// Destroy CS
+			defer CleanMemory(CS[:])
+
+			// Create token
+			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+
+			// Destroy TOKEN
+			defer CleanMemory(TOKEN[:])
+
+			// Send U, UT, V, timeValue and Message to server
+			X := make([]byte, tc.PGS)
+			_, _, _, V, U, _ := tc.client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
+
+			// Destroy X
+			defer CleanMemory(X[:])
+
+			// Authenticate
+			rtn, _, _, _, _, _ := tc.server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
+			if rtn != 0 {
+				t.Errorf("One-Pass failed; rtn=%v", rtn)
+			}
+		})
+	}
+}
+
+func TestKeyEscrowWrongPK(t *testing.T) {
+	for _, tc := range mPinTestCases {
+		t.Run(tc.curve, func(t *testing.T) {
+			// Assign the End-User an ID
+			IDstr := "testUser@miracl.com"
+			ID := []byte(IDstr)
+
+			// Epoch time in days
+			date := 16660
+
+			// Epoch time in seconds
+			timeValue := 1439465203
+
+			// PIN variable to create token
+			PIN1 := 1234
+			// PIN variable to authenticate
+			PIN2 := 1234
+
+			// Seed value for Random Number Generator (RNG)
+			seedHex := "ac4509d6"
+			seed, err := hex.DecodeString(seedHex)
+			if err != nil {
+				fmt.Println("Error decoding seed value")
+				return
+			}
+			rng := CreateCSPRNG(seed)
+
+			// Generate Master Secret Share 1
+			_, MS1 := tc.rng(&rng)
+
+			// Destroy MS1
+			defer CleanMemory(MS1[:])
+
+			// Generate Master Secret Share 2
+			_, MS2 := tc.rng(&rng)
+
+			// Destroy MS2
+			defer CleanMemory(MS2[:])
+
+			// Generate wrong Public Key
+			_, Z, _ := tc.getDVSKeyPair(&rng, nil)
+			_, _, Pa := tc.getDVSKeyPair(&rng, nil)
+
+			// Destroy Z
+			defer CleanMemory(Z[:])
+
+			// Compute ID|Pa
+			ID = append(ID, Pa...)
+
+			// Either Client or TA calculates Hash(ID)
+			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
+
+			// Generate server secret share 1
+			_, SS1 := tc.getServerSecret(MS1[:])
+
+			// Destroy SS1
+			defer CleanMemory(SS1[:])
+
+			// Generate server secret share 2
+			_, SS2 := tc.getServerSecret(MS2[:])
+
+			// Destroy SS2
+			defer CleanMemory(SS2[:])
+
+			// Combine server secret shares
+			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+
+			// Destroy SS
+			defer CleanMemory(SS[:])
+
+			// Generate client secret share 1
+			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+
+			// Destroy CS1
+			defer CleanMemory(CS1[:])
+
+			// Generate client secret share 2
+			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+
+			// Destroy CS2
+			defer CleanMemory(CS2[:])
+
+			// Combine client secret shares
+			CS := make([]byte, tc.G1S)
+			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+
+			// Compute key-escrow less secret
+			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
+
+			// Destroy CS
+			defer CleanMemory(CS[:])
+
+			// Generate time permit share 1
+			_, TP1 := tc.getClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+
+			// Destroy TP1
+			defer CleanMemory(TP1[:])
+
+			// Generate time permit share 2
+			_, TP2 := tc.getClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
+
+			// Destroy TP2
+			defer CleanMemory(TP2[:])
+
+			// Combine time permit shares
+			_, TP := tc.recombineClientSecret(TP1[:], TP2[:])
+
+			// Destroy TP
+			defer CleanMemory(TP[:])
+
+			// Create token
+			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+
+			// Destroy TOKEN
+			defer CleanMemory(TOKEN[:])
+
+			// Send U, UT, V, timeValue and Message to server
+			X := make([]byte, tc.PGS)
+			_, _, _, V, U, UT := tc.client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], nil, timeValue)
+
+			// Destroy X
+			defer CleanMemory(X[:])
+
+			timeValue += 10
+			// Authenticate
+			expected := -19
+			rtn, _, _, _, _, _ := tc.server(HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], Pa, nil, false)
+			if rtn != expected {
+				t.Errorf("One-Pass - unexpected return code; rtn: %v != %v", rtn, expected)
+			}
+		})
+	}
+}
+
+func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
+	for _, tc := range mPinTestCases {
+		t.Run(tc.curve, func(t *testing.T) {
+			// Assign the End-User an ID
+			IDstr := "testUser@miracl.com"
+			ID := []byte(IDstr)
+
+			// Epoch time in seconds
+			timeValue := 1439465203
+
+			// PIN variable to create token
+			PIN1 := 1234
+			// PIN variable to authenticate
+			PIN2 := 1234
+
+			// Seed value for Random Number Generator (RNG)
+			seedHex := "ac4509d6"
+			seed, err := hex.DecodeString(seedHex)
+			if err != nil {
+				fmt.Println("Error decoding seed value")
+				return
+			}
+			rng := CreateCSPRNG(seed)
+
+			// Generate Master Secret Share 1
+			_, MS1 := tc.rng(&rng)
+
+			// Destroy MS1
+			defer CleanMemory(MS1[:])
+
+			// Generate Master Secret Share 2
+			_, MS2 := tc.rng(&rng)
+
+			// Destroy MS2
+			defer CleanMemory(MS2[:])
+
+			// Generate wrong Public Key
+			_, Z := tc.rng(&rng)
+			_, _, Pa := tc.getDVSKeyPair(&rng, nil)
+
+			// Destroy Z
+			defer CleanMemory(Z[:])
+
+			// Compute ID|Pa
+			ID = append(ID, Pa...)
+
+			// Either Client or TA calculates Hash(ID)
+			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
+
+			// Generate server secret share 1
+			_, SS1 := tc.getServerSecret(MS1[:])
+
+			// Destroy SS1
+			defer CleanMemory(SS1[:])
+
+			// Generate server secret share 2
+			_, SS2 := tc.getServerSecret(MS2[:])
+
+			// Destroy SS2
+			defer CleanMemory(SS2[:])
+
+			// Combine server secret shares
+			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+
+			// Destroy SS
+			defer CleanMemory(SS[:])
+
+			// Generate client secret share 1
+			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+
+			// Destroy CS1
+			defer CleanMemory(CS1[:])
+
+			// Generate client secret share 2
+			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+
+			// Destroy CS2
+			defer CleanMemory(CS2[:])
+
+			// Combine client secret shares
+			CS := make([]byte, tc.G1S)
+			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+
+			// Compute key-escrow less secret
+			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
+
+			// Destroy CS
+			defer CleanMemory(CS[:])
+
+			// Create token
+			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+
+			// Destroy TOKEN
+			defer CleanMemory(TOKEN[:])
+
+			timeValue += 10
+			// Client Pass 1
+			X := make([]byte, tc.PGS)
+			_, XOut, SEC, U, _ := tc.clientPass1(HASH_TYPE_MPIN, 0, ID, &rng, X[:], PIN2, TOKEN[:], nil)
+
+			// Destroy XOut
+			defer CleanMemory(XOut[:])
+			// Destroy SEC
+			defer CleanMemory(SEC[:])
+
+			// Server Pass 1
+			var HID []byte
+			HID, _ = tc.serverPass1(HASH_TYPE_MPIN, 0, ID)
+
+			_, Y := tc.rng(&rng)
+
+			// Destroy HID
+			defer CleanMemory(HID[:])
+			// Destroy Y
+			defer CleanMemory(Y[:])
+
+			// Client Pass 2
+			_, V := tc.clientPass2(XOut[:], Y[:], SEC[:])
+
+			// Server Pass 2
+			// Send UT as V to model bad token
+			expected := -19
+			rtn, _, _ := tc.serverPass2(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
+			if rtn != expected {
+				t.Errorf("Server Pass 2 - unexpected return code; rtn: %v != %v", rtn, expected)
+			}
+		})
+	}
+}
+
+func TestKeyEscrowLessTwoPASS(t *testing.T) {
+	for _, tc := range mPinTestCases {
+		t.Run(tc.curve, func(t *testing.T) {
+			// Assign the End-User an ID
+			IDstr := "testUser@miracl.com"
+			ID := []byte(IDstr)
+
+			// Epoch time in seconds
+			timeValue := 1439465203
+
+			// PIN variable to create token
+			PIN1 := 1234
+			// PIN variable to authenticate
+			PIN2 := 1234
+
+			// Seed value for Random Number Generator (RNG)
+			seedHex := "ac4509d6"
+			seed, err := hex.DecodeString(seedHex)
+			if err != nil {
+				fmt.Println("Error decoding seed value")
+				return
+			}
+			rng := CreateCSPRNG(seed)
+
+			// Generate Master Secret Share 1
+			_, MS1 := tc.rng(&rng)
+
+			// Destroy MS1
+			defer CleanMemory(MS1[:])
+
+			// Generate Master Secret Share 2
+			_, MS2 := tc.rng(&rng)
+
+			// Destroy MS2
+			defer CleanMemory(MS2[:])
+
+			// Generate Public Key
+			_, Z := tc.rng(&rng)
+			_, _, Pa := tc.getDVSKeyPair(nil, Z[:])
+
+			// Destroy Z
+			defer CleanMemory(Z[:])
+
+			// Compute ID|Pa
+			ID = append(ID, Pa...)
+
+			// Either Client or TA calculates Hash(ID)
+			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
+
+			// Generate server secret share 1
+			_, SS1 := tc.getServerSecret(MS1[:])
+
+			// Destroy SS1
+			defer CleanMemory(SS1[:])
+
+			// Generate server secret share 2
+			_, SS2 := tc.getServerSecret(MS2[:])
+
+			// Destroy SS2
+			defer CleanMemory(SS2[:])
+
+			// Combine server secret shares
+			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+
+			// Destroy SS
+			defer CleanMemory(SS[:])
+
+			// Generate client secret share 1
+			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+
+			// Destroy CS1
+			defer CleanMemory(CS1[:])
+
+			// Generate client secret share 2
+			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+
+			// Destroy CS2
+			defer CleanMemory(CS2[:])
+
+			// Combine client secret shares
+			CS := make([]byte, tc.G1S)
+			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+
+			// Compute key-escrow less secret
+			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
+
+			// Destroy CS
+			defer CleanMemory(CS[:])
+
+			// Create token
+			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+
+			// Destroy TOKEN
+			defer CleanMemory(TOKEN[:])
+
+			timeValue += 10
+			// Client Pass 1
+			X := make([]byte, tc.PGS)
+			_, XOut, SEC, U, _ := tc.clientPass1(HASH_TYPE_MPIN, 0, ID, &rng, X[:], PIN2, TOKEN[:], nil)
+
+			// Destroy XOut
+			defer CleanMemory(XOut[:])
+			// Destroy SEC
+			defer CleanMemory(SEC[:])
+
+			// Server Pass 1
+			var HID []byte
+			HID, _ = tc.serverPass1(HASH_TYPE_MPIN, 0, ID)
+
+			_, Y := tc.rng(&rng)
+
+			// Destroy HID
+			defer CleanMemory(HID[:])
+			// Destroy Y
+			defer CleanMemory(Y[:])
+
+			// Client Pass 2
+			_, V := tc.clientPass2(XOut[:], Y[:], SEC[:])
+
+			// Server Pass 2
+			// Send UT as V to model bad token
+			rtn, _, _ := tc.serverPass2(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
+			if rtn != 0 {
+				t.Errorf("Server Pass 2 failed; rtn=%v", rtn)
+			}
+		})
+	}
+}
 
 // ExampleMPinAuthentication is example for single MPin authentication
 func ExampleMPinAuthentication() {
