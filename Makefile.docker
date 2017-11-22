@@ -1,0 +1,26 @@
+# Project root directory
+PROJECTROOT=$(shell pwd)
+
+# The name for the docker builder image
+BUILDER_CONTAINER_NAME="milagro-crypto/amcl-builder"
+
+make = docker run --rm -v $(PROJECTROOT):/src -w /src --user `id -u` -e WINEPREFIX=/tmp/.wine $(BUILDER_CONTAINER_NAME) sh -c "mkdir -p /tmp/.wine && make $1"
+
+all: builder
+
+builder:
+	docker build -t $(BUILDER_CONTAINER_NAME) .
+
+
+# --- MAKE TARGETS DOCKER WRAPPERS ---
+
+default:
+	$(call make,default)
+qa:
+	$(call make,qa)
+build:
+	$(call make,build TYPE=$(TYPE))
+buildall:
+	$(call make,buildall)
+
+.PHONY: all builder default qa build buildall
