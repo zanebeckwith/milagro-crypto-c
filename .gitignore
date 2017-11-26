@@ -1,2 +1,4 @@
 target
 *~
+wrappers/go/pkg
+wrappers/go/bin

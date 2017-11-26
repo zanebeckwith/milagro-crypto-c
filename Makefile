@@ -272,7 +272,8 @@ go:
 	export LD_LIBRARY_PATH=$(PROJECTROOT)/target/default/lib && \
 	export CGO_CPPFLAGS="-I $(PROJECTROOT)/target/default/include" && \
 	export CGO_LDFLAGS="-L $(PROJECTROOT)/target/default/lib" && \
-	go test -v -race ./wrappers/go/...
+	export GOPATH="$(PROJECTROOT)/wrappers/go" && \
+	go test -v -race github.com/miracl/amcl/...
 
 # Build the specified group of options
 build_group:

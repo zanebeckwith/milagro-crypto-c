@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	gen ".."
+	"github.com/miracl/amcl/gen"
 )
 
 const (
