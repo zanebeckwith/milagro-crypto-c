@@ -1,0 +1,93 @@
+/**
+ * @file rsa_{{.keySize}}.go
+ * @author Alessandro Budroni
+ * @brief Wrappers for RSA functions
+ *
+ * LICENSE
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package amcl
+
+/*
+#cgo LDFLAGS: -lamcl_rsa_{{.keySize}}
+#include <stdio.h>
+#include <stdlib.h>
+#include "amcl.h"
+#include "randapi.h"
+#include "rsa_{{.keySize}}.h"
+#include "utils.h"
+*/
+import "C"
+
+// RSA Constant
+const RFS_{{.keySize}} int = int(C.RFS_{{.keySize}})     // RFS_{{.keySize}} is the RSA Public Key Size in bytes
+const FFLEN_{{.keySize}} int = int(C.FFLEN_{{.keySize}}) // FFLEN_{{.keySize}} consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+
+const HASH_TYPE_RSA_{{.keySize}} int = int(C.HASH_TYPE_RSA_{{.keySize}}) // HASH_TYPE_RSA_{{.keySize}} is the chosen Hash algorithm
+
+// RSAKeyPair generates an RSA key pair
+func RSAKeyPair_{{.keySize}}(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey) {
+	PStr := string(P)
+	POct := GetOctet(PStr)
+	defer OctetFree(&POct)
+	QStr := string(Q)
+	QOct := GetOctet(QStr)
+	defer OctetFree(&QOct)
+	eVal := C.int32_t(e)
+	var RSA_PubKey C.rsa_public_key_{{.keySize}}
+	var RSA_PrivKey C.rsa_private_key_{{.keySize}}
+
+	C.RSA_{{.keySize}}_KEY_PAIR(RNG.csprng(), eVal, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
+	return &RSA_PrivKey, &RSA_PubKey
+}
+
+// RSAEncrypt_{{.keySize}} encrypts F with the public key
+func RSAEncrypt_{{.keySize}}(publicKey RSAPublicKey, F []byte) (G []byte) {
+	FStr := string(F)
+	FOct := GetOctet(FStr)
+	defer OctetFree(&FOct)
+	GOct := GetOctetZero(RFS_{{.keySize}})
+	defer OctetFree(&GOct)
+
+	RSA_PubKey := publicKey.(*C.rsa_public_key_{{.keySize}})
+	C.RSA_{{.keySize}}_ENCRYPT(RSA_PubKey, &FOct, &GOct)
+	G = OctetToBytes(&GOct)
+	return G[:]
+}
+
+// RSADecrypt_{{.keySize}} decrypts G with the private key
+func RSADecrypt_{{.keySize}}(privateKey RSAPrivateKey, G []byte) (F []byte) {
+	GStr := string(G)
+	GOct := GetOctet(GStr)
+	defer OctetFree(&GOct)
+	FOct := GetOctetZero(RFS_{{.keySize}})
+	defer OctetFree(&FOct)
+
+	RSA_PrivKey := privateKey.(*C.rsa_private_key_{{.keySize}})
+	C.RSA_{{.keySize}}_DECRYPT(RSA_PrivKey, &GOct, &FOct)
+	F = OctetToBytes(&FOct)
+	return F[:]
+}
+
+// RSAPrivateKeyKill_{{.keySize}} destroys an RSA private Key
+func RSAPrivateKeyKill_{{.keySize}}(privateKey RSAPrivateKey) {
+	RSA_PrivKey := privateKey.(*C.rsa_private_key_{{.keySize}})
+	C.RSA_{{.keySize}}_PRIVATE_KEY_KILL(RSA_PrivKey)
+}

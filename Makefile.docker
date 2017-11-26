@@ -18,6 +18,10 @@ default:
 	$(call make,default)
 qa:
 	$(call make,qa)
+default_go:
+	$(call make,default_go)
+go:
+	$(call make,go)
 build:
 	$(call make,build TYPE=$(TYPE))
 buildall:

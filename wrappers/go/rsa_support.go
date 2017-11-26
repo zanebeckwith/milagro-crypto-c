@@ -25,15 +25,10 @@
 
 package amcl
 
+//go:generate go run gen/rsa/main.go
+
 /*
-#cgo CFLAGS: -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_core
-#include <stdio.h>
-#include <stdlib.h>
-#include "amcl.h"
-#include "randapi.h"
 #include "rsa_support.h"
-#include "utils.h"
 */
 import "C"
 

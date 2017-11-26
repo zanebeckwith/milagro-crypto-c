@@ -1,5 +1,5 @@
 /**
- * @file rsa_WWW.go
+ * @file rsa_4096.go
  * @author Alessandro Budroni
  * @brief Wrappers for RSA functions
  *
@@ -26,25 +26,24 @@
 package amcl
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_rsa_WWW -lamcl_core
+#cgo LDFLAGS: -lamcl_rsa_4096
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
 #include "randapi.h"
-#include "rsa_WWW.h"
+#include "rsa_4096.h"
 #include "utils.h"
 */
 import "C"
 
 // RSA Constant
-const RFS_WWW int = int(C.RFS_WWW)     // RFS_WWW is the RSA Public Key Size in bytes
-const FFLEN_WWW int = int(C.FFLEN_WWW) // FFLEN_WWW consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+const RFS_4096 int = int(C.RFS_4096)     // RFS_4096 is the RSA Public Key Size in bytes
+const FFLEN_4096 int = int(C.FFLEN_4096) // FFLEN_4096 consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
 
-const HASH_TYPE_RSA_WWW int = int(C.HASH_TYPE_RSA_WWW) // HASH_TYPE_RSA_WWW is the chosen Hash algorithm
+const HASH_TYPE_RSA_4096 int = int(C.HASH_TYPE_RSA_4096) // HASH_TYPE_RSA_4096 is the chosen Hash algorithm
 
 // RSAKeyPair generates an RSA key pair
-func RSAKeyPair_WWW(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey) {
+func RSAKeyPair_4096(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey) {
 	PStr := string(P)
 	POct := GetOctet(PStr)
 	defer OctetFree(&POct)
@@ -52,43 +51,43 @@ func RSAKeyPair_WWW(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RS
 	QOct := GetOctet(QStr)
 	defer OctetFree(&QOct)
 	eVal := C.int32_t(e)
-	var RSA_PubKey C.rsa_public_key_WWW
-	var RSA_PrivKey C.rsa_private_key_WWW
+	var RSA_PubKey C.rsa_public_key_4096
+	var RSA_PrivKey C.rsa_private_key_4096
 
-	C.RSA_WWW_KEY_PAIR(RNG.csprng(), eVal, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
+	C.RSA_4096_KEY_PAIR(RNG.csprng(), eVal, &RSA_PrivKey, &RSA_PubKey, &POct, &QOct)
 	return &RSA_PrivKey, &RSA_PubKey
 }
 
-// RSAEncrypt_WWW encrypts F with the public key
-func RSAEncrypt_WWW(publicKey RSAPublicKey, F []byte) (G []byte) {
+// RSAEncrypt_4096 encrypts F with the public key
+func RSAEncrypt_4096(publicKey RSAPublicKey, F []byte) (G []byte) {
 	FStr := string(F)
 	FOct := GetOctet(FStr)
 	defer OctetFree(&FOct)
-	GOct := GetOctetZero(RFS_WWW)
+	GOct := GetOctetZero(RFS_4096)
 	defer OctetFree(&GOct)
 
-	RSA_PubKey := publicKey.(*C.rsa_public_key_WWW)
-	C.RSA_WWW_ENCRYPT(RSA_PubKey, &FOct, &GOct)
+	RSA_PubKey := publicKey.(*C.rsa_public_key_4096)
+	C.RSA_4096_ENCRYPT(RSA_PubKey, &FOct, &GOct)
 	G = OctetToBytes(&GOct)
 	return G[:]
 }
 
-// RSADecrypt_WWW decrypts G with the private key
-func RSADecrypt_WWW(privateKey RSAPrivateKey, G []byte) (F []byte) {
+// RSADecrypt_4096 decrypts G with the private key
+func RSADecrypt_4096(privateKey RSAPrivateKey, G []byte) (F []byte) {
 	GStr := string(G)
 	GOct := GetOctet(GStr)
 	defer OctetFree(&GOct)
-	FOct := GetOctetZero(RFS_WWW)
+	FOct := GetOctetZero(RFS_4096)
 	defer OctetFree(&FOct)
 
-	RSA_PrivKey := privateKey.(*C.rsa_private_key_WWW)
-	C.RSA_WWW_DECRYPT(RSA_PrivKey, &GOct, &FOct)
+	RSA_PrivKey := privateKey.(*C.rsa_private_key_4096)
+	C.RSA_4096_DECRYPT(RSA_PrivKey, &GOct, &FOct)
 	F = OctetToBytes(&FOct)
 	return F[:]
 }
 
-// RSAPrivateKeyKill_WWW destroys an RSA private Key
-func RSAPrivateKeyKill_WWW(privateKey RSAPrivateKey) {
-	RSA_PrivKey := privateKey.(*C.rsa_private_key_WWW)
-	C.RSA_WWW_PRIVATE_KEY_KILL(RSA_PrivKey)
+// RSAPrivateKeyKill_4096 destroys an RSA private Key
+func RSAPrivateKeyKill_4096(privateKey RSAPrivateKey) {
+	RSA_PrivKey := privateKey.(*C.rsa_private_key_4096)
+	C.RSA_4096_PRIVATE_KEY_KILL(RSA_PrivKey)
 }

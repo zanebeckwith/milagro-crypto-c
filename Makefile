@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all default format clean qa z build build_qa_item build_item buildx buildall dbuild pubdocs print-%
+.PHONY: help all default format clean qa default_go z build build_qa_item build_item buildx buildall dbuild pubdocs print-%
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -43,7 +43,6 @@ include $(PROJECTROOT)/config.mk
 
 # Common CMake options for building the language wrappers
 WRAPPYTHON="-DBUILD_PYTHON=on"
-WRAPGOLANG="-DBUILD_GO=on"
 
 # Space-separated list of build options (grouped by type):
 # <NAME>:<DOUBLECOMMA-SEPARATED_LIST_OF_CMAKE_OPTIONS>
@@ -114,14 +113,12 @@ BUILDS_ASAN=LINUX_64BIT_ASan:-DCMAKE_BUILD_TYPE=ASan,,-DAMCL_CURVE=NIST256,C2551
 
 BUILDS_COVERAGE=LINUX_64BIT_COVERAGE:-DCMAKE_BUILD_TYPE=Coverage,,-DAMCL_CURVE=NIST256,BN254CX,,-DAMCL_RSA=2048
 
-BUILD_GO_WRAPPER=GO_WRAPPER:-DAMCL_CURVE=BLS383,BN254,BN254CX,ED25519,GOLDILOCKS,NIST256,,-DAMCL_RSA=2048,3072,4096,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,${WRAPGOLANG}
-
 # Merge all build types in a single list
 BUILDS_64=$(BUILDS_PF64) $(BUILDS_NIST64) $(BUILDS_MISC64)
 BUILDS_32=$(BUILDS_PF32) $(BUILDS_NIST32) $(BUILDS_MISC32)
 BUILDS_16=$(BUILDS_BN16) $(BUILDS_MISC16)
 
-BUILDS=$(BUILDS_64) $(BUILDS_32) $(BUILDS_16) $(BUILDS_ASAN) $(BUILDS_COVERAGE) $(BUILD_GO_WRAPPER)
+BUILDS=$(BUILDS_64) $(BUILDS_32) $(BUILDS_16) $(BUILDS_ASAN) $(BUILDS_COVERAGE)
 
 # Variables used in text substitution
 dcomma := ,,
@@ -172,10 +169,6 @@ help:
 		echo "    make build TYPE=$(word 1,$(subst :, ,${PARAMS}))" ; \
 	)
 	@echo ""
-	@$(foreach PARAMS,$(BUILD_GO_WRAPPER), \
-		echo "    make build TYPE=$(word 1,$(subst :, ,${PARAMS}))" ; \
-	)
-	@echo ""
 
 # Default build configured in config.mk
 default:
@@ -190,7 +183,6 @@ ifeq ($(CMAKE_BUILD_TYPE),Coverage)
 	-DCMAKE_INSTALL_PREFIX=$(CMAKE_INSTALL_PATH) \
 	-DBUILD_SHARED_LIBS=$(AMCL_BUILD_SHARED_LIBS) \
 	-DBUILD_PYTHON=$(AMCL_BUILD_PYTHON) \
-	-DBUILD_GO=$(AMCL_BUILD_GO) \
 	-DAMCL_CHUNK=$(AMCL_CHUNK) \
 	-DAMCL_CURVE=$(AMCL_CURVE) \
 	-DAMCL_RSA=$(AMCL_RSA) \
@@ -219,7 +211,6 @@ else
 	-DCMAKE_INSTALL_PREFIX=$(CMAKE_INSTALL_PATH) \
 	-DBUILD_SHARED_LIBS=$(AMCL_BUILD_SHARED_LIBS) \
 	-DBUILD_PYTHON=$(AMCL_BUILD_PYTHON) \
-	-DBUILD_GO=$(AMCL_BUILD_GO) \
 	-DAMCL_CHUNK=$(AMCL_CHUNK) \
 	-DAMCL_CURVE=$(AMCL_CURVE) \
 	-DAMCL_RSA=$(AMCL_RSA) \
@@ -243,7 +234,6 @@ ifeq ($(AMCL_BUILD_DOXYGEN),ON)
 endif
 endif
 
-
 # Format the source code
 format:
 	astyle --style=allman --recursive --suffix=none 'include/*.h'
@@ -265,8 +255,24 @@ qa:
 	@echo 0 > target/make.exit
 	@echo '' > target/make_qa_errors.log
 	make build_group BUILD_GROUP=BUILDS
+	make default_go
 	@cat target/make_qa_errors.log
 	@exit `cat target/make.exit`
+
+# Execute go tests
+default_go:
+	make default \
+		AMCL_TEST=OFF \
+		AMCL_CURVE:=BLS383,BN254,BN254CX,ED25519,GOLDILOCKS,NIST256 \
+		AMCL_RSA:=2048,3072,4096
+
+	make go
+
+go:
+	export LD_LIBRARY_PATH=$(PROJECTROOT)/target/default/lib && \
+	export CGO_CPPFLAGS="-I $(PROJECTROOT)/target/default/include" && \
+	export CGO_LDFLAGS="-L $(PROJECTROOT)/target/default/lib" && \
+	go test -v -race ./wrappers/go/...
 
 # Build the specified group of options
 build_group:

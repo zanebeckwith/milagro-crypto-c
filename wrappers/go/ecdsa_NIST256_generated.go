@@ -1,5 +1,5 @@
 /**
- * @file ecdsa_ZZZ.go
+ * @file ecdsa_NIST256.go
  * @author Alessandro Budroni
  * @brief Wrappers for ECDSA functions
  *
@@ -26,21 +26,20 @@
 package amcl
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_curve_ZZZ -lamcl_core
+#cgo LDFLAGS: -lamcl_curve_NIST256
 #include <stdio.h>
 #include <stdlib.h>
 #include "amcl.h"
-#include "ecdh_ZZZ.h"
+#include "ecdh_NIST256.h"
 */
 import "C"
 
-const EFS_ZZZ int = int(C.EFS_ZZZ) // EFS is the ECC Field Size in bytes
-const EGS_ZZZ int = int(C.EGS_ZZZ) // EGS is the ECC Group Size in bytes
+const EFS_NIST256 int = int(C.EFS_NIST256) // EFS is the ECC Field Size in bytes
+const EGS_NIST256 int = int(C.EGS_NIST256) // EGS is the ECC Group Size in bytes
 
-// ECPKeyPairGenerate_ZZZ generates an ECC public/private key pair, S is provided as input if RNG is null
-func ECPKeyPairGenerate_ZZZ(RNG *RandNG, S []byte) (int, []byte, []byte) {
-	WOct := GetOctetZero(2*EFS_ZZZ + 1)
+// ECPKeyPairGenerate_NIST256 generates an ECC public/private key pair, S is provided as input if RNG is null
+func ECPKeyPairGenerate_NIST256(RNG *RandNG, S []byte) (int, []byte, []byte) {
+	WOct := GetOctetZero(2*EFS_NIST256 + 1)
 	defer OctetFree(&WOct)
 	var SOct C.octet
 	var rtn C.int
@@ -48,11 +47,11 @@ func ECPKeyPairGenerate_ZZZ(RNG *RandNG, S []byte) (int, []byte, []byte) {
 		SStr := string(S)
 		SOct = GetOctet(SStr)
 		defer OctetFree(&SOct)
-		rtn = C.ECP_ZZZ_KEY_PAIR_GENERATE(nil, &SOct, &WOct)
+		rtn = C.ECP_NIST256_KEY_PAIR_GENERATE(nil, &SOct, &WOct)
 	} else {
-		SOct = GetOctetZero(EGS_ZZZ)
+		SOct = GetOctetZero(EGS_NIST256)
 		defer OctetFree(&SOct)
-		rtn = C.ECP_ZZZ_KEY_PAIR_GENERATE(RNG.csprng(), &SOct, &WOct)
+		rtn = C.ECP_NIST256_KEY_PAIR_GENERATE(RNG.csprng(), &SOct, &WOct)
 	}
 	errorCode := int(rtn)
 	W := OctetToBytes(&WOct)
@@ -60,17 +59,17 @@ func ECPKeyPairGenerate_ZZZ(RNG *RandNG, S []byte) (int, []byte, []byte) {
 	return errorCode, S[:], W[:]
 }
 
-// ECPPublicKeyValidate_ZZZ validates an ECC public key, if = 0 just does some simple checks, else tests that W is of the correct order, return 0 if ok, error code otherwise
-func ECPPublicKeyValidate_ZZZ(f int, W []byte) int {
+// ECPPublicKeyValidate_NIST256 validates an ECC public key, if = 0 just does some simple checks, else tests that W is of the correct order, return 0 if ok, error code otherwise
+func ECPPublicKeyValidate_NIST256(f int, W []byte) int {
 	WStr := string(W)
 	WOct := GetOctet(WStr)
 	defer OctetFree(&WOct)
-	rtn := C.ECP_ZZZ_PUBLIC_KEY_VALIDATE(&WOct)
+	rtn := C.ECP_NIST256_PUBLIC_KEY_VALIDATE(&WOct)
 	return int(rtn)
 }
 
-// ECPSpDsa_ZZZ signs with ECDSA Signature a message M - K is used when RNG is null
-func ECPSpDsa_ZZZ(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
+// ECPSpDsa_NIST256 signs with ECDSA Signature a message M - K is used when RNG is null
+func ECPSpDsa_NIST256(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
 	KStr := string(K)
 	KOct := GetOctet(KStr)
 	defer OctetFree(&KOct)
@@ -80,20 +79,20 @@ func ECPSpDsa_ZZZ(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (erro
 	MStr := string(M)
 	MOct := GetOctet(MStr)
 	defer OctetFree(&MOct)
-	COct := GetOctetZero(EGS_ZZZ)
+	COct := GetOctetZero(EGS_NIST256)
 	defer OctetFree(&COct)
-	DOct := GetOctetZero(EGS_ZZZ)
+	DOct := GetOctetZero(EGS_NIST256)
 	defer OctetFree(&DOct)
 
-	rtn := C.ECP_ZZZ_SP_DSA(C.int(hashType), RNG.csprng(), &KOct, &SOct, &MOct, &COct, &DOct)
+	rtn := C.ECP_NIST256_SP_DSA(C.int(hashType), RNG.csprng(), &KOct, &SOct, &MOct, &COct, &DOct)
 	errorCode = int(rtn)
 	C = OctetToBytes(&COct)
 	D = OctetToBytes(&DOct)
 	return errorCode, C[:], D[:]
 }
 
-// ECPVpDsa_ZZZ verifies an ECDSA Signature on message M
-func ECPVpDsa_ZZZ(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int) {
+// ECPVpDsa_NIST256 verifies an ECDSA Signature on message M
+func ECPVpDsa_NIST256(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int) {
 	WStr := string(W)
 	WOct := GetOctet(WStr)
 	defer OctetFree(&WOct)
@@ -107,7 +106,7 @@ func ECPVpDsa_ZZZ(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCo
 	DOct := GetOctet(DStr)
 	defer OctetFree(&DOct)
 
-	rtn := C.ECP_ZZZ_VP_DSA(C.int(hashType), &WOct, &MOct, &COct, &DOct)
+	rtn := C.ECP_NIST256_VP_DSA(C.int(hashType), &WOct, &MOct, &COct, &DOct)
 	errorCode = int(rtn)
 	return errorCode
 }

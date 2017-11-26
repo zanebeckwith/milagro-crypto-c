@@ -20,12 +20,6 @@ under the License.
 package amcl
 
 /*
-#cgo CFLAGS:  -std=c99 -O3 -I@PROJECT_BINARY_DIR@/include -I@CMAKE_INSTALL_PREFIX@/include -DCMAKE
-#cgo LDFLAGS: -L. -L@CMAKE_INSTALL_PREFIX@/lib -lamcl_core
-#include <stdio.h>
-#include <stdlib.h>
-#include "amcl.h"
-#include "randapi.h"
 #include "pbc_support.h"
 #include "utils.h"
 */
