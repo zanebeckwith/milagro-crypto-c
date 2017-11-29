@@ -120,15 +120,7 @@ func OctetToString(valOct *C.octet) string {
 
 // OctetToBytes converts an octet to bytes
 func OctetToBytes(valOct *C.octet) []byte {
-	dstLen := OctetLen(valOct)
-	dstBytes := make([]byte, dstLen)
-	dstStr := string(dstBytes)
-	dst := C.CString(dstStr)
-	C.OCT_toStr(valOct, dst)
-	dstStr = C.GoStringN(dst, valOct.len)
-	C.free(unsafe.Pointer(dst))
-	dstBytes = []byte(dstStr)
-	return dstBytes
+	return C.GoBytes(unsafe.Pointer(valOct.val), valOct.len)
 }
 
 // OctetToHex converts an octet to a hex string
