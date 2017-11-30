@@ -29,6 +29,10 @@ package amcl
 
 /*
 #include "rsa_support.h"
+
+int _PKCS15(int hash_type, octet message, octet receive) {
+	return PKCS15(hash_type, &message, &receive);
+}
 */
 import "C"
 
@@ -40,17 +44,12 @@ type RSAPrivateKey interface{}
 type RSAPublicKey interface{}
 
 // PKCS15 (PKCS 1.5) - padding of a message to be signed
-func PKCS15(hashType, RFS int, M []byte) (errorCode int, C []byte) {
-	MStr := string(M)
-	MOct := GetOctet(MStr)
-	defer OctetFree(&MOct)
-	COct := GetOctetZero(RFS)
-	defer OctetFree(&COct)
-
-	rtn := C.PKCS15(C.int(hashType), &MOct, &COct)
-	errorCode = int(rtn)
-	C = OctetToBytes(&COct)
-	return errorCode, C[:]
+func PKCS15(hashType, RFS int, msg []byte) ([]byte, error) {
+	r := make([]byte, RFS)
+	if rtn := C._PKCS15(C.int(hashType), *newOctet(msg), *makeOctet(r)); rtn != 1 {
+		return nil, &Error{code: int(rtn)}
+	}
+	return r[:], nil
 }
 
 // OAEPencode encodes the message for encryption

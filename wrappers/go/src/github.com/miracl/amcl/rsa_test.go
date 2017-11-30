@@ -148,7 +148,7 @@ func TestRSASign(t *testing.T) {
 			MESSAGE := []byte(MESSAGEstr)
 
 			// Signing message
-			_, C := PKCS15(tc.hashType, tc.keySize, MESSAGE)
+			C, _ := PKCS15(tc.hashType, tc.keySize, MESSAGE)
 
 			// create signature in S
 			S := tc.decryptFunc(RSA_PrivKey, C[:])
@@ -159,7 +159,7 @@ func TestRSASign(t *testing.T) {
 			tc.keyKillFunc(RSA_PrivKey)
 
 			if !bytes.Equal(Cgot, C) {
-				t.Error("RSA encryption failed; %v != %v", string(Cgot), string(C))
+				t.Errorf("RSA encryption failed; %v != %v", Cgot, C)
 			}
 		})
 	}
@@ -250,8 +250,8 @@ func ExampleRSASign() {
 	fmt.Printf("message: %s\n", MESSAGE[:])
 
 	// Signing message
-	rtn, C := PKCS15(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE)
-	if rtn != 1 {
+	C, err := PKCS15(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE)
+	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("padded message: %x\n", C[:])
