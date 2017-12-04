@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package amcl
 
 import "fmt"
@@ -25,4 +26,12 @@ type Error struct {
 
 func (err *Error) Error() string {
 	return fmt.Sprintf("amcl: return code %v", err.code)
+}
+
+func newError(code int) error {
+	if code == 1 {
+		return nil
+	}
+
+	return &Error{code}
 }

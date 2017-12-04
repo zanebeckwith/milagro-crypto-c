@@ -17,6 +17,8 @@
 
 package amcl
 
-// #cgo CFLAGS: -std=c99 -O3
-// #cgo LDFLAGS: -lamcl_core
+//go:generate go run gen/wrappers/main.go
+
+// #cgo CFLAGS: -std=c99 -O3 -I.
+// #cgo LDFLAGS: -L. -lamcl_core
 import "C"

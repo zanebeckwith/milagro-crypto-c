@@ -24,6 +24,10 @@ import "C"
 import "unsafe"
 
 func newOctet(val []byte) *C.octet {
+	if val == nil {
+		return &C.octet{}
+	}
+
 	return &C.octet{
 		C.int(len(val)),
 		C.int(len(val)),

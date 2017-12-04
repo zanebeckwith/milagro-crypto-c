@@ -80,7 +80,7 @@ func TestRSA(t *testing.T) {
 			RSA_PrivKey, RSA_PubKey := tc.keyPairFunc(&rng, 65537, nil, nil)
 
 			// OAEP encode MESSAGE to e
-			_, F := OAEPencode(tc.hashType, tc.keySize, MESSAGE, &rng, nil)
+			F, _ := OAEPencode(tc.hashType, tc.keySize, MESSAGE, &rng, nil)
 
 			// encrypt encoded MESSAGE
 			G := tc.encryptFunc(RSA_PubKey, F[:])
@@ -89,7 +89,7 @@ func TestRSA(t *testing.T) {
 			ML := tc.decryptFunc(RSA_PrivKey, G[:])
 
 			// OAEP decode MESSAGE
-			_, Fgot := OAEPdecode(tc.hashType, nil, ML[:])
+			Fgot, _ := OAEPdecode(tc.hashType, nil, ML[:])
 
 			// destroy private key
 			tc.keyKillFunc(RSA_PrivKey)
@@ -188,9 +188,10 @@ func ExampleRSAEncryption() {
 	RSA_PrivKey, RSA_PubKey := RSAKeyPair_2048(&rng, 65537, nil, nil)
 
 	// OAEP encode MESSAGE to e
-	rtn, F := OAEPencode(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE, &rng, nil)
-	if rtn != 1 {
-		log.Fatalf("OAEPencode error: %v", rtn)
+	F, err := OAEPencode(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE, &rng, nil)
+	if err != nil {
+		log.Println(err)
+		log.Fatalf("OAEPencode error: %v", err)
 	}
 
 	fmt.Printf("encoded message: 0x%x\n", F[:])
@@ -204,9 +205,9 @@ func ExampleRSAEncryption() {
 	fmt.Printf("decrypted message: 0x%x\n", ML[:])
 
 	// OAEP decode MESSAGE
-	rtn, MESSAGEgot := OAEPdecode(HASH_TYPE_RSA_2048, nil, ML[:])
-	if rtn != 1 {
-		log.Fatalf("OAEPdecode error: %v", rtn)
+	MESSAGEgot, err := OAEPdecode(HASH_TYPE_RSA_2048, nil, ML[:])
+	if err != nil {
+		log.Fatalf("OAEPdecode error: %v", err)
 	}
 	fmt.Printf("decoded message: %s\n", MESSAGEgot[:])
 
@@ -278,4 +279,18 @@ func ExampleRSASign() {
 	// padded message: 0001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
 	// signed message: 13dcd6705321c75c3c7dcb963d3270cb0e81f53abd5afd059d27987894bfbdebb9fc339c2982874f15cd7cd2ecfc8094ddbc8738249c64333b960acc291a82b16aff42d767abe80fdac307e7ff7b40b6dffa204afb2441732ea297068e7f8956677d27dc326d4c77d4a4fcd259e1580368f2b100fb13fcbca269d7db4e53c57d2065041cd31865d8d452cbd650f4f98bb00d71777967b8dc179f5aef71e4d3234fa990781eee977da92850f3977d8ea2d46598eb7160255af3d4ee243f6c24e4344765e788dbeee1fcfc81ec9ba3d47775a5b45059ba48e4bd81689f45b1cffeacd777e3cd61da99e448c6949538443d2e43d1926226dd94397a5880e08b03d6
 	// verify signature message: 0001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+}
+
+func BenchmarkThis(b *testing.B) {
+	m := []byte("not very long message")
+	rng := CreateCSPRNG(m)
+
+	prv, pub := RSAKeyPair_2048(&rng, 65537, nil, nil)
+	c := RSAEncrypt_2048(pub, m)
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			RSADecrypt_2048(prv, c)
+		}
+	})
 }
