@@ -30,7 +30,7 @@ const EFS_BN254 int = int(C.EFS_BN254) // EFS is the ECC Field Size in bytes
 const EGS_BN254 int = int(C.EGS_BN254) // EGS is the ECC Group Size in bytes
 
 // ECPKeyPairGenerate_BN254 generates an ECC public/private key pair, S is provided as input if RNG is null
-func ECPKeyPairGenerate_BN254(RNG *RandNG, S []byte) (int, []byte, []byte) {
+func ECPKeyPairGenerate_BN254(RNG *Rand, S []byte) (int, []byte, []byte) {
 	WOct := GetOctetZero(2*EFS_BN254 + 1)
 	defer OctetFree(&WOct)
 	var SOct C.octet
@@ -61,7 +61,7 @@ func ECPPublicKeyValidate_BN254(f int, W []byte) int {
 }
 
 // ECPSpDsa_BN254 signs with ECDSA Signature a message M - K is used when RNG is null
-func ECPSpDsa_BN254(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
+func ECPSpDsa_BN254(hashType int, RNG *Rand, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
 	KStr := string(K)
 	KOct := GetOctet(KStr)
 	defer OctetFree(&KOct)

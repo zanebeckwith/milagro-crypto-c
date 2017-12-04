@@ -30,7 +30,7 @@ const EFS_GOLDILOCKS int = int(C.EFS_GOLDILOCKS) // EFS is the ECC Field Size in
 const EGS_GOLDILOCKS int = int(C.EGS_GOLDILOCKS) // EGS is the ECC Group Size in bytes
 
 // ECPKeyPairGenerate_GOLDILOCKS generates an ECC public/private key pair, S is provided as input if RNG is null
-func ECPKeyPairGenerate_GOLDILOCKS(RNG *RandNG, S []byte) (int, []byte, []byte) {
+func ECPKeyPairGenerate_GOLDILOCKS(RNG *Rand, S []byte) (int, []byte, []byte) {
 	WOct := GetOctetZero(2*EFS_GOLDILOCKS + 1)
 	defer OctetFree(&WOct)
 	var SOct C.octet
@@ -61,7 +61,7 @@ func ECPPublicKeyValidate_GOLDILOCKS(f int, W []byte) int {
 }
 
 // ECPSpDsa_GOLDILOCKS signs with ECDSA Signature a message M - K is used when RNG is null
-func ECPSpDsa_GOLDILOCKS(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
+func ECPSpDsa_GOLDILOCKS(hashType int, RNG *Rand, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
 	KStr := string(K)
 	KOct := GetOctet(KStr)
 	defer OctetFree(&KOct)

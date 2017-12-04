@@ -70,10 +70,10 @@ func TestGenerateRandomByte(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	expected := "57d662d39b1b245da469"
-	b := GenerateRandomByte(&rng, 10)
+	b := GenerateRandomByte(rng, 10)
 	if fmt.Sprintf("%x", b) != expected {
 		t.Errorf("random byte generation failed; %x != %v", b, expected)
 	}
@@ -87,10 +87,10 @@ func TestGenerateOTP(t *testing.T) {
 		fmt.Println("Error decoding seed value")
 		return
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	expected := 715827
-	otp := GenerateOTP(&rng)
+	otp := GenerateOTP(rng)
 	if otp != expected {
 		t.Errorf("OTP generation failed; %v != %v", otp, expected)
 	}

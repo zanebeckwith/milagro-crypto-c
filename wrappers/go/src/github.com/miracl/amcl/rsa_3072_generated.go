@@ -36,7 +36,7 @@ const FFLEN_3072 int = int(C.FFLEN_3072) // FFLEN_3072 consists in 2^n multiplie
 const HASH_TYPE_RSA_3072 int = int(C.HASH_TYPE_RSA_3072) // HASH_TYPE_RSA_3072 is the chosen Hash algorithm
 
 // RSAKeyPair generates an RSA key pair
-func RSAKeyPair_3072(rng *RandNG, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
+func RSAKeyPair_3072(rng *Rand, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
 	var prvKey C.rsa_private_key_3072
 	var pubKey C.rsa_public_key_3072
 

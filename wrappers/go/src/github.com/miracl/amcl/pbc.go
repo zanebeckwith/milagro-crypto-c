@@ -174,7 +174,7 @@ Returns:
     randomValue: Random value
 
 */
-func GenerateRandomByte(RNG *RandNG, randomLen int) (randomValue []byte) {
+func GenerateRandomByte(RNG *Rand, randomLen int) (randomValue []byte) {
 	randomOct := GetOctetZero(randomLen)
 	defer OctetFree(&randomOct)
 
@@ -199,7 +199,7 @@ Returns:
     otp: One time Password
 
 */
-func GenerateOTP(RNG *RandNG) int {
+func GenerateOTP(RNG *Rand) int {
 	OTP := C.generateOTP(RNG.csprng())
 	return int(OTP)
 }

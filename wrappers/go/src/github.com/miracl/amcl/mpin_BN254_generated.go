@@ -50,7 +50,7 @@ Returns:
     s: random group element
 
 */
-func RandomGenerate_BN254(RNG *RandNG) (errorCode int, S []byte) {
+func RandomGenerate_BN254(RNG *Rand) (errorCode int, S []byte) {
 	// Form Octet
 	SOct := GetOctetZero(PGS_BN254)
 	defer OctetFree(&SOct)
@@ -216,7 +216,7 @@ Returns:
     publicKey: 		client public key: (z^-1).Q
 
 */
-func GetDVSKeyPair_BN254(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publicKey []byte) {
+func GetDVSKeyPair_BN254(RNG *Rand, z []byte) (errorCode int, zOut []byte, publicKey []byte) {
 	// Form octets
 	publicKeyOct := GetOctetZero(G2S_BN254)
 	defer OctetFree(&publicKeyOct)
@@ -347,7 +347,7 @@ Returns:
     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
     y: y = H(t|U) or y = H(t|UT) if Time Permits enabled where is t is epoch time
 */
-func Client_BN254(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte) {
+func Client_BN254(hashType, epochDate int, mpinId []byte, RNG *Rand, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte) {
 
 	var UTOct *C.octet
 	var pUT C.octet
@@ -491,7 +491,7 @@ Returns:
 Raises:
 
 */
-func GetG1Multiple_BN254(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte) {
+func GetG1Multiple_BN254(RNG *Rand, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte) {
 	xStr := string(x)
 	xOct := GetOctet(xStr)
 	defer OctetFree(&xOct)
@@ -957,7 +957,7 @@ Returns:
     SEC: SEC = CS+TP, where CS is the reconstructed client secret and TP is the time permit
 
 */
-func Client1_BN254(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte) {
+func Client1_BN254(hashType, epochDate int, mpinId []byte, RNG *Rand, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte) {
 	// Form Octets
 	mpinIdStr := string(mpinId)
 	mpinIdOct := GetOctet(mpinIdStr)

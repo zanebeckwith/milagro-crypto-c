@@ -41,7 +41,7 @@ func PKCS15(hashType, rfs int, msg []byte) ([]byte, error) {
 }
 
 // OAEPencode encodes the message for encryption
-func OAEPencode(hashType, rfs int, m []byte, rng *RandNG, p []byte) ([]byte, error) {
+func OAEPencode(hashType, rfs int, m []byte, rng *Rand, p []byte) ([]byte, error) {
 	f := make([]byte, rfs)
 	rtn := C._OAEP_ENCODE(C.int(hashType), *newOctet(m), rng.csprng(), *newOctet(p), *makeOctet(f))
 	return f, newError(int(rtn))

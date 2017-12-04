@@ -29,7 +29,7 @@ func TestRSA(t *testing.T) {
 	testCases := []struct {
 		keySize     int
 		hashType    int
-		keyPairFunc func(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey)
+		keyPairFunc func(RNG *Rand, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey)
 		encryptFunc func(publicKey RSAPublicKey, F []byte) (G []byte)
 		decryptFunc func(privateKey RSAPrivateKey, G []byte) (F []byte)
 		keyKillFunc func(privateKey RSAPrivateKey)
@@ -70,17 +70,17 @@ func TestRSA(t *testing.T) {
 				return
 			}
 
-			rng := CreateCSPRNG(seed)
+			rng := NewRand(seed)
 
 			// Message to encrypt
 			MESSAGEstr := "Hello World\n"
 			MESSAGE := []byte(MESSAGEstr)
 
 			// Generating public/private key pair
-			RSA_PrivKey, RSA_PubKey := tc.keyPairFunc(&rng, 65537, nil, nil)
+			RSA_PrivKey, RSA_PubKey := tc.keyPairFunc(rng, 65537, nil, nil)
 
 			// OAEP encode MESSAGE to e
-			F, _ := OAEPencode(tc.hashType, tc.keySize, MESSAGE, &rng, nil)
+			F, _ := OAEPencode(tc.hashType, tc.keySize, MESSAGE, rng, nil)
 
 			// encrypt encoded MESSAGE
 			G := tc.encryptFunc(RSA_PubKey, F[:])
@@ -105,7 +105,7 @@ func TestRSASign(t *testing.T) {
 	testCases := []struct {
 		keySize     int
 		hashType    int
-		keyPairFunc func(RNG *RandNG, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey)
+		keyPairFunc func(RNG *Rand, e int32, P []byte, Q []byte) (RSAPrivateKey, RSAPublicKey)
 		encryptFunc func(publicKey RSAPublicKey, F []byte) (G []byte)
 		decryptFunc func(privateKey RSAPrivateKey, G []byte) (F []byte)
 		keyKillFunc func(privateKey RSAPrivateKey)
@@ -138,10 +138,10 @@ func TestRSASign(t *testing.T) {
 				return
 			}
 
-			rng := CreateCSPRNG(seed)
+			rng := NewRand(seed)
 
 			// Generating public/private key pair
-			RSA_PrivKey, RSA_PubKey := tc.keyPairFunc(&rng, 65537, nil, nil)
+			RSA_PrivKey, RSA_PubKey := tc.keyPairFunc(rng, 65537, nil, nil)
 
 			// Message to encrypt
 			MESSAGEstr := "Hello World\n"
@@ -177,7 +177,7 @@ func ExampleRSAEncryption() {
 		log.Fatal(err)
 	}
 
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	// Message to encrypt
 	MESSAGEstr := "Hello World"
@@ -185,10 +185,10 @@ func ExampleRSAEncryption() {
 	fmt.Printf("message: %s\n", MESSAGE[:])
 
 	// Generating public/private key pair
-	RSA_PrivKey, RSA_PubKey := RSAKeyPair_2048(&rng, 65537, nil, nil)
+	RSA_PrivKey, RSA_PubKey := RSAKeyPair_2048(rng, 65537, nil, nil)
 
 	// OAEP encode MESSAGE to e
-	F, err := OAEPencode(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE, &rng, nil)
+	F, err := OAEPencode(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE, rng, nil)
 	if err != nil {
 		log.Println(err)
 		log.Fatalf("OAEPencode error: %v", err)
@@ -240,10 +240,10 @@ func ExampleRSASign() {
 		log.Fatal(err)
 	}
 
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	// Generating public/private key pair
-	RSA_PrivKey, RSA_PubKey := RSAKeyPair_2048(&rng, 65537, nil, nil)
+	RSA_PrivKey, RSA_PubKey := RSAKeyPair_2048(rng, 65537, nil, nil)
 
 	// Message to encrypt
 	MESSAGEstr := "Hello World"
@@ -283,9 +283,9 @@ func ExampleRSASign() {
 
 func BenchmarkThis(b *testing.B) {
 	m := []byte("not very long message")
-	rng := CreateCSPRNG(m)
+	rng := NewRand(m)
 
-	prv, pub := RSAKeyPair_2048(&rng, 65537, nil, nil)
+	prv, pub := RSAKeyPair_2048(rng, 65537, nil, nil)
 	c := RSAEncrypt_2048(pub, m)
 
 	b.RunParallel(func(pb *testing.PB) {

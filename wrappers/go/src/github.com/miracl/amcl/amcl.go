@@ -32,37 +32,6 @@ const SHA256 int = 32
 const SHA384 int = 48
 const SHA512 int = 64
 
-// RandNG is a type alias for C.csprng
-type RandNG C.csprng
-
-// csprng is an alias function for the C counterpart
-func (rng *RandNG) csprng() *C.csprng {
-	return (*C.csprng)(rng)
-}
-
-/*
-
-CreateCSPRNG makes a cryptographically secure pseudo-random number generator instance
-
-Args:
-
-    seed:   random seed value
-
-Returns:
-
-    RNG: Pointer to cryptographically secure pseudo-random number generator instance
-
-*/
-func CreateCSPRNG(SEED []byte) RandNG {
-	// Form Octet
-	SEEDStr := string(SEED)
-	SEEDOct := GetOctet(SEEDStr)
-	defer OctetFree(&SEEDOct)
-	var RNG C.csprng
-	C.CREATE_CSPRNG(&RNG, &SEEDOct)
-	return RandNG(RNG)
-}
-
 // OctetFree frees memory associated with an octet
 func OctetFree(valOctet *C.octet) {
 	OctetClear(valOctet)

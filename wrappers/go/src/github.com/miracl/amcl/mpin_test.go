@@ -30,17 +30,17 @@ var mPinTestCases = []struct {
 	PFS                    int
 	G1S                    int
 	PGS                    int
-	rng                    func(RNG *RandNG) (errorCode int, S []byte)
-	getDVSKeyPair          func(RNG *RandNG, z []byte) (errorCode int, zOut []byte, publicKey []byte)
+	rng                    func(RNG *Rand) (errorCode int, S []byte)
+	getDVSKeyPair          func(RNG *Rand, z []byte) (errorCode int, zOut []byte, publicKey []byte)
 	getServerSecret        func(masterSecret []byte) (errorCode int, serverSecret []byte)
 	recombineServerSecret  func(W1 []byte, W2 []byte) (errorCode int, W []byte)
 	getClientSecret        func(masterSecret []byte, hashMPinId []byte) (errorCode int, clientSecret []byte)
 	recombineClientSecret  func(R1 []byte, R2 []byte) (errorCode int, R []byte)
-	getKeyEscrowLessSecret func(RNG *RandNG, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte)
+	getKeyEscrowLessSecret func(RNG *Rand, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte)
 	extractPin             func(hashType int, mpinId []byte, PIN int, clientSecret []byte) (errorCode int, token []byte)
-	client                 func(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte)
+	client                 func(hashType, epochDate int, mpinId []byte, RNG *Rand, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte)
 	server                 func(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, publicKey, message []byte, Kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte)
-	clientPass1            func(hashType, epochDate int, mpinId []byte, RNG *RandNG, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte)
+	clientPass1            func(hashType, epochDate int, mpinId []byte, RNG *Rand, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte)
 	serverPass1            func(hashType, epochDate int, mpinId []byte) (HID, HTID []byte)
 	clientPass2            func(x []byte, y []byte, SEC []byte) (errorCode int, V []byte)
 	serverPass2            func(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, Kangaroo_BN254 bool) (errorCode int, E []byte, F []byte)
@@ -136,22 +136,22 @@ func TestKeyEscrowLess(t *testing.T) {
 				fmt.Println("Error decoding seed value")
 				return
 			}
-			rng := CreateCSPRNG(seed)
+			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(&rng)
+			_, MS1 := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(&rng)
+			_, MS2 := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate Public Key
-			_, Z := tc.rng(&rng)
+			_, Z := tc.rng(rng)
 			_, _, Pa := tc.getDVSKeyPair(nil, Z[:])
 
 			// Destroy Z
@@ -211,7 +211,7 @@ func TestKeyEscrowLess(t *testing.T) {
 
 			// Send U, UT, V, timeValue and Message to server
 			X := make([]byte, tc.PGS)
-			_, _, _, V, U, _ := tc.client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
+			_, _, _, V, U, _ := tc.client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
 
 			// Destroy X
 			defer CleanMemory(X[:])
@@ -250,22 +250,22 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 				fmt.Println("Error decoding seed value")
 				return
 			}
-			rng := CreateCSPRNG(seed)
+			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(&rng)
+			_, MS1 := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(&rng)
+			_, MS2 := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate Public Key
-			_, Z, Pa := tc.getDVSKeyPair(&rng, nil)
+			_, Z, Pa := tc.getDVSKeyPair(rng, nil)
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -324,7 +324,7 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 
 			// Send U, UT, V, timeValue and Message to server
 			X := make([]byte, tc.PGS)
-			_, _, _, V, U, _ := tc.client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
+			_, _, _, V, U, _ := tc.client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN2, TOKEN[:], nil, nil, timeValue)
 
 			// Destroy X
 			defer CleanMemory(X[:])
@@ -363,23 +363,23 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 				fmt.Println("Error decoding seed value")
 				return
 			}
-			rng := CreateCSPRNG(seed)
+			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(&rng)
+			_, MS1 := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(&rng)
+			_, MS2 := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate wrong Public Key
-			_, Z, _ := tc.getDVSKeyPair(&rng, nil)
-			_, _, Pa := tc.getDVSKeyPair(&rng, nil)
+			_, Z, _ := tc.getDVSKeyPair(rng, nil)
+			_, _, Pa := tc.getDVSKeyPair(rng, nil)
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -456,7 +456,7 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 
 			// Send U, UT, V, timeValue and Message to server
 			X := make([]byte, tc.PGS)
-			_, _, _, V, U, UT := tc.client(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN2, TOKEN[:], TP[:], nil, timeValue)
+			_, _, _, V, U, UT := tc.client(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN2, TOKEN[:], TP[:], nil, timeValue)
 
 			// Destroy X
 			defer CleanMemory(X[:])
@@ -494,23 +494,23 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 				fmt.Println("Error decoding seed value")
 				return
 			}
-			rng := CreateCSPRNG(seed)
+			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(&rng)
+			_, MS1 := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(&rng)
+			_, MS2 := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate wrong Public Key
-			_, Z := tc.rng(&rng)
-			_, _, Pa := tc.getDVSKeyPair(&rng, nil)
+			_, Z := tc.rng(rng)
+			_, _, Pa := tc.getDVSKeyPair(rng, nil)
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -570,7 +570,7 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			timeValue += 10
 			// Client Pass 1
 			X := make([]byte, tc.PGS)
-			_, XOut, SEC, U, _ := tc.clientPass1(HASH_TYPE_MPIN, 0, ID, &rng, X[:], PIN2, TOKEN[:], nil)
+			_, XOut, SEC, U, _ := tc.clientPass1(HASH_TYPE_MPIN, 0, ID, rng, X[:], PIN2, TOKEN[:], nil)
 
 			// Destroy XOut
 			defer CleanMemory(XOut[:])
@@ -581,7 +581,7 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			var HID []byte
 			HID, _ = tc.serverPass1(HASH_TYPE_MPIN, 0, ID)
 
-			_, Y := tc.rng(&rng)
+			_, Y := tc.rng(rng)
 
 			// Destroy HID
 			defer CleanMemory(HID[:])
@@ -624,22 +624,22 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 				fmt.Println("Error decoding seed value")
 				return
 			}
-			rng := CreateCSPRNG(seed)
+			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(&rng)
+			_, MS1 := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(&rng)
+			_, MS2 := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate Public Key
-			_, Z := tc.rng(&rng)
+			_, Z := tc.rng(rng)
 			_, _, Pa := tc.getDVSKeyPair(nil, Z[:])
 
 			// Destroy Z
@@ -700,7 +700,7 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 			timeValue += 10
 			// Client Pass 1
 			X := make([]byte, tc.PGS)
-			_, XOut, SEC, U, _ := tc.clientPass1(HASH_TYPE_MPIN, 0, ID, &rng, X[:], PIN2, TOKEN[:], nil)
+			_, XOut, SEC, U, _ := tc.clientPass1(HASH_TYPE_MPIN, 0, ID, rng, X[:], PIN2, TOKEN[:], nil)
 
 			// Destroy XOut
 			defer CleanMemory(XOut[:])
@@ -711,7 +711,7 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 			var HID []byte
 			HID, _ = tc.serverPass1(HASH_TYPE_MPIN, 0, ID)
 
-			_, Y := tc.rng(&rng)
+			_, Y := tc.rng(rng)
 
 			// Destroy HID
 			defer CleanMemory(HID[:])
@@ -739,7 +739,7 @@ func ExampleMPinAuthentication() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	HASH_TYPE_MPIN := SHA256
 
@@ -760,7 +760,7 @@ func ExampleMPinAuthentication() {
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(&rng)
+	rtn, MS1 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 1: %v", rtn)
 	}
@@ -770,7 +770,7 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(&rng)
+	rtn, MS2 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 2: %v", rtn)
 	}
@@ -885,7 +885,7 @@ func ExampleMPinAuthentication() {
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS_BN254]byte
-	rtn, XOut, Y1, SEC, U, UT := Client_BN254(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	rtn, XOut, Y1, SEC, U, UT := Client_BN254(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
 		log.Fatalf("error client side MPin One Pass: %v", rtn)
 	}
@@ -961,13 +961,13 @@ func ExampleMPinAuthentications() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	wg := sync.WaitGroup{}
 
 	wg.Add(numRoutines)
 	for x := 0; x < numRoutines; x++ {
-		go func(rng *RandNG, wg *sync.WaitGroup) {
+		go func(rng *Rand, wg *sync.WaitGroup) {
 			HASH_TYPE_MPIN := SHA256
 
 			// Assign the End-User an ID
@@ -1108,7 +1108,7 @@ func ExampleMPinAuthentications() {
 			}
 
 			wg.Done()
-		}(&rng, &wg)
+		}(rng, &wg)
 	}
 	wg.Wait()
 
@@ -1139,14 +1139,14 @@ func ExampleMPinFull() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(&rng)
+	rtn, MS1 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 1: %v", rtn)
 	}
@@ -1156,7 +1156,7 @@ func ExampleMPinFull() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(&rng)
+	rtn, MS2 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 2: %v", rtn)
 	}
@@ -1253,7 +1253,7 @@ func ExampleMPinFull() {
 
 	// Send U, V, timeValue and Message to server
 	var X [PGS_BN254]byte
-	rtn, XOut, Y1, V, U, _ := Client_BN254(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN, TOKEN[:], nil, MESSAGE[:], timeValue)
+	rtn, XOut, Y1, V, U, _ := Client_BN254(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN, TOKEN[:], nil, MESSAGE[:], timeValue)
 	if rtn != 0 {
 		log.Fatalf("error client side MPin Full: %v", rtn)
 	}
@@ -1269,7 +1269,7 @@ func ExampleMPinFull() {
 
 	// Send Z=r.ID to Server
 	var R [PGS_BN254]byte
-	rtn, ROut, Z := GetG1Multiple_BN254(&rng, 1, R[:], HCID[:])
+	rtn, ROut, Z := GetG1Multiple_BN254(rng, 1, R[:], HCID[:])
 	fmt.Printf("ROut: 0x%x\n", ROut[:])
 
 	// Destroy R
@@ -1304,7 +1304,7 @@ func ExampleMPinFull() {
 
 	// send T=w.ID to client
 	var W [PGS_BN254]byte
-	rtn, WOut, T := GetG1Multiple_BN254(&rng, 0, W[:], HID[:])
+	rtn, WOut, T := GetG1Multiple_BN254(rng, 0, W[:], HID[:])
 	fmt.Printf("WOut: 0x%x\n", WOut[:])
 	fmt.Printf("T: 0x%x\n", T[:])
 
@@ -1342,14 +1342,14 @@ func ExampleMPinFull() {
 	//////   Server   //////
 
 	// Initialization vector
-	IV := GenerateRandomByte(&rng, 12)
+	IV := GenerateRandomByte(rng, 12)
 	fmt.Printf("IV: 0x%x\n", IV[:])
 
 	// Destroy IV
 	defer CleanMemory(IV[:])
 
 	// header
-	HEADER := GenerateRandomByte(&rng, 16)
+	HEADER := GenerateRandomByte(rng, 16)
 	fmt.Printf("Header: 0x%x\n", HEADER[:])
 
 	// Destroy HEADER
@@ -1443,14 +1443,14 @@ func ExampleMPinFullWithTP() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	// Message to sign
 	var MESSAGE []byte
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(&rng)
+	rtn, MS1 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 1: %v", rtn)
 	}
@@ -1460,7 +1460,7 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(&rng)
+	rtn, MS2 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 2: %v", rtn)
 	}
@@ -1586,7 +1586,7 @@ func ExampleMPinFullWithTP() {
 
 	// Send U, UT, V, timeValue and Message to server
 	var X [PGS_BN254]byte
-	rtn, XOut, Y1, V, U, UT := Client_BN254(HASH_TYPE_MPIN, date, ID[:], &rng, X[:], PIN, TOKEN[:], TP[:], MESSAGE[:], timeValue)
+	rtn, XOut, Y1, V, U, UT := Client_BN254(HASH_TYPE_MPIN, date, ID[:], rng, X[:], PIN, TOKEN[:], TP[:], MESSAGE[:], timeValue)
 	if rtn != 0 {
 		log.Fatalf("error client side MPin Full: %v", rtn)
 	}
@@ -1602,7 +1602,7 @@ func ExampleMPinFullWithTP() {
 
 	// Send Z=r.ID to Server
 	var R [PGS_BN254]byte
-	rtn, ROut, Z := GetG1Multiple_BN254(&rng, 1, R[:], HCID[:])
+	rtn, ROut, Z := GetG1Multiple_BN254(rng, 1, R[:], HCID[:])
 	fmt.Printf("ROut: 0x%x\n", ROut[:])
 
 	// Destroy R
@@ -1638,7 +1638,7 @@ func ExampleMPinFullWithTP() {
 
 	// send T=w.ID to client
 	var W [PGS_BN254]byte
-	rtn, WOut, T := GetG1Multiple_BN254(&rng, 0, W[:], HTID[:])
+	rtn, WOut, T := GetG1Multiple_BN254(rng, 0, W[:], HTID[:])
 	fmt.Printf("WOut: 0x%x\n", WOut[:])
 	fmt.Printf("T: 0x%x\n", T[:])
 
@@ -1676,14 +1676,14 @@ func ExampleMPinFullWithTP() {
 	//////   Server   //////
 
 	// Initialization vector
-	IV := GenerateRandomByte(&rng, 12)
+	IV := GenerateRandomByte(rng, 12)
 	fmt.Printf("IV: 0x%x\n", IV[:])
 
 	// Destroy IV
 	defer CleanMemory(IV[:])
 
 	// header
-	HEADER := GenerateRandomByte(&rng, 16)
+	HEADER := GenerateRandomByte(rng, 16)
 	fmt.Printf("Header: 0x%x\n", HEADER[:])
 
 	// Destroy HEADER
@@ -1775,10 +1775,10 @@ func ExampleMPinTwoPass() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(&rng)
+	rtn, MS1 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 1: %v", rtn)
 	}
@@ -1788,7 +1788,7 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(&rng)
+	rtn, MS2 := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating master secret share 2: %v", rtn)
 	}
@@ -1904,7 +1904,7 @@ func ExampleMPinTwoPass() {
 	////// Client Pass 1 //////
 	// Send U and UT to server
 	var X [PGS_BN254]byte
-	rtn, XOut, SEC, U, UT := Client1_BN254(HASH_TYPE_MPIN, date, ID, &rng, X[:], PIN, TOKEN[:], TP[:])
+	rtn, XOut, SEC, U, UT := Client1_BN254(HASH_TYPE_MPIN, date, ID, rng, X[:], PIN, TOKEN[:], TP[:])
 	if rtn != 0 {
 		log.Fatalf("error client side MPin Full Pass 1: %v", rtn)
 	}
@@ -1922,7 +1922,7 @@ func ExampleMPinTwoPass() {
 	HID, HTID := Server1_BN254(HASH_TYPE_MPIN, date, ID)
 
 	/* Send Y to Client */
-	rtn, Y := RandomGenerate_BN254(&rng)
+	rtn, Y := RandomGenerate_BN254(rng)
 	if rtn != 0 {
 		log.Fatalf("error generating Y: %v", rtn)
 	}

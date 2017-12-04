@@ -30,7 +30,7 @@ const EFS_{{.curve}} int = int(C.EFS_{{.curve}}) // EFS is the ECC Field Size in
 const EGS_{{.curve}} int = int(C.EGS_{{.curve}}) // EGS is the ECC Group Size in bytes
 
 // ECPKeyPairGenerate_{{.curve}} generates an ECC public/private key pair, S is provided as input if RNG is null
-func ECPKeyPairGenerate_{{.curve}}(RNG *RandNG, S []byte) (int, []byte, []byte) {
+func ECPKeyPairGenerate_{{.curve}}(RNG *Rand, S []byte) (int, []byte, []byte) {
 	WOct := GetOctetZero(2*EFS_{{.curve}} + 1)
 	defer OctetFree(&WOct)
 	var SOct C.octet
@@ -61,7 +61,7 @@ func ECPPublicKeyValidate_{{.curve}}(f int, W []byte) int {
 }
 
 // ECPSpDsa_{{.curve}} signs with ECDSA Signature a message M - K is used when RNG is null
-func ECPSpDsa_{{.curve}}(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
+func ECPSpDsa_{{.curve}}(hashType int, RNG *Rand, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte) {
 	KStr := string(K)
 	KOct := GetOctet(KStr)
 	defer OctetFree(&KOct)

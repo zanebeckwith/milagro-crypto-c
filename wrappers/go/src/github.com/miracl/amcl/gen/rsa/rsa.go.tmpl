@@ -36,7 +36,7 @@ const FFLEN_{{.keySize}} int = int(C.FFLEN_{{.keySize}}) // FFLEN_{{.keySize}} c
 const HASH_TYPE_RSA_{{.keySize}} int = int(C.HASH_TYPE_RSA_{{.keySize}}) // HASH_TYPE_RSA_{{.keySize}} is the chosen Hash algorithm
 
 // RSAKeyPair generates an RSA key pair
-func RSAKeyPair_{{.keySize}}(rng *RandNG, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
+func RSAKeyPair_{{.keySize}}(rng *Rand, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
 	var prvKey C.rsa_private_key_{{.keySize}}
 	var pubKey C.rsa_public_key_{{.keySize}}
 

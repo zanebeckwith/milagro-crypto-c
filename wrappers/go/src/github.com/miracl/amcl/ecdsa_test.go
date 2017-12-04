@@ -29,16 +29,16 @@ func TestECDSA(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	testCases := []struct {
 		curve             string
 		pbkdfKeyLen       int
-		genKey            func(RNG *RandNG, S []byte) (int, []byte, []byte)
-		genRNG            *RandNG
+		genKey            func(RNG *Rand, S []byte) (int, []byte, []byte)
+		genRNG            *Rand
 		genSeed           []byte
 		ecpPubKeyValidate func(f int, W []byte) int
-		sign              func(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte)
+		sign              func(hashType int, RNG *Rand, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte)
 		verify            func(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int)
 	}{
 		{
@@ -123,7 +123,7 @@ func TestECDSA(t *testing.T) {
 			MESSAGE := []byte(MESSAGEstr)
 
 			// Sign Message
-			rtn, C, D := tc.sign(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
+			rtn, C, D := tc.sign(SHA256, rng, nil, PrivKey[:], MESSAGE[:])
 			if rtn != 0 {
 				t.Errorf("ECDSA signature sailed; rtn=%v", rtn)
 			}
@@ -142,15 +142,15 @@ func TestECDSARandom(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	testCases := []struct {
 		curve             string
-		genKey            func(RNG *RandNG, S []byte) (int, []byte, []byte)
-		genRNG            *RandNG
+		genKey            func(RNG *Rand, S []byte) (int, []byte, []byte)
+		genRNG            *Rand
 		genSeed           []byte
 		ecpPubKeyValidate func(f int, W []byte) int
-		sign              func(hashType int, RNG *RandNG, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte)
+		sign              func(hashType int, RNG *Rand, K []byte, S []byte, M []byte) (errorCode int, C []byte, D []byte)
 		verify            func(hashType int, W []byte, M []byte, C []byte, D []byte) (errorCode int)
 	}{
 		{
@@ -201,7 +201,7 @@ func TestECDSARandom(t *testing.T) {
 		t.Run(tc.curve, func(t *testing.T) {
 
 			// Generate ECC Key Pair
-			rtn, PrivKey, PubKey := tc.genKey(&rng, nil)
+			rtn, PrivKey, PubKey := tc.genKey(rng, nil)
 			if rtn != 0 {
 				t.Errorf("ECC key pair generation failed; rtn=%v", rtn)
 			}
@@ -220,7 +220,7 @@ func TestECDSARandom(t *testing.T) {
 			MESSAGE := []byte(MESSAGEstr)
 
 			// Sign Message
-			rtn, C, D := tc.sign(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
+			rtn, C, D := tc.sign(SHA256, rng, nil, PrivKey[:], MESSAGE[:])
 			if rtn != 0 {
 				t.Errorf("ECDSA signature failed; rtn=%v", rtn)
 			}
@@ -246,7 +246,7 @@ func ExampleECDSA() {
 		log.Fatal(err)
 	}
 
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	// Set PassPhrase
 	PassPhraseStr := "AlicePassPhrase"
@@ -286,7 +286,7 @@ func ExampleECDSA() {
 	MESSAGE := []byte(MESSAGEstr)
 	fmt.Printf("message: 0x%x\n", MESSAGE[:])
 
-	rtn, C, D := ECPSpDsa_BN254(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
+	rtn, C, D := ECPSpDsa_BN254(SHA256, rng, nil, PrivKey[:], MESSAGE[:])
 	if rtn != 0 {
 		log.Fatalf("error generating ECDSA signature: %v", rtn)
 	}
@@ -320,10 +320,10 @@ func ExampleECDSARandom() {
 		log.Fatal(err)
 	}
 
-	rng := CreateCSPRNG(seed)
+	rng := NewRand(seed)
 
 	// Generate ECC Key Pair
-	rtn, PrivKey, PubKey := ECPKeyPairGenerate_BN254(&rng, nil)
+	rtn, PrivKey, PubKey := ECPKeyPairGenerate_BN254(rng, nil)
 	if rtn != 0 {
 		log.Fatalf("error generating ECC key pair: %v", rtn)
 	}
@@ -346,7 +346,7 @@ func ExampleECDSARandom() {
 	fmt.Printf("message: 0x%x\n", MESSAGE[:])
 
 	// Sign Message
-	rtn, C, D := ECPSpDsa_BN254(SHA256, &rng, nil, PrivKey[:], MESSAGE[:])
+	rtn, C, D := ECPSpDsa_BN254(SHA256, rng, nil, PrivKey[:], MESSAGE[:])
 	if rtn != 0 {
 		log.Fatalf("error generating ECDSA signature: %v", rtn)
 	}

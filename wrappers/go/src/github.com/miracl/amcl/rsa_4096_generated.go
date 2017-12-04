@@ -36,7 +36,7 @@ const FFLEN_4096 int = int(C.FFLEN_4096) // FFLEN_4096 consists in 2^n multiplie
 const HASH_TYPE_RSA_4096 int = int(C.HASH_TYPE_RSA_4096) // HASH_TYPE_RSA_4096 is the chosen Hash algorithm
 
 // RSAKeyPair generates an RSA key pair
-func RSAKeyPair_4096(rng *RandNG, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
+func RSAKeyPair_4096(rng *Rand, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
 	var prvKey C.rsa_private_key_4096
 	var pubKey C.rsa_public_key_4096
 

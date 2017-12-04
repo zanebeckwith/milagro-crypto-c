@@ -26,6 +26,7 @@ under the License.
 extern int _PKCS15(int h, octet m, octet w);
 extern int _OAEP_ENCODE(int h, octet m, csprng* rng, octet p, octet f);
 extern int _OAEP_DECODE(int h, octet p, octet f);
+extern void _CREATE_CSPRNG(csprng* R, octet S);
 extern void _RSA_2048_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_2048* priv, rsa_public_key_2048* pub, octet p, octet q);
 extern void _RSA_3072_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_3072* priv, rsa_public_key_3072* pub, octet p, octet q);
 extern void _RSA_4096_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_4096* priv, rsa_public_key_4096* pub, octet p, octet q);

@@ -48,6 +48,11 @@ int _OAEP_DECODE(int h, octet p, octet f)
 	return OAEP_DECODE(h, &p, &f);
 }
 
+void _CREATE_CSPRNG(csprng* R, octet S)
+{
+	CREATE_CSPRNG(R, &S);
+}
+
 void _RSA_2048_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_2048* priv, rsa_public_key_2048* pub, octet p, octet q)
 {
 	RSA_2048_KEY_PAIR(rng, e, priv, pub, &p, &q);

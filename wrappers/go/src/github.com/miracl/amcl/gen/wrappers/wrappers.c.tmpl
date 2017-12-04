@@ -30,6 +30,8 @@ changed in the function.
 #include "rsa_3072.h"
 #include "rsa_4096.h"
 #include "rsa_support.h"
+#include "randapi.h"
+
 
 {{range . -}}
 {{.CType}} _{{.Name}}({{range $i, $arg := .WArgs}}{{if $i}}, {{end}}{{.CType}} {{$arg.Name}}{{end}})

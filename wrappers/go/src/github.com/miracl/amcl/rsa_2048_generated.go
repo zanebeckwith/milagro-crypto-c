@@ -36,7 +36,7 @@ const FFLEN_2048 int = int(C.FFLEN_2048) // FFLEN_2048 consists in 2^n multiplie
 const HASH_TYPE_RSA_2048 int = int(C.HASH_TYPE_RSA_2048) // HASH_TYPE_RSA_2048 is the chosen Hash algorithm
 
 // RSAKeyPair generates an RSA key pair
-func RSAKeyPair_2048(rng *RandNG, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
+func RSAKeyPair_2048(rng *Rand, e int32, p []byte, q []byte) (RSAPrivateKey, RSAPublicKey) {
 	var prvKey C.rsa_private_key_2048
 	var pubKey C.rsa_public_key_2048
 
