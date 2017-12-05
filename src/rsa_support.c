@@ -134,7 +134,7 @@ int PKCS15(int sha,octet *m,octet *w)
 
     OCT_joctet(w,&H);
 
-    return 1;
+    return 0;
 }
 
 /* OAEP Message Encoding for Encryption */
@@ -175,7 +175,7 @@ int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
     OCT_clear(&SEED);
     OCT_clear(&DBMASK);
 
-    return 1;
+    return 0;
 }
 
 /* OAEP Message Decoding for Decryption */
@@ -233,5 +233,5 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     OCT_copy(f,&DBMASK);
     OCT_clear(&DBMASK);
 
-    return 1;
+    return 0;
 }
