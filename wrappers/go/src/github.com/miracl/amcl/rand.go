@@ -17,11 +17,9 @@
 
 package amcl
 
-/*
-#include "amcl.h"
-#include "randapi.h"
-#include "wrappers_generated.h"
-*/
+// #include "amcl.h"
+// #include "randapi.h"
+// #include "wrappers_generated.h"
 import "C"
 
 // Rand is a cryptographically secure random number generator

@@ -23,6 +23,6 @@ under the License.
 #include "rsa_4096.h"
 #include "rsa_support.h"
 
-{{ range . -}}
-extern {{ .CType }} _{{ .Name }}({{ range $i, $arg := .WArgs }}{{if $i}}, {{end}}{{ .CType }} {{ $arg.Name }}{{ end }});
-{{ end }}
+{{range . -}}
+extern {{.CType}} _{{.Name}}({{range $i, $arg := .WArgs}}{{if $i}}, {{end}}{{.CType}} {{$arg.Name}}{{end}});
+{{end}}

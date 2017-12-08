@@ -19,10 +19,8 @@ package amcl
 
 //go:generate go run gen/rsa/main.go
 
-/*
-#include "rsa_support.h"
-#include "wrappers_generated.h"
-*/
+// #include "rsa_support.h"
+// #include "wrappers_generated.h"
 import "C"
 import "bytes"
 

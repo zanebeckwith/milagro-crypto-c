@@ -17,10 +17,8 @@
 
 package amcl
 
-/*
-#include "amcl.h"
-#include "randapi.h"
-*/
+// #include "amcl.h"
+// #include "randapi.h"
 import "C"
 import (
 	"encoding/hex"

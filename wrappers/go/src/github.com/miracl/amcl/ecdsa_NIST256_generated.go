@@ -17,13 +17,11 @@
 
 package amcl
 
-/*
-#cgo LDFLAGS: -lamcl_curve_NIST256
-#include <stdio.h>
-#include <stdlib.h>
-#include "amcl.h"
-#include "ecdh_NIST256.h"
-*/
+// #cgo LDFLAGS: -lamcl_curve_NIST256
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include "amcl.h"
+// #include "ecdh_NIST256.h"
 import "C"
 
 const EFS_NIST256 int = int(C.EFS_NIST256) // EFS is the ECC Field Size in bytes

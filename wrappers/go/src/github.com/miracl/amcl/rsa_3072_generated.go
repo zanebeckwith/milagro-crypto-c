@@ -17,16 +17,14 @@
 
 package amcl
 
-/*
-#cgo LDFLAGS: -lamcl_rsa_3072
-#include <stdio.h>
-#include <stdlib.h>
-#include "amcl.h"
-#include "randapi.h"
-#include "rsa_3072.h"
-#include "utils.h"
-#include "wrappers_generated.h"
-*/
+// #cgo LDFLAGS: -lamcl_rsa_3072
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include "amcl.h"
+// #include "randapi.h"
+// #include "rsa_3072.h"
+// #include "utils.h"
+// #include "wrappers_generated.h"
 import "C"
 
 // RSA Constant

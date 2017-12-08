@@ -19,9 +19,7 @@
 
 package amcl
 
-/*
-#include "ecdh_support.h"
-*/
+// #include "ecdh_support.h"
 import "C"
 
 // PBKDF2 is a Password Based Key Derivation Function. Uses SHA256 internally

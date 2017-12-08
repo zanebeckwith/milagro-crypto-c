@@ -17,7 +17,13 @@
 
 package amcl
 
-import "fmt"
+import (
+	"fmt"
+)
+
+const (
+	wrongPin = -19
+)
 
 // Error is for errors returned from AMCL wrappers
 type Error struct {
@@ -29,9 +35,15 @@ func (err *Error) Error() string {
 }
 
 func newError(code int) error {
-	if code == 1 {
+	if code == 0 {
 		return nil
 	}
 
 	return &Error{code}
+}
+
+// IsWrongPin returns true if the err is Wrong PIN
+func IsWrongPin(err error) bool {
+	amclError, ok := err.(*Error)
+	return ok && amclError.code == wrongPin
 }

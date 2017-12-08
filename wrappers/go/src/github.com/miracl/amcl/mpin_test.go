@@ -30,21 +30,21 @@ var mPinTestCases = []struct {
 	PFS                    int
 	G1S                    int
 	PGS                    int
-	rng                    func(RNG *Rand) (errorCode int, S []byte)
-	getDVSKeyPair          func(RNG *Rand, z []byte) (errorCode int, zOut []byte, publicKey []byte)
-	getServerSecret        func(masterSecret []byte) (errorCode int, serverSecret []byte)
-	recombineServerSecret  func(W1 []byte, W2 []byte) (errorCode int, W []byte)
-	getClientSecret        func(masterSecret []byte, hashMPinId []byte) (errorCode int, clientSecret []byte)
-	recombineClientSecret  func(R1 []byte, R2 []byte) (errorCode int, R []byte)
+	rng                    func(RNG *Rand) ([]byte, error)
+	getDVSKeyPair          func(RNG *Rand, z []byte) ([]byte, []byte, error)
+	getServerSecret        func(masterSecret []byte) ([]byte, error)
+	recombineServerSecret  func(W1 []byte, W2 []byte) ([]byte, error)
+	getClientSecret        func(masterSecret []byte, hashMPinId []byte) ([]byte, error)
+	recombineClientSecret  func(R1 []byte, R2 []byte) ([]byte, error)
 	getKeyEscrowLessSecret func(RNG *Rand, typ int, x []byte, G []byte) (errorCode int, xOut, W []byte)
-	extractPin             func(hashType int, mpinId []byte, PIN int, clientSecret []byte) (errorCode int, token []byte)
+	extractPin             func(hashType int, mpinId []byte, PIN int, clientSecret []byte) ([]byte, error)
 	client                 func(hashType, epochDate int, mpinId []byte, RNG *Rand, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) (errorCode int, xOut, y, V, U, UT []byte)
 	server                 func(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, publicKey, message []byte, Kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte)
 	clientPass1            func(hashType, epochDate int, mpinId []byte, RNG *Rand, x []byte, PIN int, token []byte, timePermit []byte) (errorCode int, xOut, SEC, U, UT []byte)
 	serverPass1            func(hashType, epochDate int, mpinId []byte) (HID, HTID []byte)
-	clientPass2            func(x []byte, y []byte, SEC []byte) (errorCode int, V []byte)
+	clientPass2            func(x []byte, y []byte, SEC []byte) ([]byte, error)
 	serverPass2            func(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, Kangaroo_BN254 bool) (errorCode int, E []byte, F []byte)
-	getClientPermit        func(hashType, epochDate int, masterSecret, hashMPinId []byte) (errorCode int, timePermit []byte)
+	getClientPermit        func(hashType, epochDate int, masterSecret, hashMPinId []byte) ([]byte, error)
 }{
 	{
 		curve:                  "BLS383",
@@ -139,20 +139,20 @@ func TestKeyEscrowLess(t *testing.T) {
 			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(rng)
+			MS1, _ := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(rng)
+			MS2, _ := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate Public Key
-			_, Z := tc.rng(rng)
-			_, _, Pa := tc.getDVSKeyPair(nil, Z[:])
+			Z, _ := tc.rng(rng)
+			_, Pa, _ := tc.getDVSKeyPair(nil, Z[:])
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -164,38 +164,38 @@ func TestKeyEscrowLess(t *testing.T) {
 			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
 
 			// Generate server secret share 1
-			_, SS1 := tc.getServerSecret(MS1[:])
+			SS1, _ := tc.getServerSecret(MS1[:])
 
 			// Destroy SS1
 			defer CleanMemory(SS1[:])
 
 			// Generate server secret share 2
-			_, SS2 := tc.getServerSecret(MS2[:])
+			SS2, _ := tc.getServerSecret(MS2[:])
 
 			// Destroy SS2
 			defer CleanMemory(SS2[:])
 
 			// Combine server secret shares
-			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+			SS, _ := tc.recombineServerSecret(SS1[:], SS2[:])
 
 			// Destroy SS
 			defer CleanMemory(SS[:])
 
 			// Generate client secret share 1
-			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+			CS1, _ := tc.getClientSecret(MS1[:], HCID)
 
 			// Destroy CS1
 			defer CleanMemory(CS1[:])
 
 			// Generate client secret share 2
-			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+			CS2, _ := tc.getClientSecret(MS2[:], HCID)
 
 			// Destroy CS2
 			defer CleanMemory(CS2[:])
 
 			// Combine client secret shares
 			CS := make([]byte, tc.G1S)
-			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+			CS, _ = tc.recombineClientSecret(CS1[:], CS2[:])
 
 			// Compute key-escrow less secret
 			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
@@ -204,7 +204,7 @@ func TestKeyEscrowLess(t *testing.T) {
 			defer CleanMemory(CS[:])
 
 			// Create token
-			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+			TOKEN, _ := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 			// Destroy TOKEN
 			defer CleanMemory(TOKEN[:])
@@ -253,19 +253,19 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(rng)
+			MS1, _ := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(rng)
+			MS2, _ := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate Public Key
-			_, Z, Pa := tc.getDVSKeyPair(rng, nil)
+			Z, Pa, _ := tc.getDVSKeyPair(rng, nil)
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -277,38 +277,38 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
 
 			// Generate server secret share 1
-			_, SS1 := tc.getServerSecret(MS1[:])
+			SS1, _ := tc.getServerSecret(MS1[:])
 
 			// Destroy SS1
 			defer CleanMemory(SS1[:])
 
 			// Generate server secret share 2
-			_, SS2 := tc.getServerSecret(MS2[:])
+			SS2, _ := tc.getServerSecret(MS2[:])
 
 			// Destroy SS2
 			defer CleanMemory(SS2[:])
 
 			// Combine server secret shares
-			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+			SS, _ := tc.recombineServerSecret(SS1[:], SS2[:])
 
 			// Destroy SS
 			defer CleanMemory(SS[:])
 
 			// Generate client secret share 1
-			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+			CS1, _ := tc.getClientSecret(MS1[:], HCID)
 
 			// Destroy CS1
 			defer CleanMemory(CS1[:])
 
 			// Generate client secret share 2
-			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+			CS2, _ := tc.getClientSecret(MS2[:], HCID)
 
 			// Destroy CS2
 			defer CleanMemory(CS2[:])
 
 			// Combine client secret shares
 			CS := make([]byte, tc.G1S)
-			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+			CS, _ = tc.recombineClientSecret(CS1[:], CS2[:])
 
 			// Compute key-escrow less secret
 			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
@@ -317,7 +317,7 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 			defer CleanMemory(CS[:])
 
 			// Create token
-			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+			TOKEN, _ := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 			// Destroy TOKEN
 			defer CleanMemory(TOKEN[:])
@@ -366,20 +366,20 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(rng)
+			MS1, _ := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(rng)
+			MS2, _ := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate wrong Public Key
-			_, Z, _ := tc.getDVSKeyPair(rng, nil)
-			_, _, Pa := tc.getDVSKeyPair(rng, nil)
+			Z, _, _ := tc.getDVSKeyPair(rng, nil)
+			_, Pa, _ := tc.getDVSKeyPair(rng, nil)
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -391,38 +391,38 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
 
 			// Generate server secret share 1
-			_, SS1 := tc.getServerSecret(MS1[:])
+			SS1, _ := tc.getServerSecret(MS1[:])
 
 			// Destroy SS1
 			defer CleanMemory(SS1[:])
 
 			// Generate server secret share 2
-			_, SS2 := tc.getServerSecret(MS2[:])
+			SS2, _ := tc.getServerSecret(MS2[:])
 
 			// Destroy SS2
 			defer CleanMemory(SS2[:])
 
 			// Combine server secret shares
-			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+			SS, _ := tc.recombineServerSecret(SS1[:], SS2[:])
 
 			// Destroy SS
 			defer CleanMemory(SS[:])
 
 			// Generate client secret share 1
-			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+			CS1, _ := tc.getClientSecret(MS1[:], HCID)
 
 			// Destroy CS1
 			defer CleanMemory(CS1[:])
 
 			// Generate client secret share 2
-			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+			CS2, _ := tc.getClientSecret(MS2[:], HCID)
 
 			// Destroy CS2
 			defer CleanMemory(CS2[:])
 
 			// Combine client secret shares
 			CS := make([]byte, tc.G1S)
-			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+			CS, _ = tc.recombineClientSecret(CS1[:], CS2[:])
 
 			// Compute key-escrow less secret
 			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
@@ -431,25 +431,25 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 			defer CleanMemory(CS[:])
 
 			// Generate time permit share 1
-			_, TP1 := tc.getClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
+			TP1, _ := tc.getClientPermit(HASH_TYPE_MPIN, date, MS1[:], HCID)
 
 			// Destroy TP1
 			defer CleanMemory(TP1[:])
 
 			// Generate time permit share 2
-			_, TP2 := tc.getClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
+			TP2, _ := tc.getClientPermit(HASH_TYPE_MPIN, date, MS2[:], HCID)
 
 			// Destroy TP2
 			defer CleanMemory(TP2[:])
 
 			// Combine time permit shares
-			_, TP := tc.recombineClientSecret(TP1[:], TP2[:])
+			TP, _ := tc.recombineClientSecret(TP1[:], TP2[:])
 
 			// Destroy TP
 			defer CleanMemory(TP[:])
 
 			// Create token
-			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+			TOKEN, _ := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 			// Destroy TOKEN
 			defer CleanMemory(TOKEN[:])
@@ -497,20 +497,20 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(rng)
+			MS1, _ := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(rng)
+			MS2, _ := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate wrong Public Key
-			_, Z := tc.rng(rng)
-			_, _, Pa := tc.getDVSKeyPair(rng, nil)
+			Z, _ := tc.rng(rng)
+			_, Pa, _ := tc.getDVSKeyPair(rng, nil)
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -522,38 +522,38 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
 
 			// Generate server secret share 1
-			_, SS1 := tc.getServerSecret(MS1[:])
+			SS1, _ := tc.getServerSecret(MS1[:])
 
 			// Destroy SS1
 			defer CleanMemory(SS1[:])
 
 			// Generate server secret share 2
-			_, SS2 := tc.getServerSecret(MS2[:])
+			SS2, _ := tc.getServerSecret(MS2[:])
 
 			// Destroy SS2
 			defer CleanMemory(SS2[:])
 
 			// Combine server secret shares
-			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+			SS, _ := tc.recombineServerSecret(SS1[:], SS2[:])
 
 			// Destroy SS
 			defer CleanMemory(SS[:])
 
 			// Generate client secret share 1
-			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+			CS1, _ := tc.getClientSecret(MS1[:], HCID)
 
 			// Destroy CS1
 			defer CleanMemory(CS1[:])
 
 			// Generate client secret share 2
-			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+			CS2, _ := tc.getClientSecret(MS2[:], HCID)
 
 			// Destroy CS2
 			defer CleanMemory(CS2[:])
 
 			// Combine client secret shares
 			CS := make([]byte, tc.G1S)
-			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+			CS, _ = tc.recombineClientSecret(CS1[:], CS2[:])
 
 			// Compute key-escrow less secret
 			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
@@ -562,7 +562,7 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			defer CleanMemory(CS[:])
 
 			// Create token
-			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+			TOKEN, _ := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 			// Destroy TOKEN
 			defer CleanMemory(TOKEN[:])
@@ -581,7 +581,7 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			var HID []byte
 			HID, _ = tc.serverPass1(HASH_TYPE_MPIN, 0, ID)
 
-			_, Y := tc.rng(rng)
+			Y, _ := tc.rng(rng)
 
 			// Destroy HID
 			defer CleanMemory(HID[:])
@@ -589,7 +589,7 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			defer CleanMemory(Y[:])
 
 			// Client Pass 2
-			_, V := tc.clientPass2(XOut[:], Y[:], SEC[:])
+			V, _ := tc.clientPass2(XOut[:], Y[:], SEC[:])
 
 			// Server Pass 2
 			// Send UT as V to model bad token
@@ -627,20 +627,20 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 			rng := NewRand(seed)
 
 			// Generate Master Secret Share 1
-			_, MS1 := tc.rng(rng)
+			MS1, _ := tc.rng(rng)
 
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			_, MS2 := tc.rng(rng)
+			MS2, _ := tc.rng(rng)
 
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
 
 			// Generate Public Key
-			_, Z := tc.rng(rng)
-			_, _, Pa := tc.getDVSKeyPair(nil, Z[:])
+			Z, _ := tc.rng(rng)
+			_, Pa, _ := tc.getDVSKeyPair(nil, Z[:])
 
 			// Destroy Z
 			defer CleanMemory(Z[:])
@@ -652,38 +652,38 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 			HCID := HashId(HASH_TYPE_MPIN, tc.PFS, ID)
 
 			// Generate server secret share 1
-			_, SS1 := tc.getServerSecret(MS1[:])
+			SS1, _ := tc.getServerSecret(MS1[:])
 
 			// Destroy SS1
 			defer CleanMemory(SS1[:])
 
 			// Generate server secret share 2
-			_, SS2 := tc.getServerSecret(MS2[:])
+			SS2, _ := tc.getServerSecret(MS2[:])
 
 			// Destroy SS2
 			defer CleanMemory(SS2[:])
 
 			// Combine server secret shares
-			_, SS := tc.recombineServerSecret(SS1[:], SS2[:])
+			SS, _ := tc.recombineServerSecret(SS1[:], SS2[:])
 
 			// Destroy SS
 			defer CleanMemory(SS[:])
 
 			// Generate client secret share 1
-			_, CS1 := tc.getClientSecret(MS1[:], HCID)
+			CS1, _ := tc.getClientSecret(MS1[:], HCID)
 
 			// Destroy CS1
 			defer CleanMemory(CS1[:])
 
 			// Generate client secret share 2
-			_, CS2 := tc.getClientSecret(MS2[:], HCID)
+			CS2, _ := tc.getClientSecret(MS2[:], HCID)
 
 			// Destroy CS2
 			defer CleanMemory(CS2[:])
 
 			// Combine client secret shares
 			CS := make([]byte, tc.G1S)
-			_, CS = tc.recombineClientSecret(CS1[:], CS2[:])
+			CS, _ = tc.recombineClientSecret(CS1[:], CS2[:])
 
 			// Compute key-escrow less secret
 			_, _, CS = tc.getKeyEscrowLessSecret(nil, 0, Z[:], CS[:])
@@ -692,7 +692,7 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 			defer CleanMemory(CS[:])
 
 			// Create token
-			_, TOKEN := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
+			TOKEN, _ := tc.extractPin(HASH_TYPE_MPIN, ID[:], PIN1, CS[:])
 
 			// Destroy TOKEN
 			defer CleanMemory(TOKEN[:])
@@ -711,7 +711,7 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 			var HID []byte
 			HID, _ = tc.serverPass1(HASH_TYPE_MPIN, 0, ID)
 
-			_, Y := tc.rng(rng)
+			Y, _ := tc.rng(rng)
 
 			// Destroy HID
 			defer CleanMemory(HID[:])
@@ -719,7 +719,7 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 			defer CleanMemory(Y[:])
 
 			// Client Pass 2
-			_, V := tc.clientPass2(XOut[:], Y[:], SEC[:])
+			V, _ := tc.clientPass2(XOut[:], Y[:], SEC[:])
 
 			// Server Pass 2
 			// Send UT as V to model bad token
@@ -760,9 +760,9 @@ func ExampleMPinAuthentication() {
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 1: %v", rtn)
+	MS1, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 1: %v", err)
 	}
 	fmt.Printf("Master Secret share 1: 0x%x\n", MS1[:])
 
@@ -770,9 +770,9 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 2: %v", rtn)
+	MS2, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 2: %v", err)
 	}
 	fmt.Printf("Master Secret share 2: 0x%x\n", MS2[:])
 
@@ -783,9 +783,9 @@ func ExampleMPinAuthentication() {
 	HCID := HashId(HASH_TYPE_MPIN, PFS_BN254, ID)
 
 	// Generate server secret share 1
-	rtn, SS1 := GetServerSecret_BN254(MS1[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 1: %v", rtn)
+	SS1, err := GetServerSecret_BN254(MS1[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 1: %v", err)
 	}
 	fmt.Printf("Server Secret share 1: 0x%x\n", SS1[:])
 
@@ -793,9 +793,9 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	rtn, SS2 := GetServerSecret_BN254(MS2[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 2: %v", rtn)
+	SS2, err := GetServerSecret_BN254(MS2[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 2: %v", err)
 	}
 	fmt.Printf("Server Secret share 2: 0x%x\n", SS2[:])
 
@@ -803,9 +803,9 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	rtn, SS := RecombineG2_BN254(SS1[:], SS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining Server Secret shares: %v", rtn)
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
+	if err != nil {
+		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
 	fmt.Printf("Server Secret: 0x%x\n", SS[:])
 
@@ -813,9 +813,9 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(SS[:])
 
 	// Generate client secret share 1
-	rtn, CS1 := GetClientSecret_BN254(MS1[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS1, err := GetClientSecret_BN254(MS1[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 1: 0x%x\n", CS1[:])
 
@@ -823,9 +823,9 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(CS1[:])
 
 	// Generate client secret share 2
-	rtn, CS2 := GetClientSecret_BN254(MS2[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS2, err := GetClientSecret_BN254(MS2[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 2: 0x%x\n", CS2[:])
 
@@ -834,9 +834,9 @@ func ExampleMPinAuthentication() {
 
 	// Combine client secret shares
 	CS := make([]byte, G1S_BN254)
-	rtn, CS = RecombineG1_BN254(CS1[:], CS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining client secret shares: %v", rtn)
+	CS, err = RecombineG1_BN254(CS1[:], CS2[:])
+	if err != nil {
+		log.Fatalf("error recombining client secret shares: %v", err)
 	}
 	fmt.Printf("Client Secret: 0x%x\n", CS[:])
 
@@ -844,9 +844,9 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(CS[:])
 
 	// Generate time permit share 1
-	rtn, TP1 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating Time Permit share 1: %v", rtn)
+	TP1, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating Time Permit share 1: %v", err)
 	}
 	fmt.Printf("Time Permit share 1: 0x%x\n", TP1[:])
 
@@ -854,9 +854,9 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
-	rtn, TP2 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating Time Permit share 2: %v", rtn)
+	TP2, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating Time Permit share 2: %v", err)
 	}
 	fmt.Printf("Time Permit share 2: 0x%x\n", TP2[:])
 
@@ -864,17 +864,17 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(TP2[:])
 
 	// Combine time permit shares
-	rtn, TP := RecombineG1_BN254(TP1[:], TP2[:])
-	if rtn != 0 {
-		log.Fatal("error recombining Time Permit shares: %v", rtn)
+	TP, err := RecombineG1_BN254(TP1[:], TP2[:])
+	if err != nil {
+		log.Fatal("error recombining Time Permit shares: %v", err)
 	}
 
 	// Destroy TP
 	defer CleanMemory(TP[:])
 
-	rtn, TOKEN := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
-	if rtn != 0 {
-		log.Fatalf("error extracting pin from Client Secret: %v", rtn)
+	TOKEN, err := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
+	if err != nil {
+		log.Fatalf("error extracting pin from Client Secret: %v", err)
 	}
 	fmt.Printf("Token: 0x%x\n", TOKEN[:])
 
@@ -987,17 +987,17 @@ func ExampleMPinAuthentications() {
 			MESSAGE := []byte("test sign message")
 
 			// Generate Master Secret Share 1
-			rtn, MS1 := RandomGenerate_BN254(rng)
-			if rtn != 0 {
-				log.Fatalf("error generating master secret share 1: %v", rtn)
+			MS1, err := RandomGenerate_BN254(rng)
+			if err != nil {
+				log.Fatalf("error generating master secret share 1: %v", err)
 			}
 			// Destroy MS1
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			rtn, MS2 := RandomGenerate_BN254(rng)
-			if rtn != 0 {
-				log.Fatalf("error generating master secret share 2: %v", rtn)
+			MS2, err := RandomGenerate_BN254(rng)
+			if err != nil {
+				log.Fatalf("error generating master secret share 2: %v", err)
 			}
 			// Destroy MS2
 			defer CleanMemory(MS2[:])
@@ -1006,81 +1006,81 @@ func ExampleMPinAuthentications() {
 			HCID := HashId(HASH_TYPE_MPIN, PFS_BN254, ID)
 
 			// Generate server secret share 1
-			rtn, SS1 := GetServerSecret_BN254(MS1[:])
-			if rtn != 0 {
-				log.Fatalf("error generating server secret share 1: %v", rtn)
+			SS1, err := GetServerSecret_BN254(MS1[:])
+			if err != nil {
+				log.Fatalf("error generating server secret share 1: %v", err)
 			}
 			// Destroy SS1
 			defer CleanMemory(SS1[:])
 
 			// Generate server secret share 2
-			rtn, SS2 := GetServerSecret_BN254(MS2[:])
-			if rtn != 0 {
-				log.Fatalf("error generating server secret share 2: %v", rtn)
+			SS2, err := GetServerSecret_BN254(MS2[:])
+			if err != nil {
+				log.Fatalf("error generating server secret share 2: %v", err)
 			}
 			// Destroy SS2
 			defer CleanMemory(SS2[:])
 
 			// Combine server secret shares
-			rtn, SS := RecombineG2_BN254(SS1[:], SS2[:])
-			if rtn != 0 {
-				log.Fatalf("error recombining server secret shares: %v", rtn)
+			SS, err := RecombineG2_BN254(SS1[:], SS2[:])
+			if err != nil {
+				log.Fatalf("error recombining server secret shares: %v", err)
 			}
 			// Destroy SS
 			defer CleanMemory(SS[:])
 
 			// Generate client secret share 1
-			rtn, CS1 := GetClientSecret_BN254(MS1[:], HCID)
-			if rtn != 0 {
-				log.Fatalf("error generating client secret share 1: %v", rtn)
+			CS1, err := GetClientSecret_BN254(MS1[:], HCID)
+			if err != nil {
+				log.Fatalf("error generating client secret share 1: %v", err)
 			}
 			// Destroy CS1
 			defer CleanMemory(CS1[:])
 
 			// Generate client secret share 2
-			rtn, CS2 := GetClientSecret_BN254(MS2[:], HCID)
-			if rtn != 0 {
-				log.Fatalf("error generating client secret share 2: %v", rtn)
+			CS2, err := GetClientSecret_BN254(MS2[:], HCID)
+			if err != nil {
+				log.Fatalf("error generating client secret share 2: %v", err)
 			}
 			// Destroy CS2
 			defer CleanMemory(CS2[:])
 
 			// Combine client secret shares
 			CS := make([]byte, G1S_BN254)
-			rtn, CS = RecombineG1_BN254(CS1[:], CS2[:])
-			if rtn != 0 {
-				log.Fatalf("error recombining client secret shares: %v", rtn)
+			CS, err = RecombineG1_BN254(CS1[:], CS2[:])
+			if err != nil {
+				log.Fatalf("error recombining client secret shares: %v", err)
 			}
 			// Destroy CS
 			defer CleanMemory(CS[:])
 
 			// Generate time permit share 1
-			rtn, TP1 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
-			if rtn != 0 {
-				log.Fatalf("error generating time permit share 1: %v", rtn)
+			TP1, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
+			if err != nil {
+				log.Fatalf("error generating time permit share 1: %v", err)
 			}
 			// Destroy TP1
 			defer CleanMemory(TP1[:])
 
 			// Generate time permit share 2
-			rtn, TP2 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
-			if rtn != 0 {
-				log.Fatalf("error generating time permit share 2: %v", rtn)
+			TP2, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
+			if err != nil {
+				log.Fatalf("error generating time permit share 2: %v", err)
 			}
 			// Destroy TP2
 			defer CleanMemory(TP2[:])
 
 			// Combine time permit shares
-			rtn, TP := RecombineG1_BN254(TP1[:], TP2[:])
-			if rtn != 0 {
-				log.Fatalf("error recombining time permit shares: %v", rtn)
+			TP, err := RecombineG1_BN254(TP1[:], TP2[:])
+			if err != nil {
+				log.Fatalf("error recombining time permit shares: %v", err)
 			}
 			// Destroy TP
 			defer CleanMemory(TP[:])
 
-			rtn, TOKEN := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
-			if rtn != 0 {
-				log.Fatalf("error extracting pin from client secret: %v", rtn)
+			TOKEN, err := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
+			if err != nil {
+				log.Fatalf("error extracting pin from client secret: %v", err)
 			}
 			// Destroy TOKEN
 			defer CleanMemory(TOKEN[:])
@@ -1146,9 +1146,9 @@ func ExampleMPinFull() {
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 1: %v", rtn)
+	MS1, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 1: %v", err)
 	}
 	fmt.Printf("Master Secret share 1: 0x%x\n", MS1[:])
 
@@ -1156,9 +1156,9 @@ func ExampleMPinFull() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 2: %v", rtn)
+	MS2, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 2: %v", err)
 	}
 	fmt.Printf("Master Secret share 2: 0x%x\n", MS2[:])
 
@@ -1169,9 +1169,9 @@ func ExampleMPinFull() {
 	HCID := HashId(HASH_TYPE_MPIN, PFS_BN254, ID)
 
 	// Generate server secret share 1
-	rtn, SS1 := GetServerSecret_BN254(MS1[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 1: %v", rtn)
+	SS1, err := GetServerSecret_BN254(MS1[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 1: %v", err)
 	}
 	fmt.Printf("Server Secret share 1: 0x%x\n", SS1[:])
 
@@ -1179,9 +1179,9 @@ func ExampleMPinFull() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	rtn, SS2 := GetServerSecret_BN254(MS2[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 2: %v", rtn)
+	SS2, err := GetServerSecret_BN254(MS2[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 2: %v", err)
 	}
 	fmt.Printf("Server Secret share 2: 0x%x\n", SS2[:])
 
@@ -1189,9 +1189,9 @@ func ExampleMPinFull() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	rtn, SS := RecombineG2_BN254(SS1[:], SS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining Server Secret shares: %v", rtn)
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
+	if err != nil {
+		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
 	fmt.Printf("Server Secret: 0x%x\n", SS[:])
 
@@ -1199,9 +1199,9 @@ func ExampleMPinFull() {
 	defer CleanMemory(SS[:])
 
 	// Generate client secret share 1
-	rtn, CS1 := GetClientSecret_BN254(MS1[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS1, err := GetClientSecret_BN254(MS1[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 1: 0x%x\n", CS1[:])
 
@@ -1209,9 +1209,9 @@ func ExampleMPinFull() {
 	defer CleanMemory(CS1[:])
 
 	// Generate client secret share 2
-	rtn, CS2 := GetClientSecret_BN254(MS2[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS2, err := GetClientSecret_BN254(MS2[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 2: 0x%x\n", CS2[:])
 
@@ -1220,18 +1220,18 @@ func ExampleMPinFull() {
 
 	// Combine client secret shares
 	CS := make([]byte, G1S_BN254)
-	rtn, CS = RecombineG1_BN254(CS1[:], CS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining client secret shares: %v", rtn)
+	CS, err = RecombineG1_BN254(CS1[:], CS2[:])
+	if err != nil {
+		log.Fatalf("error recombining client secret shares: %v", err)
 	}
 	fmt.Printf("Client Secret: 0x%x\n", CS[:])
 
 	// Destroy CS
 	defer CleanMemory(CS[:])
 
-	rtn, TOKEN := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
-	if rtn != 0 {
-		log.Fatalf("error extracting pin from Client Secret: %v", rtn)
+	TOKEN, err := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
+	if err != nil {
+		log.Fatalf("error extracting pin from Client Secret: %v", err)
 	}
 	fmt.Printf("Token: 0x%x\n", TOKEN[:])
 
@@ -1241,9 +1241,9 @@ func ExampleMPinFull() {
 	//////   Client   //////
 
 	// Precomputation
-	rtn, G1, G2 := Precompute_BN254(TOKEN[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error client side MPin Full precompute: %v", rtn)
+	G1, G2, err := Precompute_BN254(TOKEN[:], HCID)
+	if err != nil {
+		log.Fatalf("error client side MPin Full precompute: %v", err)
 	}
 
 	// Destroy G2
@@ -1450,9 +1450,9 @@ func ExampleMPinFullWithTP() {
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 1: %v", rtn)
+	MS1, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 1: %v", err)
 	}
 	fmt.Printf("Master Secret share 1: 0x%x\n", MS1[:])
 
@@ -1460,9 +1460,9 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 2: %v", rtn)
+	MS2, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 2: %v", err)
 	}
 	fmt.Printf("Master Secret share 2: 0x%x\n", MS2[:])
 
@@ -1473,9 +1473,9 @@ func ExampleMPinFullWithTP() {
 	HCID := HashId(HASH_TYPE_MPIN, PFS_BN254, ID)
 
 	// Generate server secret share 1
-	rtn, SS1 := GetServerSecret_BN254(MS1[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 1: %v", rtn)
+	SS1, err := GetServerSecret_BN254(MS1[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 1: %v", err)
 	}
 	fmt.Printf("Server Secret share 1: 0x%x\n", SS1[:])
 
@@ -1483,9 +1483,9 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	rtn, SS2 := GetServerSecret_BN254(MS2[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 2: %v", rtn)
+	SS2, err := GetServerSecret_BN254(MS2[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 2: %v", err)
 	}
 	fmt.Printf("Server Secret share 2: 0x%x\n", SS2[:])
 
@@ -1493,9 +1493,9 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	rtn, SS := RecombineG2_BN254(SS1[:], SS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining Server Secret shares: %v", rtn)
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
+	if err != nil {
+		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
 	fmt.Printf("Server Secret: 0x%x\n", SS[:])
 
@@ -1503,9 +1503,9 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(SS[:])
 
 	// Generate client secret share 1
-	rtn, CS1 := GetClientSecret_BN254(MS1[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS1, err := GetClientSecret_BN254(MS1[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 1: 0x%x\n", CS1[:])
 
@@ -1513,9 +1513,9 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(CS1[:])
 
 	// Generate client secret share 2
-	rtn, CS2 := GetClientSecret_BN254(MS2[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS2, err := GetClientSecret_BN254(MS2[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 2: 0x%x\n", CS2[:])
 
@@ -1524,9 +1524,9 @@ func ExampleMPinFullWithTP() {
 
 	// Combine client secret shares
 	CS := make([]byte, G1S_BN254)
-	rtn, CS = RecombineG1_BN254(CS1[:], CS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining client secret shares: %v", rtn)
+	CS, err = RecombineG1_BN254(CS1[:], CS2[:])
+	if err != nil {
+		log.Fatalf("error recombining client secret shares: %v", err)
 	}
 	fmt.Printf("Client Secret: 0x%x\n", CS[:])
 
@@ -1534,9 +1534,9 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(CS[:])
 
 	// Generate time permit share 1
-	rtn, TP1 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating Time Permit share 1: %v", rtn)
+	TP1, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating Time Permit share 1: %v", err)
 	}
 	fmt.Printf("Time Permit share 1: 0x%x\n", TP1[:])
 
@@ -1544,9 +1544,9 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
-	rtn, TP2 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating Time Permit share 2: %v", rtn)
+	TP2, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating Time Permit share 2: %v", err)
 	}
 	fmt.Printf("Time Permit share 2: 0x%x\n", TP2[:])
 
@@ -1554,17 +1554,17 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(TP2[:])
 
 	// Combine time permit shares
-	rtn, TP := RecombineG1_BN254(TP1[:], TP2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining Time Permit shares: %v", rtn)
+	TP, err := RecombineG1_BN254(TP1[:], TP2[:])
+	if err != nil {
+		log.Fatalf("error recombining Time Permit shares: %v", err)
 	}
 
 	// Destroy TP
 	defer CleanMemory(TP[:])
 
-	rtn, TOKEN := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
-	if rtn != 0 {
-		log.Fatalf("error extracting pin from Client Secret: %v", rtn)
+	TOKEN, err := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
+	if err != nil {
+		log.Fatalf("error extracting pin from Client Secret: %v", err)
 	}
 	fmt.Printf("Token: 0x%x\n", TOKEN[:])
 
@@ -1574,9 +1574,9 @@ func ExampleMPinFullWithTP() {
 	//////   Client   //////
 
 	// Precomputation
-	rtn, G1, G2 := Precompute_BN254(TOKEN[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error client side MPin Full precompute: %v", rtn)
+	G1, G2, err := Precompute_BN254(TOKEN[:], HCID)
+	if err != nil {
+		log.Fatalf("error client side MPin Full precompute: %v", err)
 	}
 
 	// Destroy G2
@@ -1778,9 +1778,9 @@ func ExampleMPinTwoPass() {
 	rng := NewRand(seed)
 
 	// Generate Master Secret Share 1
-	rtn, MS1 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 1: %v", rtn)
+	MS1, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 1: %v", err)
 	}
 	fmt.Printf("Master Secret share 1: 0x%x\n", MS1[:])
 
@@ -1788,9 +1788,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	rtn, MS2 := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating master secret share 2: %v", rtn)
+	MS2, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating master secret share 2: %v", err)
 	}
 	fmt.Printf("Master Secret share 2: 0x%x\n", MS2[:])
 
@@ -1801,9 +1801,9 @@ func ExampleMPinTwoPass() {
 	HCID := HashId(HASH_TYPE_MPIN, PFS_BN254, ID)
 
 	// Generate server secret share 1
-	rtn, SS1 := GetServerSecret_BN254(MS1[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 1: %v", rtn)
+	SS1, err := GetServerSecret_BN254(MS1[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 1: %v", err)
 	}
 	fmt.Printf("Server Secret share 1: 0x%x\n", SS1[:])
 
@@ -1811,9 +1811,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	rtn, SS2 := GetServerSecret_BN254(MS2[:])
-	if rtn != 0 {
-		log.Fatalf("error generating server secret share 2: %v", rtn)
+	SS2, err := GetServerSecret_BN254(MS2[:])
+	if err != nil {
+		log.Fatalf("error generating server secret share 2: %v", err)
 	}
 	fmt.Printf("Server Secret share 2: 0x%x\n", SS2[:])
 
@@ -1821,9 +1821,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	rtn, SS := RecombineG2_BN254(SS1[:], SS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining Server Secret shares: %v", rtn)
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
+	if err != nil {
+		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
 	fmt.Printf("Server Secret: 0x%x\n", SS[:])
 
@@ -1831,9 +1831,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(SS[:])
 
 	// Generate client secret share 1
-	rtn, CS1 := GetClientSecret_BN254(MS1[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS1, err := GetClientSecret_BN254(MS1[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 1: 0x%x\n", CS1[:])
 
@@ -1841,9 +1841,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(CS1[:])
 
 	// Generate client secret share 2
-	rtn, CS2 := GetClientSecret_BN254(MS2[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating client secret share 1: %v", rtn)
+	CS2, err := GetClientSecret_BN254(MS2[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating client secret share 1: %v", err)
 	}
 	fmt.Printf("Client Secret share 2: 0x%x\n", CS2[:])
 
@@ -1852,9 +1852,9 @@ func ExampleMPinTwoPass() {
 
 	// Combine client secret shares
 	CS := make([]byte, G1S_BN254)
-	rtn, CS = RecombineG1_BN254(CS1[:], CS2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining client secret shares: %v", rtn)
+	CS, _ = RecombineG1_BN254(CS1[:], CS2[:])
+	if err != nil {
+		log.Fatalf("error recombining client secret shares: %v", err)
 	}
 	fmt.Printf("Client Secret: 0x%x\n", CS[:])
 
@@ -1862,9 +1862,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(CS[:])
 
 	// Generate time permit share 1
-	rtn, TP1 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating Time Permit share 1: %v", rtn)
+	TP1, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS1[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating Time Permit share 1: %v", err)
 	}
 	fmt.Printf("Time Permit share 1: 0x%x\n", TP1[:])
 
@@ -1872,9 +1872,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(TP1[:])
 
 	// Generate time permit share 2
-	rtn, TP2 := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
-	if rtn != 0 {
-		log.Fatalf("error generating Time Permit share 2: %v", rtn)
+	TP2, err := GetClientPermit_BN254(HASH_TYPE_MPIN, date, MS2[:], HCID)
+	if err != nil {
+		log.Fatalf("error generating Time Permit share 2: %v", err)
 	}
 	fmt.Printf("Time Permit share 2: 0x%x\n", TP2[:])
 
@@ -1882,17 +1882,17 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(TP2[:])
 
 	// Combine time permit shares
-	rtn, TP := RecombineG1_BN254(TP1[:], TP2[:])
-	if rtn != 0 {
-		log.Fatalf("error recombining Time Permit shares: %v", rtn)
+	TP, err := RecombineG1_BN254(TP1[:], TP2[:])
+	if err != nil {
+		log.Fatalf("error recombining Time Permit shares: %v", err)
 	}
 
 	// Destroy TP
 	defer CleanMemory(TP[:])
 
-	rtn, TOKEN := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
-	if rtn != 0 {
-		log.Fatalf("error extracting pin from Client Secret: %v", rtn)
+	TOKEN, err := ExtractPIN_BN254(HASH_TYPE_MPIN, ID[:], PIN, CS[:])
+	if err != nil {
+		log.Fatalf("error extracting pin from Client Secret: %v", err)
 	}
 	fmt.Printf("Token: 0x%x\n", TOKEN[:])
 
@@ -1922,9 +1922,9 @@ func ExampleMPinTwoPass() {
 	HID, HTID := Server1_BN254(HASH_TYPE_MPIN, date, ID)
 
 	/* Send Y to Client */
-	rtn, Y := RandomGenerate_BN254(rng)
-	if rtn != 0 {
-		log.Fatalf("error generating Y: %v", rtn)
+	Y, err := RandomGenerate_BN254(rng)
+	if err != nil {
+		log.Fatalf("error generating Y: %v", err)
 	}
 	fmt.Printf("Y: 0x%x\n", Y[:])
 
@@ -1932,9 +1932,9 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(Y[:])
 
 	/* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
-	rtn, V := Client2_BN254(XOut[:], Y[:], SEC[:])
-	if rtn != 0 {
-		log.Fatalf("error client pass 2: %v", rtn)
+	V, err := Client2_BN254(XOut[:], Y[:], SEC[:])
+	if err != nil {
+		log.Fatalf("error client pass 2: %v", err)
 	}
 
 	// Destroy V

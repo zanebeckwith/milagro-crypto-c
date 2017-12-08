@@ -17,13 +17,11 @@
 
 package amcl
 
-/*
-#cgo LDFLAGS: -lamcl_curve_GOLDILOCKS
-#include <stdio.h>
-#include <stdlib.h>
-#include "amcl.h"
-#include "ecdh_GOLDILOCKS.h"
-*/
+// #cgo LDFLAGS: -lamcl_curve_GOLDILOCKS
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include "amcl.h"
+// #include "ecdh_GOLDILOCKS.h"
 import "C"
 
 const EFS_GOLDILOCKS int = int(C.EFS_GOLDILOCKS) // EFS is the ECC Field Size in bytes

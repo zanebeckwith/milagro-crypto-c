@@ -17,13 +17,11 @@
 
 package amcl
 
-/*
-#cgo LDFLAGS: -lamcl_curve_{{.curve}}
-#include <stdio.h>
-#include <stdlib.h>
-#include "amcl.h"
-#include "ecdh_{{.curve}}.h"
-*/
+// #cgo LDFLAGS: -lamcl_curve_{{.curve}}
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include "amcl.h"
+// #include "ecdh_{{.curve}}.h"
 import "C"
 
 const EFS_{{.curve}} int = int(C.EFS_{{.curve}}) // EFS is the ECC Field Size in bytes

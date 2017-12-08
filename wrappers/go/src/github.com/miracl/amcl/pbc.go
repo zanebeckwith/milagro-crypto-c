@@ -17,10 +17,8 @@
 
 package amcl
 
-/*
-#include "pbc_support.h"
-#include "utils.h"
-*/
+// #include "pbc_support.h"
+// #include "utils.h"
 import "C"
 import (
 	"errors"

@@ -17,13 +17,11 @@
 
 package amcl
 
-/*
-#cgo LDFLAGS: -lamcl_curve_BN254
-#include <stdio.h>
-#include <stdlib.h>
-#include "amcl.h"
-#include "ecdh_BN254.h"
-*/
+// #cgo LDFLAGS: -lamcl_curve_BN254
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include "amcl.h"
+// #include "ecdh_BN254.h"
 import "C"
 
 const EFS_BN254 int = int(C.EFS_BN254) // EFS is the ECC Field Size in bytes
