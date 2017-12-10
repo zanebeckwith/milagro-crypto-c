@@ -41,7 +41,7 @@ int _PKCS15(int h, octet m, octet w)
 	return PKCS15(h, &m, &w);
 }
 
-int _OAEP_ENCODE(int h, octet m, csprng* rng, octet p, octet f)
+int _OAEP_ENCODE(int h, octet m, csprng *rng, octet p, octet f)
 {
 	return OAEP_ENCODE(h, &m, rng, &p, &f);
 }
@@ -51,82 +51,82 @@ int _OAEP_DECODE(int h, octet p, octet f)
 	return OAEP_DECODE(h, &p, &f);
 }
 
-void _CREATE_CSPRNG(csprng* R, octet S)
+void _CREATE_CSPRNG(csprng *R, octet S)
 {
 	CREATE_CSPRNG(R, &S);
 }
 
-void _RSA_2048_DECRYPT(rsa_private_key_2048* priv, octet G, octet F)
+void _RSA_2048_DECRYPT(rsa_private_key_2048 *priv, octet G, octet F)
 {
 	RSA_2048_DECRYPT(priv, &G, &F);
 }
 
-void _RSA_3072_DECRYPT(rsa_private_key_3072* priv, octet G, octet F)
+void _RSA_3072_DECRYPT(rsa_private_key_3072 *priv, octet G, octet F)
 {
 	RSA_3072_DECRYPT(priv, &G, &F);
 }
 
-void _RSA_4096_DECRYPT(rsa_private_key_4096* priv, octet G, octet F)
+void _RSA_4096_DECRYPT(rsa_private_key_4096 *priv, octet G, octet F)
 {
 	RSA_4096_DECRYPT(priv, &G, &F);
 }
 
-void _RSA_2048_ENCRYPT(rsa_public_key_2048* pub, octet F, octet G)
+void _RSA_2048_ENCRYPT(rsa_public_key_2048 *pub, octet F, octet G)
 {
 	RSA_2048_ENCRYPT(pub, &F, &G);
 }
 
-void _RSA_3072_ENCRYPT(rsa_public_key_3072* pub, octet F, octet G)
+void _RSA_3072_ENCRYPT(rsa_public_key_3072 *pub, octet F, octet G)
 {
 	RSA_3072_ENCRYPT(pub, &F, &G);
 }
 
-void _RSA_4096_ENCRYPT(rsa_public_key_4096* pub, octet F, octet G)
+void _RSA_4096_ENCRYPT(rsa_public_key_4096 *pub, octet F, octet G)
 {
 	RSA_4096_ENCRYPT(pub, &F, &G);
 }
 
-void _RSA_2048_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_2048* priv, rsa_public_key_2048* pub, octet p, octet q)
+void _RSA_2048_KEY_PAIR(csprng *rng, sign32 e, rsa_private_key_2048 *priv, rsa_public_key_2048 *pub, octet p, octet q)
 {
 	RSA_2048_KEY_PAIR(rng, e, priv, pub, &p, &q);
 }
 
-void _RSA_3072_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_3072* priv, rsa_public_key_3072* pub, octet p, octet q)
+void _RSA_3072_KEY_PAIR(csprng *rng, sign32 e, rsa_private_key_3072 *priv, rsa_public_key_3072 *pub, octet p, octet q)
 {
 	RSA_3072_KEY_PAIR(rng, e, priv, pub, &p, &q);
 }
 
-void _RSA_4096_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_4096* priv, rsa_public_key_4096* pub, octet p, octet q)
+void _RSA_4096_KEY_PAIR(csprng *rng, sign32 e, rsa_private_key_4096 *priv, rsa_public_key_4096 *pub, octet p, octet q)
 {
 	RSA_4096_KEY_PAIR(rng, e, priv, pub, &p, &q);
 }
 
-void _RSA_2048_PRIVATE_KEY_KILL(rsa_private_key_2048* PRIV)
+void _RSA_2048_PRIVATE_KEY_KILL(rsa_private_key_2048 *PRIV)
 {
 	RSA_2048_PRIVATE_KEY_KILL(PRIV);
 }
 
-void _RSA_3072_PRIVATE_KEY_KILL(rsa_private_key_3072* PRIV)
+void _RSA_3072_PRIVATE_KEY_KILL(rsa_private_key_3072 *PRIV)
 {
 	RSA_3072_PRIVATE_KEY_KILL(PRIV);
 }
 
-void _RSA_4096_PRIVATE_KEY_KILL(rsa_private_key_4096* PRIV)
+void _RSA_4096_PRIVATE_KEY_KILL(rsa_private_key_4096 *PRIV)
 {
 	RSA_4096_PRIVATE_KEY_KILL(PRIV);
 }
 
-int _MPIN_BLS383_CLIENT_1(int h, int d, octet ID, csprng* R, octet x, int pin, octet T, octet S, octet U, octet UT, octet TP)
+int _MPIN_BLS383_CLIENT_1(int h, int d, octet ID, csprng *R, octet x, int pin, octet T, octet S, octet U, octet UT, octet TP)
 {
 	return MPIN_BLS383_CLIENT_1(h, d, &ID, R, &x, pin, &T, &S, &U, &UT, &TP);
 }
 
-int _MPIN_BN254_CLIENT_1(int h, int d, octet ID, csprng* R, octet x, int pin, octet T, octet S, octet U, octet UT, octet TP)
+int _MPIN_BN254_CLIENT_1(int h, int d, octet ID, csprng *R, octet x, int pin, octet T, octet S, octet U, octet UT, octet TP)
 {
 	return MPIN_BN254_CLIENT_1(h, d, &ID, R, &x, pin, &T, &S, &U, &UT, &TP);
 }
 
-int _MPIN_BN254CX_CLIENT_1(int h, int d, octet ID, csprng* R, octet x, int pin, octet T, octet S, octet U, octet UT, octet TP)
+int _MPIN_BN254CX_CLIENT_1(int h, int d, octet ID, csprng *R, octet x, int pin, octet T, octet S, octet U, octet UT, octet TP)
 {
 	return MPIN_BN254CX_CLIENT_1(h, d, &ID, R, &x, pin, &T, &S, &U, &UT, &TP);
 }
@@ -161,17 +161,17 @@ int _MPIN_BN254CX_CLIENT_KEY(int h, octet g1, octet g2, int pin, octet r, octet 
 	return MPIN_BN254CX_CLIENT_KEY(h, &g1, &g2, pin, &r, &x, &p, &T, &K);
 }
 
-int _MPIN_BLS383_CLIENT(int h, int d, octet ID, csprng* R, octet x, int pin, octet T, octet V, octet U, octet UT, octet TP, octet MESSAGE, int t, octet y)
+int _MPIN_BLS383_CLIENT(int h, int d, octet ID, csprng *R, octet x, int pin, octet T, octet V, octet U, octet UT, octet TP, octet MESSAGE, int t, octet y)
 {
 	return MPIN_BLS383_CLIENT(h, d, &ID, R, &x, pin, &T, &V, &U, &UT, &TP, &MESSAGE, t, &y);
 }
 
-int _MPIN_BN254_CLIENT(int h, int d, octet ID, csprng* R, octet x, int pin, octet T, octet V, octet U, octet UT, octet TP, octet MESSAGE, int t, octet y)
+int _MPIN_BN254_CLIENT(int h, int d, octet ID, csprng *R, octet x, int pin, octet T, octet V, octet U, octet UT, octet TP, octet MESSAGE, int t, octet y)
 {
 	return MPIN_BN254_CLIENT(h, d, &ID, R, &x, pin, &T, &V, &U, &UT, &TP, &MESSAGE, t, &y);
 }
 
-int _MPIN_BN254CX_CLIENT(int h, int d, octet ID, csprng* R, octet x, int pin, octet T, octet V, octet U, octet UT, octet TP, octet MESSAGE, int t, octet y)
+int _MPIN_BN254CX_CLIENT(int h, int d, octet ID, csprng *R, octet x, int pin, octet T, octet V, octet U, octet UT, octet TP, octet MESSAGE, int t, octet y)
 {
 	return MPIN_BN254CX_CLIENT(h, d, &ID, R, &x, pin, &T, &V, &U, &UT, &TP, &MESSAGE, t, &y);
 }
@@ -221,34 +221,34 @@ int _MPIN_BN254CX_GET_CLIENT_SECRET(octet S, octet ID, octet CS)
 	return MPIN_BN254CX_GET_CLIENT_SECRET(&S, &ID, &CS);
 }
 
-int _MPIN_BLS383_GET_DVS_KEYPAIR(csprng* R, octet Z, octet Pa)
+int _MPIN_BLS383_GET_DVS_KEYPAIR(csprng *R, octet Z, octet Pa)
 {
 	return MPIN_BLS383_GET_DVS_KEYPAIR(R, &Z, &Pa);
 }
 
-int _MPIN_BN254_GET_DVS_KEYPAIR(csprng* R, octet Z, octet Pa)
+int _MPIN_BN254_GET_DVS_KEYPAIR(csprng *R, octet Z, octet Pa)
 {
 	return MPIN_BN254_GET_DVS_KEYPAIR(R, &Z, &Pa);
 }
 
-int _MPIN_BN254CX_GET_DVS_KEYPAIR(csprng* R, octet Z, octet Pa)
+int _MPIN_BN254CX_GET_DVS_KEYPAIR(csprng *R, octet Z, octet Pa)
 {
 	return MPIN_BN254CX_GET_DVS_KEYPAIR(R, &Z, &Pa);
 }
 
-int _MPIN_BLS383_GET_G1_MULTIPLE(csprng* R, int type, octet x, octet G, octet W)
+int _MPIN_BLS383_GET_G1_MULTIPLE(csprng *R, int t, octet x, octet G, octet W)
 {
-	return MPIN_BLS383_GET_G1_MULTIPLE(R, type, &x, &G, &W);
+	return MPIN_BLS383_GET_G1_MULTIPLE(R, t, &x, &G, &W);
 }
 
-int _MPIN_BN254_GET_G1_MULTIPLE(csprng* R, int type, octet x, octet G, octet W)
+int _MPIN_BN254_GET_G1_MULTIPLE(csprng *R, int t, octet x, octet G, octet W)
 {
-	return MPIN_BN254_GET_G1_MULTIPLE(R, type, &x, &G, &W);
+	return MPIN_BN254_GET_G1_MULTIPLE(R, t, &x, &G, &W);
 }
 
-int _MPIN_BN254CX_GET_G1_MULTIPLE(csprng* R, int type, octet x, octet G, octet W)
+int _MPIN_BN254CX_GET_G1_MULTIPLE(csprng *R, int t, octet x, octet G, octet W)
 {
-	return MPIN_BN254CX_GET_G1_MULTIPLE(R, type, &x, &G, &W);
+	return MPIN_BN254CX_GET_G1_MULTIPLE(R, t, &x, &G, &W);
 }
 
 int _MPIN_BLS383_GET_SERVER_SECRET(octet S, octet SS)
@@ -296,17 +296,17 @@ int _MPIN_BN254CX_PRECOMPUTE(octet T, octet ID, octet CP, octet g1, octet g2)
 	return MPIN_BN254CX_PRECOMPUTE(&T, &ID, &CP, &g1, &g2);
 }
 
-int _MPIN_BLS383_RANDOM_GENERATE(csprng* R, octet S)
+int _MPIN_BLS383_RANDOM_GENERATE(csprng *R, octet S)
 {
 	return MPIN_BLS383_RANDOM_GENERATE(R, &S);
 }
 
-int _MPIN_BN254_RANDOM_GENERATE(csprng* R, octet S)
+int _MPIN_BN254_RANDOM_GENERATE(csprng *R, octet S)
 {
 	return MPIN_BN254_RANDOM_GENERATE(R, &S);
 }
 
-int _MPIN_BN254CX_RANDOM_GENERATE(csprng* R, octet S)
+int _MPIN_BN254CX_RANDOM_GENERATE(csprng *R, octet S)
 {
 	return MPIN_BN254CX_RANDOM_GENERATE(R, &S);
 }

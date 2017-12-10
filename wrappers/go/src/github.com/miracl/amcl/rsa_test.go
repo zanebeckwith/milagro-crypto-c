@@ -148,7 +148,7 @@ func TestRSASign(t *testing.T) {
 			MESSAGE := []byte(MESSAGEstr)
 
 			// Signing message
-			C, _ := PKCS15(tc.hashType, tc.keySize, MESSAGE)
+			C, _ := PKCS15OLD(tc.hashType, tc.keySize, MESSAGE)
 
 			// create signature in S
 			S := tc.decryptFunc(RSA_PrivKey, C[:])
@@ -251,7 +251,7 @@ func ExampleRSASign() {
 	fmt.Printf("message: %s\n", MESSAGE[:])
 
 	// Signing message
-	C, err := PKCS15(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE)
+	C, err := PKCS15OLD(HASH_TYPE_RSA_2048, RFS_2048, MESSAGE)
 	if err != nil {
 		log.Fatal(err)
 	}

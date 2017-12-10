@@ -23,6 +23,9 @@ package amcl
 import "C"
 import "unsafe"
 
+// Octet is Go alias for the C octet type
+type Octet C.octet
+
 func newOctet(val []byte) *C.octet {
 	if val == nil {
 		return &C.octet{}

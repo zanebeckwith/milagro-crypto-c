@@ -24,5 +24,11 @@ under the License.
 #include "rsa_support.h"
 
 {{range . -}}
-extern {{.CType}} _{{.Name}}({{range $i, $arg := .WArgs}}{{if $i}}, {{end}}{{.CType}} {{$arg.Name}}{{end}});
+extern {{.CType}} _{{.Name}}(
+  {{- range $i, $arg := .Args -}}
+    {{- if $i}}, {{end}}
+    {{- .CType}} {{if ne $arg.CType "octet"}}{{if $arg.Ref}}*{{end}}{{end}}
+    {{- $arg.Name}}
+  {{- end -}}
+);
 {{end}}

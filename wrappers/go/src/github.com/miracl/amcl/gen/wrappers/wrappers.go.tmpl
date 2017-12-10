@@ -1,0 +1,66 @@
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package amcl
+
+// #cgo CFLAGS: -std=c99 -O3 -I.
+// #cgo LDFLAGS: -L. -lamcl_core
+// #include "amcl.h"
+// #include "mpin_BLS383.h"
+// #include "mpin_BN254.h"
+// #include "mpin_BN254CX.h"
+// #include "randapi.h"
+// #include "rsa_2048.h"
+// #include "rsa_3072.h"
+// #include "rsa_4096.h"
+// #include "rsa_support.h"
+// #include "utils.h"
+import "C"
+
+{{range .}}
+// {{.Name}} is a go wrapper for C.{{.Name}}
+func {{.Name}}(
+    {{- range .Args -}}
+        {{.Name}}{{ " " }}
+
+        {{- if eq .CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096" -}}RSAPrivateKey,
+        {{- else if eq .CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096" -}}RSAPublicKey,
+        {{- else if eq .CType "sign32"}}int32,
+        {{- else -}}
+            {{if .Ref}}*{{end}}
+
+            {{- if eq .CType "octet" -}}Octet,
+            {{- else if eq .CType "csprng" -}}Rand,
+            {{- else -}}{{.CType}},
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+) {{if eq .CType "int"}}error {{end}}{
+    {{if eq .CType "int"}}code := {{end}}C.{{.Name}}(
+        {{- range .Args -}}
+            {{- if eq .CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
+            {{- else if eq .CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
+            {{- else if .Ref -}}
+                (*C.{{.CType}})({{.Name}}),
+            {{- else -}}
+                C.{{.CType}}({{.Name}}),
+            {{- end -}}
+        {{- end -}}
+    )
+    {{if eq .CType "int"}}return newError(int(code)){{end -}}
+}
+{{end}}

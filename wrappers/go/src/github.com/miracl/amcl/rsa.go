@@ -32,7 +32,7 @@ type RSAPrivateKey interface{}
 type RSAPublicKey interface{}
 
 // PKCS15 (PKCS 1.5) - padding of a message to be signed
-func PKCS15(hashType, rfs int, msg []byte) ([]byte, error) {
+func PKCS15OLD(hashType, rfs int, msg []byte) ([]byte, error) {
 	r := make([]byte, rfs)
 	rtn := C._PKCS15(C.int(hashType), *newOctet(msg), *makeOctet(r))
 	return r, newError(int(rtn))

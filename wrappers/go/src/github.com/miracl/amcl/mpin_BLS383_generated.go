@@ -214,10 +214,27 @@ func Client_BLS383(hashType, epochDate int, mpinId []byte, rng *Rand, x []byte, 
 //     errorCcode: error from the C function
 //     pc1: Precomputed value one
 //     pc2: Precomputed value two
-func Precompute_BLS383(token, hashMPinId []byte) (pc1, pc2 []byte, err error) {
-	pc1, pc2 = make([]byte, GTS_BLS383), make([]byte, GTS_BLS383)
-	rtn := C._MPIN_BLS383_PRECOMPUTE(*newOctet(token), *newOctet(hashMPinId), nil, *makeOctet(pc1), *makeOctet(pc2))
-	return pc1, pc2, newError(int(rtn))
+func Precompute_BLS383(token, hashMPinId []byte) ( pc1, pc2 []byte, err error) {
+	// Form Octets
+	hashMPinIdStr := string(hashMPinId)
+	hashMPinIdOct := GetOctet(hashMPinIdStr)
+	defer OctetFree(&hashMPinIdOct)
+	tokenStr := string(token)
+	tokenOct := GetOctet(tokenStr)
+	defer OctetFree(&tokenOct)
+
+	pc1Oct := GetOctetZero(GTS_BLS383)
+	defer OctetFree(&pc1Oct)
+	pc2Oct := GetOctetZero(GTS_BLS383)
+	defer OctetFree(&pc2Oct)
+
+	rtn := C.MPIN_BLS383_PRECOMPUTE(&tokenOct, &hashMPinIdOct, nil, &pc1Oct, &pc2Oct)
+
+	// Convert octet to bytes
+	pc1 = OctetToBytes(&pc1Oct)
+	pc2 = OctetToBytes(&pc2Oct)
+
+	return pc1[:], pc2[:], newError(int(rtn))
 }
 
 // GetG1Multiple_BLS383 calculates W=x*P where random x < q is the order of the group of points on the curve.
