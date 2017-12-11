@@ -26,6 +26,36 @@ import "unsafe"
 // Octet is Go alias for the C octet type
 type Octet C.octet
 
+// NewOctet creates new Octet with given value
+func NewOctet(val []byte) *Octet {
+	return &Octet{
+		len: C.int(len(val)),
+		max: C.int(len(val)),
+		val: C.CString(string(val)),
+	}
+}
+
+// MakeOctet create empty Octet
+func MakeOctet(max int) *Octet {
+	return &Octet{
+		len: 0,
+		max: C.int(max),
+		val: (*C.char)(C.malloc(C.size_t(max))),
+	}
+}
+
+// ToBytes returns the bytes representation of the Octet
+func (o *Octet) ToBytes() []byte {
+	return C.GoBytes(unsafe.Pointer(o.val), o.len)
+}
+
+// Free frees the allocated memory
+func (o *Octet) Free() {
+	C.free(unsafe.Pointer(o.val))
+}
+
+// TODO: func (o *Octet) Free()
+
 func newOctet(val []byte) *C.octet {
 	if val == nil {
 		return &C.octet{}

@@ -41,35 +41,35 @@ const (
 func RandomGenerate_BLS383(rng *Rand) ([]byte, error) {
 	r := make([]byte, PGS_BLS383)
 	rtn := C._MPIN_BLS383_RANDOM_GENERATE(rng.csprng(), *makeOctet(r))
-	return r, newError(int(rtn))
+	return r, newError(rtn)
 }
 
 // GetServerSecret_BLS383 creates a server secret in G2 from a master secret
 func GetServerSecret_BLS383(ms []byte) ([]byte, error) {
 	ss := make([]byte, G2S_BLS383)
 	rtn := C._MPIN_BLS383_GET_SERVER_SECRET(*newOctet(ms), *makeOctet(ss))
-	return ss, newError(int(rtn))
+	return ss, newError(rtn)
 }
 
 // RecombineG1_BLS383 adds two members from the group G1
 func RecombineG1_BLS383(r1, r2 []byte) ([]byte, error) {
 	r := make([]byte, G1S_BLS383)
 	rtn := C._MPIN_BLS383_RECOMBINE_G1(*newOctet(r1), *newOctet(r2), *makeOctet(r))
-	return r, newError(int(rtn))
+	return r, newError(rtn)
 }
 
 // RecombineG2_BLS383 adds two members from the group G2
 func RecombineG2_BLS383(w1, w2 []byte) ([]byte, error) {
 	w := make([]byte, G2S_BLS383)
 	rtn := C._MPIN_BLS383_RECOMBINE_G2(*newOctet(w1), *newOctet(w2), *makeOctet(w))
-	return w, newError(int(rtn))
+	return w, newError(rtn)
 }
 
 // GetClientSecret_BLS383 creates a client secret in G1 from a master secret and the hash of the M-Pin Id
 func GetClientSecret_BLS383(masterSecret []byte, hashMPinId []byte) ([]byte, error ) {
 	cs := make([]byte, G1S_BLS383)
 	rtn := C._MPIN_BLS383_GET_CLIENT_SECRET(*newOctet(masterSecret), *newOctet(hashMPinId), *makeOctet(cs))
-	return cs, newError(int(rtn))
+	return cs, newError(rtn)
 }
 
 // GetDVSKeyPair_BLS383 randomly generates the public key in G2 for the key-escrow less scheme
@@ -87,21 +87,21 @@ func GetDVSKeyPair_BLS383(rng *Rand, z []byte) (zOut, publicKey []byte, err erro
 		rtn = C._MPIN_BLS383_GET_DVS_KEYPAIR(nil, *newOctet(z), *makeOctet(publicKey))
 	}
 
-	return z, publicKey, newError(int(rtn))
+	return z, publicKey, newError(rtn)
 }
 
 // GetClientPermit_BLS383 creates a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
 func GetClientPermit_BLS383(hashType, epochDate int, masterSecret, hashMPinId []byte) ([]byte, error) {
 	tp := make([]byte, G1S_BLS383)
 	rtn := C._MPIN_BLS383_GET_CLIENT_PERMIT(C.int(hashType), C.int(epochDate), *newOctet(masterSecret), *newOctet(hashMPinId), *makeOctet(tp))
-	return tp, newError(int(rtn))
+	return tp, newError(rtn)
 }
 
 
 // ExtractPIN_BLS383 extracts a PIN from the client secret
 func ExtractPIN_BLS383(hashType int, mpinId []byte, PIN int, clientSecret []byte) ([]byte, error) {
 	rtn := C._MPIN_BLS383_EXTRACT_PIN(C.int(hashType), *newOctet(mpinId), C.int(PIN), *newOctet(clientSecret))
-	return bytes.TrimRight(clientSecret, "\x00"), newError(int(rtn))
+	return bytes.TrimRight(clientSecret, "\x00"), newError(rtn)
 }
 
 
@@ -234,7 +234,7 @@ func Precompute_BLS383(token, hashMPinId []byte) ( pc1, pc2 []byte, err error) {
 	pc1 = OctetToBytes(&pc1Oct)
 	pc2 = OctetToBytes(&pc2Oct)
 
-	return pc1[:], pc2[:], newError(int(rtn))
+	return pc1[:], pc2[:], newError(rtn)
 }
 
 // GetG1Multiple_BLS383 calculates W=x*P where random x < q is the order of the group of points on the curve.
@@ -729,5 +729,5 @@ func Client1_BLS383(hashType, epochDate int, mpinId []byte, rng *Rand, x []byte,
 //     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
 func Client2_BLS383(x, y, SEC []byte) ([]byte, error) {
 	rtn := C._MPIN_BLS383_CLIENT_2(*newOctet(x), *newOctet(y), *newOctet(SEC))
-	return bytes.TrimRight(SEC, "\x00"), newError(int(rtn))
+	return bytes.TrimRight(SEC, "\x00"), newError(rtn)
 }

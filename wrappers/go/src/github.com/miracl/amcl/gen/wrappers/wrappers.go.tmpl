@@ -61,6 +61,6 @@ func {{.Name}}(
             {{- end -}}
         {{- end -}}
     )
-    {{if eq .CType "int"}}return newError(int(code)){{end -}}
+    {{if eq .CType "int"}}return newError(code){{end -}}
 }
 {{end}}

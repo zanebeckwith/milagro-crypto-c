@@ -22,7 +22,9 @@ package amcl
 // #include "rsa_support.h"
 // #include "wrappers_generated.h"
 import "C"
-import "bytes"
+import (
+	"bytes"
+)
 
 // RSA Constant
 const MAX_RSA_BYTES int = int(C.MAX_RSA_BYTES) // MAX_RSA_BYTES is the maximum RSA level of security supported - 4096
@@ -33,20 +35,28 @@ type RSAPublicKey interface{}
 
 // PKCS15 (PKCS 1.5) - padding of a message to be signed
 func PKCS15OLD(hashType, rfs int, msg []byte) ([]byte, error) {
-	r := make([]byte, rfs)
-	rtn := C._PKCS15(C.int(hashType), *newOctet(msg), *makeOctet(r))
-	return r, newError(int(rtn))
+	msgOctet := NewOctet(msg)
+	defer msgOctet.Free()
+
+	resultOctet := MakeOctet(rfs)
+	defer resultOctet.Free()
+
+	err := PKCS15(hashType, msgOctet, resultOctet)
+	if err != nil {
+		return nil, err
+	}
+	return resultOctet.ToBytes(), nil
 }
 
 // OAEPencode encodes the message for encryption
 func OAEPencode(hashType, rfs int, m []byte, rng *Rand, p []byte) ([]byte, error) {
 	f := make([]byte, rfs)
 	rtn := C._OAEP_ENCODE(C.int(hashType), *newOctet(m), rng.csprng(), *newOctet(p), *makeOctet(f))
-	return f, newError(int(rtn))
+	return f, newError(rtn)
 }
 
 // OAEPdecode decodes message M after decryption, F is the decoded message
 func OAEPdecode(hashType int, p []byte, m []byte) ([]byte, error) {
 	rtn := C._OAEP_DECODE(C.int(hashType), *newOctet(p), *newOctet(m))
-	return bytes.TrimRight(m, "\x00"), newError(int(rtn))
+	return bytes.TrimRight(m, "\x00"), newError(rtn)
 }

@@ -17,13 +17,16 @@
 
 package amcl
 
+// #include "pbc_support.h"
+import "C"
 import (
 	"fmt"
 )
 
-const (
-	wrongPin = -19
-)
+// TODO: add all possible errors
+var errorStrings = map[int]string{
+	C.MPIN_BAD_PIN: "Bad PIN number entered",
+}
 
 // Error is for errors returned from AMCL wrappers
 type Error struct {
@@ -31,19 +34,25 @@ type Error struct {
 }
 
 func (err *Error) Error() string {
-	return fmt.Sprintf("amcl: return code %v", err.code)
+	errStr := fmt.Sprintf("amcl: return code %v", err.code)
+	if str, ok := errorStrings[err.code]; ok {
+		errStr = fmt.Sprintf("%v %v", errStr, str)
+	}
+
+	return errStr
 }
 
-func newError(code int) error {
+func newError(code C.int) error {
 	if code == 0 {
 		return nil
 	}
 
-	return &Error{code}
+	return &Error{int(code)}
 }
 
 // IsWrongPin returns true if the err is Wrong PIN
+// TODO: either generate or remove
 func IsWrongPin(err error) bool {
 	amclError, ok := err.(*Error)
-	return ok && amclError.code == wrongPin
+	return ok && amclError.code == C.MPIN_BAD_PIN
 }
