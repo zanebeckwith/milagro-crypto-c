@@ -17,4 +17,8 @@
 
 package amcl
 
-//go:generate go run gen/mpin/main.go
+//go:generate go run ../gen/wrappers/main.go
+//go:generate gofmt -s -w wrappers.go
+//go:generate go run ../gen/rsa/main.go rsa.go.tmpl
+//go:generate go run ../gen/ecdsa/main.go ecdsa.go.tmpl
+//go:generate go run ../gen/mpin/main.go mpin.go.tmpl

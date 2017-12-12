@@ -20,16 +20,18 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/miracl/amcl/gen"
 )
 
-const (
-	tmplFileName   = "gen/mpin/mpin.go.tmpl"
-	fileNameFormat = "mpin_%v_generated.go"
-)
+const fileNameFormat = "mpin_%v_generated.go"
 
 func main() {
+	if len(os.Args) != 2 {
+		log.Fatalf("expects one argument - path to template file, got %v", len(os.Args)-1)
+	}
+	tmplFileName := os.Args[1]
 
 	curves := []string{"BLS383", "BN254", "BN254CX"}
 

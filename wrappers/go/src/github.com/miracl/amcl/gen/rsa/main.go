@@ -20,16 +20,18 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/miracl/amcl/gen"
 )
 
-const (
-	tmplFileName   = "gen/rsa/rsa.go.tmpl"
-	fileNameFormat = "rsa_%v_generated.go"
-)
+const fileNameFormat = "rsa_%v_generated.go"
 
 func main() {
+	if len(os.Args) != 2 {
+		log.Fatalf("expects one argument - path to template file, got %v", len(os.Args)-1)
+	}
+	tmplFileName := os.Args[1]
 
 	sizes := []string{"2048", "3072", "4096"}
 

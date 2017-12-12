@@ -31,11 +31,11 @@ import (
 var (
 	// constants related to file generation
 	wrapFilePath       = "wrappers_generated.c"
-	wrapFileTmplPath   = "gen/wrappers/wrappers.c.tmpl"
+	wrapFileTmplPath   = "wrappers.c.tmpl"
 	wrapHFilePath      = "wrappers_generated.h"
-	wrapHFileTmplPath  = "gen/wrappers/wrappers.h.tmpl"
+	wrapHFileTmplPath  = "wrappers.h.tmpl"
 	goWrapFilePath     = "wrappers.go"
-	goWrapFileTmplPath = "gen/wrappers/wrappers.go.tmpl"
+	goWrapFileTmplPath = "wrappers.go.tmpl"
 
 	// constants related to C function parsing
 	cDefRe       = regexp.MustCompile(`^(?P<type>\S+) (?P<name>[^\(]+) ?\((?P<args>([^,],?)+)\)$`)

@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:generate go run gen/ecdsa/main.go
-
 package amcl
 
 // #include "ecdh_support.h"
