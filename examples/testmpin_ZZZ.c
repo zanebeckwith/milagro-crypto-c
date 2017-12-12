@@ -40,7 +40,7 @@ under the License.
 
 int mpin(csprng *RNG)
 {
-    int pin,rtn,err;
+    int pin,pin2,rtn,err;
 #ifdef PERMITS
     int date=today();
 #else
@@ -115,6 +115,13 @@ int mpin(csprng *RNG)
     printf("Client Token= ");
     OCT_output(&TOKEN);
 
+    /* Client extracts PIN2 generated from bio-metric from token */
+    pin2=1212;
+    printf("Client extracts PIN= %d\n",pin2);
+    MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN,&CLIENT_ID,pin2,&TOKEN);
+    printf("Client Token= ");
+    OCT_output(&TOKEN);
+
 #ifdef FULL
     MPIN_ZZZ_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
 #endif
@@ -135,6 +142,12 @@ int mpin(csprng *RNG)
 #endif
 
     /* MPin Protocol */
+
+    /* Client adds PIN2 generated from bio-metric to token */
+    printf("Client adds PIN= %d\n",pin2);
+    MPIN_ZZZ_ADD_PIN(HASH_TYPE_MPIN,&CLIENT_ID,pin2,&TOKEN);
+    printf("Client Token= ");
+    OCT_output(&TOKEN);
 
     /* Client enters PIN */
     printf("\nPIN= ");

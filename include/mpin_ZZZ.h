@@ -63,6 +63,15 @@ void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
 	@return 0 or an error code
  */
 int MPIN_ZZZ_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
+/**	@brief Add a PIN number to a token
+ *
+  	@param h is the hash type
+	@param ID is the input client identity
+	@param pin is an input PIN number
+	@param T is the token to which the PIN is to be added
+	@return 0 or an error code
+ */
+int MPIN_ZZZ_ADD_PIN(int h,octet *ID,int pin,octet *T);
 /**	@brief Perform client side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
