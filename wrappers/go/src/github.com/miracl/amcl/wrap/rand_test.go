@@ -15,33 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package amcl
+package wrap
 
 import (
-	"reflect"
+	"bytes"
+	"io"
 	"testing"
 )
 
-func TestOctet(t *testing.T) {
-	m := []byte("not very long message")
-	src := newOctet(m)
+func TestRand(t *testing.T) {
+	rand := NewRand([]byte("seed"))
 
-	slice := make([]byte, len(m))
-	dst := makeOctet(slice)
-	copyOctet(dst, src)
+	results := [][]byte{
+		[]byte{0xd0, 0xf, 0xb, 0x37, 0x59},
+		[]byte{0x56, 0x2b, 0x46, 0x7, 0x35},
+		[]byte{0xe9, 0x47, 0xd4, 0x95, 0x7e},
+		[]byte{0x4c, 0xea, 0xe4, 0x9c, 0xd1},
+		[]byte{0xf5, 0x11, 0x36, 0xab, 0x83},
+	}
 
-	if dst.len != src.len || dst.max != src.max || !reflect.DeepEqual(slice, m) {
-		t.Fatalf("slices are not equal; %v != %v", slice, m)
+	randomNum := make([]byte, 5)
+	for _, expectedNum := range results {
+		io.ReadFull(rand, randomNum)
+
+		if !bytes.Equal(randomNum, expectedNum) {
+			t.Error("error")
+		}
 	}
 }
 
-func BenchmarkOctet(b *testing.B) {
-	m := []byte("not very long message")
-
+func BenchmarkNewRand(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			slice := make([]byte, len(m))
-			copyOctet(makeOctet(slice), newOctet(m))
+			NewRand([]byte("seed"))
+		}
+	})
+}
+
+func BenchmarkRandRead(b *testing.B) {
+	rand := NewRand([]byte("seed"))
+	num := make([]byte, 5)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			io.ReadFull(rand, num)
 		}
 	})
 }

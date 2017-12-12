@@ -15,10 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package amcl
+package wrap
 
-//go:generate go run ../gen/wrappers/main.go
-//go:generate gofmt -s -w wrappers.go
-//go:generate go run ../gen/rsa/main.go rsa.go.tmpl
-//go:generate go run ../gen/ecdsa/main.go ecdsa.go.tmpl
-//go:generate go run ../gen/mpin/main.go mpin.go.tmpl
+// #include "ecdh_support.h"
+import "C"
+
+// PBKDF2 is a Password Based Key Derivation Function. Uses SHA256 internally
+func PBKDF2(hashType int, Pass []byte, Salt []byte, iter int, length int) (Key []byte) {
+	PassStr := string(Pass)
+	PassOct := GetOctet(PassStr)
+	defer OctetFree(&PassOct)
+	SaltStr := string(Salt)
+	SaltOct := GetOctet(SaltStr)
+	defer OctetFree(&SaltOct)
+	KeyOct := GetOctetZero(length)
+	defer OctetFree(&KeyOct)
+
+	C.PBKDF2(C.int(hashType), &PassOct, &SaltOct, C.int(iter), C.int(length), &KeyOct)
+	Key = OctetToBytes(&KeyOct)
+	return Key
+}

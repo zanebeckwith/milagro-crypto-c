@@ -15,23 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package amcl
+package wrap
 
-// #include "ecdh_support.h"
-import "C"
+import (
+	"reflect"
+	"testing"
+)
 
-// PBKDF2 is a Password Based Key Derivation Function. Uses SHA256 internally
-func PBKDF2(hashType int, Pass []byte, Salt []byte, iter int, length int) (Key []byte) {
-	PassStr := string(Pass)
-	PassOct := GetOctet(PassStr)
-	defer OctetFree(&PassOct)
-	SaltStr := string(Salt)
-	SaltOct := GetOctet(SaltStr)
-	defer OctetFree(&SaltOct)
-	KeyOct := GetOctetZero(length)
-	defer OctetFree(&KeyOct)
+func TestOctet(t *testing.T) {
+	m := []byte("not very long message")
+	src := newOctet(m)
 
-	C.PBKDF2(C.int(hashType), &PassOct, &SaltOct, C.int(iter), C.int(length), &KeyOct)
-	Key = OctetToBytes(&KeyOct)
-	return Key
+	slice := make([]byte, len(m))
+	dst := makeOctet(slice)
+	copyOctet(dst, src)
+
+	if dst.len != src.len || dst.max != src.max || !reflect.DeepEqual(slice, m) {
+		t.Fatalf("slices are not equal; %v != %v", slice, m)
+	}
+}
+
+func BenchmarkOctet(b *testing.B) {
+	m := []byte("not very long message")
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			slice := make([]byte, len(m))
+			copyOctet(makeOctet(slice), newOctet(m))
+		}
+	})
 }
