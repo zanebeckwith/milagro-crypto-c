@@ -247,6 +247,30 @@ int MPIN_ZZZ_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
     return res;
 }
 
+/* Add PIN to TOKEN for identity CID */
+int MPIN_ZZZ_ADD_PIN(int sha,octet *CID,int pin,octet *TOKEN)
+{
+    ECP_ZZZ P,R;
+    int res=0;
+    char h[MODBYTES_XXX];
+    octet H= {0,sizeof(h),h};
+
+    if (!ECP_ZZZ_fromOctet(&P,TOKEN))  res=MPIN_INVALID_POINT;
+    if (res==0)
+    {
+        mhashit(sha,-1,CID,&H);
+        ECP_ZZZ_mapit(&R,&H);
+
+        pin%=MAXPIN;
+
+        ECP_ZZZ_pinmul(&R,pin,PBLEN);
+        ECP_ZZZ_add(&P,&R);
+
+        ECP_ZZZ_toOctet(TOKEN,&P);
+    }
+    return res;
+}
+
 /* Implement step 2 on client side of MPin protocol - SEC=-(x+y)*SEC */
 int MPIN_ZZZ_CLIENT_2(octet *X,octet *Y,octet *SEC)
 {
