@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -77,7 +78,34 @@ func (t *templates) get(path string) (*template.Template, error) {
 		return nil, err
 	}
 
-	cfgTmpl, err := template.New("main").Parse(string(tmplBody))
+	// get all templates from the templates folder
+	tmplDir := "gen/templates/"
+	dir, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	if !strings.HasSuffix(dir, "/amcl") {
+		tmplDir = "../" + tmplDir
+	}
+
+	files, err := ioutil.ReadDir(tmplDir)
+	if err != nil {
+		return nil, err
+	}
+
+	filenames := make([]string, len(files))
+	for i, f := range files {
+		filenames[i] = tmplDir + f.Name()
+	}
+
+	// parse all files from the templates folder
+	cfgTmpl, err := template.New("main").ParseFiles(filenames...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse the main template
+	cfgTmpl.Parse(string(tmplBody))
 	if err != nil {
 		return nil, err
 	}

@@ -15,12 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package wrap
+package amcl
 
-//go:generate go run ../gen/wrappers/main.go rsa rsa_wrappers.go.tmpl
-//go:generate go run ../gen/wrappers/main.go rand rand_wrappers.go.tmpl
-//go:generate go run ../gen/wrappers/main.go mpin mpin_wrappers.go.tmpl
+//go:generate go run gen/wrappers/main.go rsa rsa_wrappers.go.tmpl
+//go:generate go run gen/wrappers/main.go rand rand_wrappers.go.tmpl
+//go:generate go run gen/wrappers/main.go mpin mpin_wrappers.go.tmpl
 //go:generate gofmt -s -w .
-//go:generate go run ../gen/rsa/main.go rsa.go.tmpl
-//go:generate go run ../gen/ecdsa/main.go ecdsa.go.tmpl
-//go:generate go run ../gen/mpin/main.go mpin.go.tmpl

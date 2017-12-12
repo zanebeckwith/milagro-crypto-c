@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"text/template"
@@ -30,12 +31,10 @@ import (
 
 var (
 	// constants related to file generation
-	wrapFilePath       = "wrappers_generated.c"
-	wrapFileTmplPath   = "wrappers.c.tmpl"
-	wrapHFilePath      = "wrappers_generated.h"
-	wrapHFileTmplPath  = "wrappers.h.tmpl"
-	goWrapFilePath     = "wrappers_generated.go"
-	goWrapFileTmplPath = "wrappers.go.tmpl"
+	wrapFilePath      = "wrappers_generated.c"
+	wrapFileTmplPath  = "wrappers.c.tmpl"
+	wrapHFilePath     = "wrappers_generated.h"
+	wrapHFileTmplPath = "wrappers.h.tmpl"
 
 	// constants related to C function parsing
 	cDefRe       = regexp.MustCompile(`^(?P<type>\S+) (?P<name>[^\(]+) ?\((?P<args>([^,],?)+)\)$`)
@@ -59,12 +58,6 @@ var (
 	)
 
 	// AMCL Functions
-	cWrapFuncs = []string{
-		"int PKCS15(int h, octet* m, octet* w)",
-		"int OAEP_ENCODE(int h, octet* m, csprng* rng, octet* p, octet* f)",
-		"int OAEP_DECODE(int h, octet* p, octet* f)",
-		"void CREATE_CSPRNG(csprng* R, octet* S)",
-	}
 
 	mPinCurves        = []string{"BLS383", "BN254", "BN254CX"}
 	mPinPerCurveFuncs = []string{
@@ -89,71 +82,130 @@ var (
 		"void MPIN_{{.curve}}_SERVER_1(int h, int d, octet* ID, octet* HID, octet* HTID)",
 	}
 
-	rsaKeySizes   = []int{2048, 3072, 4096}
+	rsaKeySizes   = []string{"2048", "3072", "4096"}
 	rsaPerKeyFunc = []string{
 		"void RSA_{{.keySize}}_DECRYPT(rsa_private_key_{{.keySize}}* priv, octet* G, octet* F)",
 		"void RSA_{{.keySize}}_ENCRYPT(rsa_public_key_{{.keySize}}* pub, octet* F, octet* G)",
 		"void RSA_{{.keySize}}_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_{{.keySize}}* priv, rsa_public_key_{{.keySize}}* pub, octet* p, octet* q)",
 		"void RSA_{{.keySize}}_PRIVATE_KEY_KILL(rsa_private_key_{{.keySize}}* PRIV)",
 	}
+
+	funcSets = map[string]func() map[string][]string{
+		"mpin": func() map[string][]string {
+			return genMPinFuncs(mPinPerCurveFuncs, mPinCurves)
+		},
+		"rand": func() map[string][]string {
+			return map[string][]string{
+				"": {"void CREATE_CSPRNG(csprng* R, octet* S)"},
+			}
+		},
+		"rsa": func() map[string][]string {
+			fileFuncMap := genRSAFuncs(rsaPerKeyFunc, rsaKeySizes)
+
+			fileFuncMap[""] = []string{
+				"int PKCS15(int h, octet* m, octet* w)",
+				"int OAEP_ENCODE(int h, octet* m, csprng* rng, octet* p, octet* f)",
+				"int OAEP_DECODE(int h, octet* p, octet* f)",
+			}
+
+			return fileFuncMap
+		},
+	}
 )
 
 func main() {
-	cWrapFuncs = appendSlices(
-		cWrapFuncs,
-		genRSAFuncs(rsaPerKeyFunc, rsaKeySizes),
-		genMPinFuncs(mPinPerCurveFuncs, mPinCurves),
-	)
+	if len(os.Args) != 3 {
+		log.Fatal("unexpected number of arguments (function set, template file path); expects 2; received", len(os.Args)-1)
+	}
+	fSetName, tmplFile := os.Args[1], os.Args[2]
 
-	cWraps, cFuncDefs := genCWrapFuncs(cWrapFuncs)
-	goWraps := genGoWrappers(cFuncDefs)
-	err := gen.GenerateFiles(
-		append(cWraps, goWraps...)...,
-	)
-	if err != nil {
+	// TODO: Delete me
+	if fSetName == "c" {
+		funcs := []string{}
+		for _, set := range funcSets {
+			for _, fs := range set() {
+				funcs = append(funcs, fs...)
+			}
+		}
+
+		cWraps, _ := genCWrapFuncs(funcs)
+		if err := gen.GenerateFiles(cWraps...); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+
+	funcsGetter, ok := funcSets[fSetName]
+	if !ok {
+		log.Fatal("invalid function set", fSetName)
+	}
+
+	funcs := funcsGetter()
+	i := 0
+	files := make([]gen.File, len(funcs))
+	for suffix, funcs := range funcs {
+		fileName := fmt.Sprintf("%v_%v_wrappers_generated.go", fSetName, suffix)
+		if suffix == "" {
+			fileName = fmt.Sprintf("%v_wrappers_generated.go", fSetName)
+		}
+
+		_, cFuncDefs := genCWrapFuncs(funcs)
+		files[i] = gen.File{
+			Path:     fileName,
+			TmplPath: tmplFile,
+			Ctx: struct {
+				Funcs  []cWrap
+				Suffix string
+			}{
+				Funcs:  cFuncDefs,
+				Suffix: suffix,
+			},
+		}
+		i++
+	}
+
+	if err := gen.GenerateFiles(files...); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func genGoWrappers(cFuncDefs []cWrap) []gen.File {
-	return []gen.File{
-		gen.File{
-			Path:     goWrapFilePath,
-			TmplPath: goWrapFileTmplPath,
-			Ctx:      cFuncDefs,
-		},
-	}
-}
+func genMPinFuncs(funcs, curves []string) map[string][]string {
+	rFuncs := map[string][]string{}
 
-func genMPinFuncs(funcs, curves []string) []string {
-	rFuncs := make([]string, len(funcs)*len(curves))
-	for i, f := range funcs {
-		tmpl := template.Must(template.New("func").Parse(f))
+	for _, c := range curves {
+		rList := make([]string, len(funcs))
+		for i, f := range funcs {
+			tmpl := template.Must(template.New("func").Parse(f))
 
-		for j, c := range curves {
 			var buff bytes.Buffer
 			if err := tmpl.Execute(&buff, map[string]string{"curve": c}); err != nil {
 				panic(err)
 			}
-			rFuncs[i*len(curves)+j] = buff.String()
+
+			rList[i] = buff.String()
 		}
+		rFuncs[c] = rList
 	}
 
 	return rFuncs
 }
 
-func genRSAFuncs(funcs []string, sizes []int) []string {
-	rFuncs := make([]string, len(funcs)*len(sizes))
-	for i, f := range funcs {
-		tmpl := template.Must(template.New("func").Parse(f))
+func genRSAFuncs(funcs []string, sizes []string) map[string][]string {
+	rFuncs := map[string][]string{}
 
-		for j, s := range sizes {
+	for _, s := range sizes {
+		rList := make([]string, len(funcs))
+		for i, f := range funcs {
+			tmpl := template.Must(template.New("func").Parse(f))
+
 			var buff bytes.Buffer
-			if err := tmpl.Execute(&buff, map[string]int{"keySize": s}); err != nil {
+			if err := tmpl.Execute(&buff, map[string]string{"keySize": s}); err != nil {
 				panic(err)
 			}
-			rFuncs[i*len(sizes)+j] = buff.String()
+
+			rList[i] = buff.String()
 		}
+		rFuncs[s] = rList
 	}
 
 	return rFuncs
@@ -186,12 +238,12 @@ func genCWrapFuncs(funcs []string) ([]gen.File, []cWrap) {
 	}
 
 	return []gen.File{
-		gen.File{
+		{
 			Path:     wrapFilePath,
 			TmplPath: wrapFileTmplPath,
 			Ctx:      cWraps,
 		},
-		gen.File{
+		{
 			Path:     wrapHFilePath,
 			TmplPath: wrapHFileTmplPath,
 			Ctx:      cWraps,
