@@ -34,7 +34,7 @@ var (
 	wrapFileTmplPath   = "wrappers.c.tmpl"
 	wrapHFilePath      = "wrappers_generated.h"
 	wrapHFileTmplPath  = "wrappers.h.tmpl"
-	goWrapFilePath     = "wrappers.go"
+	goWrapFilePath     = "wrappers_generated.go"
 	goWrapFileTmplPath = "wrappers.go.tmpl"
 
 	// constants related to C function parsing
