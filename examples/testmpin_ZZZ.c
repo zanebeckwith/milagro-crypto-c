@@ -115,16 +115,16 @@ int mpin(csprng *RNG)
     printf("Client Token= ");
     OCT_output(&TOKEN);
 
+#ifdef FULL
+    MPIN_ZZZ_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
+#endif
+
     /* Client extracts PIN2 generated from bio-metric from token */
     pin2=1212;
     printf("Client extracts PIN= %d\n",pin2);
     MPIN_ZZZ_EXTRACT_PIN(HASH_TYPE_MPIN,&CLIENT_ID,pin2,&TOKEN);
     printf("Client Token= ");
     OCT_output(&TOKEN);
-
-#ifdef FULL
-    MPIN_ZZZ_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
-#endif
 
 #ifdef PERMITS
     /* Client gets "Time Permit" from DTA */
