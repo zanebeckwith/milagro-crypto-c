@@ -24,7 +24,7 @@ import "C"
 import "unsafe"
 
 // Octet is Go alias for the C octet type
-type Octet C.octet
+type Octet = C.octet
 
 // NewOctet creates new Octet with given value
 func NewOctet(val []byte) *Octet {

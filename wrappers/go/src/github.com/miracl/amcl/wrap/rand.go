@@ -19,7 +19,6 @@ package wrap
 
 // #include "amcl.h"
 // #include "randapi.h"
-// #include "wrappers_generated.h"
 import "C"
 
 // Rand is a cryptographically secure random number generator
@@ -28,7 +27,11 @@ type Rand C.csprng
 // NewRand create new seeded Rand
 func NewRand(seed []byte) *Rand {
 	var rand C.csprng
-	C._CREATE_CSPRNG(&rand, *newOctet(seed))
+
+	sOct := NewOctet(seed)
+	defer sOct.Free()
+
+	C.CREATE_CSPRNG(&rand, sOct)
 	return (*Rand)(&rand)
 }
 

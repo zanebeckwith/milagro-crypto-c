@@ -26,7 +26,6 @@ package wrap
 // #include "randapi.h"
 // #include "rsa_{{.keySize}}.h"
 // #include "utils.h"
-// #include "wrappers_generated.h"
 import "C"
 
 // RSA Constant
@@ -40,26 +39,42 @@ func RSAKeyPair_{{.keySize}}(rng *Rand, e int32, p []byte, q []byte) (RSAPrivate
 	var prvKey C.rsa_private_key_{{.keySize}}
 	var pubKey C.rsa_public_key_{{.keySize}}
 
-	C._RSA_{{.keySize}}_KEY_PAIR(rng.csprng(), C.int32_t(e), &prvKey, &pubKey, *newOctet(p), *newOctet(q))
+	pOct := NewOctet(p)
+	defer pOct.Free()
+
+	qOct := NewOctet(q)
+	defer qOct.Free()
+
+	C.RSA_{{.keySize}}_KEY_PAIR(rng.csprng(), C.int32_t(e), &prvKey, &pubKey, pOct, qOct)
 	return &prvKey, &pubKey
 
 }
 
 // RSAEncrypt_{{.keySize}} encrypts F with the public key
 func RSAEncrypt_{{.keySize}}(pubKey RSAPublicKey, f []byte) []byte {
-	g := make([]byte, RFS_{{.keySize}})
-	C._RSA_{{.keySize}}_ENCRYPT(pubKey.(*C.rsa_public_key_{{.keySize}}), *newOctet(f), *makeOctet(g))
-	return g
+	fOct := NewOctet(f)
+	defer fOct.Free()
+
+	gOct := MakeOctet(RFS_{{.keySize}})
+	defer gOct.Free()
+
+	C.RSA_{{.keySize}}_ENCRYPT(pubKey.(*C.rsa_public_key_{{.keySize}}), fOct, gOct)
+	return gOct.ToBytes()
 }
 
 // RSADecrypt_{{.keySize}} decrypts G with the private key
 func RSADecrypt_{{.keySize}}(prvKey RSAPrivateKey, g []byte) []byte {
-	f := make([]byte, RFS_{{.keySize}})
-	C._RSA_{{.keySize}}_DECRYPT(prvKey.(*C.rsa_private_key_{{.keySize}}), *newOctet(g), *makeOctet(f))
-	return f
+	gOct := NewOctet(g)
+	defer gOct.Free()
+
+	fOct := MakeOctet(RFS_{{.keySize}})
+	defer fOct.Free()
+
+	C.RSA_{{.keySize}}_DECRYPT(prvKey.(*C.rsa_private_key_{{.keySize}}), gOct, fOct)
+	return fOct.ToBytes()
 }
 
 // RSAPrivateKeyKill_{{.keySize}} destroys an RSA private Key
 func RSAPrivateKeyKill_{{.keySize}}(prvKey RSAPrivateKey) {
-	C._RSA_{{.keySize}}_PRIVATE_KEY_KILL(prvKey.(*C.rsa_private_key_{{.keySize}}))
+	C.RSA_{{.keySize}}_PRIVATE_KEY_KILL(prvKey.(*C.rsa_private_key_{{.keySize}}))
 }

@@ -18,11 +18,7 @@
 package wrap
 
 // #include "rsa_support.h"
-// #include "wrappers_generated.h"
 import "C"
-import (
-	"bytes"
-)
 
 // RSA Constant
 const MAX_RSA_BYTES int = int(C.MAX_RSA_BYTES) // MAX_RSA_BYTES is the maximum RSA level of security supported - 4096
@@ -48,13 +44,27 @@ func PKCS15OLD(hashType, rfs int, msg []byte) ([]byte, error) {
 
 // OAEPencode encodes the message for encryption
 func OAEPencode(hashType, rfs int, m []byte, rng *Rand, p []byte) ([]byte, error) {
-	f := make([]byte, rfs)
-	rtn := C._OAEP_ENCODE(C.int(hashType), *newOctet(m), rng.csprng(), *newOctet(p), *makeOctet(f))
-	return f, newError(rtn)
+	mOct := NewOctet(m)
+	defer mOct.Free()
+
+	pOct := NewOctet(p)
+	defer pOct.Free()
+
+	fOct := MakeOctet(rfs)
+	defer fOct.Free()
+
+	rtn := C.OAEP_ENCODE(C.int(hashType), mOct, rng.csprng(), pOct, fOct)
+	return fOct.ToBytes(), newError(rtn)
 }
 
 // OAEPdecode decodes message M after decryption, F is the decoded message
 func OAEPdecode(hashType int, p []byte, m []byte) ([]byte, error) {
-	rtn := C._OAEP_DECODE(C.int(hashType), *newOctet(p), *newOctet(m))
-	return bytes.TrimRight(m, "\x00"), newError(rtn)
+	pOct := NewOctet(p)
+	defer pOct.Free()
+
+	mOct := NewOctet(m)
+	defer mOct.Free()
+
+	rtn := C.OAEP_DECODE(C.int(hashType), pOct, mOct)
+	return mOct.ToBytes(), newError(rtn)
 }

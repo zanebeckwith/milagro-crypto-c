@@ -26,9 +26,7 @@ package wrap
 // #include "randapi.h"
 // #include "mpin_BN254CX.h"
 // #include "utils.h"
-// #include "wrappers_generated.h"
 import "C"
-import "bytes"
 
 const (
 	PAS_BN254CX int = int(C.MPIN_PAS)
@@ -41,37 +39,68 @@ const (
 
 // RandomGenerate_BN254CX returns a random integer where s < q is the order of the group of points on the curve.
 func RandomGenerate_BN254CX(rng *Rand) ([]byte, error) {
-	r := make([]byte, PGS_BN254CX)
-	rtn := C._MPIN_BN254CX_RANDOM_GENERATE(rng.csprng(), *makeOctet(r))
-	return r, newError(rtn)
+	rOct := MakeOctet(PGS_BN254CX)
+	defer rOct.Free()
+
+	rtn := C.MPIN_BN254CX_RANDOM_GENERATE(rng.csprng(), rOct)
+	return rOct.ToBytes(), newError(rtn)
 }
 
 // GetServerSecret_BN254CX creates a server secret in G2 from a master secret
 func GetServerSecret_BN254CX(ms []byte) ([]byte, error) {
-	ss := make([]byte, G2S_BN254CX)
-	rtn := C._MPIN_BN254CX_GET_SERVER_SECRET(*newOctet(ms), *makeOctet(ss))
-	return ss, newError(rtn)
+	msOct := NewOctet(ms)
+	defer msOct.Free()
+
+	ssOct := MakeOctet(G2S_BN254CX)
+	defer ssOct.Free()
+
+	rtn := C.MPIN_BN254CX_GET_SERVER_SECRET(msOct, ssOct)
+	return ssOct.ToBytes(), newError(rtn)
 }
 
 // RecombineG1_BN254CX adds two members from the group G1
 func RecombineG1_BN254CX(r1, r2 []byte) ([]byte, error) {
-	r := make([]byte, G1S_BN254CX)
-	rtn := C._MPIN_BN254CX_RECOMBINE_G1(*newOctet(r1), *newOctet(r2), *makeOctet(r))
-	return r, newError(rtn)
+	r1Oct:=NewOctet(r1)
+	defer r1Oct.Free()
+
+	r2Oct:=NewOctet(r2)
+	defer r2Oct.Free()
+
+	rOct := MakeOctet(G1S_BN254CX)
+	defer rOct.Free()
+
+	rtn := C.MPIN_BN254CX_RECOMBINE_G1(r1Oct, r2Oct, rOct)
+	return rOct.ToBytes(), newError(rtn)
 }
 
 // RecombineG2_BN254CX adds two members from the group G2
 func RecombineG2_BN254CX(w1, w2 []byte) ([]byte, error) {
-	w := make([]byte, G2S_BN254CX)
-	rtn := C._MPIN_BN254CX_RECOMBINE_G2(*newOctet(w1), *newOctet(w2), *makeOctet(w))
-	return w, newError(rtn)
+	w1Oct := NewOctet(w1)
+	defer w1Oct.Free()
+
+	w2Oct := NewOctet(w2)
+	defer w2Oct.Free()
+
+	wOct := MakeOctet(G2S_BN254CX)
+	defer wOct.Free()
+
+	rtn := C.MPIN_BN254CX_RECOMBINE_G2(w1Oct, w2Oct, wOct)
+	return wOct.ToBytes(), newError(rtn)
 }
 
 // GetClientSecret_BN254CX creates a client secret in G1 from a master secret and the hash of the M-Pin Id
 func GetClientSecret_BN254CX(masterSecret []byte, hashMPinId []byte) ([]byte, error ) {
-	cs := make([]byte, G1S_BN254CX)
-	rtn := C._MPIN_BN254CX_GET_CLIENT_SECRET(*newOctet(masterSecret), *newOctet(hashMPinId), *makeOctet(cs))
-	return cs, newError(rtn)
+	msOct := NewOctet(masterSecret)
+	defer msOct.Free()
+
+	mpOct := NewOctet(hashMPinId)
+	defer mpOct.Free()
+
+	csOct := MakeOctet(G1S_BN254CX)
+	defer csOct.Free()
+
+	rtn := C.MPIN_BN254CX_GET_CLIENT_SECRET(msOct, mpOct, csOct)
+	return csOct.ToBytes(), newError(rtn)
 }
 
 // GetDVSKeyPair_BN254CX randomly generates the public key in G2 for the key-escrow less scheme
@@ -79,31 +108,52 @@ func GetClientSecret_BN254CX(masterSecret []byte, hashMPinId []byte) ([]byte, er
 // zOut: output randomly generated private key if rng!=nil, z otherwise
 // publicKey: client public key: (z^-1).Q
 func GetDVSKeyPair_BN254CX(rng *Rand, z []byte) (zOut, publicKey []byte, err error) {
-	publicKey = make([]byte, G2S_BN254CX)
+	pkOct := MakeOctet(G2S_BN254CX)
+	defer pkOct.Free()
 
 	var rtn C.int
+	var zOct *Octet
 	if rng != nil {
-		z = make([]byte, PGS_BN254CX)
-		rtn = C._MPIN_BN254CX_GET_DVS_KEYPAIR(rng.csprng(), *makeOctet(z), *makeOctet(publicKey))
+		zOct = MakeOctet(PGS_BN254CX)
+		defer zOct.Free()
+
+		rtn = C.MPIN_BN254CX_GET_DVS_KEYPAIR(rng.csprng(), zOct, pkOct)
 	} else {
-		rtn = C._MPIN_BN254CX_GET_DVS_KEYPAIR(nil, *newOctet(z), *makeOctet(publicKey))
+		zOct = NewOctet(z)
+		defer zOct.Free()
+
+		rtn = C.MPIN_BN254CX_GET_DVS_KEYPAIR(nil, zOct, pkOct)
 	}
 
-	return z, publicKey, newError(rtn)
+	return zOct.ToBytes(), pkOct.ToBytes(), newError(rtn)
 }
 
 // GetClientPermit_BN254CX creates a time permit in G1 from a master secret, hash of the M-Pin Id and epoch days
 func GetClientPermit_BN254CX(hashType, epochDate int, masterSecret, hashMPinId []byte) ([]byte, error) {
-	tp := make([]byte, G1S_BN254CX)
-	rtn := C._MPIN_BN254CX_GET_CLIENT_PERMIT(C.int(hashType), C.int(epochDate), *newOctet(masterSecret), *newOctet(hashMPinId), *makeOctet(tp))
-	return tp, newError(rtn)
+	tpOct := MakeOctet(G1S_BN254CX)
+	defer tpOct.Free()
+
+	msOct := NewOctet(masterSecret)
+	defer msOct.Free()
+
+	mpOct := NewOctet(hashMPinId)
+	defer mpOct.Free()
+
+	rtn := C.MPIN_BN254CX_GET_CLIENT_PERMIT(C.int(hashType), C.int(epochDate), msOct, mpOct, tpOct)
+	return tpOct.ToBytes(), newError(rtn)
 }
 
 
 // ExtractPIN_BN254CX extracts a PIN from the client secret
 func ExtractPIN_BN254CX(hashType int, mpinId []byte, PIN int, clientSecret []byte) ([]byte, error) {
-	rtn := C._MPIN_BN254CX_EXTRACT_PIN(C.int(hashType), *newOctet(mpinId), C.int(PIN), *newOctet(clientSecret))
-	return bytes.TrimRight(clientSecret, "\x00"), newError(rtn)
+	mpOct := NewOctet(mpinId)
+	defer mpOct.Free()
+
+	csOct := NewOctet(clientSecret)
+	defer csOct.Free()
+
+	rtn := C.MPIN_BN254CX_EXTRACT_PIN(C.int(hashType), mpOct, C.int(PIN), csOct)
+	return csOct.ToBytes(), newError(rtn)
 }
 
 
@@ -730,6 +780,15 @@ func Client1_BN254CX(hashType, epochDate int, mpinId []byte, rng *Rand, x []byte
 // Returns:
 //     V: V = -(x+y)(CS+TP), where CS is the reconstructed client secret and TP is the time permit
 func Client2_BN254CX(x, y, SEC []byte) ([]byte, error) {
-	rtn := C._MPIN_BN254CX_CLIENT_2(*newOctet(x), *newOctet(y), *newOctet(SEC))
-	return bytes.TrimRight(SEC, "\x00"), newError(rtn)
+	xOct := NewOctet(x)
+	defer xOct.Free()
+
+	yOct := NewOctet(y)
+	defer yOct.Free()
+
+	sOct := NewOctet(SEC)
+	defer sOct.Free()
+
+	rtn := C.MPIN_BN254CX_CLIENT_2(xOct, yOct, sOct)
+	return sOct.ToBytes(), newError(rtn)
 }

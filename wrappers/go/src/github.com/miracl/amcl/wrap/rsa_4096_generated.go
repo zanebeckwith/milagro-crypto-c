@@ -26,7 +26,6 @@ package wrap
 // #include "randapi.h"
 // #include "rsa_4096.h"
 // #include "utils.h"
-// #include "wrappers_generated.h"
 import "C"
 
 // RSA Constant
@@ -40,26 +39,42 @@ func RSAKeyPair_4096(rng *Rand, e int32, p []byte, q []byte) (RSAPrivateKey, RSA
 	var prvKey C.rsa_private_key_4096
 	var pubKey C.rsa_public_key_4096
 
-	C._RSA_4096_KEY_PAIR(rng.csprng(), C.int32_t(e), &prvKey, &pubKey, *newOctet(p), *newOctet(q))
+	pOct := NewOctet(p)
+	defer pOct.Free()
+
+	qOct := NewOctet(q)
+	defer qOct.Free()
+
+	C.RSA_4096_KEY_PAIR(rng.csprng(), C.int32_t(e), &prvKey, &pubKey, pOct, qOct)
 	return &prvKey, &pubKey
 
 }
 
 // RSAEncrypt_4096 encrypts F with the public key
 func RSAEncrypt_4096(pubKey RSAPublicKey, f []byte) []byte {
-	g := make([]byte, RFS_4096)
-	C._RSA_4096_ENCRYPT(pubKey.(*C.rsa_public_key_4096), *newOctet(f), *makeOctet(g))
-	return g
+	fOct := NewOctet(f)
+	defer fOct.Free()
+
+	gOct := MakeOctet(RFS_4096)
+	defer gOct.Free()
+
+	C.RSA_4096_ENCRYPT(pubKey.(*C.rsa_public_key_4096), fOct, gOct)
+	return gOct.ToBytes()
 }
 
 // RSADecrypt_4096 decrypts G with the private key
 func RSADecrypt_4096(prvKey RSAPrivateKey, g []byte) []byte {
-	f := make([]byte, RFS_4096)
-	C._RSA_4096_DECRYPT(prvKey.(*C.rsa_private_key_4096), *newOctet(g), *makeOctet(f))
-	return f
+	gOct := NewOctet(g)
+	defer gOct.Free()
+
+	fOct := MakeOctet(RFS_4096)
+	defer fOct.Free()
+
+	C.RSA_4096_DECRYPT(prvKey.(*C.rsa_private_key_4096), gOct, fOct)
+	return fOct.ToBytes()
 }
 
 // RSAPrivateKeyKill_4096 destroys an RSA private Key
 func RSAPrivateKeyKill_4096(prvKey RSAPrivateKey) {
-	C._RSA_4096_PRIVATE_KEY_KILL(prvKey.(*C.rsa_private_key_4096))
+	C.RSA_4096_PRIVATE_KEY_KILL(prvKey.(*C.rsa_private_key_4096))
 }

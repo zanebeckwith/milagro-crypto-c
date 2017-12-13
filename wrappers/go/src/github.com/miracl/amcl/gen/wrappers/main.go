@@ -29,13 +29,22 @@ import (
 	"github.com/miracl/amcl/gen"
 )
 
-var (
-	// constants related to file generation
-	wrapFilePath      = "wrappers_generated.c"
-	wrapFileTmplPath  = "wrappers.c.tmpl"
-	wrapHFilePath     = "wrappers_generated.h"
-	wrapHFileTmplPath = "wrappers.h.tmpl"
+type arg struct {
+	Name, CType string
+	Ref         bool
+}
 
+type funcCtx struct {
+	// raw c declaration
+	c string
+
+	// Parsed definition
+	CType string
+	CName string
+	Args  []arg
+}
+
+var (
 	// constants related to C function parsing
 	cDefRe       = regexp.MustCompile(`^(?P<type>\S+) (?P<name>[^\(]+) ?\((?P<args>([^,],?)+)\)$`)
 	cArgReCTypes = []string{
@@ -60,52 +69,52 @@ var (
 	// AMCL Functions
 
 	mPinCurves        = []string{"BLS383", "BN254", "BN254CX"}
-	mPinPerCurveFuncs = []string{
-		"int MPIN_{{.curve}}_CLIENT_1(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* S, octet* U, octet* UT, octet* TP)",
-		"int MPIN_{{.curve}}_CLIENT_2(octet* x, octet* y, octet* V)",
-		"int MPIN_{{.curve}}_CLIENT_KEY(int h, octet* g1, octet* g2, int pin, octet* r, octet* x, octet* p, octet* T, octet* K)",
-		"int MPIN_{{.curve}}_CLIENT(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* V, octet* U, octet* UT, octet* TP, octet* MESSAGE, int t, octet* y)",
-		"int MPIN_{{.curve}}_EXTRACT_PIN(int h, octet* ID, int pin, octet* CS)",
-		"int MPIN_{{.curve}}_GET_CLIENT_PERMIT(int h, int d, octet* S, octet* ID, octet* TP)",
-		"int MPIN_{{.curve}}_GET_CLIENT_SECRET(octet* S, octet* ID, octet* CS)",
-		"int MPIN_{{.curve}}_GET_DVS_KEYPAIR(csprng* R, octet* Z, octet* Pa)",
-		"int MPIN_{{.curve}}_GET_G1_MULTIPLE(csprng* R, int t, octet* x, octet* G, octet* W)",
-		"int MPIN_{{.curve}}_GET_SERVER_SECRET(octet* S, octet* SS)",
-		"int MPIN_{{.curve}}_KANGAROO(octet* E, octet* F)",
-		"int MPIN_{{.curve}}_PRECOMPUTE(octet* T, octet* ID, octet* CP, octet* g1, octet* g2)",
-		"int MPIN_{{.curve}}_RANDOM_GENERATE(csprng* R, octet* S)",
-		"int MPIN_{{.curve}}_RECOMBINE_G1(octet* Q1, octet* Q2, octet* Q)",
-		"int MPIN_{{.curve}}_RECOMBINE_G2(octet* P1, octet* P2, octet* P)",
-		"int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)",
-		"int MPIN_{{.curve}}_SERVER_KEY(int h, octet* Z, octet* SS, octet* w, octet* p, octet* I, octet* U, octet* UT, octet* K)",
-		"int MPIN_{{.curve}}_SERVER(int h, int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* ID, octet* MESSAGE, int t, octet* Pa)",
-		"void MPIN_{{.curve}}_SERVER_1(int h, int d, octet* ID, octet* HID, octet* HTID)",
+	mPinPerCurveFuncs = []funcCtx{
+		{c: "int MPIN_{{.curve}}_CLIENT_1(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* S, octet* U, octet* UT, octet* TP)"},
+		{c: "int MPIN_{{.curve}}_CLIENT_2(octet* x, octet* y, octet* V)"},
+		{c: "int MPIN_{{.curve}}_CLIENT_KEY(int h, octet* g1, octet* g2, int pin, octet* r, octet* x, octet* p, octet* T, octet* K)"},
+		{c: "int MPIN_{{.curve}}_CLIENT(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* V, octet* U, octet* UT, octet* TP, octet* MESSAGE, int t, octet* y)"},
+		{c: "int MPIN_{{.curve}}_EXTRACT_PIN(int h, octet* ID, int pin, octet* CS)"},
+		{c: "int MPIN_{{.curve}}_GET_CLIENT_PERMIT(int h, int d, octet* S, octet* ID, octet* TP)"},
+		{c: "int MPIN_{{.curve}}_GET_CLIENT_SECRET(octet* S, octet* ID, octet* CS)"},
+		{c: "int MPIN_{{.curve}}_GET_DVS_KEYPAIR(csprng* R, octet* Z, octet* Pa)"},
+		{c: "int MPIN_{{.curve}}_GET_G1_MULTIPLE(csprng* R, int t, octet* x, octet* G, octet* W)"},
+		{c: "int MPIN_{{.curve}}_GET_SERVER_SECRET(octet* S, octet* SS)"},
+		{c: "int MPIN_{{.curve}}_KANGAROO(octet* E, octet* F)"},
+		{c: "int MPIN_{{.curve}}_PRECOMPUTE(octet* T, octet* ID, octet* CP, octet* g1, octet* g2)"},
+		{c: "int MPIN_{{.curve}}_RANDOM_GENERATE(csprng* R, octet* S)"},
+		{c: "int MPIN_{{.curve}}_RECOMBINE_G1(octet* Q1, octet* Q2, octet* Q)"},
+		{c: "int MPIN_{{.curve}}_RECOMBINE_G2(octet* P1, octet* P2, octet* P)"},
+		{c: "int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)"},
+		{c: "int MPIN_{{.curve}}_SERVER_KEY(int h, octet* Z, octet* SS, octet* w, octet* p, octet* I, octet* U, octet* UT, octet* K)"},
+		{c: "int MPIN_{{.curve}}_SERVER(int h, int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* ID, octet* MESSAGE, int t, octet* Pa)"},
+		{c: "void MPIN_{{.curve}}_SERVER_1(int h, int d, octet* ID, octet* HID, octet* HTID)"},
 	}
 
 	rsaKeySizes   = []string{"2048", "3072", "4096"}
-	rsaPerKeyFunc = []string{
-		"void RSA_{{.keySize}}_DECRYPT(rsa_private_key_{{.keySize}}* priv, octet* G, octet* F)",
-		"void RSA_{{.keySize}}_ENCRYPT(rsa_public_key_{{.keySize}}* pub, octet* F, octet* G)",
-		"void RSA_{{.keySize}}_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_{{.keySize}}* priv, rsa_public_key_{{.keySize}}* pub, octet* p, octet* q)",
-		"void RSA_{{.keySize}}_PRIVATE_KEY_KILL(rsa_private_key_{{.keySize}}* PRIV)",
+	rsaPerKeyFunc = []funcCtx{
+		{c: "void RSA_{{.keySize}}_DECRYPT(rsa_private_key_{{.keySize}}* priv, octet* G, octet* F)"},
+		{c: "void RSA_{{.keySize}}_ENCRYPT(rsa_public_key_{{.keySize}}* pub, octet* F, octet* G)"},
+		{c: "void RSA_{{.keySize}}_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_{{.keySize}}* priv, rsa_public_key_{{.keySize}}* pub, octet* p, octet* q)"},
+		{c: "void RSA_{{.keySize}}_PRIVATE_KEY_KILL(rsa_private_key_{{.keySize}}* PRIV)"},
 	}
 
-	funcSets = map[string]func() map[string][]string{
-		"mpin": func() map[string][]string {
+	funcSets = map[string]func() map[string][]funcCtx{
+		"mpin": func() map[string][]funcCtx {
 			return genMPinFuncs(mPinPerCurveFuncs, mPinCurves)
 		},
-		"rand": func() map[string][]string {
-			return map[string][]string{
-				"": {"void CREATE_CSPRNG(csprng* R, octet* S)"},
+		"rand": func() map[string][]funcCtx {
+			return map[string][]funcCtx{
+				"": {funcCtx{c: "void CREATE_CSPRNG(csprng* R, octet* S)"}},
 			}
 		},
-		"rsa": func() map[string][]string {
+		"rsa": func() map[string][]funcCtx {
 			fileFuncMap := genRSAFuncs(rsaPerKeyFunc, rsaKeySizes)
 
-			fileFuncMap[""] = []string{
-				"int PKCS15(int h, octet* m, octet* w)",
-				"int OAEP_ENCODE(int h, octet* m, csprng* rng, octet* p, octet* f)",
-				"int OAEP_DECODE(int h, octet* p, octet* f)",
+			fileFuncMap[""] = []funcCtx{
+				{c: "int PKCS15(int h, octet* m, octet* w)"},
+				{c: "int OAEP_ENCODE(int h, octet* m, csprng* rng, octet* p, octet* f)"},
+				{c: "int OAEP_DECODE(int h, octet* p, octet* f)"},
 			}
 
 			return fileFuncMap
@@ -119,45 +128,35 @@ func main() {
 	}
 	fSetName, tmplFile := os.Args[1], os.Args[2]
 
-	// TODO: Delete me
-	if fSetName == "c" {
-		funcs := []string{}
-		for _, set := range funcSets {
-			for _, fs := range set() {
-				funcs = append(funcs, fs...)
-			}
-		}
-
-		cWraps, _ := genCWrapFuncs(funcs)
-		if err := gen.GenerateFiles(cWraps...); err != nil {
-			log.Fatal(err)
-		}
-		return
-	}
-
-	funcsGetter, ok := funcSets[fSetName]
+	// Get the selected set of function
+	getFuncs, ok := funcSets[fSetName]
 	if !ok {
 		log.Fatal("invalid function set", fSetName)
 	}
+	funcs := getFuncs()
 
-	funcs := funcsGetter()
 	i := 0
 	files := make([]gen.File, len(funcs))
 	for suffix, funcs := range funcs {
+
+		// parse the c definition and add it to the context
+		for i, funcDef := range funcs {
+			funcs[i].CType, funcs[i].CName, funcs[i].Args = parseCFuncDef(funcDef.c)
+		}
+
 		fileName := fmt.Sprintf("%v_%v_wrappers_generated.go", fSetName, suffix)
 		if suffix == "" {
 			fileName = fmt.Sprintf("%v_wrappers_generated.go", fSetName)
 		}
 
-		_, cFuncDefs := genCWrapFuncs(funcs)
 		files[i] = gen.File{
 			Path:     fileName,
 			TmplPath: tmplFile,
 			Ctx: struct {
-				Funcs  []cWrap
+				Funcs  []funcCtx
 				Suffix string
 			}{
-				Funcs:  cFuncDefs,
+				Funcs:  funcs,
 				Suffix: suffix,
 			},
 		}
@@ -169,20 +168,20 @@ func main() {
 	}
 }
 
-func genMPinFuncs(funcs, curves []string) map[string][]string {
-	rFuncs := map[string][]string{}
+func genMPinFuncs(funcs []funcCtx, curves []string) map[string][]funcCtx {
+	rFuncs := map[string][]funcCtx{}
 
 	for _, c := range curves {
-		rList := make([]string, len(funcs))
-		for i, f := range funcs {
-			tmpl := template.Must(template.New("func").Parse(f))
+		rList := make([]funcCtx, len(funcs))
+		for i, w := range funcs {
+			tmpl := template.Must(template.New("func").Parse(w.c))
 
 			var buff bytes.Buffer
 			if err := tmpl.Execute(&buff, map[string]string{"curve": c}); err != nil {
 				panic(err)
 			}
 
-			rList[i] = buff.String()
+			rList[i] = funcCtx{c: buff.String()}
 		}
 		rFuncs[c] = rList
 	}
@@ -190,20 +189,20 @@ func genMPinFuncs(funcs, curves []string) map[string][]string {
 	return rFuncs
 }
 
-func genRSAFuncs(funcs []string, sizes []string) map[string][]string {
-	rFuncs := map[string][]string{}
+func genRSAFuncs(funcs []funcCtx, sizes []string) map[string][]funcCtx {
+	rFuncs := map[string][]funcCtx{}
 
 	for _, s := range sizes {
-		rList := make([]string, len(funcs))
+		rList := make([]funcCtx, len(funcs))
 		for i, f := range funcs {
-			tmpl := template.Must(template.New("func").Parse(f))
+			tmpl := template.Must(template.New("func").Parse(f.c))
 
 			var buff bytes.Buffer
 			if err := tmpl.Execute(&buff, map[string]string{"keySize": s}); err != nil {
 				panic(err)
 			}
 
-			rList[i] = buff.String()
+			rList[i] = funcCtx{c: buff.String()}
 		}
 		rFuncs[s] = rList
 	}
@@ -211,73 +210,21 @@ func genRSAFuncs(funcs []string, sizes []string) map[string][]string {
 	return rFuncs
 }
 
-type cWrap struct {
-	cFuncDef
-	WArgs  []arg
-	GoArgs []arg
-}
-
-func genCWrapFuncs(funcs []string) ([]gen.File, []cWrap) {
-	cWraps := make([]cWrap, len(funcs))
-	for fi, funcDef := range funcs {
-		cf := parseCFuncDef(funcDef)
-
-		wArgs := make([]arg, len(cf.Args))
-		for ai, a := range cf.Args {
-			wArgs[ai] = arg{
-				Name:  a.Name,
-				CType: a.CType,
-			}
-		}
-
-		cWraps[fi] = cWrap{
-			cFuncDef: *cf,
-			WArgs:    wArgs,
-		}
-
-	}
-
-	return []gen.File{
-		{
-			Path:     wrapFilePath,
-			TmplPath: wrapFileTmplPath,
-			Ctx:      cWraps,
-		},
-		{
-			Path:     wrapHFilePath,
-			TmplPath: wrapHFileTmplPath,
-			Ctx:      cWraps,
-		},
-	}, cWraps
-}
-
-type cFuncDef struct {
-	Name  string
-	CType string
-	Args  []arg
-}
-
-type arg struct {
-	Name, CType string
-	Ref         bool
-}
-
-func parseCFuncDef(def string) *cFuncDef {
+func parseCFuncDef(def string) (cType, name string, args []arg) {
 	match := cDefRe.FindStringSubmatch(def)
 
-	f := &cFuncDef{}
-	for i, name := range cDefRe.SubexpNames() {
-		switch name {
+	for i, group := range cDefRe.SubexpNames() {
+		switch group {
 		case "type":
-			f.CType = match[i]
+			cType = match[i]
 		case "name":
-			f.Name = match[i]
+			name = match[i]
 		case "args":
-			f.Args = parseCArgs(match[i])
+			args = parseCArgs(match[i])
 		}
 	}
 
-	return f
+	return cType, name, args
 }
 
 func parseCArgs(str string) []arg {
@@ -304,19 +251,4 @@ func parseCArgsGroups(match []string) (name, ctype string) {
 		}
 	}
 	return name, ctype
-}
-
-func appendSlices(slices ...[]string) []string {
-	var totalLen int
-	for _, s := range slices {
-		totalLen += len(s)
-	}
-
-	tmp := make([]string, totalLen)
-	var i int
-	for _, s := range slices {
-		i += copy(tmp[i:], s)
-	}
-
-	return tmp
 }

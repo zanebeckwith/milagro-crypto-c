@@ -2,8 +2,8 @@
 {{define "goNativeWrappers"}}
 
 {{range .}}
-// {{.Name}} is a go wrapper for C.{{.Name}}
-func {{.Name}}(
+// {{.CName}} is a go wrapper for C.{{.CName}}
+func {{.CName}}(
     {{- range .Args -}}
         {{.Name}}{{ " " }}
 
@@ -20,7 +20,7 @@ func {{.Name}}(
         {{- end -}}
     {{- end -}}
 ) {{if eq .CType "int"}}error {{end}}{
-    {{if eq .CType "int"}}code := {{end}}C.{{.Name}}(
+    {{if eq .CType "int"}}code := {{end}}C.{{.CName}}(
         {{- range .Args -}}
             {{- if eq .CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
             {{- else if eq .CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
