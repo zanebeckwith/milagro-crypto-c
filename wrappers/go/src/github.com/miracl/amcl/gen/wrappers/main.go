@@ -34,6 +34,23 @@ type arg struct {
 	Ref         bool
 }
 
+type trans struct {
+	// OctetMake means the variable is Octet and should be initialized in the
+	// wrapper.
+	OctetMake bool
+	// OctetSize works in combination with OctetMake. OctetSize should be set
+	// with the name of the constaint for the size of the Octet that have to me
+	// initialized. If empty - size with be added to the wrapper arguments.
+	OctetSize string
+
+	// Return means the variable should be returned from the wrapper. This also
+	// meant it wont be part of the wrapper arguments.
+	Return bool
+	// Receive works in combination with Return and it adds the variable in the
+	// wrapper arguments.
+	Receive bool
+}
+
 type funcCtx struct {
 	// raw c declaration
 	c string
@@ -42,6 +59,11 @@ type funcCtx struct {
 	CType string
 	CName string
 	Args  []arg
+
+	GoName string
+
+	// Argument transformations
+	ArgTrans map[string]trans
 }
 
 var (
@@ -93,10 +115,44 @@ var (
 
 	rsaKeySizes   = []string{"2048", "3072", "4096"}
 	rsaPerKeyFunc = []funcCtx{
-		{c: "void RSA_{{.keySize}}_DECRYPT(rsa_private_key_{{.keySize}}* priv, octet* G, octet* F)"},
-		{c: "void RSA_{{.keySize}}_ENCRYPT(rsa_public_key_{{.keySize}}* pub, octet* F, octet* G)"},
-		{c: "void RSA_{{.keySize}}_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_{{.keySize}}* priv, rsa_public_key_{{.keySize}}* pub, octet* p, octet* q)"},
-		{c: "void RSA_{{.keySize}}_PRIVATE_KEY_KILL(rsa_private_key_{{.keySize}}* PRIV)"},
+		{
+			c:      "void RSA_{{.keySize}}_DECRYPT(rsa_private_key_{{.keySize}}* priv, octet* G, octet* F)",
+			GoName: "RSADecrypt_{{.keySize}}",
+			ArgTrans: map[string]trans{
+				"F": {
+					OctetMake: true,
+					OctetSize: "wrap.RFS_{{.keySize}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "void RSA_{{.keySize}}_ENCRYPT(rsa_public_key_{{.keySize}}* pub, octet* F, octet* G)",
+			GoName: "RSAEncrypt_{{.keySize}}",
+			ArgTrans: map[string]trans{
+				"G": {
+					OctetMake: true,
+					OctetSize: "wrap.RFS_{{.keySize}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "void RSA_{{.keySize}}_KEY_PAIR(csprng* rng, sign32 e, rsa_private_key_{{.keySize}}* priv, rsa_public_key_{{.keySize}}* pub, octet* p, octet* q)",
+			GoName: "RSAKeyPair_{{.keySize}}",
+			ArgTrans: map[string]trans{
+				"priv": {
+					Return: true,
+				},
+				"pub": {
+					Return: true,
+				},
+			},
+		},
+		{
+			c:      "void RSA_{{.keySize}}_PRIVATE_KEY_KILL(rsa_private_key_{{.keySize}}* PRIV)",
+			GoName: "RSAPrivateKeyKill_{{.keySize}}",
+		},
 	}
 
 	funcSets = map[string]func() map[string][]funcCtx{
@@ -112,9 +168,35 @@ var (
 			fileFuncMap := genRSAFuncs(rsaPerKeyFunc, rsaKeySizes)
 
 			fileFuncMap[""] = []funcCtx{
-				{c: "int PKCS15(int h, octet* m, octet* w)"},
-				{c: "int OAEP_ENCODE(int h, octet* m, csprng* rng, octet* p, octet* f)"},
-				{c: "int OAEP_DECODE(int h, octet* p, octet* f)"},
+				{
+					c: "int PKCS15(int h, octet* m, octet* w)",
+					ArgTrans: map[string]trans{
+						"w": {
+							OctetMake: true,
+							Return:    true,
+						},
+					},
+				},
+				{
+					c:      "int OAEP_ENCODE(int h, octet* m, csprng* rng, octet* p, octet* f)",
+					GoName: "OAEPencode",
+					ArgTrans: map[string]trans{
+						"f": {
+							OctetMake: true,
+							Return:    true,
+						},
+					},
+				},
+				{
+					c:      "int OAEP_DECODE(int h, octet* p, octet* f)",
+					GoName: "OAEPdecode",
+					ArgTrans: map[string]trans{
+						"f": {
+							Receive: true,
+							Return:  true,
+						},
+					},
+				},
 			}
 
 			return fileFuncMap
@@ -140,8 +222,8 @@ func main() {
 	for suffix, funcs := range funcs {
 
 		// parse the c definition and add it to the context
-		for i, funcDef := range funcs {
-			funcs[i].CType, funcs[i].CName, funcs[i].Args = parseCFuncDef(funcDef.c)
+		for i := range funcs {
+			parseCFuncDef(&funcs[i])
 		}
 
 		fileName := fmt.Sprintf("%v_%v_wrappers_generated.go", fSetName, suffix)
@@ -173,15 +255,21 @@ func genMPinFuncs(funcs []funcCtx, curves []string) map[string][]funcCtx {
 
 	for _, c := range curves {
 		rList := make([]funcCtx, len(funcs))
+		ctx := map[string]string{"curve": c}
 		for i, w := range funcs {
-			tmpl := template.Must(template.New("func").Parse(w.c))
 
-			var buff bytes.Buffer
-			if err := tmpl.Execute(&buff, map[string]string{"curve": c}); err != nil {
-				panic(err)
+			argTrans := make(map[string]trans, len(w.ArgTrans))
+			for n, t := range w.ArgTrans {
+				curveTrans := t
+				curveTrans.OctetSize = execTmpl(t.OctetSize, ctx)
+				argTrans[n] = curveTrans
 			}
 
-			rList[i] = funcCtx{c: buff.String()}
+			rList[i] = funcCtx{
+				c:        execTmpl(w.c, ctx),
+				GoName:   execTmpl(w.GoName, ctx),
+				ArgTrans: argTrans,
+			}
 		}
 		rFuncs[c] = rList
 	}
@@ -194,15 +282,21 @@ func genRSAFuncs(funcs []funcCtx, sizes []string) map[string][]funcCtx {
 
 	for _, s := range sizes {
 		rList := make([]funcCtx, len(funcs))
+		ctx := map[string]string{"keySize": s}
 		for i, f := range funcs {
-			tmpl := template.Must(template.New("func").Parse(f.c))
 
-			var buff bytes.Buffer
-			if err := tmpl.Execute(&buff, map[string]string{"keySize": s}); err != nil {
-				panic(err)
+			argTrans := make(map[string]trans, len(f.ArgTrans))
+			for n, t := range f.ArgTrans {
+				curveTrans := t
+				curveTrans.OctetSize = execTmpl(t.OctetSize, ctx)
+				argTrans[n] = curveTrans
 			}
 
-			rList[i] = funcCtx{c: buff.String()}
+			rList[i] = funcCtx{
+				c:        execTmpl(f.c, ctx),
+				GoName:   execTmpl(f.GoName, ctx),
+				ArgTrans: argTrans,
+			}
 		}
 		rFuncs[s] = rList
 	}
@@ -210,17 +304,17 @@ func genRSAFuncs(funcs []funcCtx, sizes []string) map[string][]funcCtx {
 	return rFuncs
 }
 
-func parseCFuncDef(def string) (cType, name string, args []arg) {
-	match := cDefRe.FindStringSubmatch(def)
+func parseCFuncDef(def *funcCtx) (cType, name string, args map[string]arg) {
+	match := cDefRe.FindStringSubmatch(def.c)
 
 	for i, group := range cDefRe.SubexpNames() {
 		switch group {
 		case "type":
-			cType = match[i]
+			def.CType = match[i]
 		case "name":
-			name = match[i]
+			def.CName = match[i]
 		case "args":
-			args = parseCArgs(match[i])
+			def.Args = parseCArgs(match[i])
 		}
 	}
 
@@ -251,4 +345,15 @@ func parseCArgsGroups(match []string) (name, ctype string) {
 		}
 	}
 	return name, ctype
+}
+
+func execTmpl(tmpl string, ctx interface{}) string {
+	var b bytes.Buffer
+
+	err := template.Must(template.New("t").Parse(tmpl)).Execute(&b, ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	return b.String()
 }

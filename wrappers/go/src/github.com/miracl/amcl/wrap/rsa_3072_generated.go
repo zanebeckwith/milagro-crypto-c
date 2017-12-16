@@ -28,6 +28,14 @@ package wrap
 // #include "utils.h"
 import "C"
 
+func NewRSAPrivateKey_3072() RSAPrivateKey {
+	return &C.rsa_private_key_3072{}
+}
+
+func NewRSAPublicKey_3072() RSAPublicKey {
+	return &C.rsa_public_key_3072{}
+}
+
 // RSA Constant
 const RFS_3072 int = int(C.RFS_3072)     // RFS_3072 is the RSA Public Key Size in bytes
 const FFLEN_3072 int = int(C.FFLEN_3072) // FFLEN_3072 consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256

@@ -28,6 +28,14 @@ package wrap
 // #include "utils.h"
 import "C"
 
+func NewRSAPrivateKey_4096() RSAPrivateKey {
+	return &C.rsa_private_key_4096{}
+}
+
+func NewRSAPublicKey_4096() RSAPublicKey {
+	return &C.rsa_public_key_4096{}
+}
+
 // RSA Constant
 const RFS_4096 int = int(C.RFS_4096)     // RFS_4096 is the RSA Public Key Size in bytes
 const FFLEN_4096 int = int(C.FFLEN_4096) // FFLEN_4096 consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256

@@ -19,6 +19,6 @@
 
 package amcl
 
-{{range .Funcs}}
+import "github.com/miracl/amcl/wrap"
 
-{{end}}
+{{template "goWrappers" .Funcs}}

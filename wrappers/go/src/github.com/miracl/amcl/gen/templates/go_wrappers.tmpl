@@ -1,0 +1,155 @@
+{{/* This template is used to generate go wrappers with go types */}}
+{{define "goWrappers"}}
+    {{range .}}
+        // {{template "goWrapperName" .}} is a wrapper if wrap.{{.CName}}
+        func {{template "goWrapperName" .}}({{template "goWrappersArgs" .}}) {{template "returnType" .}} {
+
+            {{$func := .}}
+            {{range .Args}}
+
+                {{$arg := .}}
+                {{with index $func.ArgTrans .Name}}
+                    {{if .OctetMake}}
+                        {{if .OctetSize}}
+                            {{$arg.Name}}Size := {{.OctetSize}}
+                        {{- end -}}
+                        {{template "MakeOctet" $arg}}
+                    {{else}}
+                        {{if eq $arg.CType "octet"}}
+                            {{template "NewOctet" $arg}}
+                        {{else if eq $arg.CType "rsa_private_key_2048"}}
+                            {{if .Return}}{{$arg.Name}} = wrap.NewRSAPrivateKey_2048(){{end}}
+                        {{else if eq $arg.CType "rsa_public_key_2048"}}
+                            {{if .Return}}{{$arg.Name}} = wrap.NewRSAPublicKey_2048(){{end}}
+                        {{else if eq $arg.CType "rsa_private_key_3072"}}
+                            {{if .Return}}{{$arg.Name}} = wrap.NewRSAPrivateKey_3072(){{end}}
+                        {{else if eq $arg.CType "rsa_public_key_3072"}}
+                            {{if .Return}}{{$arg.Name}} = wrap.NewRSAPublicKey_3072(){{end}}
+                        {{else if eq $arg.CType "rsa_private_key_4096"}}
+                            {{if .Return}}{{$arg.Name}} = wrap.NewRSAPrivateKey_4096(){{end}}
+                        {{else if eq $arg.CType "rsa_public_key_4096"}}
+                            {{if .Return}}{{$arg.Name}} = wrap.NewRSAPublicKey_4096(){{end}}
+                        {{end}}
+                    {{end}}
+                {{else}}
+                    {{if eq .CType "octet"}}
+                        {{template "NewOctet" .}}
+                    {{end}}
+                {{end}}
+
+            {{end}}
+
+            {{if eq .CType "int"}}err = {{end}}wrap.{{.CName}}({{template "goWrappersCallArgs" .}})
+
+            {{- $trans := .ArgTrans}}
+            {{- range .Args}}
+                {{$arg := .}}
+                {{- with index $trans .Name}}
+                    {{- if .Return}}
+                        {{- if eq $arg.CType "octet"}}
+                            {{$arg.Name}}{{if .Receive}}Result{{end}} = {{$arg.Name}}Oct.ToBytes()
+                        {{- end}}
+                    {{- end}}
+                {{- end}}
+            {{- end}}
+            return
+        }
+    {{end}}
+
+{{end}}
+
+
+{{/* Go Wrapper Name */}}
+{{- define "goWrapperName" -}}
+    {{if .GoName}}{{.GoName}}{{else}}{{.CName}}{{end}}
+{{- end -}}
+
+
+{{/* Return type */}}
+{{- define "returnType" -}}
+
+    (
+    {{- $func := .}}
+    {{- range .Args -}}
+        {{$arg := .}}
+        {{- with index $func.ArgTrans .Name -}}
+            {{- if .Return -}}
+                {{- $arg.Name}}{{if .Receive}}Result{{end}}{{" "}}
+                {{- if eq $arg.CType "octet"}}[]byte,
+                {{- else if eq $arg.CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096"}}wrap.RSAPrivateKey,
+                {{- else if eq $arg.CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096"}}wrap.RSAPublicKey,
+                {{- end}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if eq .CType "int" -}}err error {{- end -}}
+    )
+
+{{- end -}}
+
+
+{{/* List of input arguments */}}
+{{- define "goWrappersArgs" -}}
+
+    {{- $func := . -}}
+    {{- range .Args -}}
+
+        {{- $arg := . -}}
+        {{- with index $func.ArgTrans .Name -}}
+            {{- if .OctetMake -}}
+                {{- if eq .OctetSize "" -}}
+                    {{$arg.Name}}Size int,
+                {{- end -}}
+            {{- else if .Return -}}
+                {{- if .Receive -}}
+                    {{/* TODO: Support all types */}}
+                    {{- $arg.Name}} []byte
+                {{- end -}}
+            {{- else -}}
+                {{$arg.Name}}{{" "}}
+
+                {{- if eq $arg.CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096" -}}wrap.RSAPrivateKey,
+                {{- else if eq $arg.CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096" -}}wrap.RSAPublicKey,
+                {{- else if eq $arg.CType "sign32"}}int32,
+                {{- else if eq $arg.CType "octet" -}}[]byte,
+                {{- else -}}
+                    {{if $arg.Ref}}*{{end}}
+
+                    {{- if eq $arg.CType "csprng" -}}wrap.Rand,
+                    {{- else -}}{{$arg.CType}},
+                    {{- end -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+
+{{- end -}}
+
+
+{{/* List of arguments to call the wrapped function */}}
+{{- define "goWrappersCallArgs" -}}
+
+    {{- range .Args -}}
+        {{- if eq .CType "octet" -}}
+            {{.Name}}Oct,
+        {{- else -}}
+            {{.Name}},
+        {{- end -}}
+    {{- end -}}
+
+{{- end -}}
+
+
+{{/* Define new Octet */}}
+{{define "NewOctet"}}
+    {{.Name}}Oct := wrap.NewOctet({{.Name}})
+    defer {{.Name}}Oct.Free()
+{{end}}
+
+
+{{/* Make new Octet */}}
+{{define "MakeOctet"}}
+    {{.Name}}Oct := wrap.MakeOctet({{.Name}}Size)
+    defer {{.Name}}Oct.Free()
+{{end}}

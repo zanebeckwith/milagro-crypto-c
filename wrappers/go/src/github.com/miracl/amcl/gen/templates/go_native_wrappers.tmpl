@@ -1,17 +1,28 @@
 {{/* This template is used to generate go wrappers with wrapped C types - Octet, Rand, etc.*/}}
 {{define "goNativeWrappers"}}
 
-{{range .}}
-// {{.CName}} is a go wrapper for C.{{.CName}}
-func {{.CName}}(
+    {{range .}}
+        // {{.CName}} is a go wrapper for C.{{.CName}}
+        func {{.CName}}({{template "cWrapperArgs" .}}) {{if eq .CType "int"}}error {{end}}{
+            {{if eq .CType "int"}}code := {{end}}C.{{.CName}}({{template "cWrappersCallArgs" .}})
+            {{if eq .CType "int"}}return newError(code){{end -}}
+        }
+    {{end}}
+
+{{end}}
+
+
+{{/* List of input arguments */}}
+{{define "cWrapperArgs"}}
+
     {{- range .Args -}}
         {{.Name}}{{ " " }}
 
         {{- if eq .CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096" -}}RSAPrivateKey,
         {{- else if eq .CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096" -}}RSAPublicKey,
-        {{- else if eq .CType "sign32"}}int32,
+        {{- else if eq .CType "sign32" -}}int32,
         {{- else -}}
-            {{if .Ref}}*{{end}}
+            {{- if .Ref -}}*{{- end -}}
 
             {{- if eq .CType "octet" -}}Octet,
             {{- else if eq .CType "csprng" -}}Rand,
@@ -19,20 +30,21 @@ func {{.CName}}(
             {{- end -}}
         {{- end -}}
     {{- end -}}
-) {{if eq .CType "int"}}error {{end}}{
-    {{if eq .CType "int"}}code := {{end}}C.{{.CName}}(
-        {{- range .Args -}}
-            {{- if eq .CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
-            {{- else if eq .CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
-            {{- else if .Ref -}}
-                (*C.{{.CType}})({{.Name}}),
-            {{- else -}}
-                C.{{.CType}}({{.Name}}),
-            {{- end -}}
-        {{- end -}}
-    )
-    {{if eq .CType "int"}}return newError(code){{end -}}
-}
+
 {{end}}
+
+
+{{/* List of arguments to call the wrapped function */}}
+{{define "cWrappersCallArgs"}}
+
+    {{- range .Args -}}
+        {{- if eq .CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
+        {{- else if eq .CType "rsa_public_key_2048" "rsa_public_key_3072" "rsa_public_key_4096" -}}{{.Name}}.(*C.{{.CType}}),
+        {{- else if .Ref -}}
+            (*C.{{.CType}})({{.Name}}),
+        {{- else -}}
+            C.{{.CType}}({{.Name}}),
+        {{- end -}}
+    {{- end -}}
 
 {{end}}
