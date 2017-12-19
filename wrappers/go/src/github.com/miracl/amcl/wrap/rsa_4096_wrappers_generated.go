@@ -19,9 +19,24 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_rsa_4096
 // #include "rsa_4096.h"
 // #include "rsa_support.h"
 import "C"
+
+const (
+	RFS_4096               = int(C.RFS_4096)           // RFS_4096 is the RSA Public Key Size in bytes
+	FFLEN_4096             = int(C.FFLEN_4096)         // FFLEN_4096 consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+	HASH_TYPE_RSA_4096 int = int(C.HASH_TYPE_RSA_4096) // HASH_TYPE_RSA_4096 is the chosen Hash algorithm
+)
+
+func NewRSAPrivateKey_4096() RSAPrivateKey {
+	return &C.rsa_private_key_4096{}
+}
+
+func NewRSAPublicKey_4096() RSAPublicKey {
+	return &C.rsa_public_key_4096{}
+}
 
 // RSA_4096_DECRYPT is a go wrapper for C.RSA_4096_DECRYPT
 func RSA_4096_DECRYPT(priv RSAPrivateKey, G *Octet, F *Octet) {

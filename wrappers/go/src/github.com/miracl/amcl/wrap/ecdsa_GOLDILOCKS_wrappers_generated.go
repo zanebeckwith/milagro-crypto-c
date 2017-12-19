@@ -19,11 +19,17 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_GOLDILOCKS
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include "amcl.h"
 // #include "ecdh_GOLDILOCKS.h"
 import "C"
+
+const (
+	EFS_GOLDILOCKS = int(C.EFS_GOLDILOCKS) // EFS is the ECC Field Size in bytes
+	EGS_GOLDILOCKS = int(C.EGS_GOLDILOCKS) // EGS is the ECC Group Size in bytes
+)
 
 // ECP_GOLDILOCKS_KEY_PAIR_GENERATE is a go wrapper for C.ECP_GOLDILOCKS_KEY_PAIR_GENERATE
 func ECP_GOLDILOCKS_KEY_PAIR_GENERATE(R *Rand, s *Octet, W *Octet) error {

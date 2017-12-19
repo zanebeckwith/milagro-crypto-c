@@ -19,11 +19,21 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_BN254CX -lamcl_mpin_BN254CX -lamcl_pairing_BN254CX
 // #include "amcl.h"
 // #include "mpin_BN254CX.h"
 // #include "randapi.h"
 // #include "utils.h"
 import "C"
+
+const (
+	PAS_BN254CX = int(C.MPIN_PAS)
+	PGS_BN254CX = int(C.MPIN_PGS_BN254CX)
+	PFS_BN254CX = int(C.MPIN_PFS_BN254CX)
+	G1S_BN254CX = 2*PFS_BN254CX + 1
+	G2S_BN254CX = 4 * PFS_BN254CX
+	GTS_BN254CX = 12 * PFS_BN254CX
+)
 
 // MPIN_BN254CX_CLIENT_1 is a go wrapper for C.MPIN_BN254CX_CLIENT_1
 func MPIN_BN254CX_CLIENT_1(h int, d int, ID *Octet, R *Rand, x *Octet, pin int, T *Octet, S *Octet, U *Octet, UT *Octet, TP *Octet) error {

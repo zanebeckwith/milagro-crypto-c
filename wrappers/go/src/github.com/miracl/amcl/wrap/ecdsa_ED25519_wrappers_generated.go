@@ -19,11 +19,17 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_ED25519
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include "amcl.h"
 // #include "ecdh_ED25519.h"
 import "C"
+
+const (
+	EFS_ED25519 = int(C.EFS_ED25519) // EFS is the ECC Field Size in bytes
+	EGS_ED25519 = int(C.EGS_ED25519) // EGS is the ECC Group Size in bytes
+)
 
 // ECP_ED25519_KEY_PAIR_GENERATE is a go wrapper for C.ECP_ED25519_KEY_PAIR_GENERATE
 func ECP_ED25519_KEY_PAIR_GENERATE(R *Rand, s *Octet, W *Octet) error {

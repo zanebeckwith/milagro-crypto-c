@@ -19,10 +19,20 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_{{.Suffix}} -lamcl_mpin_{{.Suffix}} -lamcl_pairing_{{.Suffix}}
 // #include "amcl.h"
 // #include "mpin_{{.Suffix}}.h"
 // #include "randapi.h"
 // #include "utils.h"
 import "C"
+
+const (
+	PAS_{{.Suffix}} = int(C.MPIN_PAS)
+	PGS_{{.Suffix}} = int(C.MPIN_PGS_{{.Suffix}})
+	PFS_{{.Suffix}} = int(C.MPIN_PFS_{{.Suffix}})
+	G1S_{{.Suffix}} = 2*PFS_{{.Suffix}} + 1
+	G2S_{{.Suffix}} = 4 * PFS_{{.Suffix}}
+	GTS_{{.Suffix}} = 12 * PFS_{{.Suffix}}
+)
 
 {{template "goNativeWrappers" .Funcs}}

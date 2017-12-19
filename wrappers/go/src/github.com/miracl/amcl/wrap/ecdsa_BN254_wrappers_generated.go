@@ -19,11 +19,17 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_BN254
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include "amcl.h"
 // #include "ecdh_BN254.h"
 import "C"
+
+const (
+	EFS_BN254 = int(C.EFS_BN254) // EFS is the ECC Field Size in bytes
+	EGS_BN254 = int(C.EGS_BN254) // EGS is the ECC Group Size in bytes
+)
 
 // ECP_BN254_KEY_PAIR_GENERATE is a go wrapper for C.ECP_BN254_KEY_PAIR_GENERATE
 func ECP_BN254_KEY_PAIR_GENERATE(R *Rand, s *Octet, W *Octet) error {

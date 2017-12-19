@@ -19,9 +19,24 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_rsa_3072
 // #include "rsa_3072.h"
 // #include "rsa_support.h"
 import "C"
+
+const (
+	RFS_3072               = int(C.RFS_3072)           // RFS_3072 is the RSA Public Key Size in bytes
+	FFLEN_3072             = int(C.FFLEN_3072)         // FFLEN_3072 consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+	HASH_TYPE_RSA_3072 int = int(C.HASH_TYPE_RSA_3072) // HASH_TYPE_RSA_3072 is the chosen Hash algorithm
+)
+
+func NewRSAPrivateKey_3072() RSAPrivateKey {
+	return &C.rsa_private_key_3072{}
+}
+
+func NewRSAPublicKey_3072() RSAPublicKey {
+	return &C.rsa_public_key_3072{}
+}
 
 // RSA_3072_DECRYPT is a go wrapper for C.RSA_3072_DECRYPT
 func RSA_3072_DECRYPT(priv RSAPrivateKey, G *Octet, F *Octet) {

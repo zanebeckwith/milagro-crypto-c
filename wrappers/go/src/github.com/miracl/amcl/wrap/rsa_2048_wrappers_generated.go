@@ -19,9 +19,24 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_rsa_2048
 // #include "rsa_2048.h"
 // #include "rsa_support.h"
 import "C"
+
+const (
+	RFS_2048               = int(C.RFS_2048)           // RFS_2048 is the RSA Public Key Size in bytes
+	FFLEN_2048             = int(C.FFLEN_2048)         // FFLEN_2048 consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+	HASH_TYPE_RSA_2048 int = int(C.HASH_TYPE_RSA_2048) // HASH_TYPE_RSA_2048 is the chosen Hash algorithm
+)
+
+func NewRSAPrivateKey_2048() RSAPrivateKey {
+	return &C.rsa_private_key_2048{}
+}
+
+func NewRSAPublicKey_2048() RSAPublicKey {
+	return &C.rsa_public_key_2048{}
+}
 
 // RSA_2048_DECRYPT is a go wrapper for C.RSA_2048_DECRYPT
 func RSA_2048_DECRYPT(priv RSAPrivateKey, G *Octet, F *Octet) {

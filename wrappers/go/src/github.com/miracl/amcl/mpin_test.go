@@ -32,21 +32,21 @@ var mPinTestCases = []struct {
 	PFS                    int
 	G1S                    int
 	PGS                    int
-	rng                    func(RNG *wrap.Rand) ([]byte, error)
-	getDVSKeyPair          func(RNG *wrap.Rand, z []byte) ([]byte, []byte, error)
-	getServerSecret        func(masterSecret []byte) ([]byte, error)
-	recombineServerSecret  func(W1 []byte, W2 []byte) ([]byte, error)
-	getClientSecret        func(masterSecret []byte, hashMPinId []byte) ([]byte, error)
-	recombineClientSecret  func(R1 []byte, R2 []byte) ([]byte, error)
-	getKeyEscrowLessSecret func(RNG *wrap.Rand, typ int, x []byte, G []byte) ([]byte, []byte, error)
-	extractPin             func(hashType int, mpinId []byte, PIN int, clientSecret []byte) ([]byte, error)
-	client                 func(hashType, epochDate int, mpinId []byte, RNG *wrap.Rand, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) ([]byte, []byte, []byte, []byte, []byte, error)
-	server                 func(hashType, epochDate int, serverSecret, U, UT, V, mpinId, publicKey []byte, epochTime int, message []byte) (HID, HTID, y []byte, err error)
-	clientPass1            func(hashType, epochDate int, mpinId []byte, RNG *wrap.Rand, x []byte, PIN int, token []byte, timePermit []byte) (xOut, SEC, U, UT []byte, err error)
-	serverPass1            func(hashType, epochDate int, mpinId []byte) (HID, HTID []byte)
-	clientPass2            func(x []byte, y []byte, SEC []byte) ([]byte, error)
-	serverPass2            func(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte) error
-	getClientPermit        func(hashType, epochDate int, masterSecret, hashMPinId []byte) ([]byte, error)
+	rng                    func(R *wrap.Rand) (S []byte, err error)
+	getDVSKeyPair          func(R *wrap.Rand, Z []byte) (ZResult []byte, Pa []byte, err error)
+	getServerSecret        func(S []byte) (SS []byte, err error)
+	recombineServerSecret  func(P1 []byte, P2 []byte) (P []byte, err error)
+	getClientSecret        func(S []byte, ID []byte) (CS []byte, err error)
+	recombineClientSecret  func(Q1 []byte, Q2 []byte) (Q []byte, err error)
+	getKeyEscrowLessSecret func(R *wrap.Rand, t int, x []byte, G []byte) (xResult []byte, W []byte, err error)
+	extractPin             func(h int, ID []byte, pin int, CS []byte) (CSResult []byte, err error)
+	client                 func(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin int, T []byte, TP []byte, MESSAGE []byte, t int) (xResult []byte, V []byte, U []byte, UT []byte, y []byte, err error)
+	server                 func(h int, d int, SS []byte, U []byte, UT []byte, V []byte, ID []byte, MESSAGE []byte, t int, Pa []byte) (HID []byte, HTID []byte, y []byte, err error)
+	clientPass1            func(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin int, T []byte, TP []byte) (xResult []byte, S []byte, U []byte, UT []byte, err error)
+	serverPass1            func(h int, d int, ID []byte) (HID []byte, HTID []byte)
+	clientPass2            func(x []byte, y []byte, V []byte) (VResult []byte, err error)
+	serverPass2            func(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, Pa []byte) (err error)
+	getClientPermit        func(h int, d int, S []byte, ID []byte) (TP []byte, err error)
 }{
 	{
 		curve:                  "BLS383",
@@ -1148,7 +1148,7 @@ func ExampleMPinFull() {
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	MS1, err := wrap.RandomGenerate_BN254(rng)
+	MS1, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating master secret share 1: %v", err)
 	}
@@ -1329,18 +1329,18 @@ func ExampleMPinFull() {
 	// Destroy HM
 	defer CleanMemory(HM[:])
 
-	rtn, AES_KEY_SERVER := wrap.ServerKey_BN254(wrap.HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], nil)
-	if rtn != 0 {
-		log.Fatalf("error generating AES server key: %v", rtn)
+	AES_KEY_SERVER, err := ServerKey_BN254(wrap.HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], nil)
+	if err != nil {
+		log.Fatalf("error generating AES server key: %v", err)
 	}
 	fmt.Printf("server AES Key =  %x\n", AES_KEY_SERVER[:])
 
 	// Destroy AES_KEY_SERVER
 	defer CleanMemory(AES_KEY_SERVER[:])
 
-	rtn, AES_KEY_CLIENT := wrap.ClientKey_BN254(wrap.HASH_TYPE_MPIN, PIN, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
-	if rtn != 0 {
-		log.Fatalf("error generating AES client key: %v", rtn)
+	AES_KEY_CLIENT, err := ClientKey_BN254(wrap.HASH_TYPE_MPIN, G1[:], G2[:], PIN, ROut[:], XOut[:], HM[:], T[:])
+	if err != nil {
+		log.Fatalf("error generating AES client key: %v", err)
 	}
 	fmt.Printf("client AES key =  0x%x\n", AES_KEY_CLIENT[:])
 

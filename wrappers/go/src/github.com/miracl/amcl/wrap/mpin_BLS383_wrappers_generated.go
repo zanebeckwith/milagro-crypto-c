@@ -19,11 +19,21 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_BLS383 -lamcl_mpin_BLS383 -lamcl_pairing_BLS383
 // #include "amcl.h"
 // #include "mpin_BLS383.h"
 // #include "randapi.h"
 // #include "utils.h"
 import "C"
+
+const (
+	PAS_BLS383 = int(C.MPIN_PAS)
+	PGS_BLS383 = int(C.MPIN_PGS_BLS383)
+	PFS_BLS383 = int(C.MPIN_PFS_BLS383)
+	G1S_BLS383 = 2*PFS_BLS383 + 1
+	G2S_BLS383 = 4 * PFS_BLS383
+	GTS_BLS383 = 12 * PFS_BLS383
+)
 
 // MPIN_BLS383_CLIENT_1 is a go wrapper for C.MPIN_BLS383_CLIENT_1
 func MPIN_BLS383_CLIENT_1(h int, d int, ID *Octet, R *Rand, x *Octet, pin int, T *Octet, S *Octet, U *Octet, UT *Octet, TP *Octet) error {

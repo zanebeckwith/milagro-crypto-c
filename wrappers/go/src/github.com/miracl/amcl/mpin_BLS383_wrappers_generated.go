@@ -419,50 +419,6 @@ func Server2_BLS383(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byt
 	return
 }
 
-// Server2_BLS383_Kangaroo is a wrapper of wrap.MPIN_BLS383_SERVER_2
-func Server2_BLS383_Kangaroo(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, Pa []byte) (E []byte, F []byte, err error) {
-
-	HIDOct := wrap.NewOctet(HID)
-	defer HIDOct.Free()
-
-	HTIDOct := wrap.NewOctet(HTID)
-	defer HTIDOct.Free()
-
-	yOct := wrap.NewOctet(y)
-	defer yOct.Free()
-
-	SSOct := wrap.NewOctet(SS)
-	defer SSOct.Free()
-
-	UOct := wrap.NewOctet(U)
-	defer UOct.Free()
-
-	UTOct := wrap.NewOctet(UT)
-	defer UTOct.Free()
-
-	VOct := wrap.NewOctet(V)
-	defer VOct.Free()
-
-	ESize := wrap.GTS_BLS383
-	EOct := wrap.MakeOctet(ESize)
-	defer EOct.Free()
-
-	FSize := wrap.GTS_BLS383
-	FOct := wrap.MakeOctet(FSize)
-	defer FOct.Free()
-
-	PaOct := wrap.NewOctet(Pa)
-	defer PaOct.Free()
-
-	err = wrap.MPIN_BLS383_SERVER_2(d, HIDOct, HTIDOct, yOct, SSOct, UOct, UTOct, VOct, EOct, FOct, PaOct)
-
-	E = EOct.ToBytes()
-
-	F = FOct.ToBytes()
-
-	return
-}
-
 // ServerKey_BLS383 is a wrapper of wrap.MPIN_BLS383_SERVER_KEY
 func ServerKey_BLS383(h int, Z []byte, SS []byte, w []byte, p []byte, I []byte, U []byte, UT []byte) (K []byte, err error) {
 
@@ -540,65 +496,6 @@ func Server_BLS383(h int, d int, SS []byte, U []byte, UT []byte, V []byte, ID []
 	HTID = HTIDOct.ToBytes()
 
 	y = yOct.ToBytes()
-
-	return
-}
-
-// Server_BLS383_Kangaroo is a wrapper of wrap.MPIN_BLS383_SERVER
-func Server_BLS383_Kangaroo(h int, d int, SS []byte, U []byte, UT []byte, V []byte, ID []byte, MESSAGE []byte, t int, Pa []byte) (HID []byte, HTID []byte, y []byte, E []byte, F []byte, err error) {
-
-	HIDSize := wrap.G1S_BLS383
-	HIDOct := wrap.MakeOctet(HIDSize)
-	defer HIDOct.Free()
-
-	HTIDSize := wrap.G1S_BLS383
-	HTIDOct := wrap.MakeOctet(HTIDSize)
-	defer HTIDOct.Free()
-
-	ySize := wrap.PGS_BLS383
-	yOct := wrap.MakeOctet(ySize)
-	defer yOct.Free()
-
-	SSOct := wrap.NewOctet(SS)
-	defer SSOct.Free()
-
-	UOct := wrap.NewOctet(U)
-	defer UOct.Free()
-
-	UTOct := wrap.NewOctet(UT)
-	defer UTOct.Free()
-
-	VOct := wrap.NewOctet(V)
-	defer VOct.Free()
-
-	ESize := wrap.GTS_BLS383
-	EOct := wrap.MakeOctet(ESize)
-	defer EOct.Free()
-
-	FSize := wrap.GTS_BLS383
-	FOct := wrap.MakeOctet(FSize)
-	defer FOct.Free()
-
-	IDOct := wrap.NewOctet(ID)
-	defer IDOct.Free()
-
-	MESSAGEOct := wrap.NewOctet(MESSAGE)
-	defer MESSAGEOct.Free()
-
-	PaOct := wrap.NewOctet(Pa)
-	defer PaOct.Free()
-
-	err = wrap.MPIN_BLS383_SERVER(h, d, HIDOct, HTIDOct, yOct, SSOct, UOct, UTOct, VOct, EOct, FOct, IDOct, MESSAGEOct, t, PaOct)
-
-	HID = HIDOct.ToBytes()
-
-	HTID = HTIDOct.ToBytes()
-
-	y = yOct.ToBytes()
-
-	E = EOct.ToBytes()
-
-	F = FOct.ToBytes()
 
 	return
 }

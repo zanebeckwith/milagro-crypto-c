@@ -92,6 +92,51 @@ var (
 
 	// AMCL Functions
 
+	allCurves       = []string{"BLS383", "BN254", "BN254CX", "ED25519", "GOLDILOCKS", "NIST256"}
+	ecdsaCurveFuncs = []funcCtx{
+		{
+			c:      "int ECP_{{.curve}}_KEY_PAIR_GENERATE(csprng* R, octet* s, octet* W)",
+			GoName: "ECPKeyPairGenerate_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"s": {
+					OctetMake: true,
+					OctetSize: "wrap.EGS_{{.curve}}",
+					Return:    true,
+					Receive:   true,
+				},
+				"W": {
+					OctetMake: true,
+					OctetSize: "2*wrap.EFS_{{.curve}}+1",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int ECP_{{.curve}}_PUBLIC_KEY_VALIDATE(octet* W)",
+			GoName: "ECPPublicKeyValidate_{{.curve}}",
+		},
+		{
+			c:      "int ECP_{{.curve}}_SP_DSA(int h, csprng* R, octet* k, octet* s, octet* M, octet* c, octet* d)",
+			GoName: "ECPSpDsa_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"c": {
+					OctetMake: true,
+					OctetSize: "wrap.EGS_{{.curve}}",
+					Return:    true,
+				},
+				"d": {
+					OctetMake: true,
+					OctetSize: "wrap.EGS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int ECP_{{.curve}}_VP_DSA(int h, octet* W, octet* M, octet* c, octet* d)",
+			GoName: "ECPVpDsa_{{.curve}}",
+		},
+	}
+
 	mPinCurves        = []string{"BLS383", "BN254", "BN254CX"}
 	mPinPerCurveFuncs = []funcCtx{
 		{
@@ -313,22 +358,6 @@ var (
 			},
 		},
 		{
-			c:      "int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)",
-			GoName: "Server2_{{.curve}}_Kangaroo",
-			ArgTrans: map[string]trans{
-				"E": {
-					OctetMake: true,
-					OctetSize: "wrap.GTS_{{.curve}}",
-					Return:    true,
-				},
-				"F": {
-					OctetMake: true,
-					OctetSize: "wrap.GTS_{{.curve}}",
-					Return:    true,
-				},
-			},
-		},
-		{
 			c:      "int MPIN_{{.curve}}_SERVER_KEY(int h, octet* Z, octet* SS, octet* w, octet* p, octet* I, octet* U, octet* UT, octet* K)",
 			GoName: "ServerKey_{{.curve}}",
 			ArgTrans: map[string]trans{
@@ -368,6 +397,40 @@ var (
 			},
 		},
 		{
+			c:      "void MPIN_{{.curve}}_SERVER_1(int h, int d, octet* ID, octet* HID, octet* HTID)",
+			GoName: "Server1_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"HID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"HTID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+	}
+	mPinPerCurveKangarooFuncs = []funcCtx{
+		{
+			c:      "int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)",
+			GoName: "Server2_{{.curve}}_Kangaroo",
+			ArgTrans: map[string]trans{
+				"E": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+				"F": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
 			c:      "int MPIN_{{.curve}}_SERVER(int h, int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* ID, octet* MESSAGE, int t, octet* Pa)",
 			GoName: "Server_{{.curve}}_Kangaroo",
 			ArgTrans: map[string]trans{
@@ -394,22 +457,6 @@ var (
 				"F": {
 					OctetMake: true,
 					OctetSize: "wrap.GTS_{{.curve}}",
-					Return:    true,
-				},
-			},
-		},
-		{
-			c:      "void MPIN_{{.curve}}_SERVER_1(int h, int d, octet* ID, octet* HID, octet* HTID)",
-			GoName: "Server1_{{.curve}}",
-			ArgTrans: map[string]trans{
-				"HID": {
-					OctetMake: true,
-					OctetSize: "wrap.G1S_{{.curve}}",
-					Return:    true,
-				},
-				"HTID": {
-					OctetMake: true,
-					OctetSize: "wrap.G1S_{{.curve}}",
 					Return:    true,
 				},
 			},
@@ -459,8 +506,14 @@ var (
 	}
 
 	funcSets = map[string]func() map[string][]funcCtx{
+		"ecdsa": func() map[string][]funcCtx {
+			return genPerCurveFuncs(ecdsaCurveFuncs, allCurves)
+		},
 		"mpin": func() map[string][]funcCtx {
-			return genMPinFuncs(mPinPerCurveFuncs, mPinCurves)
+			return genPerCurveFuncs(mPinPerCurveFuncs, mPinCurves)
+		},
+		"mpin_kangaroo": func() map[string][]funcCtx {
+			return genPerCurveFuncs(mPinPerCurveKangarooFuncs, mPinCurves)
 		},
 		"pbc": func() map[string][]funcCtx {
 			return map[string][]funcCtx{
@@ -534,7 +587,7 @@ func main() {
 	// Get the selected set of function
 	getFuncs, ok := funcSets[fSetName]
 	if !ok {
-		log.Fatal("invalid function set", fSetName)
+		log.Fatalf("invalid function set '%v'", fSetName)
 	}
 	funcs := getFuncs()
 
@@ -571,7 +624,7 @@ func main() {
 	}
 }
 
-func genMPinFuncs(funcs []funcCtx, curves []string) map[string][]funcCtx {
+func genPerCurveFuncs(funcs []funcCtx, curves []string) map[string][]funcCtx {
 	rFuncs := map[string][]funcCtx{}
 
 	for _, c := range curves {

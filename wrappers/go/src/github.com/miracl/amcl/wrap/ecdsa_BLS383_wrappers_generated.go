@@ -19,11 +19,17 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_BLS383
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include "amcl.h"
 // #include "ecdh_BLS383.h"
 import "C"
+
+const (
+	EFS_BLS383 = int(C.EFS_BLS383) // EFS is the ECC Field Size in bytes
+	EGS_BLS383 = int(C.EGS_BLS383) // EGS is the ECC Group Size in bytes
+)
 
 // ECP_BLS383_KEY_PAIR_GENERATE is a go wrapper for C.ECP_BLS383_KEY_PAIR_GENERATE
 func ECP_BLS383_KEY_PAIR_GENERATE(R *Rand, s *Octet, W *Octet) error {

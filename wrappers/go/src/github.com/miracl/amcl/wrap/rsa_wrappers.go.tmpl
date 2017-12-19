@@ -19,8 +19,26 @@
 
 package wrap
 
-{{if ne .Suffix ""}}// #include "rsa_{{.Suffix}}.h"{{end}}
+{{if ne .Suffix ""}}
+// #cgo LDFLAGS: -lamcl_rsa_{{.Suffix}}
+// #include "rsa_{{.Suffix}}.h"{{end}}
 // #include "rsa_support.h"
 import "C"
+
+{{if ne .Suffix ""}}
+const (
+    RFS_{{.Suffix}} = int(C.RFS_{{.Suffix}}) // RFS_{{.Suffix}} is the RSA Public Key Size in bytes
+    FFLEN_{{.Suffix}} = int(C.FFLEN_{{.Suffix}}) // FFLEN_{{.Suffix}} consists in 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256
+    HASH_TYPE_RSA_{{.Suffix}} int = int(C.HASH_TYPE_RSA_{{.Suffix}}) // HASH_TYPE_RSA_{{.Suffix}} is the chosen Hash algorithm
+)
+
+func NewRSAPrivateKey_{{.Suffix}}() RSAPrivateKey {
+	return &C.rsa_private_key_{{.Suffix}}{}
+}
+
+func NewRSAPublicKey_{{.Suffix}}() RSAPublicKey {
+	return &C.rsa_public_key_{{.Suffix}}{}
+}
+{{end}}
 
 {{template "goNativeWrappers" .Funcs}}

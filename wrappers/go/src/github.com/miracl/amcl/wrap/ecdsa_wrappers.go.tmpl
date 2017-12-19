@@ -19,10 +19,16 @@
 
 package wrap
 
+// #cgo LDFLAGS: -lamcl_curve_{{.Suffix}}
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include "amcl.h"
 // #include "ecdh_{{.Suffix}}.h"
 import "C"
+
+const (
+    EFS_{{.Suffix}} = int(C.EFS_{{.Suffix}}) // EFS is the ECC Field Size in bytes
+    EGS_{{.Suffix}} = int(C.EGS_{{.Suffix}}) // EGS is the ECC Group Size in bytes
+)
 
 {{template "goNativeWrappers" .Funcs}}
