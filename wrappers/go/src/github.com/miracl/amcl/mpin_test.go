@@ -41,11 +41,11 @@ var mPinTestCases = []struct {
 	getKeyEscrowLessSecret func(RNG *wrap.Rand, typ int, x []byte, G []byte) ([]byte, []byte, error)
 	extractPin             func(hashType int, mpinId []byte, PIN int, clientSecret []byte) ([]byte, error)
 	client                 func(hashType, epochDate int, mpinId []byte, RNG *wrap.Rand, x []byte, PIN int, token []byte, timePermit []byte, message []byte, epochTime int) ([]byte, []byte, []byte, []byte, []byte, error)
-	server                 func(hashType, epochDate, epochTime int, serverSecret, U, UT, V, mpinId, publicKey, message []byte, Kangaroo bool) (errorCode int, HID, HTID, y, E, F []byte)
+	server                 func(hashType, epochDate int, serverSecret, U, UT, V, mpinId, publicKey []byte, epochTime int, message []byte) (HID, HTID, y []byte, err error)
 	clientPass1            func(hashType, epochDate int, mpinId []byte, RNG *wrap.Rand, x []byte, PIN int, token []byte, timePermit []byte) (xOut, SEC, U, UT []byte, err error)
 	serverPass1            func(hashType, epochDate int, mpinId []byte) (HID, HTID []byte)
 	clientPass2            func(x []byte, y []byte, SEC []byte) ([]byte, error)
-	serverPass2            func(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte, Kangaroo bool) (errorCode int, E []byte, F []byte)
+	serverPass2            func(epochDate int, HID []byte, HTID []byte, publicKey []byte, y []byte, serverSecret []byte, U []byte, UT []byte, V []byte) error
 	getClientPermit        func(hashType, epochDate int, masterSecret, hashMPinId []byte) ([]byte, error)
 }{
 	{
@@ -62,11 +62,11 @@ var mPinTestCases = []struct {
 		getKeyEscrowLessSecret: GetG1Multiple_BLS383,
 		extractPin:             ExtractPIN_BLS383,
 		client:                 Client_BLS383,
-		server:                 wrap.Server_BLS383,
+		server:                 Server_BLS383,
 		clientPass1:            Client1_BLS383,
 		serverPass1:            Server1_BLS383,
 		clientPass2:            Client2_BLS383,
-		serverPass2:            wrap.Server2_BLS383,
+		serverPass2:            Server2_BLS383,
 		getClientPermit:        GetClientPermit_BLS383,
 	},
 	{
@@ -83,11 +83,11 @@ var mPinTestCases = []struct {
 		getKeyEscrowLessSecret: GetG1Multiple_BN254,
 		extractPin:             ExtractPIN_BN254,
 		client:                 Client_BN254,
-		server:                 wrap.Server_BN254,
+		server:                 Server_BN254,
 		clientPass1:            Client1_BN254,
 		serverPass1:            Server1_BN254,
 		clientPass2:            Client2_BN254,
-		serverPass2:            wrap.Server2_BN254,
+		serverPass2:            Server2_BN254,
 		getClientPermit:        GetClientPermit_BN254,
 	},
 	{
@@ -104,11 +104,11 @@ var mPinTestCases = []struct {
 		getKeyEscrowLessSecret: GetG1Multiple_BN254CX,
 		extractPin:             ExtractPIN_BN254CX,
 		client:                 Client_BN254CX,
-		server:                 wrap.Server_BN254CX,
+		server:                 Server_BN254CX,
 		clientPass1:            Client1_BN254CX,
 		serverPass1:            Server1_BN254CX,
 		clientPass2:            Client2_BN254CX,
-		serverPass2:            wrap.Server2_BN254CX,
+		serverPass2:            Server2_BN254CX,
 		getClientPermit:        GetClientPermit_BN254CX,
 	},
 }
@@ -218,9 +218,9 @@ func TestKeyEscrowLess(t *testing.T) {
 			// Destroy X
 			defer CleanMemory(X[:])
 
-			rtn, _, _, _, _, _ := tc.server(wrap.HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
-			if rtn != 0 {
-				t.Errorf("One-Pass failed; rtn=%v", rtn)
+			_, _, _, err = tc.server(wrap.HASH_TYPE_MPIN, date, SS[:], U[:], nil, V[:], ID[:], nil, timeValue, Pa)
+			if err != nil {
+				t.Errorf("One-Pass failed; rtn=%v", err)
 			}
 		})
 	}
@@ -332,9 +332,9 @@ func TestKeyEscrowLessRandom(t *testing.T) {
 			defer CleanMemory(X[:])
 
 			// Authenticate
-			rtn, _, _, _, _, _ := tc.server(wrap.HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], Pa, nil, false)
-			if rtn != 0 {
-				t.Errorf("One-Pass failed; rtn=%v", rtn)
+			_, _, _, err = tc.server(wrap.HASH_TYPE_MPIN, date, SS[:], U[:], nil, V[:], ID[:], nil, timeValue, Pa)
+			if err != nil {
+				t.Errorf("One-Pass failed; rtn=%v", err)
 			}
 		})
 	}
@@ -466,9 +466,9 @@ func TestKeyEscrowWrongPK(t *testing.T) {
 			timeValue += 10
 			// Authenticate
 			expected := -19
-			rtn, _, _, _, _, _ := tc.server(wrap.HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], Pa, nil, false)
-			if rtn != expected {
-				t.Errorf("One-Pass - unexpected return code; rtn: %v != %v", rtn, expected)
+			_, _, _, err = tc.server(wrap.HASH_TYPE_MPIN, date, SS[:], U[:], UT[:], V[:], ID[:], nil, timeValue, Pa)
+			if !wrap.IsWrongPin(err) {
+				t.Errorf("One-Pass - unexpected return code; rtn: %v != %v", err, expected)
 			}
 		})
 	}
@@ -596,9 +596,9 @@ func TestKeyEscrowLessTwoPassWrongPK(t *testing.T) {
 			// Server Pass 2
 			// Send UT as V to model bad token
 			expected := -19
-			rtn, _, _ := tc.serverPass2(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
-			if rtn != expected {
-				t.Errorf("Server Pass 2 - unexpected return code; rtn: %v != %v", rtn, expected)
+			err = tc.serverPass2(0, HID[:], nil, Y[:], SS[:], U[:], nil, V[:], Pa)
+			if !wrap.IsWrongPin(err) {
+				t.Errorf("Server Pass 2 - unexpected return code; rtn: %v != %v", err, expected)
 			}
 		})
 	}
@@ -725,9 +725,9 @@ func TestKeyEscrowLessTwoPASS(t *testing.T) {
 
 			// Server Pass 2
 			// Send UT as V to model bad token
-			rtn, _, _ := tc.serverPass2(0, HID[:], nil, Pa, Y[:], SS[:], U[:], nil, V[:], false)
-			if rtn != 0 {
-				t.Errorf("Server Pass 2 failed; rtn=%v", rtn)
+			err = tc.serverPass2(0, HID[:], nil, Y[:], SS[:], U[:], nil, V[:], Pa)
+			if err != nil {
+				t.Errorf("Server Pass 2 failed; rtn=%v", err)
 			}
 		})
 	}
@@ -772,7 +772,7 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	MS2, err := wrap.RandomGenerate_BN254(rng)
+	MS2, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating master secret share 2: %v", err)
 	}
@@ -785,7 +785,7 @@ func ExampleMPinAuthentication() {
 	HCID := HashId(HASH_TYPE_MPIN, ID, wrap.PFS_BN254)
 
 	// Generate server secret share 1
-	SS1, err := wrap.GetServerSecret_BN254(MS1[:])
+	SS1, err := GetServerSecret_BN254(MS1[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 1: %v", err)
 	}
@@ -795,7 +795,7 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	SS2, err := wrap.GetServerSecret_BN254(MS2[:])
+	SS2, err := GetServerSecret_BN254(MS2[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 2: %v", err)
 	}
@@ -805,7 +805,7 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	SS, err := wrap.RecombineG2_BN254(SS1[:], SS2[:])
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
 	if err != nil {
 		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
@@ -836,7 +836,7 @@ func ExampleMPinAuthentication() {
 
 	// Combine client secret shares
 	CS := make([]byte, wrap.G1S_BN254)
-	CS, err = wrap.RecombineG1_BN254(CS1[:], CS2[:])
+	CS, err = RecombineG1_BN254(CS1[:], CS2[:])
 	if err != nil {
 		log.Fatalf("error recombining client secret shares: %v", err)
 	}
@@ -866,7 +866,7 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(TP2[:])
 
 	// Combine time permit shares
-	TP, err := wrap.RecombineG1_BN254(TP1[:], TP2[:])
+	TP, err := RecombineG1_BN254(TP1[:], TP2[:])
 	if err != nil {
 		log.Fatal("error recombining Time Permit shares: %v", err)
 	}
@@ -905,17 +905,17 @@ func ExampleMPinAuthentication() {
 	defer CleanMemory(X[:])
 
 	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := wrap.Server_BN254(wrap.HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], nil, MESSAGE[:], true)
-	if rtn != 0 {
+	HID, HTID, Y2, E, F, err := Server_BN254_Kangaroo(wrap.HASH_TYPE_MPIN, date, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:], timeValue, nil)
+	if err != nil {
 		// authentication failed
 
 		// check pin error
-		err := wrap.Kangaroo_BN254(E[:], F[:])
-		if err != 0 {
-			log.Printf("error getting the PIN error: %v", err)
+		errKangaroo := Kangaroo_BN254(E[:], F[:])
+		if errKangaroo != nil {
+			log.Printf("error getting the PIN error: %v", errKangaroo)
 		}
 
-		log.Fatalf("error server side MPin One Pass: %v", rtn)
+		log.Fatalf("error server side MPin One Pass: %v", err)
 	}
 	fmt.Printf("Y2: 0x%x\n", Y2[:])
 	fmt.Printf("HID: 0x%x\n", HID[:])
@@ -947,7 +947,7 @@ func ExampleMPinAuthentication() {
 	// V: 0x041aa6455c08c8324de05599b358538fd05ddbe9306c1d27c2d2e5e20a663839750eb244633ebaea6705b960ccbeb30dd68b0b58794df4a8229e349070a1ce6356
 	// Y2: 0x03170d0f29c7cc85e659fecb070536cd92811a2b5a0edd3abe64d3c822997e1c
 	// HID: 0x04144527fe508041db5eef90538f2547c4bd817d6dc94f67c7226585ec67706b0301a15ec8bff704176dab6371eae41ccc07a9c9b76e4be8162c56cb115e64024a
-	// HTID: 0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	// HTID: 0x
 	// authenticated ID: testUser@miracl.com
 
 }
@@ -989,7 +989,7 @@ func ExampleMPinAuthentications() {
 			MESSAGE := []byte("test sign message")
 
 			// Generate Master Secret Share 1
-			MS1, err := wrap.RandomGenerate_BN254(rng)
+			MS1, err := RandomGenerate_BN254(rng)
 			if err != nil {
 				log.Fatalf("error generating master secret share 1: %v", err)
 			}
@@ -997,7 +997,7 @@ func ExampleMPinAuthentications() {
 			defer CleanMemory(MS1[:])
 
 			// Generate Master Secret Share 2
-			MS2, err := wrap.RandomGenerate_BN254(rng)
+			MS2, err := RandomGenerate_BN254(rng)
 			if err != nil {
 				log.Fatalf("error generating master secret share 2: %v", err)
 			}
@@ -1008,7 +1008,7 @@ func ExampleMPinAuthentications() {
 			HCID := HashId(HASH_TYPE_MPIN, ID, wrap.PFS_BN254)
 
 			// Generate server secret share 1
-			SS1, err := wrap.GetServerSecret_BN254(MS1[:])
+			SS1, err := GetServerSecret_BN254(MS1[:])
 			if err != nil {
 				log.Fatalf("error generating server secret share 1: %v", err)
 			}
@@ -1016,7 +1016,7 @@ func ExampleMPinAuthentications() {
 			defer CleanMemory(SS1[:])
 
 			// Generate server secret share 2
-			SS2, err := wrap.GetServerSecret_BN254(MS2[:])
+			SS2, err := GetServerSecret_BN254(MS2[:])
 			if err != nil {
 				log.Fatalf("error generating server secret share 2: %v", err)
 			}
@@ -1024,7 +1024,7 @@ func ExampleMPinAuthentications() {
 			defer CleanMemory(SS2[:])
 
 			// Combine server secret shares
-			SS, err := wrap.RecombineG2_BN254(SS1[:], SS2[:])
+			SS, err := RecombineG2_BN254(SS1[:], SS2[:])
 			if err != nil {
 				log.Fatalf("error recombining server secret shares: %v", err)
 			}
@@ -1049,7 +1049,7 @@ func ExampleMPinAuthentications() {
 
 			// Combine client secret shares
 			CS := make([]byte, wrap.G1S_BN254)
-			CS, err = wrap.RecombineG1_BN254(CS1[:], CS2[:])
+			CS, err = RecombineG1_BN254(CS1[:], CS2[:])
 			if err != nil {
 				log.Fatalf("error recombining client secret shares: %v", err)
 			}
@@ -1073,7 +1073,7 @@ func ExampleMPinAuthentications() {
 			defer CleanMemory(TP2[:])
 
 			// Combine time permit shares
-			TP, err := wrap.RecombineG1_BN254(TP1[:], TP2[:])
+			TP, err := RecombineG1_BN254(TP1[:], TP2[:])
 			if err != nil {
 				log.Fatalf("error recombining time permit shares: %v", err)
 			}
@@ -1096,17 +1096,17 @@ func ExampleMPinAuthentications() {
 			}
 
 			// --- Server ---
-			rtn, _, _, _, E, F := wrap.Server_BN254(wrap.HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], SEC[:], ID[:], nil, MESSAGE[:], true)
-			if rtn != 0 {
+			_, _, _, E, F, err := Server_BN254_Kangaroo(wrap.HASH_TYPE_MPIN, date, SS[:], U[:], UT[:], SEC[:], ID[:], MESSAGE[:], timeValue, nil)
+			if err != nil {
 				// authentication failed
 
 				// check pin error
-				err := wrap.Kangaroo_BN254(E[:], F[:])
-				if err != 0 {
-					log.Printf("error getting the PIN error: %v", err)
+				errKangaroo := Kangaroo_BN254(E[:], F[:])
+				if errKangaroo != nil {
+					log.Printf("error getting the PIN error: %v", errKangaroo)
 				}
 
-				log.Fatalf("error server side MPin One Pass: %v", rtn)
+				log.Fatalf("error server side MPin One Pass: %v", err)
 			}
 
 			wg.Done()
@@ -1158,7 +1158,7 @@ func ExampleMPinFull() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	MS2, err := wrap.RandomGenerate_BN254(rng)
+	MS2, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating master secret share 2: %v", err)
 	}
@@ -1171,7 +1171,7 @@ func ExampleMPinFull() {
 	HCID := HashId(HASH_TYPE_MPIN, ID, wrap.PFS_BN254)
 
 	// Generate server secret share 1
-	SS1, err := wrap.GetServerSecret_BN254(MS1[:])
+	SS1, err := GetServerSecret_BN254(MS1[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 1: %v", err)
 	}
@@ -1181,7 +1181,7 @@ func ExampleMPinFull() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	SS2, err := wrap.GetServerSecret_BN254(MS2[:])
+	SS2, err := GetServerSecret_BN254(MS2[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 2: %v", err)
 	}
@@ -1191,7 +1191,7 @@ func ExampleMPinFull() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	SS, err := wrap.RecombineG2_BN254(SS1[:], SS2[:])
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
 	if err != nil {
 		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
@@ -1222,7 +1222,7 @@ func ExampleMPinFull() {
 
 	// Combine client secret shares
 	CS := make([]byte, wrap.G1S_BN254)
-	CS, err = wrap.RecombineG1_BN254(CS1[:], CS2[:])
+	CS, err = RecombineG1_BN254(CS1[:], CS2[:])
 	if err != nil {
 		log.Fatalf("error recombining client secret shares: %v", err)
 	}
@@ -1243,7 +1243,7 @@ func ExampleMPinFull() {
 	//////   Client   //////
 
 	// Precomputation
-	G1, G2, err := wrap.Precompute_BN254(TOKEN[:], HCID)
+	G1, G2, err := Precompute_BN254(TOKEN[:], HCID, nil)
 	if err != nil {
 		log.Fatalf("error client side MPin Full precompute: %v", err)
 	}
@@ -1285,17 +1285,17 @@ func ExampleMPinFull() {
 	defer CleanMemory(Z[:])
 
 	//////   Server   //////
-	rtn, HID, _, Y2, E, F := wrap.Server_BN254(wrap.HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], nil, V[:], ID[:], nil, MESSAGE[:], true)
-	if rtn != 0 {
+	HID, _, Y2, E, F, err := Server_BN254_Kangaroo(wrap.HASH_TYPE_MPIN, date, SS[:], U[:], nil, V[:], ID[:], MESSAGE[:], timeValue, nil)
+	if err != nil {
 		// authentication failed
 
 		// check pin error
-		err := wrap.Kangaroo_BN254(E[:], F[:])
-		if err != 0 {
-			log.Printf("error getting the PIN error: %v", err)
+		errKangaroo := Kangaroo_BN254(E[:], F[:])
+		if errKangaroo != nil {
+			log.Printf("error getting the PIN error: %v", errKangaroo)
 		}
 
-		log.Fatalf("error server side MPin One Pass: %v", rtn)
+		log.Fatalf("error server side MPin One Pass: %v", err)
 	}
 	fmt.Printf("Y2: 0x%x\n", Y2[:])
 	fmt.Printf("HID: 0x%x\n", HID[:])
@@ -1458,7 +1458,7 @@ func ExampleMPinFullWithTP() {
 	// MESSAGE := []byte("test sign message")
 
 	// Generate Master Secret Share 1
-	MS1, err := wrap.RandomGenerate_BN254(rng)
+	MS1, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating master secret share 1: %v", err)
 	}
@@ -1468,7 +1468,7 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	MS2, err := wrap.RandomGenerate_BN254(rng)
+	MS2, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating master secret share 2: %v", err)
 	}
@@ -1481,7 +1481,7 @@ func ExampleMPinFullWithTP() {
 	HCID := HashId(HASH_TYPE_MPIN, ID, wrap.PFS_BN254)
 
 	// Generate server secret share 1
-	SS1, err := wrap.GetServerSecret_BN254(MS1[:])
+	SS1, err := GetServerSecret_BN254(MS1[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 1: %v", err)
 	}
@@ -1491,7 +1491,7 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	SS2, err := wrap.GetServerSecret_BN254(MS2[:])
+	SS2, err := GetServerSecret_BN254(MS2[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 2: %v", err)
 	}
@@ -1501,7 +1501,7 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	SS, err := wrap.RecombineG2_BN254(SS1[:], SS2[:])
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
 	if err != nil {
 		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
@@ -1532,7 +1532,7 @@ func ExampleMPinFullWithTP() {
 
 	// Combine client secret shares
 	CS := make([]byte, wrap.G1S_BN254)
-	CS, err = wrap.RecombineG1_BN254(CS1[:], CS2[:])
+	CS, err = RecombineG1_BN254(CS1[:], CS2[:])
 	if err != nil {
 		log.Fatalf("error recombining client secret shares: %v", err)
 	}
@@ -1562,7 +1562,7 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(TP2[:])
 
 	// Combine time permit shares
-	TP, err := wrap.RecombineG1_BN254(TP1[:], TP2[:])
+	TP, err := RecombineG1_BN254(TP1[:], TP2[:])
 	if err != nil {
 		log.Fatalf("error recombining Time Permit shares: %v", err)
 	}
@@ -1582,7 +1582,7 @@ func ExampleMPinFullWithTP() {
 	//////   Client   //////
 
 	// Precomputation
-	G1, G2, err := wrap.Precompute_BN254(TOKEN[:], HCID)
+	G1, G2, err := Precompute_BN254(TOKEN[:], HCID, nil)
 	if err != nil {
 		log.Fatalf("error client side MPin Full precompute: %v", err)
 	}
@@ -1624,17 +1624,17 @@ func ExampleMPinFullWithTP() {
 	defer CleanMemory(Z[:])
 
 	//////   Server   //////
-	rtn, HID, HTID, Y2, E, F := wrap.Server_BN254(wrap.HASH_TYPE_MPIN, date, timeValue, SS[:], U[:], UT[:], V[:], ID[:], nil, MESSAGE[:], true)
-	if rtn != 0 {
+	HID, HTID, Y2, E, F, err := Server_BN254_Kangaroo(wrap.HASH_TYPE_MPIN, date, SS[:], U[:], UT[:], V[:], ID[:], MESSAGE[:], timeValue, nil)
+	if err != nil {
 		// authentication failed
 
 		// check pin error
-		err := wrap.Kangaroo_BN254(E[:], F[:])
-		if err != 0 {
-			log.Printf("error getting the PIN error: %v", err)
+		errKangaroo := Kangaroo_BN254(E[:], F[:])
+		if errKangaroo != nil {
+			log.Printf("error getting the PIN error: %v", errKangaroo)
 		}
 
-		log.Fatalf("error server side MPin One Pass: %v", rtn)
+		log.Fatalf("error server side MPin One Pass: %v", err)
 	}
 	fmt.Printf("Y2: 0x%x\n", Y2[:])
 	fmt.Printf("HID: 0x%x\n", HID[:])
@@ -1669,18 +1669,18 @@ func ExampleMPinFullWithTP() {
 	// Destroy HM
 	defer CleanMemory(HM[:])
 
-	rtn, AES_KEY_SERVER := wrap.ServerKey_BN254(wrap.HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
-	if rtn != 0 {
-		log.Fatalf("error generating AES server key: %v", rtn)
+	AES_KEY_SERVER, err := ServerKey_BN254(wrap.HASH_TYPE_MPIN, Z[:], SS[:], WOut[:], HM[:], HID[:], U[:], UT[:])
+	if err != nil {
+		log.Fatalf("error generating AES server key: %v", err)
 	}
 	fmt.Printf("server AES Key =  %x\n", AES_KEY_SERVER[:])
 
 	// Destroy AES_KEY_SERVER
 	defer CleanMemory(AES_KEY_SERVER[:])
 
-	rtn, AES_KEY_CLIENT := wrap.ClientKey_BN254(wrap.HASH_TYPE_MPIN, PIN, G1[:], G2[:], ROut[:], XOut[:], HM[:], T[:])
-	if rtn != 0 {
-		log.Fatalf("error generating AES client key: %v", rtn)
+	AES_KEY_CLIENT, err := ClientKey_BN254(wrap.HASH_TYPE_MPIN, G1[:], G2[:], PIN, ROut[:], XOut[:], HM[:], T[:])
+	if err != nil {
+		log.Fatalf("error generating AES client key: %v", err)
 	}
 	fmt.Printf("client AES key =  0x%x\n", AES_KEY_CLIENT[:])
 
@@ -1792,7 +1792,7 @@ func ExampleMPinTwoPass() {
 	rng := wrap.NewRand(seed)
 
 	// Generate Master Secret Share 1
-	MS1, err := wrap.RandomGenerate_BN254(rng)
+	MS1, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating master secret share 1: %v", err)
 	}
@@ -1802,7 +1802,7 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(MS1[:])
 
 	// Generate Master Secret Share 2
-	MS2, err := wrap.RandomGenerate_BN254(rng)
+	MS2, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating master secret share 2: %v", err)
 	}
@@ -1815,7 +1815,7 @@ func ExampleMPinTwoPass() {
 	HCID := HashId(HASH_TYPE_MPIN, ID, wrap.PFS_BN254)
 
 	// Generate server secret share 1
-	SS1, err := wrap.GetServerSecret_BN254(MS1[:])
+	SS1, err := GetServerSecret_BN254(MS1[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 1: %v", err)
 	}
@@ -1825,7 +1825,7 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(SS1[:])
 
 	// Generate server secret share 2
-	SS2, err := wrap.GetServerSecret_BN254(MS2[:])
+	SS2, err := GetServerSecret_BN254(MS2[:])
 	if err != nil {
 		log.Fatalf("error generating server secret share 2: %v", err)
 	}
@@ -1835,7 +1835,7 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(SS2[:])
 
 	// Combine server secret shares
-	SS, err := wrap.RecombineG2_BN254(SS1[:], SS2[:])
+	SS, err := RecombineG2_BN254(SS1[:], SS2[:])
 	if err != nil {
 		log.Fatalf("error recombining Server Secret shares: %v", err)
 	}
@@ -1866,7 +1866,7 @@ func ExampleMPinTwoPass() {
 
 	// Combine client secret shares
 	CS := make([]byte, wrap.G1S_BN254)
-	CS, _ = wrap.RecombineG1_BN254(CS1[:], CS2[:])
+	CS, _ = RecombineG1_BN254(CS1[:], CS2[:])
 	if err != nil {
 		log.Fatalf("error recombining client secret shares: %v", err)
 	}
@@ -1896,7 +1896,7 @@ func ExampleMPinTwoPass() {
 	defer CleanMemory(TP2[:])
 
 	// Combine time permit shares
-	TP, err := wrap.RecombineG1_BN254(TP1[:], TP2[:])
+	TP, err := RecombineG1_BN254(TP1[:], TP2[:])
 	if err != nil {
 		log.Fatalf("error recombining Time Permit shares: %v", err)
 	}
@@ -1936,7 +1936,7 @@ func ExampleMPinTwoPass() {
 	HID, HTID := Server1_BN254(wrap.HASH_TYPE_MPIN, date, ID)
 
 	/* Send Y to Client */
-	Y, err := wrap.RandomGenerate_BN254(rng)
+	Y, err := RandomGenerate_BN254(rng)
 	if err != nil {
 		log.Fatalf("error generating Y: %v", err)
 	}
@@ -1957,17 +1957,17 @@ func ExampleMPinTwoPass() {
 	/* Server Second Pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help wrap.Kangaroo_BN254s to find error. */
 	/* If PIN error not required, set E and F = null */
 
-	rtn, E, F := wrap.Server2_BN254(date, HID[:], HTID[:], nil, Y[:], SS[:], U[:], UT[:], V[:], true)
-	if rtn != 0 {
+	E, F, err := Server2_BN254_Kangaroo(date, HID[:], HTID[:], Y[:], SS[:], U[:], UT[:], V[:], nil)
+	if err != nil {
 		// authentication failed
 
 		// check pin error
-		err := wrap.Kangaroo_BN254(E[:], F[:])
-		if err != 0 {
-			log.Printf("error getting the PIN error: %v", err)
+		errKangaroo := Kangaroo_BN254(E[:], F[:])
+		if errKangaroo != nil {
+			log.Printf("error getting the PIN error: %v", errKangaroo)
 		}
 
-		log.Fatalf("error server pass 2: %v", rtn)
+		log.Fatalf("error server pass 2: %v", err)
 	}
 	fmt.Printf("HID: 0x%x\n", HID[:])
 	fmt.Printf("HTID: 0x%x\n", HTID[:])

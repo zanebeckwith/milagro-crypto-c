@@ -388,7 +388,39 @@ func RecombineG2_BN254CX(P1 []byte, P2 []byte) (P []byte, err error) {
 }
 
 // Server2_BN254CX is a wrapper of wrap.MPIN_BN254CX_SERVER_2
-func Server2_BN254CX(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, Pa []byte) (E []byte, F []byte, err error) {
+func Server2_BN254CX(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, Pa []byte) (err error) {
+
+	HIDOct := wrap.NewOctet(HID)
+	defer HIDOct.Free()
+
+	HTIDOct := wrap.NewOctet(HTID)
+	defer HTIDOct.Free()
+
+	yOct := wrap.NewOctet(y)
+	defer yOct.Free()
+
+	SSOct := wrap.NewOctet(SS)
+	defer SSOct.Free()
+
+	UOct := wrap.NewOctet(U)
+	defer UOct.Free()
+
+	UTOct := wrap.NewOctet(UT)
+	defer UTOct.Free()
+
+	VOct := wrap.NewOctet(V)
+	defer VOct.Free()
+
+	PaOct := wrap.NewOctet(Pa)
+	defer PaOct.Free()
+
+	err = wrap.MPIN_BN254CX_SERVER_2(d, HIDOct, HTIDOct, yOct, SSOct, UOct, UTOct, VOct, nil, nil, PaOct)
+
+	return
+}
+
+// Server2_BN254CX_Kangaroo is a wrapper of wrap.MPIN_BN254CX_SERVER_2
+func Server2_BN254CX_Kangaroo(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, Pa []byte) (E []byte, F []byte, err error) {
 
 	HIDOct := wrap.NewOctet(HID)
 	defer HIDOct.Free()
@@ -466,7 +498,54 @@ func ServerKey_BN254CX(h int, Z []byte, SS []byte, w []byte, p []byte, I []byte,
 }
 
 // Server_BN254CX is a wrapper of wrap.MPIN_BN254CX_SERVER
-func Server_BN254CX(h int, d int, SS []byte, U []byte, UT []byte, V []byte, ID []byte, MESSAGE []byte, t int, Pa []byte) (HID []byte, HTID []byte, y []byte, E []byte, F []byte, err error) {
+func Server_BN254CX(h int, d int, SS []byte, U []byte, UT []byte, V []byte, ID []byte, MESSAGE []byte, t int, Pa []byte) (HID []byte, HTID []byte, y []byte, err error) {
+
+	HIDSize := wrap.G1S_BN254CX
+	HIDOct := wrap.MakeOctet(HIDSize)
+	defer HIDOct.Free()
+
+	HTIDSize := wrap.G1S_BN254CX
+	HTIDOct := wrap.MakeOctet(HTIDSize)
+	defer HTIDOct.Free()
+
+	ySize := wrap.PGS_BN254CX
+	yOct := wrap.MakeOctet(ySize)
+	defer yOct.Free()
+
+	SSOct := wrap.NewOctet(SS)
+	defer SSOct.Free()
+
+	UOct := wrap.NewOctet(U)
+	defer UOct.Free()
+
+	UTOct := wrap.NewOctet(UT)
+	defer UTOct.Free()
+
+	VOct := wrap.NewOctet(V)
+	defer VOct.Free()
+
+	IDOct := wrap.NewOctet(ID)
+	defer IDOct.Free()
+
+	MESSAGEOct := wrap.NewOctet(MESSAGE)
+	defer MESSAGEOct.Free()
+
+	PaOct := wrap.NewOctet(Pa)
+	defer PaOct.Free()
+
+	err = wrap.MPIN_BN254CX_SERVER(h, d, HIDOct, HTIDOct, yOct, SSOct, UOct, UTOct, VOct, nil, nil, IDOct, MESSAGEOct, t, PaOct)
+
+	HID = HIDOct.ToBytes()
+
+	HTID = HTIDOct.ToBytes()
+
+	y = yOct.ToBytes()
+
+	return
+}
+
+// Server_BN254CX_Kangaroo is a wrapper of wrap.MPIN_BN254CX_SERVER
+func Server_BN254CX_Kangaroo(h int, d int, SS []byte, U []byte, UT []byte, V []byte, ID []byte, MESSAGE []byte, t int, Pa []byte) (HID []byte, HTID []byte, y []byte, E []byte, F []byte, err error) {
 
 	HIDSize := wrap.G1S_BN254CX
 	HIDOct := wrap.MakeOctet(HIDSize)
@@ -532,11 +611,11 @@ func Server1_BN254CX(h int, d int, ID []byte) (HID []byte, HTID []byte) {
 
 	HIDSize := wrap.G1S_BN254CX
 	HIDOct := wrap.MakeOctet(HIDSize)
-	defer HIDOct.Clean()
+	defer HIDOct.Free()
 
 	HTIDSize := wrap.G1S_BN254CX
 	HTIDOct := wrap.MakeOctet(HTIDSize)
-	defer HTIDOct.Clean()
+	defer HTIDOct.Free()
 
 	wrap.MPIN_BN254CX_SERVER_1(h, d, IDOct, HIDOct, HTIDOct)
 

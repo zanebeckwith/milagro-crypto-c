@@ -9,7 +9,8 @@
 
                 {{$arg := .}}
                 {{with index $func.ArgTrans .Name}}
-                    {{if .OctetMake}}
+                    {{if .Skip}}
+                    {{else if .OctetMake}}
                         {{if .Receive}}
                             var {{$arg.Name}}Oct *wrap.Octet
                             if {{$arg.Name}} != nil {
@@ -87,7 +88,8 @@
     {{- range .Args -}}
         {{$arg := .}}
         {{- with index $func.ArgTrans .Name -}}
-            {{- if .Return -}}
+            {{- if .Skip -}}
+            {{- else if .Return -}}
                 {{- $arg.Name}}{{if .Receive}}Result{{end}}{{" "}}
                 {{- if eq $arg.CType "octet"}}[]byte,
                 {{- else if eq $arg.CType "rsa_private_key_2048" "rsa_private_key_3072" "rsa_private_key_4096"}}wrap.RSAPrivateKey,
@@ -116,7 +118,8 @@
                     {{$arg.Name}}Size int,
                 {{- end -}}
             {{- end -}}
-            {{- if .Return -}}
+            {{- if .Skip -}}
+            {{- else if .Return -}}
                 {{- if .Receive -}}
                     {{/* TODO: Support all types */}}
                     {{- $arg.Name}} []byte,
@@ -145,11 +148,18 @@
 {{/* List of arguments to call the wrapped function */}}
 {{- define "goWrappersCallArgs" -}}
 
+    {{- $func := . -}}
     {{- range .Args -}}
-        {{- if eq .CType "octet" -}}
-            {{.Name}}Oct,
-        {{- else -}}
-            {{.Name}},
+
+        {{- $arg := . -}}
+        {{- with index $func.ArgTrans .Name -}}
+            {{- if .Skip -}}
+                nil,
+            {{- else if eq $arg.CType "octet" -}}
+                {{$arg.Name}}Oct,
+            {{- else -}}
+                {{$arg.Name}},
+            {{- end -}}
         {{- end -}}
     {{- end -}}
 

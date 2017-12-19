@@ -49,6 +49,8 @@ type trans struct {
 	// Receive works in combination with Return and it adds the variable in the
 	// wrapper arguments.
 	Receive bool
+
+	Skip bool
 }
 
 type funcCtx struct {
@@ -306,6 +308,14 @@ var (
 			c:      "int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)",
 			GoName: "Server2_{{.curve}}",
 			ArgTrans: map[string]trans{
+				"E": {Skip: true},
+				"F": {Skip: true},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)",
+			GoName: "Server2_{{.curve}}_Kangaroo",
+			ArgTrans: map[string]trans{
 				"E": {
 					OctetMake: true,
 					OctetSize: "wrap.GTS_{{.curve}}",
@@ -337,6 +347,29 @@ var (
 		{
 			c:      "int MPIN_{{.curve}}_SERVER(int h, int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* ID, octet* MESSAGE, int t, octet* Pa)",
 			GoName: "Server_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"HID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"HTID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"y": {
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+					Return:    true,
+				},
+				"E": {Skip: true},
+				"F": {Skip: true},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_SERVER(int h, int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* ID, octet* MESSAGE, int t, octet* Pa)",
+			GoName: "Server_{{.curve}}_Kangaroo",
 			ArgTrans: map[string]trans{
 				"HID": {
 					OctetMake: true,
