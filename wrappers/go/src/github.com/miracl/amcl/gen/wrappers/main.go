@@ -92,25 +92,295 @@ var (
 
 	mPinCurves        = []string{"BLS383", "BN254", "BN254CX"}
 	mPinPerCurveFuncs = []funcCtx{
-		{c: "int MPIN_{{.curve}}_CLIENT_1(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* S, octet* U, octet* UT, octet* TP)"},
-		{c: "int MPIN_{{.curve}}_CLIENT_2(octet* x, octet* y, octet* V)"},
-		{c: "int MPIN_{{.curve}}_CLIENT_KEY(int h, octet* g1, octet* g2, int pin, octet* r, octet* x, octet* p, octet* T, octet* K)"},
-		{c: "int MPIN_{{.curve}}_CLIENT(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* V, octet* U, octet* UT, octet* TP, octet* MESSAGE, int t, octet* y)"},
-		{c: "int MPIN_{{.curve}}_EXTRACT_PIN(int h, octet* ID, int pin, octet* CS)"},
-		{c: "int MPIN_{{.curve}}_GET_CLIENT_PERMIT(int h, int d, octet* S, octet* ID, octet* TP)"},
-		{c: "int MPIN_{{.curve}}_GET_CLIENT_SECRET(octet* S, octet* ID, octet* CS)"},
-		{c: "int MPIN_{{.curve}}_GET_DVS_KEYPAIR(csprng* R, octet* Z, octet* Pa)"},
-		{c: "int MPIN_{{.curve}}_GET_G1_MULTIPLE(csprng* R, int t, octet* x, octet* G, octet* W)"},
-		{c: "int MPIN_{{.curve}}_GET_SERVER_SECRET(octet* S, octet* SS)"},
-		{c: "int MPIN_{{.curve}}_KANGAROO(octet* E, octet* F)"},
-		{c: "int MPIN_{{.curve}}_PRECOMPUTE(octet* T, octet* ID, octet* CP, octet* g1, octet* g2)"},
-		{c: "int MPIN_{{.curve}}_RANDOM_GENERATE(csprng* R, octet* S)"},
-		{c: "int MPIN_{{.curve}}_RECOMBINE_G1(octet* Q1, octet* Q2, octet* Q)"},
-		{c: "int MPIN_{{.curve}}_RECOMBINE_G2(octet* P1, octet* P2, octet* P)"},
-		{c: "int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)"},
-		{c: "int MPIN_{{.curve}}_SERVER_KEY(int h, octet* Z, octet* SS, octet* w, octet* p, octet* I, octet* U, octet* UT, octet* K)"},
-		{c: "int MPIN_{{.curve}}_SERVER(int h, int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* ID, octet* MESSAGE, int t, octet* Pa)"},
-		{c: "void MPIN_{{.curve}}_SERVER_1(int h, int d, octet* ID, octet* HID, octet* HTID)"},
+		{
+			c:      "int MPIN_{{.curve}}_CLIENT_1(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* S, octet* U, octet* UT, octet* TP)",
+			GoName: "Client1_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"x": {
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+					Return:    true,
+					Receive:   true,
+				},
+				"U": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"UT": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"S": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_CLIENT_2(octet* x, octet* y, octet* V)",
+			GoName: "Client2_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"V": {
+					Receive: true,
+					Return:  true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_CLIENT_KEY(int h, octet* g1, octet* g2, int pin, octet* r, octet* x, octet* p, octet* T, octet* K)",
+			GoName: "ClientKey_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"K": {
+					OctetMake: true,
+					OctetSize: "wrap.PAS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_CLIENT(int h, int d, octet* ID, csprng* R, octet* x, int pin, octet* T, octet* V, octet* U, octet* UT, octet* TP, octet* MESSAGE, int t, octet* y)",
+			GoName: "Client_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"x": {
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+					Return:    true,
+					Receive:   true,
+				},
+				"V": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"U": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"UT": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"y": {
+					Return:    true,
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_EXTRACT_PIN(int h, octet* ID, int pin, octet* CS)",
+			GoName: "ExtractPIN_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"CS": {
+					Return:  true,
+					Receive: true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_GET_CLIENT_PERMIT(int h, int d, octet* S, octet* ID, octet* TP)",
+			GoName: "GetClientPermit_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"TP": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_GET_CLIENT_SECRET(octet* S, octet* ID, octet* CS)",
+			GoName: "GetClientSecret_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"CS": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_GET_DVS_KEYPAIR(csprng* R, octet* Z, octet* Pa)",
+			GoName: "GetDVSKeyPair_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"Z": {
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+					Return:    true,
+					Receive:   true,
+				},
+				"Pa": {
+					OctetMake: true,
+					OctetSize: "wrap.G2S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_GET_G1_MULTIPLE(csprng* R, int t, octet* x, octet* G, octet* W)",
+			GoName: "GetG1Multiple_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"x": {
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+					Return:    true,
+					Receive:   true,
+				},
+				"W": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_GET_SERVER_SECRET(octet* S, octet* SS)",
+			GoName: "GetServerSecret_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"SS": {
+					OctetMake: true,
+					OctetSize: "wrap.G2S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_KANGAROO(octet* E, octet* F)",
+			GoName: "Kangaroo_{{.curve}}",
+		},
+		{
+			c:      "int MPIN_{{.curve}}_PRECOMPUTE(octet* T, octet* ID, octet* CP, octet* g1, octet* g2)",
+			GoName: "Precompute_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"g1": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+				"g2": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_RANDOM_GENERATE(csprng* R, octet* S)",
+			GoName: "RandomGenerate_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"S": {
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_RECOMBINE_G1(octet* Q1, octet* Q2, octet* Q)",
+			GoName: "RecombineG1_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"Q": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_RECOMBINE_G2(octet* P1, octet* P2, octet* P)",
+			GoName: "RecombineG2_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"P": {
+					OctetMake: true,
+					OctetSize: "wrap.G2S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_SERVER_2(int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* Pa)",
+			GoName: "Server2_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"E": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+				"F": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_SERVER_KEY(int h, octet* Z, octet* SS, octet* w, octet* p, octet* I, octet* U, octet* UT, octet* K)",
+			GoName: "ServerKey_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"K": {
+					OctetMake: true,
+					OctetSize: "wrap.PAS_{{.curve}}",
+					Return:    true,
+				},
+				"F": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "int MPIN_{{.curve}}_SERVER(int h, int d, octet* HID, octet* HTID, octet* y, octet* SS, octet* U, octet* UT, octet* V, octet* E, octet* F, octet* ID, octet* MESSAGE, int t, octet* Pa)",
+			GoName: "Server_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"HID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"HTID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"y": {
+					OctetMake: true,
+					OctetSize: "wrap.PGS_{{.curve}}",
+					Return:    true,
+				},
+				"E": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+				"F": {
+					OctetMake: true,
+					OctetSize: "wrap.GTS_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
+		{
+			c:      "void MPIN_{{.curve}}_SERVER_1(int h, int d, octet* ID, octet* HID, octet* HTID)",
+			GoName: "Server1_{{.curve}}",
+			ArgTrans: map[string]trans{
+				"HID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+				"HTID": {
+					OctetMake: true,
+					OctetSize: "wrap.G1S_{{.curve}}",
+					Return:    true,
+				},
+			},
+		},
 	}
 
 	rsaKeySizes   = []string{"2048", "3072", "4096"}
@@ -159,9 +429,27 @@ var (
 		"mpin": func() map[string][]funcCtx {
 			return genMPinFuncs(mPinPerCurveFuncs, mPinCurves)
 		},
+		"pbc": func() map[string][]funcCtx {
+			return map[string][]funcCtx{
+				"": {
+					{
+						c:      "void HASH_ID(int h, octet* ID, octet* HID)",
+						GoName: "HashId",
+						ArgTrans: map[string]trans{
+							"HID": {
+								OctetMake: true,
+								Return:    true,
+							},
+						},
+					},
+				},
+			}
+		},
 		"rand": func() map[string][]funcCtx {
 			return map[string][]funcCtx{
-				"": {funcCtx{c: "void CREATE_CSPRNG(csprng* R, octet* S)"}},
+				"": {
+					{c: "void CREATE_CSPRNG(csprng* R, octet* S)"},
+				},
 			}
 		},
 		"rsa": func() map[string][]funcCtx {

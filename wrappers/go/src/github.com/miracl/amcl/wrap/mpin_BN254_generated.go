@@ -32,9 +32,9 @@ const (
 	PAS_BN254 int = int(C.MPIN_PAS)
 	PGS_BN254 int = int(C.MPIN_PGS_BN254)
 	PFS_BN254 int = int(C.MPIN_PFS_BN254)
-	G1S_BN254 = 2*PFS_BN254 + 1
-	G2S_BN254 = 4 * PFS_BN254
-	GTS_BN254 = 12 * PFS_BN254
+	G1S_BN254     = 2*PFS_BN254 + 1
+	G2S_BN254     = 4 * PFS_BN254
+	GTS_BN254     = 12 * PFS_BN254
 )
 
 // RandomGenerate_BN254 returns a random integer where s < q is the order of the group of points on the curve.
@@ -60,10 +60,10 @@ func GetServerSecret_BN254(ms []byte) ([]byte, error) {
 
 // RecombineG1_BN254 adds two members from the group G1
 func RecombineG1_BN254(r1, r2 []byte) ([]byte, error) {
-	r1Oct:=NewOctet(r1)
+	r1Oct := NewOctet(r1)
 	defer r1Oct.Free()
 
-	r2Oct:=NewOctet(r2)
+	r2Oct := NewOctet(r2)
 	defer r2Oct.Free()
 
 	rOct := MakeOctet(G1S_BN254)
@@ -89,7 +89,7 @@ func RecombineG2_BN254(w1, w2 []byte) ([]byte, error) {
 }
 
 // GetClientSecret_BN254 creates a client secret in G1 from a master secret and the hash of the M-Pin Id
-func GetClientSecret_BN254(masterSecret []byte, hashMPinId []byte) ([]byte, error ) {
+func GetClientSecret_BN254(masterSecret []byte, hashMPinId []byte) ([]byte, error) {
 	msOct := NewOctet(masterSecret)
 	defer msOct.Free()
 
@@ -143,7 +143,6 @@ func GetClientPermit_BN254(hashType, epochDate int, masterSecret, hashMPinId []b
 	return tpOct.ToBytes(), newError(rtn)
 }
 
-
 // ExtractPIN_BN254 extracts a PIN from the client secret
 func ExtractPIN_BN254(hashType int, mpinId []byte, PIN int, clientSecret []byte) ([]byte, error) {
 	mpOct := NewOctet(mpinId)
@@ -155,7 +154,6 @@ func ExtractPIN_BN254(hashType int, mpinId []byte, PIN int, clientSecret []byte)
 	rtn := C.MPIN_BN254_EXTRACT_PIN(C.int(hashType), mpOct, C.int(PIN), csOct)
 	return csOct.ToBytes(), newError(rtn)
 }
-
 
 // Client_BN254 performs client side of the one-Pass version of the M-Pin protocol. If Time Permits are
 // disabled then set epoch_date = 0.In this case UT is not generated and can be set to nil.
@@ -266,7 +264,7 @@ func Client_BN254(hashType, epochDate int, mpinId []byte, rng *Rand, x []byte, P
 //     errorCcode: error from the C function
 //     pc1: Precomputed value one
 //     pc2: Precomputed value two
-func Precompute_BN254(token, hashMPinId []byte) ( pc1, pc2 []byte, err error) {
+func Precompute_BN254(token, hashMPinId []byte) (pc1, pc2 []byte, err error) {
 	// Form Octets
 	hashMPinIdStr := string(hashMPinId)
 	hashMPinIdOct := GetOctet(hashMPinIdStr)

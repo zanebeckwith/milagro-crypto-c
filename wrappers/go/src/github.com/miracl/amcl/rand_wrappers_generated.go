@@ -21,7 +21,7 @@ package amcl
 
 import "github.com/miracl/amcl/wrap"
 
-// CREATE_CSPRNG is a wrapper if wrap.CREATE_CSPRNG
+// CREATE_CSPRNG is a wrapper of wrap.CREATE_CSPRNG
 func CREATE_CSPRNG(R *wrap.Rand, S []byte) {
 
 	SOct := wrap.NewOctet(S)

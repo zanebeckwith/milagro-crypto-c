@@ -23,11 +23,15 @@ package wrap
 import "C"
 import "unsafe"
 
-// Octet is Go alias for the C octet type
+// Octet is Go alias for the C octet type.
 type Octet = C.octet
 
-// NewOctet creates new Octet with given value
+// NewOctet creates new Octet with given value.
 func NewOctet(val []byte) *Octet {
+	if val == nil {
+		return nil
+	}
+
 	return &Octet{
 		len: C.int(len(val)),
 		max: C.int(len(val)),
@@ -35,7 +39,7 @@ func NewOctet(val []byte) *Octet {
 	}
 }
 
-// MakeOctet create empty Octet
+// MakeOctet create empty Octet.
 func MakeOctet(max int) *Octet {
 	return &Octet{
 		len: 0,
@@ -44,17 +48,27 @@ func MakeOctet(max int) *Octet {
 	}
 }
 
-// ToBytes returns the bytes representation of the Octet
+// ToBytes returns the bytes representation of the Octet.
 func (o *Octet) ToBytes() []byte {
 	return C.GoBytes(unsafe.Pointer(o.val), o.len)
 }
 
-// Free frees the allocated memory
+// Free frees the allocated memory.
 func (o *Octet) Free() {
+	if o == nil {
+		return
+	}
 	C.free(unsafe.Pointer(o.val))
 }
 
-// TODO: func (o *Octet) Free()
+// Clean overwrites the memory before freeing it.
+// TODO: Check secrets and Clean
+func (o *Octet) Clean() {
+	if o == nil {
+		return
+	}
+	C.OCT_clear((*C.octet)(o))
+}
 
 func newOctet(val []byte) *C.octet {
 	if val == nil {

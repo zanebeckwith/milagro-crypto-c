@@ -21,7 +21,7 @@ package amcl
 
 import "github.com/miracl/amcl/wrap"
 
-// RSADecrypt_3072 is a wrapper if wrap.RSA_3072_DECRYPT
+// RSADecrypt_3072 is a wrapper of wrap.RSA_3072_DECRYPT
 func RSADecrypt_3072(priv wrap.RSAPrivateKey, G []byte) (F []byte) {
 
 	GOct := wrap.NewOctet(G)
@@ -37,7 +37,7 @@ func RSADecrypt_3072(priv wrap.RSAPrivateKey, G []byte) (F []byte) {
 	return
 }
 
-// RSAEncrypt_3072 is a wrapper if wrap.RSA_3072_ENCRYPT
+// RSAEncrypt_3072 is a wrapper of wrap.RSA_3072_ENCRYPT
 func RSAEncrypt_3072(pub wrap.RSAPublicKey, F []byte) (G []byte) {
 
 	FOct := wrap.NewOctet(F)
@@ -53,7 +53,7 @@ func RSAEncrypt_3072(pub wrap.RSAPublicKey, F []byte) (G []byte) {
 	return
 }
 
-// RSAKeyPair_3072 is a wrapper if wrap.RSA_3072_KEY_PAIR
+// RSAKeyPair_3072 is a wrapper of wrap.RSA_3072_KEY_PAIR
 func RSAKeyPair_3072(rng *wrap.Rand, e int32, p []byte, q []byte) (priv wrap.RSAPrivateKey, pub wrap.RSAPublicKey) {
 
 	priv = wrap.NewRSAPrivateKey_3072()
@@ -71,7 +71,7 @@ func RSAKeyPair_3072(rng *wrap.Rand, e int32, p []byte, q []byte) (priv wrap.RSA
 	return
 }
 
-// RSAPrivateKeyKill_3072 is a wrapper if wrap.RSA_3072_PRIVATE_KEY_KILL
+// RSAPrivateKeyKill_3072 is a wrapper of wrap.RSA_3072_PRIVATE_KEY_KILL
 func RSAPrivateKeyKill_3072(PRIV wrap.RSAPrivateKey) {
 
 	wrap.RSA_3072_PRIVATE_KEY_KILL(PRIV)

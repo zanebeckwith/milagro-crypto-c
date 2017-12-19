@@ -32,9 +32,9 @@ const (
 	PAS_BLS383 int = int(C.MPIN_PAS)
 	PGS_BLS383 int = int(C.MPIN_PGS_BLS383)
 	PFS_BLS383 int = int(C.MPIN_PFS_BLS383)
-	G1S_BLS383 = 2*PFS_BLS383 + 1
-	G2S_BLS383 = 4 * PFS_BLS383
-	GTS_BLS383 = 12 * PFS_BLS383
+	G1S_BLS383     = 2*PFS_BLS383 + 1
+	G2S_BLS383     = 4 * PFS_BLS383
+	GTS_BLS383     = 12 * PFS_BLS383
 )
 
 // RandomGenerate_BLS383 returns a random integer where s < q is the order of the group of points on the curve.
@@ -60,10 +60,10 @@ func GetServerSecret_BLS383(ms []byte) ([]byte, error) {
 
 // RecombineG1_BLS383 adds two members from the group G1
 func RecombineG1_BLS383(r1, r2 []byte) ([]byte, error) {
-	r1Oct:=NewOctet(r1)
+	r1Oct := NewOctet(r1)
 	defer r1Oct.Free()
 
-	r2Oct:=NewOctet(r2)
+	r2Oct := NewOctet(r2)
 	defer r2Oct.Free()
 
 	rOct := MakeOctet(G1S_BLS383)
@@ -89,7 +89,7 @@ func RecombineG2_BLS383(w1, w2 []byte) ([]byte, error) {
 }
 
 // GetClientSecret_BLS383 creates a client secret in G1 from a master secret and the hash of the M-Pin Id
-func GetClientSecret_BLS383(masterSecret []byte, hashMPinId []byte) ([]byte, error ) {
+func GetClientSecret_BLS383(masterSecret []byte, hashMPinId []byte) ([]byte, error) {
 	msOct := NewOctet(masterSecret)
 	defer msOct.Free()
 
@@ -143,7 +143,6 @@ func GetClientPermit_BLS383(hashType, epochDate int, masterSecret, hashMPinId []
 	return tpOct.ToBytes(), newError(rtn)
 }
 
-
 // ExtractPIN_BLS383 extracts a PIN from the client secret
 func ExtractPIN_BLS383(hashType int, mpinId []byte, PIN int, clientSecret []byte) ([]byte, error) {
 	mpOct := NewOctet(mpinId)
@@ -155,7 +154,6 @@ func ExtractPIN_BLS383(hashType int, mpinId []byte, PIN int, clientSecret []byte
 	rtn := C.MPIN_BLS383_EXTRACT_PIN(C.int(hashType), mpOct, C.int(PIN), csOct)
 	return csOct.ToBytes(), newError(rtn)
 }
-
 
 // Client_BLS383 performs client side of the one-Pass version of the M-Pin protocol. If Time Permits are
 // disabled then set epoch_date = 0.In this case UT is not generated and can be set to nil.
@@ -266,7 +264,7 @@ func Client_BLS383(hashType, epochDate int, mpinId []byte, rng *Rand, x []byte, 
 //     errorCcode: error from the C function
 //     pc1: Precomputed value one
 //     pc2: Precomputed value two
-func Precompute_BLS383(token, hashMPinId []byte) ( pc1, pc2 []byte, err error) {
+func Precompute_BLS383(token, hashMPinId []byte) (pc1, pc2 []byte, err error) {
 	// Form Octets
 	hashMPinIdStr := string(hashMPinId)
 	hashMPinIdOct := GetOctet(hashMPinIdStr)

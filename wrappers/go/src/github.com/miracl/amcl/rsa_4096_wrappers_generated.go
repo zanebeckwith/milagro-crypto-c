@@ -21,7 +21,7 @@ package amcl
 
 import "github.com/miracl/amcl/wrap"
 
-// RSADecrypt_4096 is a wrapper if wrap.RSA_4096_DECRYPT
+// RSADecrypt_4096 is a wrapper of wrap.RSA_4096_DECRYPT
 func RSADecrypt_4096(priv wrap.RSAPrivateKey, G []byte) (F []byte) {
 
 	GOct := wrap.NewOctet(G)
@@ -37,7 +37,7 @@ func RSADecrypt_4096(priv wrap.RSAPrivateKey, G []byte) (F []byte) {
 	return
 }
 
-// RSAEncrypt_4096 is a wrapper if wrap.RSA_4096_ENCRYPT
+// RSAEncrypt_4096 is a wrapper of wrap.RSA_4096_ENCRYPT
 func RSAEncrypt_4096(pub wrap.RSAPublicKey, F []byte) (G []byte) {
 
 	FOct := wrap.NewOctet(F)
@@ -53,7 +53,7 @@ func RSAEncrypt_4096(pub wrap.RSAPublicKey, F []byte) (G []byte) {
 	return
 }
 
-// RSAKeyPair_4096 is a wrapper if wrap.RSA_4096_KEY_PAIR
+// RSAKeyPair_4096 is a wrapper of wrap.RSA_4096_KEY_PAIR
 func RSAKeyPair_4096(rng *wrap.Rand, e int32, p []byte, q []byte) (priv wrap.RSAPrivateKey, pub wrap.RSAPublicKey) {
 
 	priv = wrap.NewRSAPrivateKey_4096()
@@ -71,7 +71,7 @@ func RSAKeyPair_4096(rng *wrap.Rand, e int32, p []byte, q []byte) (priv wrap.RSA
 	return
 }
 
-// RSAPrivateKeyKill_4096 is a wrapper if wrap.RSA_4096_PRIVATE_KEY_KILL
+// RSAPrivateKeyKill_4096 is a wrapper of wrap.RSA_4096_PRIVATE_KEY_KILL
 func RSAPrivateKeyKill_4096(PRIV wrap.RSAPrivateKey) {
 
 	wrap.RSA_4096_PRIVATE_KEY_KILL(PRIV)

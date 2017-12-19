@@ -1,7 +1,7 @@
 {{/* This template is used to generate go wrappers with go types */}}
 {{define "goWrappers"}}
     {{range .}}
-        // {{template "goWrapperName" .}} is a wrapper if wrap.{{.CName}}
+        // {{template "goWrapperName" .}} is a wrapper of wrap.{{.CName}}
         func {{template "goWrapperName" .}}({{template "goWrappersArgs" .}}) {{template "returnType" .}} {
 
             {{$func := .}}
@@ -10,10 +10,24 @@
                 {{$arg := .}}
                 {{with index $func.ArgTrans .Name}}
                     {{if .OctetMake}}
-                        {{if .OctetSize}}
-                            {{$arg.Name}}Size := {{.OctetSize}}
-                        {{- end -}}
-                        {{template "MakeOctet" $arg}}
+                        {{if .Receive}}
+                            var {{$arg.Name}}Oct *wrap.Octet
+                            if {{$arg.Name}} != nil {
+                                {{$arg.Name}}Oct = wrap.NewOctet({{$arg.Name}})
+                                defer {{$arg.Name}}Oct.Free()
+                            } else {
+                                {{- if .OctetSize}}
+                                    {{$arg.Name}}Size := {{.OctetSize}}
+                                {{- end}}
+                                {{$arg.Name}}Oct = wrap.MakeOctet({{$arg.Name}}Size)
+                                defer {{$arg.Name}}Oct.Free()
+                            }
+                        {{else}}
+                            {{if .OctetSize}}
+                                {{$arg.Name}}Size := {{.OctetSize}}
+                            {{- end -}}
+                            {{template "MakeOctet" $arg}}
+                        {{end}}
                     {{else}}
                         {{if eq $arg.CType "octet"}}
                             {{template "NewOctet" $arg}}
@@ -101,10 +115,11 @@
                 {{- if eq .OctetSize "" -}}
                     {{$arg.Name}}Size int,
                 {{- end -}}
-            {{- else if .Return -}}
+            {{- end -}}
+            {{- if .Return -}}
                 {{- if .Receive -}}
                     {{/* TODO: Support all types */}}
-                    {{- $arg.Name}} []byte
+                    {{- $arg.Name}} []byte,
                 {{- end -}}
             {{- else -}}
                 {{$arg.Name}}{{" "}}

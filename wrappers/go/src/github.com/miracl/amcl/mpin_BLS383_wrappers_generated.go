@@ -21,25 +21,35 @@ package amcl
 
 import "github.com/miracl/amcl/wrap"
 
-// MPIN_BLS383_CLIENT_1 is a wrapper if wrap.MPIN_BLS383_CLIENT_1
-func MPIN_BLS383_CLIENT_1(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin int, T []byte, S []byte, U []byte, UT []byte, TP []byte) (err error) {
+// Client1_BLS383 is a wrapper of wrap.MPIN_BLS383_CLIENT_1
+func Client1_BLS383(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin int, T []byte, TP []byte) (xResult []byte, S []byte, U []byte, UT []byte, err error) {
 
 	IDOct := wrap.NewOctet(ID)
 	defer IDOct.Free()
 
-	xOct := wrap.NewOctet(x)
-	defer xOct.Free()
+	var xOct *wrap.Octet
+	if x != nil {
+		xOct = wrap.NewOctet(x)
+		defer xOct.Free()
+	} else {
+		xSize := wrap.PGS_BLS383
+		xOct = wrap.MakeOctet(xSize)
+		defer xOct.Free()
+	}
 
 	TOct := wrap.NewOctet(T)
 	defer TOct.Free()
 
-	SOct := wrap.NewOctet(S)
+	SSize := wrap.G1S_BLS383
+	SOct := wrap.MakeOctet(SSize)
 	defer SOct.Free()
 
-	UOct := wrap.NewOctet(U)
+	USize := wrap.G1S_BLS383
+	UOct := wrap.MakeOctet(USize)
 	defer UOct.Free()
 
-	UTOct := wrap.NewOctet(UT)
+	UTSize := wrap.G1S_BLS383
+	UTOct := wrap.MakeOctet(UTSize)
 	defer UTOct.Free()
 
 	TPOct := wrap.NewOctet(TP)
@@ -47,11 +57,19 @@ func MPIN_BLS383_CLIENT_1(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin i
 
 	err = wrap.MPIN_BLS383_CLIENT_1(h, d, IDOct, R, xOct, pin, TOct, SOct, UOct, UTOct, TPOct)
 
+	xResult = xOct.ToBytes()
+
+	S = SOct.ToBytes()
+
+	U = UOct.ToBytes()
+
+	UT = UTOct.ToBytes()
+
 	return
 }
 
-// MPIN_BLS383_CLIENT_2 is a wrapper if wrap.MPIN_BLS383_CLIENT_2
-func MPIN_BLS383_CLIENT_2(x []byte, y []byte, V []byte) (err error) {
+// Client2_BLS383 is a wrapper of wrap.MPIN_BLS383_CLIENT_2
+func Client2_BLS383(x []byte, y []byte, V []byte) (VResult []byte, err error) {
 
 	xOct := wrap.NewOctet(x)
 	defer xOct.Free()
@@ -64,11 +82,12 @@ func MPIN_BLS383_CLIENT_2(x []byte, y []byte, V []byte) (err error) {
 
 	err = wrap.MPIN_BLS383_CLIENT_2(xOct, yOct, VOct)
 
+	VResult = VOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_CLIENT_KEY is a wrapper if wrap.MPIN_BLS383_CLIENT_KEY
-func MPIN_BLS383_CLIENT_KEY(h int, g1 []byte, g2 []byte, pin int, r []byte, x []byte, p []byte, T []byte, K []byte) (err error) {
+// ClientKey_BLS383 is a wrapper of wrap.MPIN_BLS383_CLIENT_KEY
+func ClientKey_BLS383(h int, g1 []byte, g2 []byte, pin int, r []byte, x []byte, p []byte, T []byte) (K []byte, err error) {
 
 	g1Oct := wrap.NewOctet(g1)
 	defer g1Oct.Free()
@@ -88,33 +107,45 @@ func MPIN_BLS383_CLIENT_KEY(h int, g1 []byte, g2 []byte, pin int, r []byte, x []
 	TOct := wrap.NewOctet(T)
 	defer TOct.Free()
 
-	KOct := wrap.NewOctet(K)
+	KSize := wrap.PAS_BLS383
+	KOct := wrap.MakeOctet(KSize)
 	defer KOct.Free()
 
 	err = wrap.MPIN_BLS383_CLIENT_KEY(h, g1Oct, g2Oct, pin, rOct, xOct, pOct, TOct, KOct)
 
+	K = KOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_CLIENT is a wrapper if wrap.MPIN_BLS383_CLIENT
-func MPIN_BLS383_CLIENT(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin int, T []byte, V []byte, U []byte, UT []byte, TP []byte, MESSAGE []byte, t int, y []byte) (err error) {
+// Client_BLS383 is a wrapper of wrap.MPIN_BLS383_CLIENT
+func Client_BLS383(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin int, T []byte, TP []byte, MESSAGE []byte, t int) (xResult []byte, V []byte, U []byte, UT []byte, y []byte, err error) {
 
 	IDOct := wrap.NewOctet(ID)
 	defer IDOct.Free()
 
-	xOct := wrap.NewOctet(x)
-	defer xOct.Free()
+	var xOct *wrap.Octet
+	if x != nil {
+		xOct = wrap.NewOctet(x)
+		defer xOct.Free()
+	} else {
+		xSize := wrap.PGS_BLS383
+		xOct = wrap.MakeOctet(xSize)
+		defer xOct.Free()
+	}
 
 	TOct := wrap.NewOctet(T)
 	defer TOct.Free()
 
-	VOct := wrap.NewOctet(V)
+	VSize := wrap.G1S_BLS383
+	VOct := wrap.MakeOctet(VSize)
 	defer VOct.Free()
 
-	UOct := wrap.NewOctet(U)
+	USize := wrap.G1S_BLS383
+	UOct := wrap.MakeOctet(USize)
 	defer UOct.Free()
 
-	UTOct := wrap.NewOctet(UT)
+	UTSize := wrap.G1S_BLS383
+	UTOct := wrap.MakeOctet(UTSize)
 	defer UTOct.Free()
 
 	TPOct := wrap.NewOctet(TP)
@@ -123,16 +154,26 @@ func MPIN_BLS383_CLIENT(h int, d int, ID []byte, R *wrap.Rand, x []byte, pin int
 	MESSAGEOct := wrap.NewOctet(MESSAGE)
 	defer MESSAGEOct.Free()
 
-	yOct := wrap.NewOctet(y)
+	ySize := wrap.PGS_BLS383
+	yOct := wrap.MakeOctet(ySize)
 	defer yOct.Free()
 
 	err = wrap.MPIN_BLS383_CLIENT(h, d, IDOct, R, xOct, pin, TOct, VOct, UOct, UTOct, TPOct, MESSAGEOct, t, yOct)
 
+	xResult = xOct.ToBytes()
+
+	V = VOct.ToBytes()
+
+	U = UOct.ToBytes()
+
+	UT = UTOct.ToBytes()
+
+	y = yOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_EXTRACT_PIN is a wrapper if wrap.MPIN_BLS383_EXTRACT_PIN
-func MPIN_BLS383_EXTRACT_PIN(h int, ID []byte, pin int, CS []byte) (err error) {
+// ExtractPIN_BLS383 is a wrapper of wrap.MPIN_BLS383_EXTRACT_PIN
+func ExtractPIN_BLS383(h int, ID []byte, pin int, CS []byte) (CSResult []byte, err error) {
 
 	IDOct := wrap.NewOctet(ID)
 	defer IDOct.Free()
@@ -142,11 +183,12 @@ func MPIN_BLS383_EXTRACT_PIN(h int, ID []byte, pin int, CS []byte) (err error) {
 
 	err = wrap.MPIN_BLS383_EXTRACT_PIN(h, IDOct, pin, CSOct)
 
+	CSResult = CSOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_GET_CLIENT_PERMIT is a wrapper if wrap.MPIN_BLS383_GET_CLIENT_PERMIT
-func MPIN_BLS383_GET_CLIENT_PERMIT(h int, d int, S []byte, ID []byte, TP []byte) (err error) {
+// GetClientPermit_BLS383 is a wrapper of wrap.MPIN_BLS383_GET_CLIENT_PERMIT
+func GetClientPermit_BLS383(h int, d int, S []byte, ID []byte) (TP []byte, err error) {
 
 	SOct := wrap.NewOctet(S)
 	defer SOct.Free()
@@ -154,16 +196,18 @@ func MPIN_BLS383_GET_CLIENT_PERMIT(h int, d int, S []byte, ID []byte, TP []byte)
 	IDOct := wrap.NewOctet(ID)
 	defer IDOct.Free()
 
-	TPOct := wrap.NewOctet(TP)
+	TPSize := wrap.G1S_BLS383
+	TPOct := wrap.MakeOctet(TPSize)
 	defer TPOct.Free()
 
 	err = wrap.MPIN_BLS383_GET_CLIENT_PERMIT(h, d, SOct, IDOct, TPOct)
 
+	TP = TPOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_GET_CLIENT_SECRET is a wrapper if wrap.MPIN_BLS383_GET_CLIENT_SECRET
-func MPIN_BLS383_GET_CLIENT_SECRET(S []byte, ID []byte, CS []byte) (err error) {
+// GetClientSecret_BLS383 is a wrapper of wrap.MPIN_BLS383_GET_CLIENT_SECRET
+func GetClientSecret_BLS383(S []byte, ID []byte) (CS []byte, err error) {
 
 	SOct := wrap.NewOctet(S)
 	defer SOct.Free()
@@ -171,61 +215,87 @@ func MPIN_BLS383_GET_CLIENT_SECRET(S []byte, ID []byte, CS []byte) (err error) {
 	IDOct := wrap.NewOctet(ID)
 	defer IDOct.Free()
 
-	CSOct := wrap.NewOctet(CS)
+	CSSize := wrap.G1S_BLS383
+	CSOct := wrap.MakeOctet(CSSize)
 	defer CSOct.Free()
 
 	err = wrap.MPIN_BLS383_GET_CLIENT_SECRET(SOct, IDOct, CSOct)
 
+	CS = CSOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_GET_DVS_KEYPAIR is a wrapper if wrap.MPIN_BLS383_GET_DVS_KEYPAIR
-func MPIN_BLS383_GET_DVS_KEYPAIR(R *wrap.Rand, Z []byte, Pa []byte) (err error) {
+// GetDVSKeyPair_BLS383 is a wrapper of wrap.MPIN_BLS383_GET_DVS_KEYPAIR
+func GetDVSKeyPair_BLS383(R *wrap.Rand, Z []byte) (ZResult []byte, Pa []byte, err error) {
 
-	ZOct := wrap.NewOctet(Z)
-	defer ZOct.Free()
+	var ZOct *wrap.Octet
+	if Z != nil {
+		ZOct = wrap.NewOctet(Z)
+		defer ZOct.Free()
+	} else {
+		ZSize := wrap.PGS_BLS383
+		ZOct = wrap.MakeOctet(ZSize)
+		defer ZOct.Free()
+	}
 
-	PaOct := wrap.NewOctet(Pa)
+	PaSize := wrap.G2S_BLS383
+	PaOct := wrap.MakeOctet(PaSize)
 	defer PaOct.Free()
 
 	err = wrap.MPIN_BLS383_GET_DVS_KEYPAIR(R, ZOct, PaOct)
 
+	ZResult = ZOct.ToBytes()
+
+	Pa = PaOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_GET_G1_MULTIPLE is a wrapper if wrap.MPIN_BLS383_GET_G1_MULTIPLE
-func MPIN_BLS383_GET_G1_MULTIPLE(R *wrap.Rand, t int, x []byte, G []byte, W []byte) (err error) {
+// GetG1Multiple_BLS383 is a wrapper of wrap.MPIN_BLS383_GET_G1_MULTIPLE
+func GetG1Multiple_BLS383(R *wrap.Rand, t int, x []byte, G []byte) (xResult []byte, W []byte, err error) {
 
-	xOct := wrap.NewOctet(x)
-	defer xOct.Free()
+	var xOct *wrap.Octet
+	if x != nil {
+		xOct = wrap.NewOctet(x)
+		defer xOct.Free()
+	} else {
+		xSize := wrap.PGS_BLS383
+		xOct = wrap.MakeOctet(xSize)
+		defer xOct.Free()
+	}
 
 	GOct := wrap.NewOctet(G)
 	defer GOct.Free()
 
-	WOct := wrap.NewOctet(W)
+	WSize := wrap.G1S_BLS383
+	WOct := wrap.MakeOctet(WSize)
 	defer WOct.Free()
 
 	err = wrap.MPIN_BLS383_GET_G1_MULTIPLE(R, t, xOct, GOct, WOct)
 
+	xResult = xOct.ToBytes()
+
+	W = WOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_GET_SERVER_SECRET is a wrapper if wrap.MPIN_BLS383_GET_SERVER_SECRET
-func MPIN_BLS383_GET_SERVER_SECRET(S []byte, SS []byte) (err error) {
+// GetServerSecret_BLS383 is a wrapper of wrap.MPIN_BLS383_GET_SERVER_SECRET
+func GetServerSecret_BLS383(S []byte) (SS []byte, err error) {
 
 	SOct := wrap.NewOctet(S)
 	defer SOct.Free()
 
-	SSOct := wrap.NewOctet(SS)
+	SSSize := wrap.G2S_BLS383
+	SSOct := wrap.MakeOctet(SSSize)
 	defer SSOct.Free()
 
 	err = wrap.MPIN_BLS383_GET_SERVER_SECRET(SOct, SSOct)
 
+	SS = SSOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_KANGAROO is a wrapper if wrap.MPIN_BLS383_KANGAROO
-func MPIN_BLS383_KANGAROO(E []byte, F []byte) (err error) {
+// Kangaroo_BLS383 is a wrapper of wrap.MPIN_BLS383_KANGAROO
+func Kangaroo_BLS383(E []byte, F []byte) (err error) {
 
 	EOct := wrap.NewOctet(E)
 	defer EOct.Free()
@@ -238,8 +308,8 @@ func MPIN_BLS383_KANGAROO(E []byte, F []byte) (err error) {
 	return
 }
 
-// MPIN_BLS383_PRECOMPUTE is a wrapper if wrap.MPIN_BLS383_PRECOMPUTE
-func MPIN_BLS383_PRECOMPUTE(T []byte, ID []byte, CP []byte, g1 []byte, g2 []byte) (err error) {
+// Precompute_BLS383 is a wrapper of wrap.MPIN_BLS383_PRECOMPUTE
+func Precompute_BLS383(T []byte, ID []byte, CP []byte) (g1 []byte, g2 []byte, err error) {
 
 	TOct := wrap.NewOctet(T)
 	defer TOct.Free()
@@ -250,30 +320,37 @@ func MPIN_BLS383_PRECOMPUTE(T []byte, ID []byte, CP []byte, g1 []byte, g2 []byte
 	CPOct := wrap.NewOctet(CP)
 	defer CPOct.Free()
 
-	g1Oct := wrap.NewOctet(g1)
+	g1Size := wrap.GTS_BLS383
+	g1Oct := wrap.MakeOctet(g1Size)
 	defer g1Oct.Free()
 
-	g2Oct := wrap.NewOctet(g2)
+	g2Size := wrap.GTS_BLS383
+	g2Oct := wrap.MakeOctet(g2Size)
 	defer g2Oct.Free()
 
 	err = wrap.MPIN_BLS383_PRECOMPUTE(TOct, IDOct, CPOct, g1Oct, g2Oct)
 
+	g1 = g1Oct.ToBytes()
+
+	g2 = g2Oct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_RANDOM_GENERATE is a wrapper if wrap.MPIN_BLS383_RANDOM_GENERATE
-func MPIN_BLS383_RANDOM_GENERATE(R *wrap.Rand, S []byte) (err error) {
+// RandomGenerate_BLS383 is a wrapper of wrap.MPIN_BLS383_RANDOM_GENERATE
+func RandomGenerate_BLS383(R *wrap.Rand) (S []byte, err error) {
 
-	SOct := wrap.NewOctet(S)
+	SSize := wrap.PGS_BLS383
+	SOct := wrap.MakeOctet(SSize)
 	defer SOct.Free()
 
 	err = wrap.MPIN_BLS383_RANDOM_GENERATE(R, SOct)
 
+	S = SOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_RECOMBINE_G1 is a wrapper if wrap.MPIN_BLS383_RECOMBINE_G1
-func MPIN_BLS383_RECOMBINE_G1(Q1 []byte, Q2 []byte, Q []byte) (err error) {
+// RecombineG1_BLS383 is a wrapper of wrap.MPIN_BLS383_RECOMBINE_G1
+func RecombineG1_BLS383(Q1 []byte, Q2 []byte) (Q []byte, err error) {
 
 	Q1Oct := wrap.NewOctet(Q1)
 	defer Q1Oct.Free()
@@ -281,16 +358,18 @@ func MPIN_BLS383_RECOMBINE_G1(Q1 []byte, Q2 []byte, Q []byte) (err error) {
 	Q2Oct := wrap.NewOctet(Q2)
 	defer Q2Oct.Free()
 
-	QOct := wrap.NewOctet(Q)
+	QSize := wrap.G1S_BLS383
+	QOct := wrap.MakeOctet(QSize)
 	defer QOct.Free()
 
 	err = wrap.MPIN_BLS383_RECOMBINE_G1(Q1Oct, Q2Oct, QOct)
 
+	Q = QOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_RECOMBINE_G2 is a wrapper if wrap.MPIN_BLS383_RECOMBINE_G2
-func MPIN_BLS383_RECOMBINE_G2(P1 []byte, P2 []byte, P []byte) (err error) {
+// RecombineG2_BLS383 is a wrapper of wrap.MPIN_BLS383_RECOMBINE_G2
+func RecombineG2_BLS383(P1 []byte, P2 []byte) (P []byte, err error) {
 
 	P1Oct := wrap.NewOctet(P1)
 	defer P1Oct.Free()
@@ -298,16 +377,18 @@ func MPIN_BLS383_RECOMBINE_G2(P1 []byte, P2 []byte, P []byte) (err error) {
 	P2Oct := wrap.NewOctet(P2)
 	defer P2Oct.Free()
 
-	POct := wrap.NewOctet(P)
+	PSize := wrap.G2S_BLS383
+	POct := wrap.MakeOctet(PSize)
 	defer POct.Free()
 
 	err = wrap.MPIN_BLS383_RECOMBINE_G2(P1Oct, P2Oct, POct)
 
+	P = POct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_SERVER_2 is a wrapper if wrap.MPIN_BLS383_SERVER_2
-func MPIN_BLS383_SERVER_2(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, E []byte, F []byte, Pa []byte) (err error) {
+// Server2_BLS383 is a wrapper of wrap.MPIN_BLS383_SERVER_2
+func Server2_BLS383(d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, Pa []byte) (E []byte, F []byte, err error) {
 
 	HIDOct := wrap.NewOctet(HID)
 	defer HIDOct.Free()
@@ -330,10 +411,12 @@ func MPIN_BLS383_SERVER_2(d int, HID []byte, HTID []byte, y []byte, SS []byte, U
 	VOct := wrap.NewOctet(V)
 	defer VOct.Free()
 
-	EOct := wrap.NewOctet(E)
+	ESize := wrap.GTS_BLS383
+	EOct := wrap.MakeOctet(ESize)
 	defer EOct.Free()
 
-	FOct := wrap.NewOctet(F)
+	FSize := wrap.GTS_BLS383
+	FOct := wrap.MakeOctet(FSize)
 	defer FOct.Free()
 
 	PaOct := wrap.NewOctet(Pa)
@@ -341,11 +424,15 @@ func MPIN_BLS383_SERVER_2(d int, HID []byte, HTID []byte, y []byte, SS []byte, U
 
 	err = wrap.MPIN_BLS383_SERVER_2(d, HIDOct, HTIDOct, yOct, SSOct, UOct, UTOct, VOct, EOct, FOct, PaOct)
 
+	E = EOct.ToBytes()
+
+	F = FOct.ToBytes()
+
 	return
 }
 
-// MPIN_BLS383_SERVER_KEY is a wrapper if wrap.MPIN_BLS383_SERVER_KEY
-func MPIN_BLS383_SERVER_KEY(h int, Z []byte, SS []byte, w []byte, p []byte, I []byte, U []byte, UT []byte, K []byte) (err error) {
+// ServerKey_BLS383 is a wrapper of wrap.MPIN_BLS383_SERVER_KEY
+func ServerKey_BLS383(h int, Z []byte, SS []byte, w []byte, p []byte, I []byte, U []byte, UT []byte) (K []byte, err error) {
 
 	ZOct := wrap.NewOctet(Z)
 	defer ZOct.Free()
@@ -368,24 +455,29 @@ func MPIN_BLS383_SERVER_KEY(h int, Z []byte, SS []byte, w []byte, p []byte, I []
 	UTOct := wrap.NewOctet(UT)
 	defer UTOct.Free()
 
-	KOct := wrap.NewOctet(K)
+	KSize := wrap.PAS_BLS383
+	KOct := wrap.MakeOctet(KSize)
 	defer KOct.Free()
 
 	err = wrap.MPIN_BLS383_SERVER_KEY(h, ZOct, SSOct, wOct, pOct, IOct, UOct, UTOct, KOct)
 
+	K = KOct.ToBytes()
 	return
 }
 
-// MPIN_BLS383_SERVER is a wrapper if wrap.MPIN_BLS383_SERVER
-func MPIN_BLS383_SERVER(h int, d int, HID []byte, HTID []byte, y []byte, SS []byte, U []byte, UT []byte, V []byte, E []byte, F []byte, ID []byte, MESSAGE []byte, t int, Pa []byte) (err error) {
+// Server_BLS383 is a wrapper of wrap.MPIN_BLS383_SERVER
+func Server_BLS383(h int, d int, SS []byte, U []byte, UT []byte, V []byte, ID []byte, MESSAGE []byte, t int, Pa []byte) (HID []byte, HTID []byte, y []byte, E []byte, F []byte, err error) {
 
-	HIDOct := wrap.NewOctet(HID)
+	HIDSize := wrap.G1S_BLS383
+	HIDOct := wrap.MakeOctet(HIDSize)
 	defer HIDOct.Free()
 
-	HTIDOct := wrap.NewOctet(HTID)
+	HTIDSize := wrap.G1S_BLS383
+	HTIDOct := wrap.MakeOctet(HTIDSize)
 	defer HTIDOct.Free()
 
-	yOct := wrap.NewOctet(y)
+	ySize := wrap.PGS_BLS383
+	yOct := wrap.MakeOctet(ySize)
 	defer yOct.Free()
 
 	SSOct := wrap.NewOctet(SS)
@@ -400,10 +492,12 @@ func MPIN_BLS383_SERVER(h int, d int, HID []byte, HTID []byte, y []byte, SS []by
 	VOct := wrap.NewOctet(V)
 	defer VOct.Free()
 
-	EOct := wrap.NewOctet(E)
+	ESize := wrap.GTS_BLS383
+	EOct := wrap.MakeOctet(ESize)
 	defer EOct.Free()
 
-	FOct := wrap.NewOctet(F)
+	FSize := wrap.GTS_BLS383
+	FOct := wrap.MakeOctet(FSize)
 	defer FOct.Free()
 
 	IDOct := wrap.NewOctet(ID)
@@ -417,22 +511,37 @@ func MPIN_BLS383_SERVER(h int, d int, HID []byte, HTID []byte, y []byte, SS []by
 
 	err = wrap.MPIN_BLS383_SERVER(h, d, HIDOct, HTIDOct, yOct, SSOct, UOct, UTOct, VOct, EOct, FOct, IDOct, MESSAGEOct, t, PaOct)
 
+	HID = HIDOct.ToBytes()
+
+	HTID = HTIDOct.ToBytes()
+
+	y = yOct.ToBytes()
+
+	E = EOct.ToBytes()
+
+	F = FOct.ToBytes()
+
 	return
 }
 
-// MPIN_BLS383_SERVER_1 is a wrapper if wrap.MPIN_BLS383_SERVER_1
-func MPIN_BLS383_SERVER_1(h int, d int, ID []byte, HID []byte, HTID []byte) {
+// Server1_BLS383 is a wrapper of wrap.MPIN_BLS383_SERVER_1
+func Server1_BLS383(h int, d int, ID []byte) (HID []byte, HTID []byte) {
 
 	IDOct := wrap.NewOctet(ID)
 	defer IDOct.Free()
 
-	HIDOct := wrap.NewOctet(HID)
+	HIDSize := wrap.G1S_BLS383
+	HIDOct := wrap.MakeOctet(HIDSize)
 	defer HIDOct.Free()
 
-	HTIDOct := wrap.NewOctet(HTID)
+	HTIDSize := wrap.G1S_BLS383
+	HTIDOct := wrap.MakeOctet(HTIDSize)
 	defer HTIDOct.Free()
 
 	wrap.MPIN_BLS383_SERVER_1(h, d, IDOct, HIDOct, HTIDOct)
 
+	HID = HIDOct.ToBytes()
+
+	HTID = HTIDOct.ToBytes()
 	return
 }
