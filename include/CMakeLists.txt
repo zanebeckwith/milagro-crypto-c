@@ -169,9 +169,9 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   endif(NOT(${pf} STREQUAL "NOT"))
 
   install (FILES ${CURVE_HEADERS} DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
   # if(BUILD_GO)
   #   # Copy header files for testing before installation
@@ -238,9 +238,9 @@ function(RSA_HEADERS_SET tb tff nb base ml)
   endif(BUILD_X509)
 
   install (FILES ${RSA_HEADERS} DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
   # if(BUILD_GO)
   #   # Copy header files for testing before installation
@@ -417,19 +417,19 @@ install (DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
         WORLD_READ WORLD_EXECUTE)
 
 install (FILES ${COMMON_HEADERS} DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/arch.h DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
 # if(BUILD_GO)
 #   # Copy header files for testing before installation
