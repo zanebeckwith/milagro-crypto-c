@@ -7,7 +7,9 @@ services:
 install:
   - gem install coveralls-lcov
 
+# The fcntl line works around a bug where Travis truncates logs and fails.
 script:
+  - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
   - make -f Makefile.docker
   - make -f Makefile.docker buildall
 
