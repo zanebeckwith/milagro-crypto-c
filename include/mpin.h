@@ -18,7 +18,7 @@ under the License.
 */
 
 /**
- * @file mpin_ZZZ.h
+ * @file mpin.h
  * @author Mike Scott and Kealan McCusker
  * @date 2nd June 2015
  * @brief M-Pin Header file
@@ -37,23 +37,49 @@ under the License.
 
 /* Field size is assumed to be greater than or equal to group size */
 
-#define MPIN_PGS_ZZZ MODBYTES_XXX  /**< MPIN Group Size */
-#define MPIN_PFS_ZZZ MODBYTES_XXX  /**< MPIN Field Size */
+#define PGS_ZZZ MODBYTES_XXX  /**< MPIN Group Size */
+#define PFS_ZZZ MODBYTES_XXX  /**< MPIN Field Size */
+#define PAS_ZZZ 16            /**< MPIN Symmetric Key Size */
 
-#define M_SIZE (MESSAGE_SIZE+2*MPIN_PFS_ZZZ+1)   /**< Signature message size and G1 size */
+#define M_SIZE (MESSAGE_SIZE+2*PFS_ZZZ+1)   /**< Signature message size and G1 size */
+
+#define MPIN_OK             0   /**< Function completed without error */
+#define MPIN_INVALID_POINT  -14	/**< Point is NOT on the curve */
+#define MPIN_BAD_PIN        -19 /**< Bad PIN number entered */
+
+#define MAXPIN 10000         /**< max PIN */
+#define PBLEN 14             /**< max length of PIN in bits */
 
 /* MPIN support functions */
 
 /* MPIN primitives */
 
-/**	@brief Generate Y=H(s,O), where s is epoch time, O is an octet, and H(.) is a hash function
+
+void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
+
+/**	@brief Extract a PIN number from a client secret
  *
   	@param h is the hash type
-	@param t is epoch time in seconds
-	@param O is an input octet
-	@param Y is the output octet
+	@param ID is the input client identity
+	@param factor is an input factor
+	@param facbits is the number of bits in the factor
+	@param CS is the client secret from which the factor is to be extracted
+	@return 0 or an error code
  */
-void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
+int MPIN_ZZZ_EXTRACT_FACTOR(int h,octet *ID,int factor,int facbits,octet *CS);
+
+/**	@brief Extract a PIN number from a client secret
+ *
+  	@param h is the hash type
+	@param ID is the input client identity
+	@param factor is an input factor
+	@param facbits is the number of bits in the factor
+	@param CS is the client secret to which the factor is to be added
+	@return 0 or an error code
+ */
+int MPIN_ZZZ_RESTORE_FACTOR(int h,octet *ID,int factor,int facbits,octet *CS);
+
+
 /**	@brief Extract a PIN number from a client secret
  *
   	@param h is the hash type
@@ -63,15 +89,9 @@ void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
 	@return 0 or an error code
  */
 int MPIN_ZZZ_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
-/**	@brief Add a PIN number to a token
- *
-  	@param h is the hash type
-	@param ID is the input client identity
-	@param pin is an input PIN number
-	@param T is the token to which the PIN is to be added
-	@return 0 or an error code
- */
-int MPIN_ZZZ_ADD_PIN(int h,octet *ID,int pin,octet *T);
+
+
+
 /**	@brief Perform client side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
@@ -151,7 +171,6 @@ int MPIN_ZZZ_CLIENT_2(octet *x,octet *y,octet *V);
 	@return 0 or an error code
  */
 int MPIN_ZZZ_SERVER(int h,int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE, int t, octet *Pa);
-
 /**	@brief Perform first pass of the server side of the 3-pass version of the M-Pin protocol
  *
  	@param h is the hash type
@@ -181,7 +200,6 @@ void MPIN_ZZZ_SERVER_1(int h,int d,octet *ID,octet *HID,octet *HTID);
 	@return 0 or an error code
  */
 int MPIN_ZZZ_SERVER_2(int d,octet *HID,octet *HTID,octet *y,octet *SS,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *Pa);
-
 /**	@brief Add two members from the group G1
  *
 	@param Q1 an input member of G1

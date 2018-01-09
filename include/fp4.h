@@ -1,30 +1,3 @@
-/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
-
-/**
- * @file fp4_YYY.h
- * @author Mike Scott
- * @date 2nd June 2015
- * @brief FP4 functions
- *
- */
-
 #ifndef FP4_YYY_H
 #define FP4_YYY_H
 
@@ -81,6 +54,16 @@ extern void FP4_YYY_from_FP2s(FP4_YYY *x,FP2_YYY *a,FP2_YYY *b);
 	@param a FP2 to form real part of FP4
  */
 extern void FP4_YYY_from_FP2(FP4_YYY *x,FP2_YYY *a);
+
+/**	@brief Initialise FP4 from single FP2
+ *
+	real part is set to zero
+	@param x FP4 instance to be initialised
+	@param a FP2 to form imaginary part of FP4
+ */
+extern void FP4_YYY_from_FP2H(FP4_YYY *x,FP2_YYY *a);
+
+
 /**	@brief Copy FP4 to another FP4
  *
 	@param x FP4 instance, on exit = y
