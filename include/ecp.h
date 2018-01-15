@@ -1,3 +1,29 @@
+/*
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+*/
+
+/**
+ * @file ecp.h
+ * @author Mike Scott
+ * @brief ECP Header File
+ *
+ */
+
 #ifndef ECP_ZZZ_H
 #define ECP_ZZZ_H
 
@@ -5,8 +31,8 @@
 #include "config_curve_ZZZ.h"
 
 /* Curve Params - see rom_zzz.c */
-extern const int CURVE_A_ZZZ;     /**< Elliptic curve A parameter */
-extern const int CURVE_B_I_ZZZ;
+extern const int CURVE_A_ZZZ;         /**< Elliptic curve A parameter */
+extern const int CURVE_B_I_ZZZ;       /**< Elliptic curve B_i parameter */
 extern const BIG_XXX CURVE_B_ZZZ;     /**< Elliptic curve B parameter */
 extern const BIG_XXX CURVE_Order_ZZZ; /**< Elliptic curve group order */
 extern const BIG_XXX CURVE_Cof_ZZZ;   /**< Elliptic curve cofactor */

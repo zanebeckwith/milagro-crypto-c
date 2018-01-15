@@ -20,12 +20,8 @@ under the License.
 /**
  * @file mpin.h
  * @author Mike Scott and Kealan McCusker
- * @date 2nd June 2015
  * @brief M-Pin Header file
  *
- * Allows some user configuration
- * defines structures
- * declares functions
  *
  */
 
@@ -55,6 +51,13 @@ under the License.
 /* MPIN primitives */
 
 
+/**	@brief Generate Y=H(s,O), where s is epoch time, O is an octet, and H(.) is a hash function
+ *
+  	@param h is the hash type
+	@param t is epoch time in seconds
+	@param O is an input octet
+	@param Y is the output octet
+*/
 void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
 
 /**	@brief Extract a PIN number from a client secret
