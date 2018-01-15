@@ -92,15 +92,6 @@ extern void ECP_ZZZ_inf(ECP_ZZZ *P);
 	@param x BIG n-residue x
  */
 extern void ECP_ZZZ_rhs(FP_YYY *r,FP_YYY *x);
-/**	@brief Set ECP to point(x,y) given just x and sign of y
- *
-	Point P set to infinity if no such point on the curve. If x is on the curve then y is calculated from the curve equation.
-	The correct y value (plus or minus) is selected given its sign s.
-	@param P ECP instance to be set (x,[y])
-	@param x BIG x coordinate of point
-	@param s an integer representing the "sign" of y, in fact its least significant bit.
- */
-extern int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s);
 
 #if CURVETYPE_ZZZ==MONTGOMERY
 /**	@brief Set ECP to point(x,[y]) given x
@@ -157,6 +148,21 @@ extern void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q);
 	@param Q ECP instance to be subtracted from P
  */
 extern void ECP_ZZZ_sub(ECP_ZZZ *P,ECP_ZZZ *Q);
+/**	@brief Set ECP to point(x,y) given just x and sign of y
+ *
+	Point P set to infinity if no such point on the curve. If x is on the curve then y is calculated from the curve equation.
+	The correct y value (plus or minus) is selected given its sign s.
+	@param P ECP instance to be set (x,[y])
+	@param x BIG x coordinate of point
+	@param s an integer representing the "sign" of y, in fact its least significant bit.
+ */
+extern int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s);
+/**	@brief Maps random BIG to curve point of correct order
+ *
+	@param Q ECP instance of correct order
+	@param w OCTET byte array to be mapped
+ */
+extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,octet *w);
 #endif
 /**	@brief Converts an ECP point from Projective (x,y,z) coordinates to affine (x,y) coordinates
  *
@@ -226,11 +232,5 @@ extern void ECP_ZZZ_mul(ECP_ZZZ *P,BIG_XXX b);
  */
 extern void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f);
 
-/**	@brief Maps random BIG to curve point of correct order
- *
-	@param Q ECP instance of correct order
-	@param w OCTET byte array to be mapped
- */
-extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,octet *w);
 
 #endif
