@@ -48,7 +48,7 @@ extern const BIG_XXX R2modp_YYY;	/**< Montgomery constant */
 extern const chunk MConst_YYY;		/**< Constant associated with Modulus - for Montgomery = 1/p mod 2^BASEBITS */
 
 
-#define MODBITS_YYY MBITS_YYY                        /**< TODO */
+#define MODBITS_YYY MBITS_YYY                        /**< Number of bits in Modulus for selected curve */
 #define TBITS_YYY (MBITS_YYY%BASEBITS_XXX)           /**< Number of active bits in top word */
 #define TMASK_YYY (((chunk)1<<TBITS_YYY)-1)          /**< Mask for active bits in top word */
 #define FEXCESS_YYY ((sign32)1<<MAXXES_YYY)	     /**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
