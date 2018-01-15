@@ -1,7 +1,7 @@
 /**
- * @file test_mpin_ZZZ.c
+ * @file test_mpin_dvs_ZZZ.c
  * @author Kealan McCusker
- * @brief Test Designated Verifier Signature (DVS) scheme 
+ * @brief Test Designated Verifier Signature (DVS) scheme
  *
  * LICENSE
  *
