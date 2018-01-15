@@ -547,7 +547,7 @@ extern void BIG_XXX_mod2m(BIG_XXX x,int m);
 #ifdef dchunk
 
 /* Method required to calculate x*y+c+r, bottom half in r, top half returned */
-inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
+static inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 {
     dchunk prod=(dchunk)x*y+c+*r;
     *r=(chunk)prod&BMASK_XXX;
@@ -559,7 +559,7 @@ inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 /* No integer type available that can store double the wordlength */
 /* accumulate partial products */
 
-inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
+static inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 {
     chunk x0,x1,y0,y1;
     chunk bot,top,mid,carry;
