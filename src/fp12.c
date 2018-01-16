@@ -241,46 +241,94 @@ void FP12_YYY_mul(FP12_YYY *w,FP12_YYY *y)
 /* FP12 multiplication w=w*y */
 /* SU= 744 */
 /* catering for special case that arises from special form of ATE pairing line function */
-void FP12_YYY_smul(FP12_YYY *w,FP12_YYY *y)
+void FP12_YYY_smul(FP12_YYY *w,FP12_YYY *y,int type)
 {
-    FP4_YYY z0,z2,z3,t0,t1;
+    FP4_YYY z0,z1,z2,z3,t0,t1;
 
-    FP4_YYY_copy(&z3,&(w->b));
-    FP4_YYY_mul(&z0,&(w->a),&(y->a));
+    if (type==D_TYPE)
+    {
+        // y->c is 0
 
-    FP4_YYY_pmul(&z2,&(w->b),&(y->b).a);
-    FP4_YYY_add(&(w->b),&(w->a),&(w->b));
-    FP4_YYY_copy(&t1,&(y->a));
-    FP2_YYY_add(&t1.a,&t1.a,&(y->b).a);
+        FP4_YYY_copy(&z3,&(w->b));
+        FP4_YYY_mul(&z0,&(w->a),&(y->a));
 
-    FP4_YYY_norm(&t1);
-    FP4_YYY_norm(&(w->b));
+        FP4_YYY_pmul(&z2,&(w->b),&(y->b).a);
+        FP4_YYY_add(&(w->b),&(w->a),&(w->b));
+        FP4_YYY_copy(&t1,&(y->a));
+        FP2_YYY_add(&t1.a,&t1.a,&(y->b).a);
 
-    FP4_YYY_mul(&(w->b),&(w->b),&t1);
-    FP4_YYY_add(&z3,&z3,&(w->c));
-    FP4_YYY_norm(&z3);
-    FP4_YYY_pmul(&z3,&z3,&(y->b).a);
-    FP4_YYY_neg(&t0,&z0);
-    FP4_YYY_neg(&t1,&z2);
+        FP4_YYY_norm(&t1);
+        FP4_YYY_norm(&(w->b));
 
-    FP4_YYY_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
+        FP4_YYY_mul(&(w->b),&(w->b),&t1);
+        FP4_YYY_add(&z3,&z3,&(w->c));
+        FP4_YYY_norm(&z3);
+        FP4_YYY_pmul(&z3,&z3,&(y->b).a);
+        FP4_YYY_neg(&t0,&z0);
+        FP4_YYY_neg(&t1,&z2);
+
+        FP4_YYY_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
 //    FP4_YYY_norm(&(w->b));
-    FP4_YYY_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
+        FP4_YYY_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
 
-    FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
-    FP4_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
+        FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
+        FP4_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
 
-    FP4_YYY_add(&t0,&(w->a),&(w->c));
+        FP4_YYY_add(&t0,&(w->a),&(w->c));
 
-    FP4_YYY_norm(&t0);
-    FP4_YYY_norm(&z3);
+        FP4_YYY_norm(&t0);
+        FP4_YYY_norm(&z3);
 
-    FP4_YYY_mul(&t0,&(y->a),&t0);
-    FP4_YYY_add(&(w->c),&z2,&t0);
+        FP4_YYY_mul(&t0,&(y->a),&t0);
+        FP4_YYY_add(&(w->c),&z2,&t0);
 
-    FP4_YYY_times_i(&z3);
-    FP4_YYY_add(&(w->a),&z0,&z3);
+        FP4_YYY_times_i(&z3);
+        FP4_YYY_add(&(w->a),&z0,&z3);
+    }
 
+    if (type==M_TYPE)
+    {
+        // y->b is zero
+        FP4_YYY_mul(&z0,&(w->a),&(y->a));
+        FP4_YYY_add(&t0,&(w->a),&(w->b));
+        FP4_YYY_norm(&t0);
+
+        FP4_YYY_mul(&z1,&t0,&(y->a));
+        FP4_YYY_add(&t0,&(w->b),&(w->c));
+        FP4_YYY_norm(&t0);
+
+        FP4_YYY_pmul(&z3,&t0,&(y->c).b);
+        FP4_YYY_times_i(&z3);
+
+        FP4_YYY_neg(&t0,&z0);
+        FP4_YYY_add(&z1,&z1,&t0);   // z1=z1-z0
+
+        FP4_YYY_copy(&(w->b),&z1);
+
+        FP4_YYY_copy(&z2,&t0);
+
+        FP4_YYY_add(&t0,&(w->a),&(w->c));
+        FP4_YYY_add(&t1,&(y->a),&(y->c));
+
+        FP4_YYY_norm(&t0);
+        FP4_YYY_norm(&t1);
+
+        FP4_YYY_mul(&t0,&t1,&t0);
+        FP4_YYY_add(&z2,&z2,&t0);
+
+        FP4_YYY_pmul(&t0,&(w->c),&(y->c).b);
+        FP4_YYY_times_i(&t0);
+        FP4_YYY_neg(&t1,&t0);
+        FP4_YYY_times_i(&t0);
+
+        FP4_YYY_add(&(w->c),&z2,&t1);
+        FP4_YYY_add(&z3,&z3,&t1);
+
+        FP4_YYY_add(&(w->b),&(w->b),&t0);
+        FP4_YYY_norm(&z3);
+        FP4_YYY_times_i(&z3);
+        FP4_YYY_add(&(w->a),&z0,&z3);
+    }
     FP12_YYY_norm(w);
 }
 
@@ -374,6 +422,13 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
 
     FP12_YYY_trace(c,&g1);
 
+    if (BIG_XXX_iszilch(b))
+    {
+        FP4_YYY_xtr_pow(c,c,e);
+        return;
+    }
+
+
     FP12_YYY_frob(&g2,&f);
     FP12_YYY_trace(&cp,&g2);
 
@@ -395,25 +450,44 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
 void FP12_YYY_pow(FP12_YYY *r,FP12_YYY *a,BIG_XXX b)
 {
     FP12_YYY w;
-    BIG_XXX z,zilch;
-    int bt;
-    BIG_XXX_zero(zilch);
+    BIG_XXX b3;
+    int i,nb,bt;
     BIG_XXX_norm(b);
-    BIG_XXX_copy(z,b);
-    FP12_YYY_copy(&w,a);
-    FP12_YYY_one(r);
+    BIG_XXX_pmul(b3,b,3);
+    BIG_XXX_norm(b3);
 
-    while(1)
+    FP12_YYY_copy(&w,a);
+
+    nb=BIG_XXX_nbits(b3);
+    for (i=nb-2; i>=1; i--)
     {
-        bt=BIG_XXX_parity(z);
-        BIG_XXX_shr(z,1);
-        if (bt)
-            FP12_YYY_mul(r,&w);
-        if (BIG_XXX_comp(z,zilch)==0) break;
         FP12_YYY_usqr(&w,&w);
+        bt=BIG_XXX_bit(b3,i)-BIG_XXX_bit(b,i);
+        if (bt==1)
+            FP12_YYY_mul(&w,a);
+        if (bt==-1)
+        {
+            FP12_YYY_conj(a,a);
+            FP12_YYY_mul(&w,a);
+            FP12_YYY_conj(a,a);
+        }
     }
 
+    FP12_YYY_copy(r,&w);
     FP12_YYY_reduce(r);
+
+    /*
+        while(1)
+        {
+            bt=BIG_XXX_parity(z);
+            BIG_XXX_shr(z,1);
+            if (bt)
+                FP12_YYY_mul(r,&w);
+            if (BIG_XXX_comp(z,zilch)==0) break;
+            FP12_YYY_usqr(&w,&w);
+        }
+
+        FP12_YYY_reduce(r); */
 }
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */

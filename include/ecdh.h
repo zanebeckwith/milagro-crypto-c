@@ -18,12 +18,10 @@ under the License.
 */
 
 /**
- * @file ecdh_ZZZ.h
- * @author Mike Scott and Kealan McCusker
- * @date 2nd June 2015
+ * @file ecdh.h
+ * @author Mike Scott
  * @brief ECDH Header file for implementation of standard EC protocols
  *
- * declares functions
  *
  */
 

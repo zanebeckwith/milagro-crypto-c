@@ -14,13 +14,13 @@ include_directories (${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR}/include )
 function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
   set(bd "${tb}_${base}")
 
-  file(READ "big_XXX.c" tempc)
+  file(READ "big.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c" "${tempc}")
   set(SOURCES_CURVE_${tc}
     ${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c)
 
-  file(READ "fp_YYY.c" tempc)
+  file(READ "fp.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.c" "${tempc}")
@@ -29,7 +29,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     ${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.c
     ${CMAKE_CURRENT_BINARY_DIR}/rom_field_${tf}.c)
 
-  file(READ "ecp_ZZZ.c" tempc)
+  file(READ "ecp.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
   string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
@@ -37,7 +37,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
   set(SOURCES_CURVE_${tc} ${SOURCES_CURVE_${tc}}
     ${CMAKE_CURRENT_BINARY_DIR}/ecp_${tc}.c)
 
-  file(READ "ecdh_ZZZ.c" tempc)
+  file(READ "ecdh.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
   string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
@@ -55,28 +55,28 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
 
   if(NOT(${pf} STREQUAL "NOT"))
 
-    file(READ "fp2_YYY.c" tempc)
+    file(READ "fp2.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp2_${tc}.c" "${tempc}")
     set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
       ${CMAKE_CURRENT_BINARY_DIR}/fp2_${tc}.c)
 
-    file(READ "fp4_YYY.c" tempc)
+    file(READ "fp4.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp4_${tc}.c" "${tempc}")
     set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
-    ${CMAKE_CURRENT_BINARY_DIR}/fp4_${tc}.c)
+      ${CMAKE_CURRENT_BINARY_DIR}/fp4_${tc}.c)
 
-    file(READ "fp12_YYY.c" tempc)
+    file(READ "fp12.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp12_${tc}.c" "${tempc}")
     set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
       ${CMAKE_CURRENT_BINARY_DIR}/fp12_${tc}.c)
 
-    file(READ "ecp2_ZZZ.c" tempc)
+    file(READ "ecp2.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
@@ -84,7 +84,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     set(SOURCES_PAIRING_${tc} ${SOURCES_PAIRING_${tc}}
       ${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.c)
 
-    file(READ "pair_ZZZ.c" tempc)
+    file(READ "pair.c" tempc)
     string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
     string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
     string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
@@ -166,7 +166,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     endif (BUILD_PYTHON AND BUILD_SHARED_LIBS)
 
     if(BUILD_MPIN)
-      file(READ "mpin_ZZZ.c" tempc)
+      file(READ "mpin.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
       string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
@@ -250,7 +250,7 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
-      file(READ "wcc_ZZZ.c" tempc)
+      file(READ "wcc.c" tempc)
       string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
       string(REGEX REPLACE "YYY" ${tf} tempc "${tempc}")
       string(REGEX REPLACE "ZZZ" ${tc} tempc "${tempc}")
@@ -378,20 +378,20 @@ function(RSA_SRC_SET tb tff nb base ml)
   
   set(bd "${tb}_${base}")
 
-  file(READ "big_XXX.c" tempc)
+  file(READ "big.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c" "${tempc}")
   set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
       ${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.c)
 
-  file(READ "ff_WWW.c" tempc)
+  file(READ "ff.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.c" "${tempc}")
   set(SOURCES_RSA_${tff} ${SOURCES_RSA_${tff}}
       ${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.c)
 
-  file(READ "rsa_WWW.c" tempc)
+  file(READ "rsa.c" tempc)
   string(REGEX REPLACE "XXX" ${bd} tempc "${tempc}")
   string(REGEX REPLACE "WWW" ${tff} tempc "${tempc}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.c" "${tempc}")
@@ -570,6 +570,12 @@ foreach(CURVE ${AMCL_CURVE})
         CURVE_SRC_SET("256" "BN254CX" "BN254CX" "32" "56" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
     elseif(CURVE STREQUAL "BLS383")
         CURVE_SRC_SET("384" "BLS383" "BLS383" "48" "56" "383" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS")
+    elseif(CURVE STREQUAL "FP256BN")
+        CURVE_SRC_SET("256" "FP256BN" "FP256BN" "32" "56" "256" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+    elseif(CURVE STREQUAL "FP512BN")
+        CURVE_SRC_SET("512" "FP512BN" "FP512BN" "64" "60" "512" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+    elseif(CURVE STREQUAL "BLS461")
+        CURVE_SRC_SET("464" "BLS461" "BLS461" "58" "60" "461" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS")
     else()
       message(FATAL_ERROR "Invalid curve input")
     endif(CURVE STREQUAL "ED25519")
@@ -612,14 +618,18 @@ foreach(CURVE ${AMCL_CURVE})
         CURVE_SRC_SET("256" "BN254CX" "BN254CX" "32" "28" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
     elseif(CURVE STREQUAL "BLS383")
         CURVE_SRC_SET("384" "BLS383" "BLS383" "48" "29" "383" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS")
+    elseif(CURVE STREQUAL "FP256BN")
+        CURVE_SRC_SET("256" "FP256BN" "FP256BN" "32" "28" "256" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+    elseif(CURVE STREQUAL "FP512BN")
+        CURVE_SRC_SET("512" "FP512BN" "FP512BN" "64" "29" "512" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+    elseif(CURVE STREQUAL "BLS461")
+        CURVE_SRC_SET("464" "BLS461" "BLS461" "58" "28" "461" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS")
     else()
       message(FATAL_ERROR "Invalid curve input")
     endif(CURVE STREQUAL "ED25519")
   elseif(AMCL_CHUNK STREQUAL "16")
     if(CURVE STREQUAL "ED25519")
         CURVE_SRC_SET("256" "25519" "ED25519" "32" "13" "255" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
-    elseif(CURVE STREQUAL "C25519")
-        CURVE_SRC_SET("256" "25519" "C25519" "32" "13" "255" "5" "PSEUDO_MERSENNE" "MONTGOMERY" "NOT")
     elseif(CURVE STREQUAL "NUMS256E")
         CURVE_SRC_SET("256" "256PME" "NUMS256E" "32" "13" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
     elseif(CURVE STREQUAL "BN254")
@@ -755,13 +765,3 @@ if (BUILD_PYTHON AND BUILD_SHARED_LIBS)
                 COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.dylib" "${PROJECT_BINARY_DIR}/wrappers/python/")
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif (BUILD_PYTHON AND BUILD_SHARED_LIBS)
-
-
-
-
-
-
-
-
-
-

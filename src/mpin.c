@@ -73,7 +73,7 @@ static void mpin_hash(int sha,FP4_YYY *f, ECP_ZZZ *P,octet *w)
         break;
     }
 
-    OCT_jbytes(w,h,MPIN_PAS);
+    OCT_jbytes(w,h,PAS_ZZZ);
     for (i=0; i<hlen; i++) h[i]=0;
 }
 
@@ -88,7 +88,10 @@ static void map(ECP_ZZZ *P,BIG_XXX u,int cb)
     BIG_XXX_mod(x,q);
 
     while (!ECP_ZZZ_setx(P,x,cb))
+    {
         BIG_XXX_inc(x,1);
+        BIG_XXX_norm(x);
+    }
 }
 
 /* returns u derived from P. Random value in range 1 to return value should then be added to u */
@@ -102,6 +105,7 @@ static int unmap(BIG_XXX u,int *cb,ECP_ZZZ *P)
     do
     {
         BIG_XXX_dec(u,1);
+        BIG_XXX_norm(u);
         r++;
     }
     while (!ECP_ZZZ_setx(P,u,s));
@@ -123,7 +127,6 @@ int MPIN_ZZZ_ENCODING(csprng *RNG,octet *E)
     ECP_ZZZ P,W;
 
     if (!ECP_ZZZ_fromOctet(&P,E)) res=MPIN_INVALID_POINT;
-
     if (res==0)
     {
         BIG_XXX_rcopy(q,Modulus_YYY);
@@ -143,9 +146,8 @@ int MPIN_ZZZ_ENCODING(csprng *RNG,octet *E)
         BIG_XXX_inc(v,m+1);
         E->val[0]=su+2*sv;
         BIG_XXX_toBytes(&(E->val[1]),u);
-        BIG_XXX_toBytes(&(E->val[MPIN_PFS_ZZZ+1]),v);
+        BIG_XXX_toBytes(&(E->val[PFS_ZZZ+1]),v);
     }
-
     return res;
 }
 
@@ -161,17 +163,16 @@ int MPIN_ZZZ_DECODING(octet *D)
     {
 
         BIG_XXX_fromBytes(u,&(D->val[1]));
-        BIG_XXX_fromBytes(v,&(D->val[MPIN_PFS_ZZZ+1]));
+        BIG_XXX_fromBytes(v,&(D->val[PFS_ZZZ+1]));
 
         su=D->val[0]&1;
         sv=(D->val[0]>>1)&1;
-
         map(&W,u,su);
         map(&P,v,sv);
-
         ECP_ZZZ_add(&P,&W);
         ECP_ZZZ_toOctet(D,&P);
     }
+
     return res;
 }
 
@@ -226,29 +227,12 @@ int MPIN_ZZZ_RANDOM_GENERATE(csprng *RNG,octet* S)
 /* Extract PIN from TOKEN for identity CID */
 int MPIN_ZZZ_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
 {
-    ECP_ZZZ P,R;
-    int res=0;
-    char h[MODBYTES_XXX];
-    octet H= {0,sizeof(h),h};
-
-    if (!ECP_ZZZ_fromOctet(&P,TOKEN))  res=MPIN_INVALID_POINT;
-    if (res==0)
-    {
-        mhashit(sha,-1,CID,&H);
-        ECP_ZZZ_mapit(&R,&H);
-
-        pin%=MAXPIN;
-
-        ECP_ZZZ_pinmul(&R,pin,PBLEN);
-        ECP_ZZZ_sub(&P,&R);
-
-        ECP_ZZZ_toOctet(TOKEN,&P);
-    }
-    return res;
+    pin%=MAXPIN;
+    return MPIN_ZZZ_EXTRACT_FACTOR(sha,CID,pin,PBLEN,TOKEN);
 }
 
-/* Add PIN to TOKEN for identity CID */
-int MPIN_ZZZ_ADD_PIN(int sha,octet *CID,int pin,octet *TOKEN)
+/* Extract a factor < 32 bits for identity CID */
+int MPIN_ZZZ_EXTRACT_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TOKEN)
 {
     ECP_ZZZ P,R;
     int res=0;
@@ -261,9 +245,29 @@ int MPIN_ZZZ_ADD_PIN(int sha,octet *CID,int pin,octet *TOKEN)
         mhashit(sha,-1,CID,&H);
         ECP_ZZZ_mapit(&R,&H);
 
-        pin%=MAXPIN;
+        ECP_ZZZ_pinmul(&R,factor,facbits);
+        ECP_ZZZ_sub(&P,&R);
 
-        ECP_ZZZ_pinmul(&R,pin,PBLEN);
+        ECP_ZZZ_toOctet(TOKEN,&P);
+    }
+    return res;
+}
+
+/* Extract a factor < 32 bits for identity CID */
+int MPIN_ZZZ_RESTORE_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TOKEN)
+{
+    ECP_ZZZ P,R;
+    int res=0;
+    char h[MODBYTES_XXX];
+    octet H= {0,sizeof(h),h};
+
+    if (!ECP_ZZZ_fromOctet(&P,TOKEN))  res=MPIN_INVALID_POINT;
+    if (res==0)
+    {
+        mhashit(sha,-1,CID,&H);
+        ECP_ZZZ_mapit(&R,&H);
+
+        ECP_ZZZ_pinmul(&R,factor,facbits);
         ECP_ZZZ_add(&P,&R);
 
         ECP_ZZZ_toOctet(TOKEN,&P);
@@ -426,6 +430,7 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
                 ECP_ZZZ_add(&T,&W);					// SEC=s.H(ID)+s.H(T|ID)
             }
             mhashit(sha,date,&H,&H);
+
             ECP_ZZZ_mapit(&W,&H);
             if (xID!=NULL)
             {
@@ -470,10 +475,12 @@ int MPIN_ZZZ_GET_SERVER_SECRET(octet *S,octet *SST)
     FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
     FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
     FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
+
     ECP2_ZZZ_set(&Q,&qx,&qy);
 
     if (res==0)
     {
+
         BIG_XXX_fromBytes(s,S->val);
         PAIR_ZZZ_G2mul(&Q,s);
         ECP2_ZZZ_toOctet(SST,&Q);
@@ -492,6 +499,7 @@ int MPIN_ZZZ_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
     octet H= {0,sizeof(h),h};
 
     mhashit(sha,date,CID,&H);
+
     ECP_ZZZ_mapit(&P,&H);
 
 //printf("P= "); ECP_ZZZ_output(&P); printf("\n");
@@ -519,15 +527,23 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
     octet H= {0,sizeof(h),h};
     ECP_ZZZ P,R;
 
+#ifdef USE_ANONYMOUS
+    ECP_ZZZ_mapit(&P,CID);
+#else
     mhashit(sha,-1,CID,&H);
     ECP_ZZZ_mapit(&P,&H);
+#endif
 
     ECP_ZZZ_toOctet(HID,&P);  // new
 
     if (date)
     {
         //	if (HID!=NULL) ECP_ZZZ_toOctet(HID,&P);
+#ifdef USE_ANONYMOUS
+        mhashit(sha,date,CID,&H);
+#else
         mhashit(sha,date,&H,&H);
+#endif
         ECP_ZZZ_mapit(&R,&H);
         ECP_ZZZ_add(&P,&R);
         ECP_ZZZ_toOctet(HTID,&P);
@@ -569,12 +585,12 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
         if (date)
         {
             BIG_XXX_fromBytes(px,&(xCID->val[1]));
-            BIG_XXX_fromBytes(py,&(xCID->val[MPIN_PFS_ZZZ+1]));
+            BIG_XXX_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
         }
         else
         {
             BIG_XXX_fromBytes(px,&(xID->val[1]));
-            BIG_XXX_fromBytes(py,&(xID->val[MPIN_PFS_ZZZ+1]));
+            BIG_XXX_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
         }
         if (!ECP_ZZZ_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
     }
@@ -599,6 +615,7 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     }
     if (res==0)
     {
+
         PAIR_ZZZ_double_ate(&g,&Q,&R,&sQ,&P);
         PAIR_ZZZ_fexp(&g);
 
@@ -893,7 +910,7 @@ void MPIN_ZZZ_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
     BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
     BIG_XXX_mod(y,q);
     BIG_XXX_toBytes(Y->val,y);
-    Y->len=MPIN_PGS_ZZZ;
+    Y->len=PGS_ZZZ;
 }
 
 /* One pass MPIN Client */
@@ -914,11 +931,11 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
         return rtn;
 
     OCT_joctet(&M,pID);
-
     if (MESSAGE!=NULL)
     {
         OCT_joctet(&M,MESSAGE);
     }
+
     MPIN_ZZZ_GET_Y(sha,TimeValue,&M,Y);
 
     rtn = MPIN_ZZZ_CLIENT_2(X,Y,V);
@@ -929,7 +946,7 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
 }
 
 /* One pass MPIN Server */
-int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue,octet *Pa)
+int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue, octet *Pa)
 {
     int rtn=0;
     char m[M_SIZE];
@@ -952,7 +969,6 @@ int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,o
     MPIN_ZZZ_GET_Y(sha,TimeValue,&M,Y);
 
     rtn = MPIN_ZZZ_SERVER_2(date,HID,HTID,Y,sQ,U,UT,V,E,F,Pa);
-
     if (rtn != 0)
         return rtn;
 
@@ -993,4 +1009,3 @@ int MPIN_ZZZ_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa)
 
     return res;
 }
-

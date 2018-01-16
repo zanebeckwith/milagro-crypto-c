@@ -1,28 +1,26 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
 */
 
 /**
- * @file ff_WWW.h
+ * @file ff.h
  * @author Mike Scott
- * @date 2nd June 2015
- * @brief Finite Field Prototypes
- *
+ * @brief FF Header File
  *
  */
 
@@ -33,10 +31,10 @@ under the License.
 #include "config_ff_WWW.h"
 
 #define HFLEN_WWW (FFLEN_WWW/2) /**< Useful for half-size RSA private key operations */
-#define P_MBITS_WWW (MODBYTES_XXX*8)  /**< TODO */
-#define P_TBITS_WWW (P_MBITS_WWW%BASEBITS_XXX)  /**< TODO */
+#define P_MBITS_WWW (MODBYTES_XXX*8) /**< Number of bits in modulus */
+#define P_TBITS_WWW (P_MBITS_WWW%BASEBITS_XXX) /**< TODO  */
 #define P_EXCESS_WWW(a) (((a[NLEN_XXX-1])>>(P_TBITS_WWW))+1) /**< TODO */
-#define P_FEXCESS_WWW ((chunk)1<<(BASEBITS_XXX*NLEN_XXX-P_MBITS_WWW-1))  /**< TODO */
+#define P_FEXCESS_WWW ((chunk)1<<(BASEBITS_XXX*NLEN_XXX-P_MBITS_WWW-1)) /**< TODO */
 
 
 /* Finite Field Prototypes */

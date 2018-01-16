@@ -18,29 +18,21 @@
 */
 
 /**
- * @file randapi.h
+ * @file config_ff.h
  * @author Mike Scott
- * @brief PRNG API File
+ * @brief COnfig FF Header File
  *
  */
 
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef CONFIG_RSA_WWW_H
+#define CONFIG_RSA_WWW_H
 
 #include "amcl.h"
+#include "config_big_XXX.h"
 
-/**	@brief Initialise a random number generator
- *
-	@param R is a pointer to a cryptographically secure random number generator
-	@param S is an input truly random seed value
- */
-extern void CREATE_CSPRNG(csprng *R,octet *S);
-/**	@brief Kill a random number generator
- *
-	Deletes all internal state
-	@param R is a pointer to a cryptographically secure random number generator
- */
-extern void KILL_CSPRNG(csprng *R);
+// FF stuff
+
+#define FFLEN_WWW @ML@ /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
+
 
 #endif
-

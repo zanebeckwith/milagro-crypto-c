@@ -20,7 +20,6 @@ under the License.
 /**
  * @file pbc_support.h
  * @author Mike Scott
- * @date January 2017
  * @brief Auxiliary functions for Pairing-based protocols
  *
  *
@@ -50,6 +49,8 @@ under the License.
 
 #define PIV 12                 /**< AES-GCM Initialization Vector Size */
 #define PTAG 16                /**< AES-GCM MAC Size */
+
+#define TIME_SLOT_MINUTES 1440  /**< Time Slot = 1 day */
 
 /** @brief general purpose hash function w=hash(n|x)
  *

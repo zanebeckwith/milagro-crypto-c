@@ -18,29 +18,21 @@
 */
 
 /**
- * @file randapi.h
+ * @file config_big.h
  * @author Mike Scott
- * @brief PRNG API File
+ * @brief Config BIG  Header File
  *
  */
 
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef CONFIG_BIG_XXX_H
+#define CONFIG_BIG_XXX_H
 
-#include "amcl.h"
+#include"amcl.h"
 
-/**	@brief Initialise a random number generator
- *
-	@param R is a pointer to a cryptographically secure random number generator
-	@param S is an input truly random seed value
- */
-extern void CREATE_CSPRNG(csprng *R,octet *S);
-/**	@brief Kill a random number generator
- *
-	Deletes all internal state
-	@param R is a pointer to a cryptographically secure random number generator
- */
-extern void KILL_CSPRNG(csprng *R);
+// BIG stuff
+
+#define MODBYTES_XXX @NB@  	/**< Number of bytes in Modulus */
+#define BASEBITS_XXX @BASE@ 	/**< Numbers represented to base 2*BASEBITS */
+
 
 #endif
-

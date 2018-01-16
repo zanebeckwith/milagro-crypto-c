@@ -23,7 +23,6 @@ option (BUILD_GO "Build Golang" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
 option (BUILD_WCC "Build WCC" ON)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
-option (USE_PATENTS "Use patents for G1 and G2 multiplication" OFF)
 option (DEBUG_REDUCE "Print debug message for field reduction" OFF)
 option (DEBUG_NORM "Detect digit overflow" OFF)
 option (GET_STATS "Debug statistics" OFF)
@@ -96,7 +95,7 @@ message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
 set(AMCL_CURVE "BN254CX" CACHE STRING "Choice of Field. See ./include/amcl.h for explanation")
-set(Curves_values "NIST256;C25519;ED25519;BRAINPOOL;ANSSI;NUMS256E;NUMS256W;NUMS384E;NUMS384W;NUMS512E;NUMS512W;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN254;BN254CX;BLS383")
+set(Curves_values "NIST256;C25519;ED25519;BRAINPOOL;ANSSI;NUMS256E;NUMS256W;NUMS384E;NUMS384W;NUMS512E;NUMS512W;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN254;BN254CX;BLS383;FP256BN;FP512BN;BLS461")
 set_property(CACHE AMCL_CURVE PROPERTY STRINGS ${Curves_values})
 message(STATUS "AMCL_CURVE='${AMCL_CURVE}'")
 

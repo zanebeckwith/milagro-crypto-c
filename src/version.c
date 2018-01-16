@@ -59,9 +59,9 @@ void amcl_version(void)
      * - BN254CX
      * - BLS383
      */
-   	printf("\nSupported curves:\n");
+    printf("\nSupported curves:\n");
 #ifdef NIST256_VER
-   	printf("- NIST256\n");
+    printf("- NIST256\n");
 #endif
 #ifdef C25519_VER
     printf("- C25519\n");

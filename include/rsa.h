@@ -18,9 +18,8 @@ under the License.
 */
 
 /**
- * @file rsa_WWW.h
- * @author Mike Scott and Kealan McCusker
- * @date 2nd June 2015
+ * @file rsa.h
+ * @author Mike Scott
  * @brief RSA Header file for implementation of RSA protocol
  *
  * declares functions
@@ -66,7 +65,6 @@ typedef struct
 } rsa_private_key_WWW;
 
 /* RSA Auxiliary Functions */
-
 
 /**	@brief RSA Key Pair Generator
  *
