@@ -1,10 +1,10 @@
 # MAKEFILE
 #
-# @author      Nicola Asuni <nicola.asuni@miracl.com>
+# @author      Nicola Asuni <support@miracl.com>
 # @link        https://github.com/milagro-crypto/milagro-crypto-c
 #
 # Requires GNU parallel: https://www.gnu.org/software/parallel/
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
 .PHONY: help all default format clean qa z build build_qa_item build_item buildx buildall pubdocs print-%
@@ -96,8 +96,8 @@ BUILDS_MISC32=LINUX_32BIT_C25519_RSA2048:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CHUNK=32,,
 	LINUX_32BIT_GOLDILOCKS:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CHUNK=32,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,-DAMCL_CURVE=GOLDILOCKS \
 	LINUX_32BIT_C41417:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CHUNK=32,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,-DAMCL_CURVE=C41417 \
 	LINUX_32BIT_C25519_BN254CX_RSA2048:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CHUNK=32,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,-DAMCL_CURVE=C25519,BN254CX,,-DAMCL_RSA=2048 \
-	LINUX_32BIT_NIST256_BN254CX_RSA2048:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CHUNK=32,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,-DAMCL_CURVE=NIST256,BN254CX,,-DAMCL_RSA=2048 
-	# WINDOWS_32BIT_BN254CX:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CURVE=BN254CX,,-DAMCL_RSA=2048,,-DAMCL_CHUNK=32,,-DCMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake
+	LINUX_32BIT_NIST256_BN254CX_RSA2048:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CHUNK=32,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,-DAMCL_CURVE=NIST256,BN254CX,,-DAMCL_RSA=2048 \
+	WINDOWS_32BIT_BN254CX:-DCMAKE_C_FLAGS=-m32,,-DAMCL_CURVE=BN254CX,,-DAMCL_RSA=2048,,-DAMCL_CHUNK=32,,-DCMAKE_TOOLCHAIN_FILE=../../resources/cmake/mingw32-cross.cmake
 
 BUILDS_PFS16=LINUX_16BIT_BN254CX:-DAMCL_CHUNK=16,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,-DAMCL_CURVE=BN254CX \
 	LINUX_16BIT_BN254:-DAMCL_CHUNK=16,,-DCMAKE_INSTALL_PREFIX=/opt/amcl,,-DAMCL_CURVE=BN254
