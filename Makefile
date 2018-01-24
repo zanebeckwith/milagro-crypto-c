@@ -1,18 +1,13 @@
 # MAKEFILE
 #
 # @author      Nicola Asuni <nicola.asuni@miracl.com>
-# @link        https://github.com/miracl/milagro-crypto-c
-#
-# This file is intended to be executed in a Linux-compatible system and requires
-# the packages listed in resources/DockerDev/Dockerfile to execute the build in
-# the current environment, or Docker to build everything inside a Docker
-# container via the command "MAKETARGET=buildall make dbuild".
+# @link        https://github.com/milagro-crypto/milagro-crypto-c
 #
 # Requires GNU parallel: https://www.gnu.org/software/parallel/
 # ------------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all default format clean qa z build build_qa_item build_item buildx buildall dbuild pubdocs print-%
+.PHONY: help all default format clean qa z build build_qa_item build_item buildx buildall pubdocs print-%
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -150,7 +145,7 @@ help:
 	@echo "    make         :  Build library based on options in config.mk"
 	@echo "    make dbuild  :  Build library using docker based on options in config.mk"
 	@echo "    make format  :  Format the source code"
-	@echo "    make clean   :  Remove any build artefact"
+	@echo "    make clean   :  Remove any build artifact"
 	@echo ""
 	@echo "    Testing:"
 	@echo ""
@@ -281,7 +276,7 @@ build_group:
 build:
 	make build_item ITEM=$(filter ${TYPE}:%,$(BUILDS))
 
-# Same as build_item but stores the exit code and faling items
+# Same as build_item but stores the exit code and failing items
 build_qa_item:
 	make build_item ITEM=${ITEM} || (echo $$? > target/make.exit && echo ${ITEM} >> target/make_qa_errors.log);
 
@@ -318,23 +313,16 @@ endif
 # Alias for building all inside the Docker container
 buildall: default qa
 
-# Build everything inside a Docker container
-dbuild:
-	@mkdir -p target
-	@rm -rf target/*
-	@echo 0 > target/make.exit
-	CVSPATH=$(CVSPATH) VENDOR=$(VENDOR) PROJECT=$(PROJECT) MAKETARGET='$(MAKETARGET)' ./dockerbuild.sh
-	@exit `cat target/make.exit`
-
 # Publish Documentation in GitHub (requires writing permissions)
-# Use this only after generating with default build i.e. "make"
+# Use this only after generating library with AMCL_BUILD_DOXYGEN
+# turned on for the default build i.e. when you type "make"
 pubdocs:
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
 	mkdir -p ./target/DOCS/doc
 	cp -r ./target/default/doc/html/* ./target/DOCS/doc
 	cp ./doc/Home.md ./target/DOCS/
-	git clone https://github.com/miracl/milagro-crypto-c.wiki.git ./target/WIKI
+	git clone https://github.com/milagro-crypto/milagro-crypto-c.wiki.git ./target/WIKI
 	mv -f ./target/WIKI/.git ./target/DOCS/
 	cd ./target/DOCS/ && \
 	git add . -A && \
@@ -343,5 +331,5 @@ pubdocs:
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
 
-# Print variables usage: make print-VARABLE
+# Print variables usage: make print-VARIABLE
 print-%: ; @echo $* = $($*)

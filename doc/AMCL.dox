@@ -9,7 +9,7 @@
 
  For a detailed explanation about this library please read: <a href="AMCL.pdf">AMCL.pdf</a>
 
- AMCL is provided in *C* language but includes a <a href="https://www.python.org">Python</a> and <a href="https://golang.org">GO</a> wrapper.
+ AMCL is provided in *C* language but includes a <a href="https://www.python.org">Python</a> wrapper.for some components as an aid for development work.
 
   \section homepage Project page
   The official project page is hosted at 
