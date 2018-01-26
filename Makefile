@@ -249,7 +249,6 @@ format:
 	astyle --style=allman --recursive --suffix=none 'test/*.c'
 	astyle --style=allman --recursive --suffix=none 'examples/*.c'
 	astyle --style=allman --recursive --suffix=none 'benchmark/*.c'
-	find ./wrappers/go -type f -name "*.go" -exec gofmt -s -w {} \;
 	autopep8 --in-place --aggressive --aggressive ./wrappers/python/*.py
 
 # Remove any build artifact
@@ -259,7 +258,6 @@ clean:
 
 # Execute all builds and tests
 qa:
-	go get github.com/stretchr/testify/assert
 	@mkdir -p target/
 	@echo 0 > target/make.exit
 	@echo '' > target/make_qa_errors.log

@@ -105,41 +105,6 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
                     COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.dll" "${PROJECT_BINARY_DIR}/test/")
     endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-    # Copy built libs to wrappers/go to allow testing without
-    # having to install the libs.
-    if (BUILD_GO AND BUILD_SHARED_LIBS)
-      if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        add_custom_command(
-                    TARGET amcl_pairing_${tc}
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-      endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-      if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        add_custom_command(
-                    TARGET amcl_pairing_${tc}
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-      endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-      if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        add_custom_command(
-                    TARGET amcl_pairing_${tc}
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-      endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    endif (BUILD_GO AND BUILD_SHARED_LIBS)
-
-    # Static build
-    if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-      if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        add_custom_command(
-                    TARGET amcl_pairing_${tc}
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-      endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-
     # Copy built libs to wrappers/python to allow testing without
     # having to install the libs.
     if (BUILD_PYTHON AND BUILD_SHARED_LIBS)
@@ -186,41 +151,6 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
                       POST_BUILD
                       COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.dll" "${PROJECT_BINARY_DIR}/test/")
       endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-      # Copy built libs to wrappers/go to allow testing without
-      # having to install the libs.
-      if (BUILD_GO AND BUILD_SHARED_LIBS)
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-          add_custom_command(
-                      TARGET amcl_mpin_${tc}
-                      POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-        endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-          add_custom_command(
-                      TARGET amcl_mpin_${tc}
-                      POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-        endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-          add_custom_command(
-                      TARGET amcl_mpin_${tc}
-                      POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-        endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      endif (BUILD_GO AND BUILD_SHARED_LIBS)
-
-      # Static build
-      if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-          add_custom_command(
-                      TARGET amcl_mpin_${tc}
-                      POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-        endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-      endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
 
       # Copy built libs to wrappers/python to allow testing without
       # having to install the libs.
@@ -312,41 +242,6 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
                   COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.dll" "${PROJECT_BINARY_DIR}/test/")
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-  # Copy built libs to wrappers/go to allow testing without
-  # having to install the libs.
-  if (BUILD_GO AND BUILD_SHARED_LIBS)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-      add_custom_command(
-                  TARGET amcl_curve_${tc}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-      add_custom_command(
-                  TARGET amcl_curve_${tc}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      add_custom_command(
-                  TARGET amcl_curve_${tc}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  endif (BUILD_GO AND BUILD_SHARED_LIBS)
-
-  # Static build
-  if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-      add_custom_command(
-                  TARGET amcl_curve_${tc}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-
   # Copy built libs to wrappers/python to allow testing without
   # having to install the libs.
   if (BUILD_PYTHON AND BUILD_SHARED_LIBS)
@@ -416,41 +311,6 @@ function(RSA_SRC_SET tb tff nb base ml)
                   POST_BUILD
                   COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.dll" "${PROJECT_BINARY_DIR}/test/")
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-  # Copy built libs to wrappers/go to allow testing without
-  # having to install the libs.
-  if (BUILD_GO AND BUILD_SHARED_LIBS)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-      add_custom_command(
-                  TARGET amcl_rsa_${tff}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-      add_custom_command(
-                  TARGET amcl_rsa_${tff}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      add_custom_command(
-                  TARGET amcl_rsa_${tff}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  endif (BUILD_GO AND BUILD_SHARED_LIBS)
-
-  # Static build
-  if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-      add_custom_command(
-                  TARGET amcl_rsa_${tff}
-                  POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
 
   # Copy built libs to wrappers/python to allow testing without
   # having to install the libs.
@@ -705,41 +565,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.dll" "${PROJECT_BINARY_DIR}/test/")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-# Copy built libs to wrappers/go to allow testing without
-# having to install the libs.
-if (BUILD_GO AND BUILD_SHARED_LIBS)
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    add_custom_command(
-                TARGET amcl_core
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.so" "${PROJECT_BINARY_DIR}/wrappers/go/")
-  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    add_custom_command(
-                TARGET amcl_core
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.dll" "${PROJECT_BINARY_DIR}/wrappers/go/")
-  endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    add_custom_command(
-                TARGET amcl_core
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.dylib" "${PROJECT_BINARY_DIR}/wrappers/go/")
-  endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-endif (BUILD_GO AND BUILD_SHARED_LIBS)
-
-# Static build
-if (BUILD_GO AND NOT BUILD_SHARED_LIBS)
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    add_custom_command(
-                TARGET amcl_core
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.a" "${PROJECT_BINARY_DIR}/wrappers/go/")
-  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-endif (BUILD_GO AND NOT BUILD_SHARED_LIBS)
 
 # Copy built libs to wrappers/python to allow testing without
 # having to install the libs.
