@@ -10,7 +10,7 @@
 
 
 * **category**:    Library
-* **copyright**:   2016 The Apache Software Foundation
+* **copyright**:   2018 The Apache Software Foundation
 * **license**:     ASL 2.0 ([Apache License Version 2.0, January 2004](http://www.apache.org/licenses/LICENSE-2.0))
 * **link**:        https://github.com/milagro-crypto/milagro-crypto-c
 * **introduction**: [AMCL.pdf](doc/AMCL.pdf)
@@ -24,7 +24,7 @@ AMCL is a standards compliant C cryptographic library with no external dependenc
 
 For a detailed explanation about this library please read: [doc/AMCL.pdf](doc/AMCL.pdf)
 
-AMCL is provided in *C* language but includes a *[Python](https://www.python.org)* and *[GO](https://golang.org)* wrapper.
+AMCL is provided in *C* language but includes a *[Python](https://www.python.org)* wrapper for some modules to aid development work.
 
 NOTE: This product includes software developed at *[The Apache Software Foundation](http://www.apache.org/)*.
 
@@ -35,8 +35,7 @@ In order to build this library, the following packages are required:
 * [CMake](https://cmake.org/) is required to build the source code.
 * [CFFI](https://cffi.readthedocs.org/en/release-0.8/), the C Foreign Function Interface for Python is required in order to execute tests.
 * [Doxygen](http://doxygen.org) is required to build the source code documentation.
-* [GO](https://golang.org/dl/) and [Python](https://www.python.org/) languages are required to build the language wrappers.
-* Please refer to the *resources/DockerDev/Dockerfile* file for any additional dependency.
+* [Python](https://www.python.org/) language is required to build the Python language wrapper.
 
 
 The above packages can be installed in different ways, depending on the Operating System used:

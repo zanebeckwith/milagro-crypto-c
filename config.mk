@@ -24,9 +24,6 @@ AMCL_BUILD_SHARED_LIBS:=ON
 # Build Python wrapper ON/OFF
 AMCL_BUILD_PYTHON:=OFF
 
-# Build Golang wrapper ON/OFF
-AMCL_BUILD_GO:=OFF
-
 # Build MPIN ON/OFF
 AMCL_BUILD_MPIN:=ON
 
