@@ -1,12 +1,4 @@
-FROM ubuntu:latest AS downloader
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates
-
 FROM ubuntu:latest
-
-# Install and configure GO
-COPY --from=downloader /usr/local/go /usr/local/
 
 RUN dpkg --add-architecture i386 \
     && apt-get update && apt-get install -y --no-install-recommends \
