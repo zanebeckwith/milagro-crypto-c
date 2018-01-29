@@ -33,7 +33,7 @@ under the License.
 #include "mpin_ZZZ.h"
 #include "randapi.h"
 
-// #define PERMITS  /* for time permits ON or OFF */
+//#define PERMITS  /* for time permits ON or OFF */
 #define PINERROR /* For PIN ERROR detection ON or OFF */
 #define FULL     /* for M-Pin Full or M-Pin regular */
 //#define SINGLE_MPIN_PASS /* SINGLE MPIN_PASS M-Pin */
@@ -199,7 +199,7 @@ int mpin(csprng *RNG)
 #ifdef SINGLE_MPIN_PASS
     int timeValue;
     printf("MPIN Single Pass\n");
-    timeValue = MPIN_ZZZ_GET_TIME();
+    timeValue = GET_TIME();
 
     rtn=MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
 
