@@ -24,7 +24,7 @@ import json
 import hashlib
 import mpin_ZZZ
 
-HASH_TYPE_MPIN = mpin_ZZZ.SHA256
+HASH_TYPE_MPIN_ZZZ = mpin_ZZZ.SHA256
 
 
 class TestMPIN(unittest.TestCase):
@@ -42,7 +42,7 @@ class TestMPIN(unittest.TestCase):
         self.mpin_id = json.dumps(endUserData)
 
         # Hash value of MPIN_ID
-        self.hash_mpin_id = mpin_ZZZ.hash_id(HASH_TYPE_MPIN, self.mpin_id)
+        self.hash_mpin_id = mpin_ZZZ.hash_id(HASH_TYPE_MPIN_ZZZ, self.mpin_id)
 
         # Assign a seed value
         seedHex = "3ade3d4a5c698e8910bf92f25d97ceeb7c25ed838901a5cb5db2cf25434c1fe76c7f79b7af2e5e1e4988e4294dbd9bd9fa3960197fb7aec373609fb890d74b16a4b14b2ae7e23b75f15d36c21791272372863c4f8af39980283ae69a79cf4e48e908f9e0"
@@ -86,10 +86,10 @@ class TestMPIN(unittest.TestCase):
 
         # Generate Time Permit shares
         rtn, tp1 = mpin_ZZZ.get_client_permit(
-            HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
+            HASH_TYPE_MPIN_ZZZ, self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
         rtn, tp2 = mpin_ZZZ.get_client_permit(
-            HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
+            HASH_TYPE_MPIN_ZZZ, self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -98,16 +98,17 @@ class TestMPIN(unittest.TestCase):
 
         # Client extracts PIN from secret to create Token
         rtn, token = mpin_ZZZ.extract_pin(
-            HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
+            HASH_TYPE_MPIN_ZZZ, self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
         rtn, x, u, ut, sec = mpin_ZZZ.client_1(
-            HASH_TYPE_MPIN, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+            HASH_TYPE_MPIN_ZZZ, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
-        HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, self.date, self.mpin_id)
+        HID, HTID = mpin_ZZZ.server_1(
+            HASH_TYPE_MPIN_ZZZ, self.date, self.mpin_id)
 
         # Server generates Random number Y and sends it to Client
         rtn, y = mpin_ZZZ.random_generate(rng)
@@ -158,10 +159,10 @@ class TestMPIN(unittest.TestCase):
 
         # Generate Time Permit shares
         rtn, tp1 = mpin_ZZZ.get_client_permit(
-            HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
+            HASH_TYPE_MPIN_ZZZ, self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
         rtn, tp2 = mpin_ZZZ.get_client_permit(
-            HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
+            HASH_TYPE_MPIN_ZZZ, self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -170,16 +171,17 @@ class TestMPIN(unittest.TestCase):
 
         # Client extracts PIN from secret to create Token
         rtn, token = mpin_ZZZ.extract_pin(
-            HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
+            HASH_TYPE_MPIN_ZZZ, self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
         rtn, x, u, ut, sec = mpin_ZZZ.client_1(
-            HASH_TYPE_MPIN, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+            HASH_TYPE_MPIN_ZZZ, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
-        HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, self.date, self.mpin_id)
+        HID, HTID = mpin_ZZZ.server_1(
+            HASH_TYPE_MPIN_ZZZ, self.date, self.mpin_id)
 
         # Server generates Random number Y and sends it to Client
         rtn, y = mpin_ZZZ.random_generate(rng)
@@ -230,10 +232,10 @@ class TestMPIN(unittest.TestCase):
 
         # Generate Time Permit shares
         rtn, tp1 = mpin_ZZZ.get_client_permit(
-            HASH_TYPE_MPIN, self.date, ms1, self.hash_mpin_id)
+            HASH_TYPE_MPIN_ZZZ, self.date, ms1, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
         rtn, tp2 = mpin_ZZZ.get_client_permit(
-            HASH_TYPE_MPIN, self.date, ms2, self.hash_mpin_id)
+            HASH_TYPE_MPIN_ZZZ, self.date, ms2, self.hash_mpin_id)
         self.assertEqual(rtn, 0)
 
         # Combine Time Permit shares
@@ -242,16 +244,17 @@ class TestMPIN(unittest.TestCase):
 
         # Client extracts PIN from secret to create Token
         rtn, token = mpin_ZZZ.extract_pin(
-            HASH_TYPE_MPIN, self.mpin_id, PIN1, client_secret)
+            HASH_TYPE_MPIN_ZZZ, self.mpin_id, PIN1, client_secret)
         self.assertEqual(rtn, 0)
 
         # Client first pass
         rtn, x, u, ut, sec = mpin_ZZZ.client_1(
-            HASH_TYPE_MPIN, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
+            HASH_TYPE_MPIN_ZZZ, self.date, self.mpin_id, rng, None, PIN2, token, time_permit)
         self.assertEqual(rtn, 0)
 
         # Server calculates H(ID) and H(T|H(ID))
-        HID, HTID = mpin_ZZZ.server_1(HASH_TYPE_MPIN, self.date, self.mpin_id)
+        HID, HTID = mpin_ZZZ.server_1(
+            HASH_TYPE_MPIN_ZZZ, self.date, self.mpin_id)
 
         # Server generates Random number Y and sends it to Client
         rtn, y = mpin_ZZZ.random_generate(rng)
@@ -280,7 +283,7 @@ class TestMPIN(unittest.TestCase):
         match = 0
         for i in range(1, 1000):
             rand_val = os.urandom(32)
-            hash_mpin_id = mpin_ZZZ.hash_id(HASH_TYPE_MPIN, rand_val)
+            hash_mpin_id = mpin_ZZZ.hash_id(HASH_TYPE_MPIN_ZZZ, rand_val)
 
             # Generate client secret shares
             rtn, cs1 = mpin_ZZZ.get_client_secret(ms1, hash_mpin_id)
