@@ -19,11 +19,9 @@ message(STATUS "Generator - ${CMAKE_GENERATOR}")
 # Add options for build
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 option (BUILD_PYTHON "Build Python" OFF)
-option (BUILD_GO "Build Golang" OFF)
 option (BUILD_MPIN "Build MPIN" ON)
 option (BUILD_WCC "Build WCC" ON)
 option (BUILD_DOXYGEN "Build Doxygen" ON)
-option (USE_PATENTS "Use patents for G1 and G2 multiplication" OFF)
 option (DEBUG_REDUCE "Print debug message for field reduction" OFF)
 option (DEBUG_NORM "Detect digit overflow" OFF)
 option (GET_STATS "Debug statistics" OFF)
@@ -50,7 +48,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
     message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
                     OUTPUT_VARIABLE GCC_VERSION)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wextra -Wno-strict-prototypes -Wunused-value -Wcast-align -Wunused-variable -Wundef -Wformat-security")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -static-libgcc -Wall -Wextra -Wno-strict-prototypes -Wunused-value -Wcast-align -Wunused-variable -Wundef -Wformat-security")
 
     if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
@@ -96,7 +94,7 @@ message(STATUS "AMCL_CHUNK='${AMCL_CHUNK}'")
 
 # Select Field
 set(AMCL_CURVE "BN254CX" CACHE STRING "Choice of Field. See ./include/amcl.h for explanation")
-set(Curves_values "NIST256;C25519;ED25519;BRAINPOOL;ANSSI;NUMS256E;NUMS256W;NUMS384E;NUMS384W;NUMS512E;NUMS512W;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN254;BN254CX;BLS383")
+set(Curves_values "NIST256;C25519;ED25519;BRAINPOOL;ANSSI;NUMS256E;NUMS256W;NUMS384E;NUMS384W;NUMS512E;NUMS512W;HIFIVE;GOLDILOCKS;NIST384;C41417;NIST521;BN254;BN254CX;BLS383;FP256BN;FP512BN;BLS461")
 set_property(CACHE AMCL_CURVE PROPERTY STRINGS ${Curves_values})
 message(STATUS "AMCL_CURVE='${AMCL_CURVE}'")
 
@@ -153,13 +151,6 @@ if (BUILD_PYTHON)
 
   add_subdirectory (wrappers/python)
 endif (BUILD_PYTHON)
-
-if (BUILD_GO)
-  set(GO_PATH "$ENV{GOPATH}" CACHE STRING "GOPATH")
-  message(STATUS "Build Golang: GOPATH='${GO_PATH}'")
-  add_subdirectory (wrappers/go)
-  add_subdirectory (wrappers/go/examples)
-endif (BUILD_GO)
 
 # Build Documentation
 if (BUILD_DOXYGEN)

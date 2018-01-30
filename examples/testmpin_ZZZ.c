@@ -33,24 +33,24 @@ under the License.
 #include "mpin_ZZZ.h"
 #include "randapi.h"
 
-#define PERMITS  /* for time permits ON or OFF */
+//#define PERMITS  /* for time permits ON or OFF */
 #define PINERROR /* For PIN ERROR detection ON or OFF */
 #define FULL     /* for M-Pin Full or M-Pin regular */
 //#define SINGLE_MPIN_PASS /* SINGLE MPIN_PASS M-Pin */
 
 int mpin(csprng *RNG)
 {
-    int pin,rtn,err;
+    int pin,pin2,rtn,err;
 #ifdef PERMITS
     int date=today();
 #else
     int date=0;
 #endif
-    char x[MPIN_PGS_ZZZ],s[MPIN_PGS_ZZZ],y[MPIN_PGS_ZZZ],client_id[100],sst[4*MPIN_PFS_ZZZ],token[2*MPIN_PFS_ZZZ+1],sec[2*MPIN_PFS_ZZZ+1],permit[2*MPIN_PFS_ZZZ+1],xcid[2*MPIN_PFS_ZZZ+1],xid[2*MPIN_PFS_ZZZ+1],e[12*MPIN_PFS_ZZZ],f[12*MPIN_PFS_ZZZ];
-    char hcid[MPIN_PFS_ZZZ],hsid[MPIN_PFS_ZZZ],hid[2*MPIN_PFS_ZZZ+1],htid[2*MPIN_PFS_ZZZ+1],h[MPIN_PGS_ZZZ];
+    char x[PGS_ZZZ],s[PGS_ZZZ],y[PGS_ZZZ],client_id[100],sst[4*PFS_ZZZ],token[2*PFS_ZZZ+1],sec[2*PFS_ZZZ+1],permit[2*PFS_ZZZ+1],xcid[2*PFS_ZZZ+1],xid[2*PFS_ZZZ+1],e[12*PFS_ZZZ],f[12*PFS_ZZZ];
+    char hcid[PFS_ZZZ],hsid[PFS_ZZZ],hid[2*PFS_ZZZ+1],htid[2*PFS_ZZZ+1],h[PGS_ZZZ];
 #ifdef FULL
-    char r[MPIN_PGS_ZZZ],z[2*MPIN_PFS_ZZZ+1],w[MPIN_PGS_ZZZ],t[2*MPIN_PFS_ZZZ+1];
-    char g1[12*MPIN_PFS_ZZZ],g2[12*MPIN_PFS_ZZZ];
+    char r[PGS_ZZZ],z[2*PFS_ZZZ+1],w[PGS_ZZZ],t[2*PFS_ZZZ+1];
+    char g1[12*PFS_ZZZ],g2[12*PFS_ZZZ];
     char ck[MPIN_PAS],sk[MPIN_PAS];
 #endif
     octet S= {0,sizeof(s),s};
@@ -119,6 +119,13 @@ int mpin(csprng *RNG)
     MPIN_ZZZ_PRECOMPUTE(&TOKEN,&HCID,NULL,&G1,&G2);
 #endif
 
+    /* Client extracts PIN2 generated from bio-metric from token */
+    pin2=1212;
+    printf("Client extracts PIN= %d\n",pin2);
+    MPIN_ZZZ_EXTRACT_FACTOR(HASH_TYPE_MPIN,&CLIENT_ID,pin2,14,&TOKEN);
+    printf("Client Token= ");
+    OCT_output(&TOKEN);
+
 #ifdef PERMITS
     /* Client gets "Time Permit" from DTA */
     printf("Client gets Time Permit\n");
@@ -135,6 +142,12 @@ int mpin(csprng *RNG)
 #endif
 
     /* MPin Protocol */
+
+    /* Client adds PIN2 generated from bio-metric to token */
+    printf("Client adds PIN= %d\n",pin2);
+    MPIN_ZZZ_RESTORE_FACTOR(HASH_TYPE_MPIN,&CLIENT_ID,pin2,14,&TOKEN);
+    printf("Client Token= ");
+    OCT_output(&TOKEN);
 
     /* Client enters PIN */
     printf("\nPIN= ");
@@ -185,8 +198,8 @@ int mpin(csprng *RNG)
 
 #ifdef SINGLE_MPIN_PASS
     int timeValue;
-    printf("MPIN Single MPIN_PASs\n");
-    timeValue = MPIN_ZZZ_GET_TIME();
+    printf("MPIN Single Pass\n");
+    timeValue = GET_TIME();
 
     rtn=MPIN_ZZZ_CLIENT(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
 
@@ -211,7 +224,7 @@ int mpin(csprng *RNG)
 #endif
 
 #else // SINGLE_MPIN_PASS
-    printf("MPIN Multi MPIN_PASs\n");
+    printf("MPIN Multi Pass\n");
     if (MPIN_ZZZ_CLIENT_1(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT)!=0)
     {
         printf("Error from Client side - First MPIN_PASs\n");

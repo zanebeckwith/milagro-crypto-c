@@ -566,7 +566,7 @@ int main(int argc, char** argv)
         }
         if (!strncmp(line,  HEXline, strlen(HEXline)))
         {
-            len = strlen(OCTline);
+            len = strlen(HEXline);
             linePtr = line + len;
             amcl_hex2bin(linePtr, bin, 64);
             printf("\n%s", HEXline);

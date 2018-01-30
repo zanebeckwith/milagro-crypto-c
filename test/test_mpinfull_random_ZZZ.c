@@ -59,63 +59,63 @@ int main()
     char id[256];
     octet ID = {0,sizeof(id),id};
 
-    char x[MPIN_PGS_ZZZ],y[MPIN_PGS_ZZZ];
+    char x[PGS_ZZZ],y[PGS_ZZZ];
     octet X= {sizeof(x), sizeof(x),x};
     octet Y= {sizeof(y),sizeof(y),y};
 
     /* Master secret shares */
-    char ms1[MPIN_PGS_ZZZ], ms2[MPIN_PGS_ZZZ];
+    char ms1[PGS_ZZZ], ms2[PGS_ZZZ];
     octet MS1= {sizeof(ms1),sizeof(ms1),ms1};
     octet MS2= {sizeof(ms2),sizeof(ms2),ms2};
 
     /* Hash values of client ID */
-    char hcid[MPIN_PFS_ZZZ];
+    char hcid[PFS_ZZZ];
     octet HCID= {sizeof(hcid),sizeof(hcid), hcid};
 
     /* Hash values of messages */
-    char hm[MPIN_PFS_ZZZ];
+    char hm[PFS_ZZZ];
     octet HM= {sizeof(hm),sizeof(hm), hm};
 
     /* Client secret and shares */
-    char cs1[2*MPIN_PFS_ZZZ+1], cs2[2*MPIN_PFS_ZZZ+1], sec[2*MPIN_PFS_ZZZ+1];
+    char cs1[2*PFS_ZZZ+1], cs2[2*PFS_ZZZ+1], sec[2*PFS_ZZZ+1];
     octet SEC= {sizeof(sec),sizeof(sec),sec};
     octet CS1= {sizeof(cs1),sizeof(cs1), cs1};
     octet CS2= {sizeof(cs2),sizeof(cs2), cs2};
 
     /* Server secret and shares */
-    char ss1[4*MPIN_PFS_ZZZ], ss2[4*MPIN_PFS_ZZZ], serverSecret[4*MPIN_PFS_ZZZ];
+    char ss1[4*PFS_ZZZ], ss2[4*PFS_ZZZ], serverSecret[4*PFS_ZZZ];
     octet ServerSecret= {sizeof(serverSecret),sizeof(serverSecret),serverSecret};
     octet SS1= {sizeof(ss1),sizeof(ss1),ss1};
     octet SS2= {sizeof(ss2),sizeof(ss2),ss2};
 
     /* Time Permit and shares */
-    char tp1[2*MPIN_PFS_ZZZ+1], tp2[2*MPIN_PFS_ZZZ+1], tp[2*MPIN_PFS_ZZZ+1];
+    char tp1[2*PFS_ZZZ+1], tp2[2*PFS_ZZZ+1], tp[2*PFS_ZZZ+1];
     octet TP= {sizeof(tp),sizeof(tp),tp};
     octet TP1= {sizeof(tp1),sizeof(tp1),tp1};
     octet TP2= {sizeof(tp2),sizeof(tp2),tp2};
 
     /* Token stored on computer */
-    char token[2*MPIN_PFS_ZZZ+1];
+    char token[2*PFS_ZZZ+1];
     octet TOKEN= {sizeof(token),sizeof(token),token};
 
     /* Precomputed values stored on device */
-    char g1[12*MPIN_PFS_ZZZ],g2[12*MPIN_PFS_ZZZ];
+    char g1[12*PFS_ZZZ],g2[12*PFS_ZZZ];
     octet G1= {0,sizeof(g1),g1};
     octet G2= {0,sizeof(g2),g2};
 
-    char ut[2*MPIN_PFS_ZZZ+1],u[2*MPIN_PFS_ZZZ+1];
+    char ut[2*PFS_ZZZ+1],u[2*PFS_ZZZ+1];
     octet UT= {sizeof(ut),sizeof(ut),ut};
     octet U= {sizeof(u),sizeof(u),u};
 
-    char hid[2*MPIN_PFS_ZZZ+1],htid[2*MPIN_PFS_ZZZ+1];
+    char hid[2*PFS_ZZZ+1],htid[2*PFS_ZZZ+1];
     octet HID= {0,sizeof(hid),hid};
     octet HTID= {0,sizeof(htid),htid};
 
-    char e[12*MPIN_PFS_ZZZ], f[12*MPIN_PFS_ZZZ];
+    char e[12*PFS_ZZZ], f[12*PFS_ZZZ];
     octet E= {sizeof(e),sizeof(e),e};
     octet F= {sizeof(f),sizeof(f),f};
 
-    char r[MPIN_PGS_ZZZ],z[2*MPIN_PFS_ZZZ+1],w[MPIN_PGS_ZZZ],t[2*MPIN_PFS_ZZZ+1];
+    char r[PGS_ZZZ],z[2*PFS_ZZZ+1],w[PGS_ZZZ],t[2*PFS_ZZZ+1];
     char ck[MPIN_PAS],sk[MPIN_PAS];
     octet R= {0,sizeof(r),r};
     octet Z= {0,sizeof(z),z};

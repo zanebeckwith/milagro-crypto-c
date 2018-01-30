@@ -1,9 +1,9 @@
 # AMCL header files
 
 # Copy curve dependant header files
-function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
+function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf stw sx)
   set(bd "${tb}_${base}")
-  file(READ "config_big_XXX.h" temph)
+  file(READ "config_big.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "@NB@" ${nb} temph "${temph}")
   string(REGEX REPLACE "@BASE@" ${base} temph "${temph}")
@@ -12,16 +12,16 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   set(CURVE_HEADERS ${CURVE_HEADERS}
   	${CMAKE_CURRENT_BINARY_DIR}/config_big_${bd}.h)
 
-  file(READ "config_field_YYY.h" temph)
+  file(READ "config_field.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
   string(REGEX REPLACE "@NBT@" ${nbt} temph "${temph}")
   string(REGEX REPLACE "@M8@" ${m8} temph "${temph}")
   string(REGEX REPLACE "@MT@" ${mt} temph "${temph}")
   math(EXPR sh "${base} * (1 + ((8 * ${nb} - 1) / ${base})) - ${nbt}")
-  if(sh GREATER '30')
-    set(sh '30')
-  endif(sh GREATER '30')
+  if(sh GREATER "30")
+    set(sh "30")
+  endif(sh GREATER "30")
   string(REGEX REPLACE "@SH@" ${sh} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_field_${tf}.h" "${temph}")
 
@@ -32,25 +32,27 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   string(REGEX REPLACE "@SC@" "#define ${tc}_VER\n@SC@" temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "${temph}")
 
-  file(READ "config_curve_ZZZ.h" temph)
+  file(READ "config_curve.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
   string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
   string(REGEX REPLACE "@CT@" ${ct} temph "${temph}")
   string(REGEX REPLACE "@PF@" ${pf} temph "${temph}")
+  string(REGEX REPLACE "@ST@" ${stw} temph "${temph}")
+  string(REGEX REPLACE "@SX@" ${sx} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_curve_${tc}.h" "${temph}")
 
   set(CURVE_HEADERS ${CURVE_HEADERS}
   	${CMAKE_CURRENT_BINARY_DIR}/config_curve_${tc}.h)
 
-  file(READ "big_XXX.h" temph)
+  file(READ "big.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h" "${temph}")
 
   set(CURVE_HEADERS ${CURVE_HEADERS}
   	${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h)
 
-  file(READ "fp_YYY.h" temph)
+  file(READ "fp.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.h" "${temph}")
@@ -58,7 +60,7 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   set(CURVE_HEADERS ${CURVE_HEADERS}
   	${CMAKE_CURRENT_BINARY_DIR}/fp_${tf}.h)
 
-  file(READ "ecp_ZZZ.h" temph)
+  file(READ "ecp.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
   string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
@@ -67,7 +69,7 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
   set(CURVE_HEADERS ${CURVE_HEADERS}
   	${CMAKE_CURRENT_BINARY_DIR}/ecp_${tc}.h)
 
-  file(READ "ecdh_ZZZ.h" temph)
+  file(READ "ecdh.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
   string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
@@ -83,107 +85,93 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
 
   if(NOT(${pf} STREQUAL "NOT"))
 
-    file(READ "fp2_YYY.h" temph)
+    file(READ "fp2.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp2_${tf}.h" "${temph}")
+    set(CURVE_HEADERS ${CURVE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/fp2_${tf}.h)
 
-	  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  	${CMAKE_CURRENT_BINARY_DIR}/fp2_${tf}.h)
-
-    file(READ "fp4_YYY.h" temph)
+    file(READ "fp4.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp4_${tf}.h" "${temph}")
+    set(CURVE_HEADERS ${CURVE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/fp4_${tf}.h)
 
-	  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  	${CMAKE_CURRENT_BINARY_DIR}/fp4_${tf}.h)
-
-    file(READ "fp12_YYY.h" temph)
+    file(READ "fp12.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fp12_${tf}.h" "${temph}")
+    set(CURVE_HEADERS ${CURVE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/fp12_${tf}.h)
 
-	  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  	${CMAKE_CURRENT_BINARY_DIR}/fp12_${tf}.h)
-
-    file(READ "ecp2_ZZZ.h" temph)
+    file(READ "ecp2.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
     string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.h" "${temph}")
+    set(CURVE_HEADERS ${CURVE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.h)
 
-	  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  	${CMAKE_CURRENT_BINARY_DIR}/ecp2_${tc}.h)
-
-    file(READ "pair_ZZZ.h" temph)
+    file(READ "pair.h" temph)
     string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
     string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
     string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.h" "${temph}")
+    set(CURVE_HEADERS ${CURVE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.h)
 
-	  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  	${CMAKE_CURRENT_BINARY_DIR}/pair_${tc}.h)
+    if(BUILD_MPIN OR BUILD_WCC)
+      file(COPY pbc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+      set(PBC_TIME_PERMIT_TESTS 10 CACHE STRING "Number of days in the future to test M-PIN/WCC time permits")
+      set(PBC_RANDOM_TESTS 10 CACHE STRING "Number of random M-PIN/WCC tests")
+      # message(STATUS "PBC_TIME_PERMIT_TESTS=${PBC_TIME_PERMIT_TESTS}")
+      # message(STATUS "PBC_RANDOM_TESTS=${PBC_RANDOM_TESTS}")
+      # Configure test variables
+      configure_file (
+        "config_test.h"
+        "${CMAKE_CURRENT_BINARY_DIR}/config_test.h"
+      )
 
-	if(BUILD_MPIN OR BUILD_WCC)
-    file(COPY pbc_support.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    set(PBC_TIME_PERMIT_TESTS 10 CACHE STRING "Number of days in the future to test M-PIN/WCC time permits")
-    set(PBC_RANDOM_TESTS 10 CACHE STRING "Number of random M-PIN/WCC tests")
-    # message(STATUS "PBC_TIME_PERMIT_TESTS=${PBC_TIME_PERMIT_TESTS}")
-    # message(STATUS "PBC_RANDOM_TESTS=${PBC_RANDOM_TESTS}")
-    # Configure test variables
-    configure_file (
-      "config_test.h"
-      "${CMAKE_CURRENT_BINARY_DIR}/config_test.h"
-    )
-
-	  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  	${CMAKE_CURRENT_BINARY_DIR}/pbc_support.h
-	  	${CMAKE_CURRENT_BINARY_DIR}/config_test.h)
-	endif(BUILD_MPIN OR BUILD_WCC)
+      set(CURVE_HEADERS ${CURVE_HEADERS}
+	  ${CMAKE_CURRENT_BINARY_DIR}/pbc_support.h
+	  ${CMAKE_CURRENT_BINARY_DIR}/config_test.h)
+    endif(BUILD_MPIN OR BUILD_WCC)
 
     if(BUILD_MPIN)
       set(fnameh "mpin_${tc}.h")
-      file(READ "mpin_ZZZ.h" temph)
+      file(READ "mpin.h" temph)
       string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
       string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
       string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
-
- 		  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  		${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.h)
+      set(CURVE_HEADERS ${CURVE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/mpin_${tc}.h)
     endif(BUILD_MPIN)
 
     if(BUILD_WCC)
       set(fnameh "wcc_${tc}.h")
-      file(READ "wcc_ZZZ.h" temph)
+      file(READ "wcc.h" temph)
       string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
       string(REGEX REPLACE "YYY" ${tf} temph "${temph}")
       string(REGEX REPLACE "ZZZ" ${tc} temph "${temph}")
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${fnameh}" "${temph}")
-
- 		  set(CURVE_HEADERS ${CURVE_HEADERS}
-	  		${CMAKE_CURRENT_BINARY_DIR}/wcc_${tc}.h)
+      set(CURVE_HEADERS ${CURVE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/wcc_${tc}.h)
     endif(BUILD_WCC)
 
   endif(NOT(${pf} STREQUAL "NOT"))
 
   install (FILES ${CURVE_HEADERS} DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
   # if(BUILD_GO)
   #   # Copy header files for testing before installation
   #   file(COPY ${CURVE_HEADERS} DESTINATION "${PROJECT_BINARY_DIR}/wrappers/go/")
   # endif(BUILD_GO)
 
-endfunction(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf)
+endfunction(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf stw sx)
 
 # Copy rsa dependant header files
 function(RSA_HEADERS_SET tb tff nb base ml)
   set(bd "${tb}_${base}")
-  file(READ "config_big_XXX.h" temph)
+  file(READ "config_big.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "@NB@" ${nb} temph "${temph}")
   string(REGEX REPLACE "@BASE@" ${base} temph "${temph}")
@@ -196,7 +184,7 @@ function(RSA_HEADERS_SET tb tff nb base ml)
   string(REGEX REPLACE "@RSL@" "#define RSA_SECURITY_LEVEL_${tff}_VER\n@RSL@" temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "${temph}")
 
-  file(READ "config_ff_WWW.h" temph)
+  file(READ "config_ff.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "WWW" ${tff} temph "${temph}")
   string(REGEX REPLACE "@ML@" ${ml} temph "${temph}")
@@ -205,14 +193,14 @@ function(RSA_HEADERS_SET tb tff nb base ml)
   set(RSA_HEADERS ${RSA_HEADERS}
 		${CMAKE_CURRENT_BINARY_DIR}/config_ff_${tff}.h)
 
-  file(READ "big_XXX.h" temph)
+  file(READ "big.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h" "${temph}")
 
   set(RSA_HEADERS ${RSA_HEADERS}
 		${CMAKE_CURRENT_BINARY_DIR}/big_${bd}.h)
 
-  file(READ "ff_WWW.h" temph)
+  file(READ "ff.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "WWW" ${tff} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.h" "${temph}")
@@ -220,7 +208,7 @@ function(RSA_HEADERS_SET tb tff nb base ml)
   set(RSA_HEADERS ${RSA_HEADERS}
 		${CMAKE_CURRENT_BINARY_DIR}/ff_${tff}.h)
 
-  file(READ "rsa_WWW.h" temph)
+  file(READ "rsa.h" temph)
   string(REGEX REPLACE "XXX" ${bd} temph "${temph}")
   string(REGEX REPLACE "WWW" ${tff} temph "${temph}")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/rsa_${tff}.h" "${temph}")
@@ -238,9 +226,9 @@ function(RSA_HEADERS_SET tb tff nb base ml)
   endif(BUILD_X509)
 
   install (FILES ${RSA_HEADERS} DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
   # if(BUILD_GO)
   #   # Copy header files for testing before installation
@@ -274,99 +262,109 @@ string(REGEX REPLACE "," ";" AMCL_RSA ${AMCL_RSA})
 foreach(CURVE ${AMCL_CURVE})
   if(AMCL_CHUNK STREQUAL "64")
     if(CURVE STREQUAL "ED25519")
-        CURVE_HEADERS_SET("256" "25519" "ED25519" "32" "56" "255" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("256" "25519" "ED25519" "32" "56" "255" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "C25519")
-        CURVE_HEADERS_SET("256" "25519" "C25519" "32" "56" "255" "5" "PSEUDO_MERSENNE" "MONTGOMERY" "NOT")
+        CURVE_HEADERS_SET("256" "25519" "C25519" "32" "56" "255" "5" "PSEUDO_MERSENNE" "MONTGOMERY" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NIST256")
-        CURVE_HEADERS_SET("256" "NIST256" "NIST256" "32" "56" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "NIST256" "NIST256" "32" "56" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "BRAINPOOL")
-        CURVE_HEADERS_SET("256" "BRAINPOOL" "BRAINPOOL" "32" "56" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "BRAINPOOL" "BRAINPOOL" "32" "56" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "ANSSI")
-        CURVE_HEADERS_SET("256" "ANSSI" "ANSSI" "32" "56" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "ANSSI" "ANSSI" "32" "56" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "HIFIVE")
-        CURVE_HEADERS_SET("336" "HIFIVE" "HIFIVE" "42" "60" "336" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("336" "HIFIVE" "HIFIVE" "42" "60" "336" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "GOLDILOCKS")
-        CURVE_HEADERS_SET("448" "GOLDILOCKS" "GOLDILOCKS" "56" "58" "448" "7" "GENERALISED_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("448" "GOLDILOCKS" "GOLDILOCKS" "56" "58" "448" "7" "GENERALISED_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NIST384")
-        CURVE_HEADERS_SET("384" "NIST384" "NIST384" "48" "56" "384" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("384" "NIST384" "NIST384" "48" "56" "384" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "C41417")
-        CURVE_HEADERS_SET("416" "C41417" "C41417" "52" "60" "414" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("416" "C41417" "C41417" "52" "60" "414" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NIST521")
-        CURVE_HEADERS_SET("528" "NIST521" "NIST521" "66" "60" "521" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("528" "NIST521" "NIST521" "66" "60" "521" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS256W")
-        CURVE_HEADERS_SET("256" "256PMW" "NUMS256W" "32" "56" "256" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "256PMW" "NUMS256W" "32" "56" "256" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS256E")
-        CURVE_HEADERS_SET("256" "256PME" "NUMS256E" "32" "56" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("256" "256PME" "NUMS256E" "32" "56" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS384W")
-        CURVE_HEADERS_SET("384" "384PM" "NUMS384W" "48" "56" "384" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("384" "384PM" "NUMS384W" "48" "56" "384" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS384E")
-        CURVE_HEADERS_SET("384" "384PM" "NUMS384E" "48" "56" "384" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("384" "384PM" "NUMS384E" "48" "56" "384" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS512W")
-        CURVE_HEADERS_SET("512" "512PM" "NUMS512W" "64" "56" "512" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("512" "512PM" "NUMS512W" "64" "56" "512" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS512E")
-        CURVE_HEADERS_SET("512" "512PM" "NUMS512E" "64" "56" "512" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("512" "512PM" "NUMS512E" "64" "56" "512" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "BN254")
-        CURVE_HEADERS_SET("256" "BN254" "BN254" "32" "56" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+        CURVE_HEADERS_SET("256" "BN254" "BN254" "32" "56" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "D_TYPE" "NEGATIVEX")
     elseif(CURVE STREQUAL "BN254CX")
-        CURVE_HEADERS_SET("256" "BN254CX" "BN254CX" "32" "56" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+        CURVE_HEADERS_SET("256" "BN254CX" "BN254CX" "32" "56" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "D_TYPE" "NEGATIVEX")
     elseif(CURVE STREQUAL "BLS383")
-        CURVE_HEADERS_SET("384" "BLS383" "BLS383" "48" "56" "383" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS")
+        CURVE_HEADERS_SET("384" "BLS383" "BLS383" "48" "56" "383" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS" "D_TYPE" "POSITIVEX")
+    elseif(CURVE STREQUAL "FP256BN")
+        CURVE_HEADERS_SET("256" "FP256BN" "FP256BN" "32" "56" "256" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "M_TYPE" "NEGATIVEX")
+    elseif(CURVE STREQUAL "FP512BN")
+        CURVE_HEADERS_SET("512" "FP512BN" "FP512BN" "64" "60" "512" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "M_TYPE" "POSITIVEX")
+    elseif(CURVE STREQUAL "BLS461")
+        CURVE_HEADERS_SET("464" "BLS461" "BLS461" "58" "60" "461" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS" "M_TYPE" "NEGATIVEX")
     else()
       message(FATAL_ERROR "Invalid curve input")
     endif(CURVE STREQUAL "ED25519")
   elseif(AMCL_CHUNK STREQUAL "32")
     if(CURVE STREQUAL "ED25519")
-        CURVE_HEADERS_SET("256" "25519" "ED25519" "32" "29" "255" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("256" "25519" "ED25519" "32" "29" "255" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "C25519")
-        CURVE_HEADERS_SET("256" "25519" "C25519" "32" "29" "255" "5" "PSEUDO_MERSENNE" "MONTGOMERY" "NOT")
+        CURVE_HEADERS_SET("256" "25519" "C25519" "32" "29" "255" "5" "PSEUDO_MERSENNE" "MONTGOMERY" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NIST256")
-        CURVE_HEADERS_SET("256" "NIST256" "NIST256" "32" "28" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "NIST256" "NIST256" "32" "28" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "BRAINPOOL")
-        CURVE_HEADERS_SET("256" "BRAINPOOL" "BRAINPOOL" "32" "28" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "BRAINPOOL" "BRAINPOOL" "32" "28" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "ANSSI")
-        CURVE_HEADERS_SET("256" "ANSSI" "ANSSI" "32" "28" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "ANSSI" "ANSSI" "32" "28" "256" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "HIFIVE")
-        CURVE_HEADERS_SET("336" "HIFIVE" "HIFIVE" "42" "29" "336" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("336" "HIFIVE" "HIFIVE" "42" "29" "336" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "GOLDILOCKS")
-        CURVE_HEADERS_SET("448" "GOLDILOCKS" "GOLDILOCKS" "56" "29" "448" "7" "GENERALISED_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("448" "GOLDILOCKS" "GOLDILOCKS" "56" "29" "448" "7" "GENERALISED_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NIST384")
-        CURVE_HEADERS_SET("384" "NIST384" "NIST384" "48" "29" "384" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("384" "NIST384" "NIST384" "48" "29" "384" "7" "NOT_SPECIAL" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "C41417")
-        CURVE_HEADERS_SET("416" "C41417" "C41417" "52" "29" "414" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("416" "C41417" "C41417" "52" "29" "414" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NIST521")
-        CURVE_HEADERS_SET("528" "NIST521" "NIST521" "66" "28" "521" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("528" "NIST521" "NIST521" "66" "28" "521" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS256W")
-        CURVE_HEADERS_SET("256" "256PMW" "NUMS256W" "32" "28" "256" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("256" "256PMW" "NUMS256W" "32" "28" "256" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS256E")
-        CURVE_HEADERS_SET("256" "256PME" "NUMS256E" "32" "29" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("256" "256PME" "NUMS256E" "32" "29" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS384W")
-        CURVE_HEADERS_SET("384" "384PM" "NUMS384W" "48" "29" "384" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("384" "384PM" "NUMS384W" "48" "29" "384" "3" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS384E")
-        CURVE_HEADERS_SET("384" "384PM" "NUMS384E" "48" "29" "384" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("384" "384PM" "NUMS384E" "48" "29" "384" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS512W")
-        CURVE_HEADERS_SET("512" "512PM" "NUMS512W" "64" "29" "512" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT")
+        CURVE_HEADERS_SET("512" "512PM" "NUMS512W" "64" "29" "512" "7" "PSEUDO_MERSENNE" "WEIERSTRASS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS512E")
-        CURVE_HEADERS_SET("512" "512PM" "NUMS512E" "64" "29" "512" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("512" "512PM" "NUMS512E" "64" "29" "512" "7" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "BN254")
-        CURVE_HEADERS_SET("256" "BN254" "BN254" "32" "28" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+        CURVE_HEADERS_SET("256" "BN254" "BN254" "32" "28" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "D_TYPE" "NEGATIVEX")
     elseif(CURVE STREQUAL "BN254CX")
-        CURVE_HEADERS_SET("256" "BN254CX" "BN254CX" "32" "28" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+        CURVE_HEADERS_SET("256" "BN254CX" "BN254CX" "32" "28" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "D_TYPE" "NEGATIVEX")
     elseif(CURVE STREQUAL "BLS383")
-        CURVE_HEADERS_SET("384" "BLS383" "BLS383" "48" "29" "383" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS")
+        CURVE_HEADERS_SET("384" "BLS383" "BLS383" "48" "29" "383" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS" "D_TYPE" "POSITIVEX")
+    elseif(CURVE STREQUAL "FP256BN")
+        CURVE_HEADERS_SET("256" "FP256BN" "FP256BN" "32" "28" "256" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "M_TYPE" "NEGATIVEX")
+    elseif(CURVE STREQUAL "FP512BN")
+        CURVE_HEADERS_SET("512" "FP512BN" "FP512BN" "64" "29" "512" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "M_TYPE" "POSITIVEX")
+    elseif(CURVE STREQUAL "BLS461")
+        CURVE_HEADERS_SET("464" "BLS461" "BLS461" "58" "28" "461" "3" "NOT_SPECIAL" "WEIERSTRASS" "BLS" "M_TYPE" "NEGATIVEX")
     else()
       message(FATAL_ERROR "Invalid curve input")
     endif(CURVE STREQUAL "ED25519")
   elseif(AMCL_CHUNK STREQUAL "16")
     if(CURVE STREQUAL "ED25519")
-        CURVE_HEADERS_SET("256" "25519" "ED25519" "32" "13" "255" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
-    elseif(CURVE STREQUAL "C25519")
-        CURVE_HEADERS_SET("256" "25519" "C25519" "32" "13" "255" "5" "PSEUDO_MERSENNE" "MONTGOMERY" "NOT")
+        CURVE_HEADERS_SET("256" "25519" "ED25519" "32" "13" "255" "5" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "NUMS256E")
-        CURVE_HEADERS_SET("256" "256PME" "NUMS256E" "32" "13" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT")
+        CURVE_HEADERS_SET("256" "256PME" "NUMS256E" "32" "13" "256" "3" "PSEUDO_MERSENNE" "EDWARDS" "NOT" "NA" "NA")
     elseif(CURVE STREQUAL "BN254")
-        CURVE_HEADERS_SET("256" "BN254" "BN254" "32" "13" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+        CURVE_HEADERS_SET("256" "BN254" "BN254" "32" "13" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "D_TYPE" "NEGATIVEX")
     elseif(CURVE STREQUAL "BN254CX")
-        CURVE_HEADERS_SET("256" "BN254CX" "BN254CX" "32" "13" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN")
+        CURVE_HEADERS_SET("256" "BN254CX" "BN254CX" "32" "13" "254" "3" "NOT_SPECIAL" "WEIERSTRASS" "BN" "D_TYPE" "NEGATIVEX")
     else()
       message(FATAL_ERROR "Invalid curve input")
     endif(CURVE STREQUAL "ED25519")
@@ -413,23 +411,23 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "${temph}")
 
 install (DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_WRITE GROUP_READ
-        WORLD_WRITE WORLD_READ WORLD_EXECUTE)
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
 
 install (FILES ${COMMON_HEADERS} DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/arch.h DESTINATION include PERMISSIONS
-        OWNER_WRITE OWNER_READ OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+        OWNER_WRITE OWNER_READ
+        GROUP_READ
+        WORLD_READ)
 
 # if(BUILD_GO)
 #   # Copy header files for testing before installation

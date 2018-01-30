@@ -1,7 +1,7 @@
 /**
  * @file test_mpin_ZZZ.c
  * @author Kealan McCusker
- * @brief Test good token and correct PIN with D-TA. Single pass
+ * @brief Test Designated Verifier Signature (DVS) scheme with incorrect PIN
  *
  * LICENSE
  *
@@ -37,7 +37,7 @@ int main()
 {
     int i,PIN1,PIN2,rtn;
 
-    char id[256+4*MPIN_PFS_ZZZ];
+    char id[256+4*PFS_ZZZ];
     octet ID = {0,sizeof(id),id};
 
     // Message to sign
@@ -45,50 +45,50 @@ int main()
     octet M= {0,sizeof(m),m};
 
     /* Hash of the message */
-    char hm[MPIN_PFS_ZZZ];
+    char hm[PFS_ZZZ];
     octet HM= {0,sizeof(hm), hm};
 
-    char x[MPIN_PGS_ZZZ],y1[MPIN_PGS_ZZZ],y2[MPIN_PGS_ZZZ];
+    char x[PGS_ZZZ],y1[PGS_ZZZ],y2[PGS_ZZZ];
     octet X= {0, sizeof(x),x};
     octet Y1= {0,sizeof(y1),y1};
     octet Y2= {0,sizeof(y2),y2};
 
     /* Master secret shares */
-    char ms1[MPIN_PGS_ZZZ], ms2[MPIN_PGS_ZZZ];
+    char ms1[PGS_ZZZ], ms2[PGS_ZZZ];
     octet MS1= {0,sizeof(ms1),ms1};
     octet MS2= {0,sizeof(ms2),ms2};
 
     /* Hash values of Client ID */
-    char hcid[MPIN_PFS_ZZZ];
+    char hcid[PFS_ZZZ];
     octet HCID= {0,sizeof(hcid), hcid};
 
     /* Client secret and shares */
-    char cs1[2*MPIN_PFS_ZZZ+1], cs2[2*MPIN_PFS_ZZZ+1], sec[2*MPIN_PFS_ZZZ+1];
+    char cs1[2*PFS_ZZZ+1], cs2[2*PFS_ZZZ+1], sec[2*PFS_ZZZ+1];
     octet SEC= {0,sizeof(sec),sec};
     octet CS1= {0,sizeof(cs1), cs1};
     octet CS2= {0,sizeof(cs2), cs2};
 
     /* Client Public Key and z */
-    char z1[MPIN_PGS_ZZZ], z2[MPIN_PGS_ZZZ], pa1[4*MPIN_PFS_ZZZ], pa2[4*MPIN_PFS_ZZZ];
+    char z1[PGS_ZZZ], z2[PGS_ZZZ], pa1[4*PFS_ZZZ], pa2[4*PFS_ZZZ];
     octet Z1= {0,sizeof(z1),z1};
     octet Z2= {0,sizeof(z2),z2};
     octet Pa1= {0,sizeof(pa1),pa1};
     octet Pa2= {0,sizeof(pa2),pa2};
 
     /* Server secret and shares */
-    char ss1[4*MPIN_PFS_ZZZ], ss2[4*MPIN_PFS_ZZZ], serverSecret[4*MPIN_PFS_ZZZ];
+    char ss1[4*PFS_ZZZ], ss2[4*PFS_ZZZ], serverSecret[4*PFS_ZZZ];
     octet ServerSecret= {0,sizeof(serverSecret),serverSecret};
     octet SS1= {0,sizeof(ss1),ss1};
     octet SS2= {0,sizeof(ss2),ss2};
 
     /* Token stored on computer */
-    char token[2*MPIN_PFS_ZZZ+1];
+    char token[2*PFS_ZZZ+1];
     octet TOKEN= {0,sizeof(token),token};
 
-    char u[2*MPIN_PFS_ZZZ+1];
+    char u[2*PFS_ZZZ+1];
     octet U= {0,sizeof(u),u};
 
-    char hid[2*MPIN_PFS_ZZZ+1];
+    char hid[2*PFS_ZZZ+1];
     octet HID= {0,sizeof(hid),hid};
 
     int TimeValue = 0;
