@@ -31,91 +31,6 @@
 #include <time.h>
 #include "wcc_ZZZ.h"
 
-/* Hash number (optional) and octet to octet */
-static void hashit(int sha,int n,octet *x,octet *w)
-{
-    int i,c[4],hlen;
-    hash256 sha256;
-    hash512 sha512;
-    char hh[64];
-
-    switch (sha)
-    {
-    case SHA256:
-        HASH256_init(&sha256);
-        break;
-    case SHA384:
-        HASH384_init(&sha512);
-        break;
-    case SHA512:
-        HASH512_init(&sha512);
-        break;
-    }
-
-    hlen=sha;
-
-    if (n>0)
-    {
-        c[0]=(n>>24)&0xff;
-        c[1]=(n>>16)&0xff;
-        c[2]=(n>>8)&0xff;
-        c[3]=(n)&0xff;
-        for (i=0; i<4; i++)
-        {
-            switch(sha)
-            {
-            case SHA256:
-                HASH256_process(&sha256,c[i]);
-                break;
-            case SHA384:
-                HASH384_process(&sha512,c[i]);
-                break;
-            case SHA512:
-                HASH512_process(&sha512,c[i]);
-                break;
-            }
-        }
-    }
-    if (x!=NULL) for (i=0; i<x->len; i++)
-        {
-            switch(sha)
-            {
-            case SHA256:
-                HASH256_process(&sha256,x->val[i]);
-                break;
-            case SHA384:
-                HASH384_process(&sha512,x->val[i]);
-                break;
-            case SHA512:
-                HASH512_process(&sha512,x->val[i]);
-                break;
-            }
-        }
-
-    for (i=0; i<hlen; i++) hh[i]=0;
-    switch (sha)
-    {
-    case SHA256:
-        HASH256_hash(&sha256,hh);
-        break;
-    case SHA384:
-        HASH384_hash(&sha512,hh);
-        break;
-    case SHA512:
-        HASH512_hash(&sha512,hh);
-        break;
-    }
-
-    OCT_empty(w);
-
-    if (hlen>=MODBYTES_XXX)
-        OCT_jbytes(w,hh,MODBYTES_XXX);
-    else
-    {
-        OCT_jbytes(w,hh,hlen);
-        OCT_jbyte(w,0,MODBYTES_XXX-hlen);
-    }
-}
 
 /* Perform sha256 of EC Points and Id. Map to an integer modulo the curve order.  */
 void WCC_ZZZ_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
@@ -148,7 +63,7 @@ void WCC_ZZZ_Hq(int sha, octet *A,octet *B,octet *C,octet *D,octet *h)
     OCT_joctet(&HV,B);
     OCT_joctet(&HV,C);
     OCT_joctet(&HV,D);
-    hashit(sha,0,&HV,&HT);
+    mhashit(sha,0,&HV,&HT);
 
     BIG_XXX_fromBytes(hs,HT.val);
     BIG_XXX_mod(hs,q);
@@ -171,7 +86,7 @@ int WCC_ZZZ_GET_G1_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG1
     }
     else
     {
-        hashit(sha,0,ID,&H);
+        mhashit(sha,0,ID,&H);
         ECP_ZZZ_mapit(&P,&H);
     }
 
@@ -193,11 +108,11 @@ int WCC_ZZZ_GET_G1_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG1)
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
-    hashit(sha,0,ID,&H1);
+    mhashit(sha,0,ID,&H1);
     ECP_ZZZ_mapit(&P,&H1);
 
     // H1(date|sha256(ID))
-    hashit(sha,date,&H1,&H2);
+    mhashit(sha,date,&H1,&H2);
     ECP_ZZZ_mapit(&Q,&H2);
 
     // P = P + Q
@@ -222,11 +137,11 @@ int WCC_ZZZ_GET_G2_TPMULT(int sha, int date, octet *S,octet *ID,octet *VG2)
     octet H2= {0,sizeof(h2),h2};
 
     // H1(ID)
-    hashit(sha,0,ID,&H1);
+    mhashit(sha,0,ID,&H1);
     ECP2_ZZZ_mapit(&P,&H1);
 
     // H1(date|sha256(ID))
-    hashit(sha,date,&H1,&H2);
+    mhashit(sha,date,&H1,&H2);
     ECP2_ZZZ_mapit(&Q,&H2);
 
     // P = P + Q
@@ -254,7 +169,7 @@ int WCC_ZZZ_GET_G2_MULTIPLE(int sha, int hashDone, octet *S,octet *ID,octet *VG2
     }
     else
     {
-        hashit(sha,0,ID,&H);
+        mhashit(sha,0,ID,&H);
         ECP2_ZZZ_mapit(&P,&H);
     }
 
@@ -273,7 +188,7 @@ int WCC_ZZZ_GET_G2_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG2)
     char h[WCC_PFS_ZZZ];
     octet H= {0,sizeof(h),h};
 
-    hashit(sha,date,HID,&H);
+    mhashit(sha,date,HID,&H);
     ECP2_ZZZ_mapit(&P,&H);
     BIG_XXX_fromBytes(s,S->val);
     PAIR_ZZZ_G2mul(&P,s);
@@ -329,7 +244,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
         return WCC_INVALID_POINT;
     }
 
-    hashit(sha,0,IdBOct,&HV1);
+    mhashit(sha,0,IdBOct,&HV1);
     ECP2_ZZZ_mapit(&BG2,&HV1);
 
     if (!ECP_ZZZ_fromOctet(&sAG1,AKeyG1Oct))
@@ -357,7 +272,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
         }
 
         // H2(date|sha256(IdB))
-        hashit(sha,date,&HV1,&HV2);
+        mhashit(sha,date,&HV1,&HV2);
         ECP2_ZZZ_mapit(&dateBG2,&HV2);
 
         // sAG1 = sAG1 + ATPG1
@@ -407,7 +322,7 @@ int WCC_ZZZ_SENDER_KEY(int sha, int date, octet *xOct, octet *piaOct, octet *pib
     // Set HV.len to correct value
     OCT_joctet(&HV,&xPgG1Oct);
 
-    hashit(sha,0,&HV,&HT);
+    mhashit(sha,0,&HV,&HT);
 
     OCT_empty(AESKeyOct);
     OCT_jbytes(AESKeyOct,HT.val,WCC_PAS);
@@ -449,7 +364,7 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
     if (!ECP_ZZZ_fromOctet(&PgG1,PgG1Oct))
         return WCC_INVALID_POINT;
 
-    hashit(sha,0,IdAOct,&HV1);
+    mhashit(sha,0,IdAOct,&HV1);
     ECP_ZZZ_mapit(&AG1,&HV1);
 
     if (!ECP2_ZZZ_fromOctet(&sBG2,BKeyG2Oct))
@@ -462,7 +377,7 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
             return WCC_INVALID_POINT;
 
         // H1(date|sha256(AID))
-        hashit(sha,date,&HV1,&HV2);
+        mhashit(sha,date,&HV1,&HV2);
         ECP_ZZZ_mapit(&dateAG1,&HV2);
 
         // sBG2 = sBG2 + TPG2
@@ -512,7 +427,7 @@ int WCC_ZZZ_RECEIVER_KEY(int sha, int date, octet *yOct, octet *wOct,  octet *pi
     // Set HV.len to correct value
     OCT_joctet(&HV,&wPaG1Oct);
 
-    hashit(sha,0,&HV,&HT);
+    mhashit(sha,0,&HV,&HT);
 
     OCT_empty(AESKeyOct);
     OCT_jbytes(AESKeyOct,HT.val,WCC_PAS);
@@ -540,7 +455,7 @@ int WCC_ZZZ_GET_G1_PERMIT(int sha, int date,octet *S,octet *HID,octet *TPG1)
     char h[WCC_PFS_ZZZ];
     octet H= {0,sizeof(h),h};
 
-    hashit(sha,date,HID,&H);
+    mhashit(sha,date,HID,&H);
     ECP_ZZZ_mapit(&P,&H);
     BIG_XXX_fromBytes(s,S->val);
     PAIR_ZZZ_G1mul(&P,s);
