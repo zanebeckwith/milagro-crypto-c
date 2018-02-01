@@ -88,15 +88,6 @@ the library.
 
     make
 
-If you are using GO then you must set the GOPATH first. Note that there can
-only be one entry in the GOPATH
-
-    export GOPATH=${HOME}/src
-    make
-
-If you have docker installed then type ```make dbuild``` to build and test
-the library in a docker container.
-
 ##### Multiple curves and RSA security levels
 
 The default build (see config.mk) uses multiple curves and RSA security
@@ -115,7 +106,6 @@ NOTE: The default build is for 64 bit machines
     mkdir -p target/build
     cd target/build
     cmake -D CMAKE_INSTALL_PREFIX=/opt/amcl ../..
-    export GOPATH=${HOME}/src
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
     make
     make test
@@ -213,7 +203,6 @@ To build a particular set of predefined makefile options inside a Docker contain
 ```
 make -f Makefile.docker build TYPE=LINUX_64BIT_NIST256_RSA2048
 ```
-The list of pre-defined options can be listed by typing ```make help```
 
 To execute all the test builds and generate reports in the current environment:
 ```
