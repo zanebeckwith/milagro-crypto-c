@@ -99,10 +99,17 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     set(INSTALL_LIBS ${INSTALL_LIBS} amcl_pairing_${tc})
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+      if(BUILD_SHARED_LIBS)
         add_custom_command(
                     TARGET amcl_pairing_${tc}
                     POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.dll" "${PROJECT_BINARY_DIR}/test/")
+      else()
+        add_custom_command(
+                    TARGET amcl_pairing_${tc}
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_pairing_${tc}.a" "${PROJECT_BINARY_DIR}/test/")
+      endif(BUILD_SHARED_LIBS)
     endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     # Copy built libs to wrappers/python to allow testing without
@@ -146,10 +153,17 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       set(INSTALL_LIBS ${INSTALL_LIBS} amcl_mpin_${tc})
 
       if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        if(BUILD_SHARED_LIBS)
           add_custom_command(
                       TARGET amcl_mpin_${tc}
                       POST_BUILD
                       COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.dll" "${PROJECT_BINARY_DIR}/test/")
+        else()
+          add_custom_command(
+                      TARGET amcl_mpin_${tc}
+                      POST_BUILD
+                      COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_mpin_${tc}.a" "${PROJECT_BINARY_DIR}/test/")
+        endif(BUILD_SHARED_LIBS)
       endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
       # Copy built libs to wrappers/python to allow testing without
@@ -195,10 +209,17 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       set(INSTALL_LIBS ${INSTALL_LIBS} amcl_wcc_${tc})
 
       if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-          add_custom_command(
+        if(BUILD_SHARED_LIBS)
+           add_custom_command(
                       TARGET amcl_wcc_${tc}
                       POST_BUILD
                       COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_wcc_${tc}.dll" "${PROJECT_BINARY_DIR}/test/")
+        else()
+           add_custom_command(
+                      TARGET amcl_wcc_${tc}
+                      POST_BUILD
+                      COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_wcc_${tc}.a" "${PROJECT_BINARY_DIR}/test/")
+        endif(BUILD_SHARED_LIBS)
       endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
       # Copy built libs to wrappers/python to allow testing without
@@ -236,10 +257,17 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
       WORLD_READ WORLD_EXECUTE)
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    if(BUILD_SHARED_LIBS)
       add_custom_command(
                   TARGET amcl_curve_${tc}
                   POST_BUILD
                   COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.dll" "${PROJECT_BINARY_DIR}/test/")
+    else()
+      add_custom_command(
+                  TARGET amcl_curve_${tc}
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.a" "${PROJECT_BINARY_DIR}/test/")
+    endif(BUILD_SHARED_LIBS)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
   # Copy built libs to wrappers/python to allow testing without
@@ -253,10 +281,17 @@ function(CURVE_SRC_SET tb tf tc nb base nbt m8 mt ct pf)
     endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-      add_custom_command(
+      if(BUILD_SHARED_LIBS)
+        add_custom_command(
                   TARGET amcl_curve_${tc}
                   POST_BUILD
                   COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.dll" "${PROJECT_BINARY_DIR}/wrappers/python/")
+      else()
+        add_custom_command(
+                  TARGET amcl_curve_${tc}
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_curve_${tc}.a" "${PROJECT_BINARY_DIR}/wrappers/python/")
+      endif(BUILD_SHARED_LIBS)
     endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -305,11 +340,18 @@ function(RSA_SRC_SET tb tff nb base ml)
         WORLD_READ WORLD_EXECUTE)
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-      message(STATUS "Copy libs to test for testing")
+    message(STATUS "Copy libs to test for testing")
+    if(BUILD_SHARED_LIBS)
       add_custom_command(
                   TARGET amcl_rsa_${tff}
                   POST_BUILD
                   COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.dll" "${PROJECT_BINARY_DIR}/test/")
+    else()
+      add_custom_command(
+                  TARGET amcl_rsa_${tff}
+                  POST_BUILD
+                  COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.a" "${PROJECT_BINARY_DIR}/test/")
+    endif(BUILD_SHARED_LIBS)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
   # Copy built libs to wrappers/python to allow testing without
@@ -323,7 +365,7 @@ function(RSA_SRC_SET tb tff nb base ml)
     endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-      add_custom_command(
+       add_custom_command(
                   TARGET amcl_rsa_${tff}
                   POST_BUILD
                   COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_rsa_${tff}.dll" "${PROJECT_BINARY_DIR}/wrappers/python/")
@@ -560,10 +602,17 @@ install(DIRECTORY DESTINATION lib DIRECTORY_PERMISSIONS
         WORLD_READ WORLD_EXECUTE)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  if(BUILD_SHARED_LIBS)
     add_custom_command(
                 TARGET amcl_core
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.dll" "${PROJECT_BINARY_DIR}/test/")
+  else()
+    add_custom_command(
+                TARGET amcl_core
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_BINARY_DIR}/lib/libamcl_core.a" "${PROJECT_BINARY_DIR}/test/")
+  endif(BUILD_SHARED_LIBS)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Copy built libs to wrappers/python to allow testing without
