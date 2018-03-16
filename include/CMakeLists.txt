@@ -260,8 +260,8 @@ file(READ "amcl.h" temph)
 string(CONFIGURE "${temph}" temph)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/amcl.h" "${temph}")
 
-string(REGEX REPLACE "," ";" AMCL_CURVE ${AMCL_CURVE})
-string(REGEX REPLACE "," ";" AMCL_RSA ${AMCL_RSA})
+string(REGEX REPLACE "," ";" AMCL_CURVE "${AMCL_CURVE}")
+string(REGEX REPLACE "," ";" AMCL_RSA "${AMCL_RSA}")
 
 foreach(CURVE ${AMCL_CURVE})
   if(AMCL_CHUNK STREQUAL "64")
