@@ -35,8 +35,8 @@ function(RSA_BENCHMARK_SET tb tff nb base ml)
     target_link_libraries (benchtest_rsa_${tff} amcl_rsa_${tff})
 endfunction(RSA_BENCHMARK_SET tb tff nb base ml)
 
-string(REGEX REPLACE "," ";" AMCL_CURVE ${AMCL_CURVE})
-string(REGEX REPLACE "," ";" AMCL_RSA ${AMCL_RSA})
+string(REGEX REPLACE "," ";" AMCL_CURVE "${AMCL_CURVE}")
+string(REGEX REPLACE "," ";" AMCL_RSA "${AMCL_RSA}")
 
 foreach(CURVE ${AMCL_CURVE})
   if(AMCL_CHUNK STREQUAL "64")

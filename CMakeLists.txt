@@ -26,6 +26,10 @@ option (DEBUG_REDUCE "Print debug message for field reduction" OFF)
 option (DEBUG_NORM "Detect digit overflow" OFF)
 option (GET_STATS "Debug statistics" OFF)
 
+# Control prefix
+set (AMCL_HEADER_INSTALL_SUBDIR "" CACHE STRING "The subdir of \"include/\" to install headers in")
+message(STATUS "AMCL_HEADER_INSTALL_SUBDIR='${AMCL_HEADER_INSTALL_SUBDIR}'")
+
 # Allow the developer to select if Dynamic or Static libraries are built
 # Set the default LIB_TYPE variable to STATIC
 SET (LIB_TYPE STATIC)

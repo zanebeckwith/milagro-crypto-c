@@ -1,5 +1,7 @@
 # AMCL header files
 
+set(AMCL_HEADER_INSTALL_DEST "include/${AMCL_HEADER_INSTALL_SUBDIR}")
+
 # Copy curve dependant header files
 function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf stw sx)
   set(bd "${tb}_${base}")
@@ -156,7 +158,8 @@ function(CURVE_HEADERS_SET tb tf tc nb base nbt m8 mt ct pf stw sx)
 
   endif(NOT(${pf} STREQUAL "NOT"))
 
-  install (FILES ${CURVE_HEADERS} DESTINATION include PERMISSIONS
+  install (FILES ${CURVE_HEADERS}
+        DESTINATION "${AMCL_HEADER_INSTALL_DEST}" PERMISSIONS
         OWNER_WRITE OWNER_READ
         GROUP_READ
         WORLD_READ)
@@ -225,7 +228,8 @@ function(RSA_HEADERS_SET tb tff nb base ml)
 			${CMAKE_CURRENT_BINARY_DIR}/x509.h)
   endif(BUILD_X509)
 
-  install (FILES ${RSA_HEADERS} DESTINATION include PERMISSIONS
+  install (FILES ${RSA_HEADERS}
+        DESTINATION "${AMCL_HEADER_INSTALL_DEST}" PERMISSIONS
         OWNER_WRITE OWNER_READ
         GROUP_READ
         WORLD_READ)
@@ -256,8 +260,8 @@ file(READ "amcl.h" temph)
 string(CONFIGURE "${temph}" temph)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/amcl.h" "${temph}")
 
-string(REGEX REPLACE "," ";" AMCL_CURVE ${AMCL_CURVE})
-string(REGEX REPLACE "," ";" AMCL_RSA ${AMCL_RSA})
+string(REGEX REPLACE "," ";" AMCL_CURVE "${AMCL_CURVE}")
+string(REGEX REPLACE "," ";" AMCL_RSA "${AMCL_RSA}")
 
 foreach(CURVE ${AMCL_CURVE})
   if(AMCL_CHUNK STREQUAL "64")
@@ -409,22 +413,26 @@ string(REGEX REPLACE "@SC@" "" temph "${temph}")
 string(REGEX REPLACE "@RSL@" "" temph "${temph}")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "${temph}")
 
-install (DIRECTORY DESTINATION include DIRECTORY_PERMISSIONS
+install (DIRECTORY
+        DESTINATION "${AMCL_HEADER_INSTALL_DEST}" DIRECTORY_PERMISSIONS
         OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
 
-install (FILES ${COMMON_HEADERS} DESTINATION include PERMISSIONS
+install (FILES ${COMMON_HEADERS}
+        DESTINATION "${AMCL_HEADER_INSTALL_DEST}" PERMISSIONS
         OWNER_WRITE OWNER_READ
         GROUP_READ
         WORLD_READ)
 
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h DESTINATION include PERMISSIONS
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/amcl.h
+        DESTINATION "${AMCL_HEADER_INSTALL_DEST}" PERMISSIONS
         OWNER_WRITE OWNER_READ
         GROUP_READ
         WORLD_READ)
 
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/arch.h DESTINATION include PERMISSIONS
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/arch.h
+        DESTINATION "${AMCL_HEADER_INSTALL_DEST}" PERMISSIONS
         OWNER_WRITE OWNER_READ
         GROUP_READ
         WORLD_READ)
