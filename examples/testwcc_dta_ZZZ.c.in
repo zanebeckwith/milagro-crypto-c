@@ -121,7 +121,7 @@ int main()
     octet P= {0,sizeof(p),p};
 
     int date;
-    date = WCC_today();
+    date = today();
     printf("Date %d \n", date);
 
     int hashDoneOn = 1;
@@ -176,10 +176,10 @@ int main()
     printf("TA A2KeyG1: ");
     OCT_output(&A2KeyG1);
 
-    rtn = WCC_RECOMBINE_G1(&A1KeyG1, &A2KeyG1, &AKeyG1);
+    rtn = WCC_ZZZ_RECOMBINE_G1(&A1KeyG1, &A2KeyG1, &AKeyG1);
     if (rtn != 0)
     {
-        printf("TA WCC_RECOMBINE_G1(&A1KeyG1, &A2KeyG1, &AKeyG1) Error %d\n", rtn);
+        printf("TA WCC_ZZZ_RECOMBINE_G1(&A1KeyG1, &A2KeyG1, &AKeyG1) Error %d\n", rtn);
         return 1;
     }
     printf("TA Alice's sender key: ");
@@ -203,10 +203,10 @@ int main()
     printf("TA A2TPG1: ");
     OCT_output(&A2TPG1);
 
-    rtn = WCC_RECOMBINE_G1(&A1TPG1, &A2TPG1, &ATPG1);
+    rtn = WCC_ZZZ_RECOMBINE_G1(&A1TPG1, &A2TPG1, &ATPG1);
     if (rtn != 0)
     {
-        printf("Alice WCC_RECOMBINE_G1(&A1TPG1, &A2TPG1, &ATPG1) Error %d\n", rtn);
+        printf("Alice WCC_ZZZ_RECOMBINE_G1(&A1TPG1, &A2TPG1, &ATPG1) Error %d\n", rtn);
         return 1;
     }
     printf("TA Alice's sender time permit: ");
@@ -234,10 +234,10 @@ int main()
     printf("TA B2KeyG2: ");
     OCT_output(&B2KeyG2);
 
-    rtn = WCC_RECOMBINE_G2(&B1KeyG2, &B2KeyG2, &BKeyG2);
+    rtn = WCC_ZZZ_RECOMBINE_G2(&B1KeyG2, &B2KeyG2, &BKeyG2);
     if (rtn != 0)
     {
-        printf("Bob WCC_RECOMBINE_G2(&B1KeyG1, &B2KeyG1, &BKeyG2) Error %d\n", rtn);
+        printf("Bob WCC_ZZZ_RECOMBINE_G2(&B1KeyG1, &B2KeyG1, &BKeyG2) Error %d\n", rtn);
         return 1;
     }
     printf("TA Bob's receiver key: ");
@@ -261,10 +261,10 @@ int main()
     printf("TA B2TPG2: ");
     OCT_output(&B2TPG2);
 
-    rtn = WCC_RECOMBINE_G2(&B1TPG2, &B2TPG2, &BTPG2);
+    rtn = WCC_ZZZ_RECOMBINE_G2(&B1TPG2, &B2TPG2, &BTPG2);
     if (rtn != 0)
     {
-        printf("Bob WCC_RECOMBINE_G2(&B1TPG2, &B2TPG2, &BTPG2) Error %d\n", rtn);
+        printf("Bob WCC_ZZZ_RECOMBINE_G2(&B1TPG2, &B2TPG2, &BTPG2) Error %d\n", rtn);
         return 1;
     }
     printf("TA Bob's receiver time permit: ");

@@ -111,7 +111,7 @@ int main()
     octet P= {0,sizeof(p),p};
 
     int date;
-    date = WCC_today();
+    date = today();
     printf("Date %d \n", date);
 
     int hashDoneOn = 1;
