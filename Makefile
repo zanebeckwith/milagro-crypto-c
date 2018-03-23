@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 
 # List special make targets that are not associated with files
-.PHONY: help all default format clean qa z build build_qa_item build_item buildx buildall pubdocs print-%
+.PHONY: help all default format clean qa z build build_qa_item build_item buildx buildall pubdocs doc print-%
 
 # Use bash as shell (Note: Ubuntu now uses dash which doesn't support PIPESTATUS).
 SHELL=/bin/bash
@@ -146,14 +146,14 @@ help:
 	@echo "The following commands are available:"
 	@echo ""
 	@echo "    make         :  Build library based on options in config.mk"
-	@echo "    make dbuild  :  Build library using docker based on options in config.mk"
 	@echo "    make format  :  Format the source code"
 	@echo "    make clean   :  Remove any build artifact"
+	@echo "    make doc     :  Build documentation"
+	@echo "    make pubdocs :  Publish documentation to GitHub"
 	@echo ""
 	@echo "    Testing:"
 	@echo ""
 	@echo "    make qa      :  Build all versions in this makefile and generate reports"
-	@echo "    MAKETARGET=buildall make dbuild:  Build all versions in this makefile using docker and generate reports"
 	@echo ""
 	@echo "    You can also build individual types, groups or sub-groups:"
 	@echo ""
@@ -305,21 +305,46 @@ else
 	cmake $(subst $(dcomma),$(space),${BUILD_PARAMS}) ../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
 	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
-	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0 && \
 	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0
 endif
 
 # Alias for building all inside the Docker container
-buildall: default qa
+buildall: default qa doc
+
+# Build documentation
+doc:
+	@echo -e "\n\n*** BUILD documentation ***\n"
+	rm -rf target/documentation/*
+	mkdir -p target/documentation
+	cd target/documentation && \
+	cmake -DCMAKE_C_FLAGS=$(CMAKE_C_FLAGS) \
+	-DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \
+	-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) \
+	-DCMAKE_INSTALL_PREFIX=$(CMAKE_INSTALL_PATH) \
+	-DBUILD_SHARED_LIBS=$(AMCL_BUILD_SHARED_LIBS) \
+	-DBUILD_PYTHON=$(AMCL_BUILD_PYTHON) \
+	-DAMCL_CHUNK=$(AMCL_CHUNK) \
+	-DAMCL_CURVE=$(AMCL_CURVE) \
+	-DAMCL_RSA=$(AMCL_RSA) \
+	-DBUILD_MPIN=$(AMCL_BUILD_MPIN) \
+	-DBUILD_WCC=$(AMCL_BUILD_WCC) \
+	-DBUILD_DOXYGEN=$(AMCL_BUILD_DOXYGEN) \
+	-DAMCL_MAXPIN=$(AMCL_MAXPIN) \
+	-DAMCL_PBLEN=$(AMCL_PBLEN) \
+	-DDEBUG_REDUCE=$(DEBUG_REDUCE) \
+	-DDEBUG_NORM=$(DEBUG_NORM) \
+	../.. | tee cmake.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	make | tee make.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./ && \
+	env CTEST_OUTPUT_ON_FAILURE=1 make test | tee test.log ; test $${PIPESTATUS[0]} -eq 0 && \
+	make doc | tee doc.log ; test $${PIPESTATUS[0]} -eq 0
 
 # Publish Documentation in GitHub (requires writing permissions)
-# Use this only after generating library with AMCL_BUILD_DOXYGEN
-# turned on for the default build i.e. when you type "make"
-pubdocs:
+pubdocs: doc
 	rm -rf ./target/DOCS
 	rm -rf ./target/WIKI
 	mkdir -p ./target/DOCS/doc
-	cp -r ./target/default/doc/html/* ./target/DOCS/doc
+	cp -r ./target/documentation/doc/html/* ./target/DOCS/doc
 	cp ./doc/Home.md ./target/DOCS/
 	git clone https://github.com/milagro-crypto/milagro-crypto-c.wiki.git ./target/WIKI
 	mv -f ./target/WIKI/.git ./target/DOCS/
