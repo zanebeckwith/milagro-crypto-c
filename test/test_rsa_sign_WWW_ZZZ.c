@@ -47,7 +47,7 @@ typedef enum { false, true } bool;
 #define H512 4
 
 #define LINE_LEN 10000
-#define DEBUG
+//#define DEBUG
 
 #define MAXMODBYTES 66
 #define MAXFFLEN 16
