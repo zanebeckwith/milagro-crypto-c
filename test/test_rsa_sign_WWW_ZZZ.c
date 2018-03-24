@@ -47,7 +47,7 @@ typedef enum { false, true } bool;
 #define H512 4
 
 #define LINE_LEN 10000
-#define DEBUG
+//#define DEBUG
 
 #define MAXMODBYTES 66
 #define MAXFFLEN 16
@@ -75,16 +75,6 @@ octet H= {0,sizeof(h),h};
 
 char hh[5000];
 octet HH= {0,sizeof(hh),hh};
-
-
-void print_out(char *des,octet *c,int index,int len)
-{
-    int i;
-    printf("%s [",des);
-    for (i=0; i<len; i++)
-        printf("%c",c->val[index+i]);
-    printf("]\n");
-}
 
 int main(int argc, char** argv)
 {
