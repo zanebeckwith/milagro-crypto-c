@@ -18,21 +18,21 @@
 */
 
 /**
- * @file config_ff.h
+ * @file config_big_XXX.h
  * @author Mike Scott
- * @brief COnfig FF Header File
+ * @brief Config BIG  Header File
  *
  */
 
-#ifndef CONFIG_RSA_WWW_H
-#define CONFIG_RSA_WWW_H
+#ifndef CONFIG_BIG_XXX_H
+#define CONFIG_BIG_XXX_H
 
-#include "amcl.h"
-#include "config_big_XXX.h"
+#include"amcl.h"
 
-// FF stuff
+// BIG stuff
 
-#define FFLEN_WWW @ML@ /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
+#define MODBYTES_XXX @NB@  	/**< Number of bytes in Modulus */
+#define BASEBITS_XXX @BASE@ 	/**< Numbers represented to base 2*BASEBITS */
 
 
 #endif
